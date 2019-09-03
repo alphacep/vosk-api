@@ -1,0 +1,63 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.0'
+    }
+}
+
+allprojects {
+  repositories {
+      google()
+      jcenter()
+  }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 5
+        versionName "5.2"
+        setProperty("archivesBaseName", "kaldi-android-$versionName")
+	externalNativeBuild {
+	    cmake {
+	    }
+	}
+        ndk {
+	    abiFilters 'armeabi-v7a'
+	}
+    }
+    sourceSets {
+         main {
+              java.srcDirs = ['src/main/java', 'build/generated-src']
+         }
+    }
+    externalNativeBuild {
+	cmake {
+    	    path "CMakeLists.txt"
+	}
+    }
+}
+
+task mkdir {
+    doLast {
+        new File('build/generated-src/java').mkdirs()
+	new File('build/generated-src/cpp').mkdirs()
+    }
+}
+
+task swig(type: Exec) {
+    commandLine 'swig',
+        "-c++",
+        "-java", "-package", "org.kaldi",
+        "-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/kaldi_recognizer_wrap.cc",
+        "src/main/cpp/kaldi_recognizer.i"
+}
+
+preBuild.dependsOn mkdir, swig
