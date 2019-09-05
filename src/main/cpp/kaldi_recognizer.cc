@@ -8,9 +8,8 @@ using namespace kaldi::nnet3;
 
 KaldiRecognizer::KaldiRecognizer(Model &model) : model_(model) {
 
-    feature_info_ = new kaldi::OnlineNnet2FeaturePipelineInfo(model_.feature_config_);
-    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (*feature_info_);
-    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, feature_info_->silence_weighting_config, 3);
+    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
     decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
             *model_.trans_model_,
@@ -24,7 +23,6 @@ KaldiRecognizer::KaldiRecognizer(Model &model) : model_(model) {
 
 KaldiRecognizer::~KaldiRecognizer() {
     delete feature_pipeline_;
-    delete feature_info_;
     delete silence_weighting_;
 
     delete decoder_;
@@ -33,7 +31,7 @@ KaldiRecognizer::~KaldiRecognizer() {
 void KaldiRecognizer::CleanUp()
 {
     delete silence_weighting_;
-    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, feature_info_->silence_weighting_config, 3);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
     frame_offset += decoder_->NumFramesDecoded();
     decoder_->InitDecoding(frame_offset);
@@ -65,7 +63,7 @@ bool KaldiRecognizer::AcceptWaveform(const char *data, int len)
     for (int i = 0; i < len / 2; i++)
         wave(i) = *(((short *)data) + i);
 
-    feature_pipeline_->AcceptWaveform(8000, wave);
+    feature_pipeline_->AcceptWaveform(16000, wave);
     UpdateSilenceWeights();
     decoder_->AdvanceDecoding();
 

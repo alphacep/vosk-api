@@ -30,7 +30,6 @@ class KaldiRecognizer {
         Model &model_;
         SingleUtteranceNnet3Decoder *decoder_;
 
-        OnlineNnet2FeaturePipelineInfo *feature_info_;
         OnlineNnet2FeaturePipeline *feature_pipeline_;
         OnlineSilenceWeighting *silence_weighting_;
 

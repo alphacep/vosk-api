@@ -39,7 +39,7 @@ class KaldiRecognizer;
 class Model {
 
 public:
-    Model();
+    Model(const char *model_path);
     ~Model();
 
 protected:
@@ -53,7 +53,7 @@ protected:
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
     kaldi::nnet3::NnetSimpleLoopedComputationOptions decodable_opts_;
 
-    kaldi::OnlineNnet2FeaturePipelineConfig feature_config_;
+    kaldi::OnlineNnet2FeaturePipelineInfo feature_info_;
     kaldi::BaseFloat sample_frequency;
 
     kaldi::nnet3::DecodableNnetSimpleLoopedInfo *decodable_info_;

@@ -75,8 +75,8 @@ public class SpeechRecognizer {
      * 
      * @throws IOException thrown if audio recorder can not be created for some reason.
      */
-    public SpeechRecognizer() throws IOException {
-        model = new Model();
+    public SpeechRecognizer(String modelPath) throws IOException {
+        model = new Model(modelPath);
         recognizer = new KaldiRecognizer(model);
         sampleRate = 16000;
         bufferSize = Math.round(sampleRate * BUFFER_SIZE_SECONDS);
