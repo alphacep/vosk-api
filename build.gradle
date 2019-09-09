@@ -48,7 +48,8 @@ android {
 task mkdir {
     doLast {
         new File('build/generated-src/java').mkdirs()
-	new File('build/generated-src/cpp').mkdirs()
+        new File('build/generated-src/cpp').mkdirs()
+        new File('build/kaldi').mkdirs()
     }
 }
 
@@ -60,4 +61,8 @@ task swig(type: Exec) {
         "src/main/cpp/kaldi_recognizer.i"
 }
 
-preBuild.dependsOn mkdir, swig
+task kaldi(type: Exec) {
+    commandLine './build-kaldi.sh'
+}
+
+preBuild.dependsOn mkdir, kaldi, swig

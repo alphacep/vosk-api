@@ -2,7 +2,8 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-set(KALDI_ROOT /home/shmyrev/android/kaldi)
+set(KALDI_ROOT /home/shmyrev/android/kaldi-android/build/kaldi/kaldi)
+set(LIB_ROOT /home/shmyrev/android/kaldi-android/build/kaldi/local)
 
 set(API_SOURCES
 src/main/cpp/kaldi_recognizer.cc
@@ -16,7 +17,7 @@ add_library( kaldi_jni SHARED
              ${API_SOURCES}
 )
 
-include_directories("src/main/cpp" "../kaldi/src" "../kaldi/tools/openfst/include")
+include_directories("src/main/cpp" "build/kaldi/kaldi/src" "build/kaldi/local/include")
 
 target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/online2/kaldi-online2.a
@@ -34,11 +35,11 @@ target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/fstext/kaldi-fstext.a
              ${KALDI_ROOT}/src/util/kaldi-util.a
              ${KALDI_ROOT}/src/base/kaldi-base.a
-             ${KALDI_ROOT}/tools/openfst/lib/libfst.a
-             /home/shmyrev/android/kaldi-android/lib/libopenblas_armv6-r0.3.8.dev.a
-             /home/shmyrev/android/kaldi-android/lib/libclapack.a
-             /home/shmyrev/android/kaldi-android/lib/liblapack.a
-             /home/shmyrev/android/kaldi-android/lib/libblas.a
-             /home/shmyrev/android/kaldi-android/lib/libf2c.a
+             ${LIB_ROOT}/lib/libfst.a
+             ${LIB_ROOT}/lib/libopenblas_armv6-r0.3.8.dev.a
+             ${LIB_ROOT}/lib/libclapack.a
+             ${LIB_ROOT}/lib/liblapack.a
+             ${LIB_ROOT}/lib/libblas.a
+             ${LIB_ROOT}/lib/libf2c.a
              log
              )
