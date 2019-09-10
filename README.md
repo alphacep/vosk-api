@@ -7,7 +7,7 @@ This is still work in progress, more to come
 
    * Build proper optimized large vocabulary model (maybe 20k words from teldium, 4-5 layers, small enough to run on mobile)
 
-   * Move to grammar decoder to avoid huge HCLG model
+   * Move to grammar decoder to avoid huge HCLG model. https://github.com/jpuigcerver/kaldi-decoders
 
    * Load model from the AAR (mmap them in tflite style)
 

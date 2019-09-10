@@ -13,9 +13,9 @@ Model::Model(const char *model_path) {
     const char *usage = "Read the docs";
     const char *extra_args[] = {
         "--min-active=200",
-        "--max-active=8000",
-        "--beam=13.0",
-        "--lattice-beam=6.0",
+        "--max-active=3000",
+        "--beam=8.0",
+        "--lattice-beam=2.0",
         "--acoustic-scale=1.0",
 
         "--frame-subsampling-factor=3",

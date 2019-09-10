@@ -36,7 +36,7 @@ target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/util/kaldi-util.a
              ${KALDI_ROOT}/src/base/kaldi-base.a
              ${LIB_ROOT}/lib/libfst.a
-             ${LIB_ROOT}/lib/libopenblas_armv6-r0.3.8.dev.a
+             ${LIB_ROOT}/lib/libopenblas_armv7-r0.3.8.dev.a
              ${LIB_ROOT}/lib/libclapack.a
              ${LIB_ROOT}/lib/liblapack.a
              ${LIB_ROOT}/lib/libblas.a

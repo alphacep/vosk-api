@@ -55,7 +55,6 @@ public class SpeechRecognizer {
 
     protected static final String TAG = SpeechRecognizer.class.getSimpleName();
 
-    private final Model model;
     private final KaldiRecognizer recognizer;
 
     private final int sampleRate;        
@@ -75,8 +74,7 @@ public class SpeechRecognizer {
      * 
      * @throws IOException thrown if audio recorder can not be created for some reason.
      */
-    public SpeechRecognizer(String modelPath) throws IOException {
-        model = new Model(modelPath);
+    public SpeechRecognizer(Model model) throws IOException {
         recognizer = new KaldiRecognizer(model);
         sampleRate = 16000;
         bufferSize = Math.round(sampleRate * BUFFER_SIZE_SECONDS);

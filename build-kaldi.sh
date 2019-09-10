@@ -12,7 +12,7 @@ OPENFST_VERSION=1.6.7
 mkdir -p $WORKDIR
 cd $WORKDIR
 git clone https://github.com/xianyi/OpenBLAS
-make -C OpenBLAS TARGET=ARMV6 ONLY_CBLAS=1 AR=arm-linux-androideabi-ar CC="armv7a-linux-androideabi21-clang" HOSTCC=gcc ARM_SOFTFP_ABI=1 USE_THREAD=0 NUM_THREADS=1 -j4
+make -C OpenBLAS TARGET=ARMV7 ONLY_CBLAS=1 AR=arm-linux-androideabi-ar CC="armv7a-linux-androideabi21-clang" HOSTCC=gcc ARM_SOFTFP_ABI=1 USE_THREAD=0 NUM_THREADS=1 -j4
 make -C OpenBLAS install PREFIX=$WORKDIR/local
 
 # CLAPACK since gfortran is missing
