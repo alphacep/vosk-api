@@ -230,9 +230,9 @@ public class SpeechRecognizer {
                     && ((timeoutSamples == NO_TIMEOUT) || (remainingSamples > 0))) {
                 int nread = recorder.read(buffer, 0, buffer.length);
 
-                if (-1 == nread) {
+                if (nread < 0) {
                     throw new RuntimeException("error reading audio buffer");
-                } else if (nread > 0) {
+                } else {
                     boolean isFinal = recognizer.AcceptWaveform(buffer, nread);
                     if (isFinal) {
                         mainHandler.post(new ResultEvent(recognizer.Result(), true));

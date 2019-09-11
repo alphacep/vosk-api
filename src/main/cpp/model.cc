@@ -1,14 +1,18 @@
 #include "model.h"
 
+#ifdef __ANDROID__
 #include <android/log.h>
 static void AndroidLogHandler(const LogMessageEnvelope &env, const char *message)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, "KaldiDemo", message, 1);
 }
+#endif
 
 Model::Model(const char *model_path) {
 
+#ifdef __ANDROID__
     SetLogHandler(AndroidLogHandler);
+#endif
 
     const char *usage = "Read the docs";
     const char *extra_args[] = {
