@@ -12,6 +12,8 @@ src/main/cpp/model.cc
 src/main/cpp/model.h
 )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
+
 add_library( kaldi_jni SHARED
              build/generated-src/cpp/kaldi_recognizer_wrap.cc
              ${API_SOURCES}

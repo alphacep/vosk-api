@@ -6,15 +6,33 @@
 using namespace fst;
 using namespace kaldi::nnet3;
 
+template<class Arc>
+ComposeFst<Arc> *TableComposeFst(
+    const Fst<Arc> &ifst1, const Fst<Arc> &ifst2) {
+  typedef LookAheadMatcher< StdFst > M;
+  typedef SequenceComposeFilter<M> SF;
+  typedef LookAheadComposeFilter<SF, M>  LF;
+  typedef PushWeightsComposeFilter<LF, M> WF;
+  typedef PushLabelsComposeFilter<WF, M> ComposeFilter;
+  typedef M FstMatcher;
+
+  fst::CacheOptions cache_opts(true, 1 << 25LL);
+  ComposeFstOptions<StdArc, FstMatcher, ComposeFilter> opts(cache_opts);
+
+  return new ComposeFst<Arc>(ifst1, ifst2, opts);
+}
+
 KaldiRecognizer::KaldiRecognizer(Model &model) : model_(model) {
 
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
+    decode_fst_ = TableComposeFst(*model_.hcl_fst_, *model_.g_fst_);
+
     decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
             *model_.trans_model_,
             *model_.decodable_info_,
-            *model_.decode_fst_,
+            *decode_fst_,
             feature_pipeline_);
 
     frame_offset = 0;
@@ -24,7 +42,7 @@ KaldiRecognizer::KaldiRecognizer(Model &model) : model_(model) {
 KaldiRecognizer::~KaldiRecognizer() {
     delete feature_pipeline_;
     delete silence_weighting_;
-
+    delete decode_fst_;
     delete decoder_;
 }
 

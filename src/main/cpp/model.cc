@@ -1,5 +1,23 @@
 #include "model.h"
 
+#include <fst/fst.h>
+#include <fst/matcher-fst.h>
+
+namespace fst {
+
+static FstRegisterer<StdOLabelLookAheadFst>
+    OLabelLookAheadFst_StdArc_registerer;
+
+static FstRegisterer<MatcherFst<
+    ConstFst<LogArc>,
+    LabelLookAheadMatcher<SortedMatcher<ConstFst<LogArc>>,
+                          olabel_lookahead_flags, FastLogAccumulator<LogArc>>,
+    olabel_lookahead_fst_type, LabelLookAheadRelabeler<LogArc>>>
+    OLabelLookAheadFst_LogArc_registerer;
+
+}  // namespace fst
+
+
 #ifdef __ANDROID__
 #include <android/log.h>
 static void AndroidLogHandler(const LogMessageEnvelope &env, const char *message)
@@ -18,7 +36,7 @@ Model::Model(const char *model_path) {
     const char *extra_args[] = {
         "--min-active=200",
         "--max-active=3000",
-        "--beam=8.0",
+        "--beam=11.0",
         "--lattice-beam=2.0",
         "--acoustic-scale=1.0",
 
@@ -67,7 +85,8 @@ Model::Model(const char *model_path) {
 
     nnet3_rxfilename_ = model_path_str + "/final.mdl";
     word_syms_rxfilename_ = model_path_str + "/words.txt";
-    fst_rxfilename_ = model_path_str + "/HCLG.fst";
+    hcl_fst_rxfilename_ = model_path_str + "/HCLr.fst";
+    g_fst_rxfilename_ = model_path_str + "/Gr.fst";
 
     trans_model_ = new kaldi::TransitionModel();
     nnet_ = new kaldi::nnet3::AmNnetSimple();
@@ -83,7 +102,8 @@ Model::Model(const char *model_path) {
 
     decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
                                                                nnet_);
-    decode_fst_ = fst::ReadFstKaldiGeneric(fst_rxfilename_);
+    g_fst_ = fst::ReadFstKaldiGeneric(g_fst_rxfilename_);
+    hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename_);
 
     word_syms_ = NULL;
     if (word_syms_rxfilename_ != "")
@@ -97,9 +117,10 @@ Model::Model(const char *model_path) {
 
 Model::~Model() {
     delete decodable_info_;
-    delete decode_fst_;
     delete trans_model_;
     delete nnet_;
     delete word_syms_;
     delete winfo_;
+    delete hcl_fst_;
+    delete g_fst_;
 }

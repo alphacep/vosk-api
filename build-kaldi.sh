@@ -36,18 +36,18 @@ wget -c -T 10 -t 3 http://www.openslr.org/resources/2/openfst-${OPENFST_VERSION}
 
 tar -zxvf openfst-${OPENFST_VERSION}.tar.gz
 cd openfst-${OPENFST_VERSION}
-CXX=armv7a-linux-androideabi21-clang++ ./configure --prefix=${WORKDIR}/local --enable-shared --enable-static --with-pic --enable-far --enable-ngram-fsts --host=arm-linux-androideabi
+CXX=armv7a-linux-androideabi21-clang++ CXXFLAGS="-O3 -DFST_NO_DYNAMIC_LINKING" ./configure --prefix=${WORKDIR}/local --enable-shared --enable-static --with-pic --enable-lookahead-fsts --host=arm-linux-androideabi
 make -j 8
 make install
 
 # Kaldi itself
 cd $WORKDIR
-git clone https://github.com/cmusphinx/kaldi
+git clone https://github.com/alphacep/kaldi
 cd $WORKDIR/kaldi
 git checkout android-mix
 cd $WORKDIR/kaldi/src
 
-CXX=armv7a-linux-androideabi21-clang++ ./configure --use-cuda=no \
+CXX=armv7a-linux-androideabi21-clang++ CXXFLAGS="-O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS --shared \
     --android-incdir=${ANDROID_TOOLCHAIN_PATH}/sysroot/usr/include \
     --host=arm-linux-androideabi --openblas-root=${WORKDIR}/local \
