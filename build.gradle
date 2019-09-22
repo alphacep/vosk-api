@@ -27,6 +27,7 @@ android {
         setProperty("archivesBaseName", "kaldi-android-$versionName")
 	externalNativeBuild {
 	    cmake {
+                arguments "-DCMAKE_VERBOSE_MAKEFILE=ON", "-DANDROID_ARM_NEON=TRUE", "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
 	    }
 	}
         ndk {
@@ -39,9 +40,9 @@ android {
          }
     }
     externalNativeBuild {
-	cmake {
-    	    path "CMakeLists.txt"
-	}
+       cmake {
+           path "CMakeLists.txt"
+       }
     }
 }
 

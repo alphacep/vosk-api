@@ -12,7 +12,7 @@ src/main/cpp/model.cc
 src/main/cpp/model.h
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mfpu=neon -ftree-vectorize -DFST_NO_DYNAMIC_LINKING")
 
 add_library( kaldi_jni SHARED
              build/generated-src/cpp/kaldi_recognizer_wrap.cc
@@ -38,6 +38,7 @@ target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/util/kaldi-util.a
              ${KALDI_ROOT}/src/base/kaldi-base.a
              ${LIB_ROOT}/lib/libfst.a
+             ${LIB_ROOT}/lib/libfstngram.a
              ${LIB_ROOT}/lib/libopenblas_armv7-r0.3.8.dev.a
              ${LIB_ROOT}/lib/libclapack.a
              ${LIB_ROOT}/lib/liblapack.a
