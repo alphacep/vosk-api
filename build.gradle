@@ -31,7 +31,7 @@ android {
 	    }
 	}
         ndk {
-	    abiFilters 'armeabi-v7a'
+	    abiFilters 'armeabi-v7a', 'arm64-v8a'
 	}
     }
     sourceSets {
@@ -50,7 +50,6 @@ task mkdir {
     doLast {
         new File('build/generated-src/java').mkdirs()
         new File('build/generated-src/cpp').mkdirs()
-        new File('build/kaldi').mkdirs()
     }
 }
 
