@@ -3,16 +3,18 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 if ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
-set(KALDI_ROOT /home/shmyrev/android/kaldi-android/build/kaldi32/kaldi)
-set(LIB_ROOT /home/shmyrev/android/kaldi-android/build/kaldi32/local)
 set(OPENBLAS_ARCH "armv7")
-set(KALDI_SUFFIX "32")
-else ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
-set(KALDI_ROOT /home/shmyrev/android/kaldi-android/build/kaldi64/kaldi)
-set(LIB_ROOT /home/shmyrev/android/kaldi-android/build/kaldi64/local)
+set(KALDI_SUFFIX "arm_32")
+elseif ("x${ANDROID_ABI}" STREQUAL "xarm64-v8a")
 set(OPENBLAS_ARCH "armv8")
-set(KALDI_SUFFIX "64")
+set(KALDI_SUFFIX "arm_64")
+else ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
+set(OPENBLAS_ARCH "sandybridge")
+set(KALDI_SUFFIX "x86_64")
 endif ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
+
+set(KALDI_ROOT "/home/shmyrev/android/kaldi-android/build/kaldi_${KALDI_SUFFIX}/kaldi")
+set(LIB_ROOT "/home/shmyrev/android/kaldi-android/build/kaldi_${KALDI_SUFFIX}/local")
 
 set(API_SOURCES
 src/main/cpp/kaldi_recognizer.cc
@@ -21,14 +23,14 @@ src/main/cpp/model.cc
 src/main/cpp/model.h
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mfpu=neon -ftree-vectorize -DFST_NO_DYNAMIC_LINKING")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
 
 add_library( kaldi_jni SHARED
              build/generated-src/cpp/kaldi_recognizer_wrap.cc
              ${API_SOURCES}
 )
 
-include_directories("src/main/cpp" "build/kaldi${KALDI_SUFFIX}/kaldi/src" "build/kaldi${KALDI_SUFFIX}/local/include")
+include_directories("src/main/cpp" "build/kaldi_${KALDI_SUFFIX}/kaldi/src" "build/kaldi_${KALDI_SUFFIX}/local/include")
 
 target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/online2/kaldi-online2.a

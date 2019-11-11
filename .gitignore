@@ -16,6 +16,9 @@ out/
 # Gradle files
 .gradle/
 build/
+gradlew
+gradlew.bat
+gradle
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -68,3 +71,7 @@ google-services.json
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Cmake
+.cxx
+cmake_install.cmake
