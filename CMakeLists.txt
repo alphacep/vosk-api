@@ -9,7 +9,7 @@ elseif ("x${ANDROID_ABI}" STREQUAL "xarm64-v8a")
 set(OPENBLAS_ARCH "armv8")
 set(KALDI_SUFFIX "arm_64")
 else ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
-set(OPENBLAS_ARCH "sandybridge")
+set(OPENBLAS_ARCH "atom")
 set(KALDI_SUFFIX "x86_64")
 endif ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
 

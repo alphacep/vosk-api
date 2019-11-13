@@ -55,7 +55,7 @@ case $arch in
           ARCHFLAGS=""
           ;;
     x86_64)
-          BLAS_ARCH=SANDYBRIDGE
+          BLAS_ARCH=ATOM
           WORKDIR=$WORKDIR_X86_64
           HOST=x86_64-linux-android
           AR=x86_64-linux-android-ar
