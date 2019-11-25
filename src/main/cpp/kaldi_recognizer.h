@@ -16,9 +16,11 @@ using namespace kaldi;
 
 class KaldiRecognizer {
     public:
-        KaldiRecognizer(Model &model);
+        KaldiRecognizer(Model &model, float sample_frequency);
         ~KaldiRecognizer();
         bool AcceptWaveform(const char *data, int len);
+        bool AcceptWaveform(const short *sdata, int len);
+        bool AcceptWaveform(const float *fdata, int len);
         std::string Result();
         std::string FinalResult();
         std::string PartialResult();
@@ -26,13 +28,15 @@ class KaldiRecognizer {
     private:
         void CleanUp();
         void UpdateSilenceWeights();
+        bool AcceptWaveform(Vector<BaseFloat> &wdata);
 
         Model &model_;
         SingleUtteranceNnet3Decoder *decoder_;
-        fst::ComposeFst<fst::StdArc> *decode_fst_;
+        fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
         OnlineNnet2FeaturePipeline *feature_pipeline_;
         OnlineSilenceWeighting *silence_weighting_;
 
-        int32 frame_offset;
+        float sample_frequency_;
+        int32 frame_offset_;
         bool input_finalized_;
 };

@@ -49,19 +49,19 @@ protected:
     std::string hcl_fst_rxfilename_;
     std::string g_fst_rxfilename_;
     std::string word_syms_rxfilename_;
+    std::string disambig_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
     kaldi::nnet3::NnetSimpleLoopedComputationOptions decodable_opts_;
-
     kaldi::OnlineNnet2FeaturePipelineInfo feature_info_;
-    kaldi::BaseFloat sample_frequency;
 
     kaldi::nnet3::DecodableNnetSimpleLoopedInfo *decodable_info_;
     kaldi::TransitionModel *trans_model_;
     kaldi::nnet3::AmNnetSimple *nnet_;
     fst::SymbolTable *word_syms_;
     kaldi::WordBoundaryInfo *winfo_;
+    std::vector<int32> disambig_;
 
     fst::Fst<fst::StdArc> *hcl_fst_;
     fst::Fst<fst::StdArc> *g_fst_;

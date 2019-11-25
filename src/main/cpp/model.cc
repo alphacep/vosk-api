@@ -37,8 +37,8 @@ Model::Model(const char *model_path) {
     const char *usage = "Read the docs";
     const char *extra_args[] = {
         "--min-active=200",
-        "--max-active=2000",
-        "--beam=11.0",
+        "--max-active=3000",
+        "--beam=10.0",
         "--lattice-beam=2.0",
         "--acoustic-scale=1.0",
 
@@ -63,8 +63,6 @@ Model::Model(const char *model_path) {
 
     feature_info_.feature_type = "mfcc";
     ReadConfigFromFile(model_path_str + "/mfcc.conf", &feature_info_.mfcc_opts);
-    sample_frequency = feature_info_.mfcc_opts.frame_opts.samp_freq;
-    KALDI_LOG << "Sample rate is " << sample_frequency;
 
     feature_info_.silence_weighting_config.silence_weight = 1e-3;
     feature_info_.silence_weighting_config.silence_phones_str = "1:2:3:4:5:6:7:8:9:10";
@@ -81,7 +79,7 @@ Model::Model(const char *model_path) {
     ivector_extraction_opts.posterior_scale = 0.1;
     ivector_extraction_opts.max_remembered_frames = 1000;
     ivector_extraction_opts.max_count = 100;
-    ivector_extraction_opts.ivector_period = 50;
+    ivector_extraction_opts.ivector_period = 200;
     feature_info_.use_ivectors = true;
     feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
 
@@ -89,6 +87,7 @@ Model::Model(const char *model_path) {
     word_syms_rxfilename_ = model_path_str + "/words.txt";
     hcl_fst_rxfilename_ = model_path_str + "/HCLr.fst";
     g_fst_rxfilename_ = model_path_str + "/Gr.fst";
+    disambig_rxfilename_ = model_path_str + "/disambig_tid.int";
 
     trans_model_ = new kaldi::TransitionModel();
     nnet_ = new kaldi::nnet3::AmNnetSimple();
@@ -104,8 +103,8 @@ Model::Model(const char *model_path) {
 
     decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
                                                                nnet_);
-    g_fst_ = fst::StdFst::Read(g_fst_rxfilename_);
     hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename_);
+    g_fst_ = fst::StdFst::Read(g_fst_rxfilename_);
 
     word_syms_ = NULL;
     if (word_syms_rxfilename_ != "")
@@ -115,6 +114,8 @@ Model::Model(const char *model_path) {
 
     kaldi::WordBoundaryInfoNewOpts opts;
     winfo_ = new kaldi::WordBoundaryInfo(opts, model_path_str + "/word_boundary.int");
+
+    ReadIntegerVectorSimple(disambig_rxfilename_, &disambig_);
 }
 
 Model::~Model() {

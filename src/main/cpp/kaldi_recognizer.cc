@@ -6,28 +6,12 @@
 using namespace fst;
 using namespace kaldi::nnet3;
 
-template<class Arc>
-ComposeFst<Arc> *TableComposeFst(
-    const Fst<Arc> &ifst1, const Fst<Arc> &ifst2) {
-  typedef LookAheadMatcher< StdFst > M;
-  typedef AltSequenceComposeFilter<M> SF;
-  typedef LookAheadComposeFilter<SF, M>  LF;
-  typedef PushWeightsComposeFilter<LF, M> WF;
-  typedef PushLabelsComposeFilter<WF, M> ComposeFilter;
-  typedef M FstMatcher;
-
-  fst::CacheOptions cache_opts(true, 1 << 26LL);
-  ComposeFstOptions<StdArc, FstMatcher, ComposeFilter> opts(cache_opts);
-
-  return new ComposeFst<Arc>(ifst1, ifst2, opts);
-}
-
-KaldiRecognizer::KaldiRecognizer(Model &model) : model_(model) {
+KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(model), sample_frequency_(sample_frequency) {
 
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
-    decode_fst_ = TableComposeFst(*model_.hcl_fst_, *model_.g_fst_);
+    decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, *model_.g_fst_, model_.disambig_);
 
     decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
             *model_.trans_model_,
@@ -35,15 +19,15 @@ KaldiRecognizer::KaldiRecognizer(Model &model) : model_(model) {
             *decode_fst_,
             feature_pipeline_);
 
-    frame_offset = 0;
+    frame_offset_ = 0;
     input_finalized_ = false;
 }
 
 KaldiRecognizer::~KaldiRecognizer() {
     delete feature_pipeline_;
     delete silence_weighting_;
-    delete decode_fst_;
     delete decoder_;
+    delete decode_fst_;
 }
 
 void KaldiRecognizer::CleanUp()
@@ -51,8 +35,8 @@ void KaldiRecognizer::CleanUp()
     delete silence_weighting_;
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
-    frame_offset += decoder_->NumFramesDecoded();
-    decoder_->InitDecoding(frame_offset);
+    frame_offset_ += decoder_->NumFramesDecoded();
+    decoder_->InitDecoding(frame_offset_);
 }
 
 void KaldiRecognizer::UpdateSilenceWeights()
@@ -62,26 +46,47 @@ void KaldiRecognizer::UpdateSilenceWeights()
         std::vector<std::pair<int32, BaseFloat> > delta_weights;
         silence_weighting_->ComputeCurrentTraceback(decoder_->Decoder());
         silence_weighting_->GetDeltaWeights(feature_pipeline_->NumFramesReady(),
-                                          frame_offset * 3,
+                                          frame_offset_ * 3,
                                           &delta_weights);
         feature_pipeline_->UpdateFrameWeights(delta_weights);
     }
 }
 
-bool KaldiRecognizer::AcceptWaveform(const char *data, int len) 
+bool KaldiRecognizer::AcceptWaveform(const char *data, int len)
 {
+    Vector<BaseFloat> wave;
+    wave.Resize(len / 2, kUndefined);
+    for (int i = 0; i < len / 2; i++)
+        wave(i) = *(((short *)data) + i);
+    return AcceptWaveform(wave);
+}
 
+bool KaldiRecognizer::AcceptWaveform(const short *sdata, int len)
+{
+    Vector<BaseFloat> wave;
+    wave.Resize(len, kUndefined);
+    for (int i = 0; i < len; i++)
+        wave(i) = sdata[i];
+    return AcceptWaveform(wave);
+}
+
+bool KaldiRecognizer::AcceptWaveform(const float *fdata, int len)
+{
+    Vector<BaseFloat> wave;
+    wave.Resize(len, kUndefined);
+    for (int i = 0; i < len; i++)
+        wave(i) = fdata[i];
+    return AcceptWaveform(wave);
+}
+
+bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
+{
     if (input_finalized_) {
         CleanUp();
         input_finalized_ = false;
     }
 
-    Vector<BaseFloat> wave;
-    wave.Resize(len / 2, kUndefined);
-    for (int i = 0; i < len / 2; i++)
-        wave(i) = *(((short *)data) + i);
-
-    feature_pipeline_->AcceptWaveform(16000, wave);
+    feature_pipeline_->AcceptWaveform(sample_frequency_, wdata);
     UpdateSilenceWeights();
     decoder_->AdvanceDecoding();
 
@@ -120,8 +125,8 @@ std::string KaldiRecognizer::Result()
     // Create JSON object
     ss << "{\"result\" : [ ";
     for (int i = 0; i < size; i++) {
-        ss << "{\"word\": \"" << model_.word_syms_->Find(words[i]) << "\", \"start\" : " << times[i].first << "," <<
-                " \"end\" : " << times[i].second << ", \"conf\" : " << conf[i] << "}";
+        ss << "{\"word\": \"" << model_.word_syms_->Find(words[i]) << "\", \"start\" : " << (frame_offset_ + times[i].first) * 0.03 << "," <<
+                " \"end\" : " << (frame_offset_ + times[i].second) * 0.03 << ", \"conf\" : " << conf[i] << "}";
         if (i != size - 1)
             ss << ",\n";
         else
