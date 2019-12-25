@@ -84,7 +84,6 @@ Model::Model(const char *model_path) {
     feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
 
     nnet3_rxfilename_ = model_path_str + "/final.mdl";
-    word_syms_rxfilename_ = model_path_str + "/words.txt";
     hcl_fst_rxfilename_ = model_path_str + "/HCLr.fst";
     g_fst_rxfilename_ = model_path_str + "/Gr.fst";
     disambig_rxfilename_ = model_path_str + "/disambig_tid.int";
@@ -106,11 +105,9 @@ Model::Model(const char *model_path) {
     hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename_);
     g_fst_ = fst::StdFst::Read(g_fst_rxfilename_);
 
-    word_syms_ = NULL;
-    if (word_syms_rxfilename_ != "")
-        if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_)))
-            KALDI_ERR << "Could not read symbol table from file "
-                      << word_syms_rxfilename_;
+    word_syms_ = g_fst_->OutputSymbols();
+    if (word_syms_ == NULL)
+        KALDI_ERR << "No word symbols in the grammar";
 
     kaldi::WordBoundaryInfoNewOpts opts;
     winfo_ = new kaldi::WordBoundaryInfo(opts, model_path_str + "/word_boundary.int");
@@ -122,7 +119,6 @@ Model::~Model() {
     delete decodable_info_;
     delete trans_model_;
     delete nnet_;
-    delete word_syms_;
     delete winfo_;
     delete hcl_fst_;
     delete g_fst_;

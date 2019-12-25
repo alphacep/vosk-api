@@ -59,7 +59,7 @@ protected:
     kaldi::nnet3::DecodableNnetSimpleLoopedInfo *decodable_info_;
     kaldi::TransitionModel *trans_model_;
     kaldi::nnet3::AmNnetSimple *nnet_;
-    fst::SymbolTable *word_syms_;
+    const fst::SymbolTable *word_syms_;
     kaldi::WordBoundaryInfo *winfo_;
     std::vector<int32> disambig_;
 
