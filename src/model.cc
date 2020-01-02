@@ -23,17 +23,9 @@
 
 namespace fst {
 
-static FstRegisterer<StdOLabelLookAheadFst>
-    OLabelLookAheadFst_StdArc_registerer;
-
-static FstRegisterer<MatcherFst<
-    ConstFst<LogArc>,
-    LabelLookAheadMatcher<SortedMatcher<ConstFst<LogArc>>,
-                          olabel_lookahead_flags, FastLogAccumulator<LogArc>>,
-    olabel_lookahead_fst_type, LabelLookAheadRelabeler<LogArc>>>
-    OLabelLookAheadFst_LogArc_registerer;
-
+static FstRegisterer<StdOLabelLookAheadFst> OLabelLookAheadFst_StdArc_registerer;
 static FstRegisterer<NGramFst<StdArc>> NGramFst_StdArc_registerer;
+
 }  // namespace fst
 
 #ifdef __ANDROID__
