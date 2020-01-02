@@ -13,7 +13,7 @@ cd kaldi
 git checkout lookahead
 cd tools
 make -j 10
-extras/make_openblas.sh
+extras/install_openblas.sh
 cd ../src
 ./configure --mathlib=OPENBLAS --shared --use-cuda=no
 make -j 10
