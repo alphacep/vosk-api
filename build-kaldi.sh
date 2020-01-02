@@ -79,7 +79,7 @@ wget -c -T 10 -t 3 http://www.openslr.org/resources/2/openfst-${OPENFST_VERSION}
 tar -zxvf openfst-${OPENFST_VERSION}.tar.gz
 cd openfst-${OPENFST_VERSION}
 
-CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -ftree-vectorize -DFST_NO_DYNAMIC_LINKING" ./configure --prefix=${WORKDIR}/local \
+CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --prefix=${WORKDIR}/local \
     --enable-shared --enable-static --with-pic --disable-bin \
     --enable-lookahead-fsts --enable-ngram-fsts --host=$HOST --build=x86-linux-gnu
 make -j 8
@@ -90,7 +90,7 @@ cd $WORKDIR
 git clone -b android-mix --single-branch https://github.com/alphacep/kaldi
 cd $WORKDIR/kaldi/src
 
-CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -ftree-vectorize -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
+CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS --shared \
     --android-incdir=${ANDROID_TOOLCHAIN_PATH}/sysroot/usr/include \
     --host=$HOST --openblas-root=${WORKDIR}/local \
