@@ -57,8 +57,8 @@ task swig(type: Exec) {
     commandLine 'swig',
         "-c++",
         "-java", "-package", "org.kaldi",
-        "-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/kaldi_recognizer_wrap.cc",
-        "src/main/cpp/kaldi_recognizer.i"
+        "-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/vosk_wrap.cc",
+        "../src/vosk.i"
 }
 
 task kaldi(type: Exec) {

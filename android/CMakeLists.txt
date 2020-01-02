@@ -13,24 +13,25 @@ set(OPENBLAS_ARCH "atom")
 set(KALDI_SUFFIX "x86_64")
 endif ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
 
-set(KALDI_ROOT "/home/shmyrev/android/kaldi-android/build/kaldi_${KALDI_SUFFIX}/kaldi")
-set(LIB_ROOT "/home/shmyrev/android/kaldi-android/build/kaldi_${KALDI_SUFFIX}/local")
+set(PROJECT_ROOT "/home/shmyrev/android/vosk-api")
+set(KALDI_ROOT "${PROJECT_ROOT}/android/build/kaldi_${KALDI_SUFFIX}/kaldi")
+set(LIB_ROOT "${PROJECT_ROOT}/android/build/kaldi_${KALDI_SUFFIX}/local")
 
 set(API_SOURCES
-src/main/cpp/kaldi_recognizer.cc
-src/main/cpp/kaldi_recognizer.h
-src/main/cpp/model.cc
-src/main/cpp/model.h
+"${PROJECT_ROOT}/src/kaldi_recognizer.cc"
+"${PROJECT_ROOT}/src/kaldi_recognizer.h"
+"${PROJECT_ROOT}/src/model.cc"
+"${PROJECT_ROOT}/src/model.h"
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
 
 add_library( kaldi_jni SHARED
-             build/generated-src/cpp/kaldi_recognizer_wrap.cc
+             build/generated-src/cpp/vosk_wrap.cc
              ${API_SOURCES}
 )
 
-include_directories("src/main/cpp" "build/kaldi_${KALDI_SUFFIX}/kaldi/src" "build/kaldi_${KALDI_SUFFIX}/local/include")
+include_directories("${PROJECT_ROOT}/src" "build/kaldi_${KALDI_SUFFIX}/kaldi/src" "build/kaldi_${KALDI_SUFFIX}/local/include")
 
 target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/online2/kaldi-online2.a
@@ -50,7 +51,7 @@ target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/base/kaldi-base.a
              ${LIB_ROOT}/lib/libfst.a
              ${LIB_ROOT}/lib/libfstngram.a
-             ${LIB_ROOT}/lib/libopenblas_${OPENBLAS_ARCH}-r0.3.8.dev.a
+             ${LIB_ROOT}/lib/libopenblas_${OPENBLAS_ARCH}-r0.3.7.a
              ${LIB_ROOT}/lib/libclapack.a
              ${LIB_ROOT}/lib/liblapack.a
              ${LIB_ROOT}/lib/libblas.a
