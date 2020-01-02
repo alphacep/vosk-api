@@ -1,0 +1,18 @@
+{
+  "name": "vosk",
+  "version": "0.1.0",
+  "description": "Node binding for continuous voice recoginition through pocketsphinx.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alphacep/vosk-api.git"
+  },
+  "main": "index.js",
+  "keywords": [
+    "speech",
+    "speech recognition",
+    "voice"
+  ],
+  "author": "Alpha Cephei Inc.",
+  "license": "BSD-2-Clause",
+  "engines": { "node" : ">= 12.x.x" }
+}
