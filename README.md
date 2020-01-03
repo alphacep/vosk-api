@@ -4,8 +4,19 @@ Language bindings for Vosk and Kaldi to access speech recognition from various l
   * Node
   * Android
   * iOS
+  
+## Android build
 
-## Kaldi build
+```
+cd android
+gradle build
+```
+
+Please note that medium blog post about 64-bit is not relevant anymore, the script builds x86, arm64 and armv7 libraries automatically without any modifications.
+
+## Python module build
+
+First build Kaldi
 
 ```
 git clone https://github.com/alphacep/kaldi
@@ -18,19 +29,11 @@ cd ../src
 ./configure --mathlib=OPENBLAS --shared --use-cuda=no
 make -j 10
 ```
-
-## Python module build
+Then python module
 
 ```
 cd python
 python3 setup.py install
 ```
 
-## Android build
 
-```
-cd android
-gradle build
-```
-
-Please note that medium blog post about 64-bit is not relevant anymore, the script builds x86, arm64 and armv7 libraries automatically without any modifications.
