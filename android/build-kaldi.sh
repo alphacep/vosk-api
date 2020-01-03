@@ -1,8 +1,6 @@
 #!/bin/bash
 # Follows jsilva setup
 
-exit 0
-
 set -x
 
 ANDROID_NDK_HOME=$HOME/android/sdk/ndk-bundle
