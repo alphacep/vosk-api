@@ -23,10 +23,11 @@ class CMakeExtension(Extension):
     setuptools.Extension for cmake
     """
 
-    def __init__(self, name, sourcedir=''):
+    def __init__(self, name, pkg_name, sourcedir=''):
         check_for_cmake()
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
+        self.pkg_name = pkg_name
 
 
 class CMakeBuildExt(build_ext):
@@ -39,11 +40,12 @@ class CMakeBuildExt(build_ext):
         check_for_cmake()
         if isinstance(ext, CMakeExtension):
             output_dir = os.path.abspath(
-                os.path.dirname(self.get_ext_fullpath(ext.name)))
+                os.path.dirname(self.get_ext_fullpath(ext.pkg_name + "/" + ext.name)))
 
             build_type = 'Debug' if self.debug else 'Release'
             cmake_args = [CMAKE_EXE,
                           ext.sourcedir,
+                          '-Wno-dev',
                           '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + output_dir,
                           '-DCMAKE_BUILD_TYPE=' + build_type]
             cmake_args.extend(

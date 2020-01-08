@@ -1,4 +1,4 @@
-%module vosk
+%module(package="vosk") vosk
 
 %include <typemaps.i>
 %include <std_string.i>

@@ -1,19 +1,27 @@
 cmake_minimum_required(VERSION 3.10.1)
-
 project(vosk)
 
-find_package (Python COMPONENTS Interpreter Development)
+set(TOP_SRCDIR "${CMAKE_SOURCE_DIR}/..")
+if("x$ENV{WHEEL_FLAGS}" STREQUAL "x")
+    find_package (Python COMPONENTS Interpreter Development)
+else()
+    # docker case
+    set(Python_INCLUDE_DIR "")
+    set(Python_LIBRARY "")
+    set(TOP_SRCDIR "/io")
+endif()
 
-set(KALDI_ROOT "$ENV{HOME}/kaldi")
+set(KALDI_ROOT "$ENV{KALDI_ROOT}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
-include_directories("../src" "${KALDI_ROOT}/src" "${KALDI_ROOT}/tools/openfst/include" ${Python_INCLUDE_DIR})
+include_directories("${TOP_SRCDIR}/src" "${KALDI_ROOT}/src" "${KALDI_ROOT}/tools/openfst/include" ${Python_INCLUDE_DIR})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{WHEEL_FLAGS}")
 
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
-set_property(SOURCE "../src/vosk.i" PROPERTY CPLUSPLUS ON)
-swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "../../vosk" OUTFILE_DIR "."
-    SOURCES "../../../src/kaldi_recognizer.cc" "../src/vosk.i" "../../../src/model.cc")
+set_property(SOURCE "${TOP_SRCDIR}/src/vosk.i" PROPERTY CPLUSPLUS ON)
+swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" OUTFILE_DIR "."
+    SOURCES "${TOP_SRCDIR}/src/kaldi_recognizer.cc" "${TOP_SRCDIR}/src/vosk.i" "${TOP_SRCDIR}/src/model.cc")
 
 swig_link_libraries(vosk
              ${KALDI_ROOT}/src/online2/kaldi-online2.a

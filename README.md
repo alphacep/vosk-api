@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/alphacep/vosk-api.svg?branch=master)](https://travis-ci.com/alphacep/vosk-api)
+
 Language bindings for Vosk and Kaldi to access speech recognition from various languages and on various platforms
 
   * Python on Linux, Windows and RPi
