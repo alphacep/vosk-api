@@ -42,4 +42,4 @@ swig_link_libraries(vosk
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
              ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a
-             ${Python_LIBRARY} -lgfortran)
+             -lgfortran)
