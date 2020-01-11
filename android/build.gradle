@@ -46,23 +46,22 @@ android {
     }
 }
 
-task mkdir {
+task swig {
     doLast {
-        new File('build/generated-src/java').mkdirs()
-        new File('build/generated-src/cpp').mkdirs()
+        mkdir 'build/generated-src/java'
+        mkdir 'build/generated-src/cpp'
+        exec {
+            commandLine 'swig',
+            "-c++",
+            "-java", "-package", "org.kaldi",
+            "-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/vosk_wrap.cc",
+            "../src/vosk.i"
+        }
     }
-}
-
-task swig(type: Exec) {
-    commandLine 'swig',
-        "-c++",
-        "-java", "-package", "org.kaldi",
-        "-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/vosk_wrap.cc",
-        "../src/vosk.i"
 }
 
 task kaldi(type: Exec) {
     commandLine './build-kaldi.sh'
 }
 
-preBuild.dependsOn mkdir, kaldi, swig
+preBuild.dependsOn kaldi, swig
