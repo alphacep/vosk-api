@@ -3,6 +3,12 @@
 from vosk import Model, KaldiRecognizer
 import sys
 import json
+import os
+
+if not os.path.exists("model"):
+    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'model' in the current folder.")
+    exit (1)
+
 
 model = Model("model")
 rec = KaldiRecognizer(model, 16000)
