@@ -48,10 +48,28 @@ cd ../src
 make -j 10
 ```
 
-Then build python build module
+Then build the python module
 
 ```
 export KALDI_ROOT=<KALDI_ROOT>
 cd python
 python3 setup.py install
 ```
+
+## Running the example code with python
+
+Run like this:
+
+```
+cd vosk-api/python/example
+wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-model-android-en-us-0.3.tar.gz
+tar xf alphacep-model-android-en-us-0.3.tar.gz 
+mv alphacep-model-android-en-us-0.3 model
+python3 ./test_local.py test.wav
+```
+
+There are models for other languages available too.
+
+To run with your audio file make sure it has proper format - PCM 16khz 16bit mono, otherwise decoding will not work.
+
+Microphone example will come soon.
