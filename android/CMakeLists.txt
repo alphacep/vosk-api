@@ -1,4 +1,4 @@
-#Pocketsphinx cmake file
+# Vosk CMake File
 
 cmake_minimum_required(VERSION 3.4.1)
 
@@ -13,15 +13,14 @@ set(OPENBLAS_ARCH "atom")
 set(KALDI_SUFFIX "x86_64")
 endif ("x${ANDROID_ABI}" STREQUAL "xarmeabi-v7a")
 
-set(PROJECT_ROOT "/home/shmyrev/android/vosk-api")
-set(KALDI_ROOT "${PROJECT_ROOT}/android/build/kaldi_${KALDI_SUFFIX}/kaldi")
-set(LIB_ROOT "${PROJECT_ROOT}/android/build/kaldi_${KALDI_SUFFIX}/local")
+set(KALDI_ROOT "${PROJECT_SOURCE_DIR}/build/kaldi_${KALDI_SUFFIX}/kaldi")
+set(LIB_ROOT "${PROJECT_SOURCE_DIR}/build/kaldi_${KALDI_SUFFIX}/local")
 
 set(API_SOURCES
-"${PROJECT_ROOT}/src/kaldi_recognizer.cc"
-"${PROJECT_ROOT}/src/kaldi_recognizer.h"
-"${PROJECT_ROOT}/src/model.cc"
-"${PROJECT_ROOT}/src/model.h"
+"${PROJECT_SOURCE_DIR}/../src/kaldi_recognizer.cc"
+"${PROJECT_SOURCE_DIR}/../src/kaldi_recognizer.h"
+"${PROJECT_SOURCE_DIR}/../src/model.cc"
+"${PROJECT_SOURCE_DIR}/../src/model.h"
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
@@ -31,7 +30,7 @@ add_library( kaldi_jni SHARED
              ${API_SOURCES}
 )
 
-include_directories("${PROJECT_ROOT}/src" "build/kaldi_${KALDI_SUFFIX}/kaldi/src" "build/kaldi_${KALDI_SUFFIX}/local/include")
+include_directories("${PROJECT_SOURCE_DIR}/../src" "build/kaldi_${KALDI_SUFFIX}/kaldi/src" "build/kaldi_${KALDI_SUFFIX}/local/include")
 
 target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/online2/kaldi-online2.a

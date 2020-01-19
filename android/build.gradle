@@ -62,6 +62,7 @@ task swig {
 
 task kaldi(type: Exec) {
     commandLine './build-kaldi.sh'
+    environment ANDROID_SDK_HOME: android.getSdkDirectory()
 }
 
 preBuild.dependsOn kaldi, swig
