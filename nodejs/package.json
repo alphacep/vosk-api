@@ -13,6 +13,6 @@
     "voice"
   ],
   "author": "Alpha Cephei Inc.",
-  "license": "BSD-2-Clause",
+  "license": "Apache 2.0",
   "engines": { "node" : ">= 12.x.x" }
 }
