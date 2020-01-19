@@ -18,7 +18,7 @@ public class DecoderTest {
 
     public static void main(String args[]) throws IOException {
         FileInputStream ais = new FileInputStream(new File("../python/example/test.wav"));
-        Model model = new Model("model");
+        Model model = new Model("model-en");
         KaldiRecognizer rec = new KaldiRecognizer(model, 16000.0f);
 
         int nbytes;
