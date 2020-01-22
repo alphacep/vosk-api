@@ -11,7 +11,12 @@ if not os.path.exists("model"):
 
 
 model = Model("model")
+
+# Large vocabulary free form recognition
 rec = KaldiRecognizer(model, 16000)
+
+# You can also specify the possible word list
+#rec = KaldiRecognizer(model, 16000, "zero oh one two three four five six seven eight nine")
 
 wf = open(sys.argv[1], "rb")
 wf.read(44) # skip header

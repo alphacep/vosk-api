@@ -25,14 +25,52 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
+    decode_fst_ = NULL;
+
     if (!model_.hclg_fst_) {
         if (model_.hcl_fst_ && model_.g_fst_) {
             decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, *model_.g_fst_, model_.disambig_);
         } else {
             KALDI_ERR << "Can't create decoding graph";
         }
+    }
+
+    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
+            *model_.trans_model_,
+            *model_.decodable_info_,
+            model_.hclg_fst_ ? *model.hclg_fst_ : *decode_fst_,
+            feature_pipeline_);
+
+    frame_offset_ = 0;
+    input_finalized_ = false;
+}
+
+KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char const *grammar) : model_(model), sample_frequency_(sample_frequency)
+{
+    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
+
+    if (model_.hcl_fst_) {
+        g_fst_.AddState();
+        g_fst_.SetStart(0);
+        g_fst_.AddState();
+        g_fst_.SetFinal(1, fst::TropicalWeight::One());
+        g_fst_.AddArc(1, StdArc(0, 0, fst::TropicalWeight::One(), 0));
+
+        // Create simple word loop FST
+        std::stringstream ss(grammar);
+        std::string token;
+
+        while (std::getline(ss, token, ' ')) {
+            int32 id = model_.word_syms_->Find(token);
+            g_fst_.AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
+        }
+        ArcSort(&g_fst_, ILabelCompare<StdArc>());
+
+        decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, g_fst_, model_.disambig_);
     } else {
         decode_fst_ = NULL;
+        KALDI_ERR << "Can't create decoding graph";
     }
 
     decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,

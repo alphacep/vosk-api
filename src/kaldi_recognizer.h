@@ -31,6 +31,7 @@ using namespace kaldi;
 class KaldiRecognizer {
     public:
         KaldiRecognizer(Model &model, float sample_frequency);
+        KaldiRecognizer(Model &model, float sample_frequency, char const *grammar);
         ~KaldiRecognizer();
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
@@ -47,6 +48,7 @@ class KaldiRecognizer {
         Model &model_;
         SingleUtteranceNnet3Decoder *decoder_;
         fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
+        fst::StdVectorFst g_fst_; // dynamically constructed grammar
         OnlineNnet2FeaturePipeline *feature_pipeline_;
         OnlineSilenceWeighting *silence_weighting_;
 
