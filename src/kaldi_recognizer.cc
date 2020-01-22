@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "kaldi_recognizer.h"
-
+#include "json.h"
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
 
@@ -127,6 +127,10 @@ std::string KaldiRecognizer::Result()
         input_finalized_ = true;
     }
 
+    if (decoder_->NumFramesDecoded() == 0) {
+        return "{\"text\": \"\"}";
+    }
+
     kaldi::CompactLattice clat;
     decoder_->GetLattice(true, &clat);
     fst::ScaleLattice(fst::LatticeScale(8.0, 10.0), &clat);
@@ -146,33 +150,34 @@ std::string KaldiRecognizer::Result()
 
     int size = words.size();
 
-    std::stringstream ss;
+    json::JSON obj;
+    std::stringstream text;
 
     // Create JSON object
-    ss << "{\"result\" : [ ";
     for (int i = 0; i < size; i++) {
-        ss << "{\"word\": \"" << model_.word_syms_->Find(words[i]) << "\", \"start\" : " << (frame_offset_ + times[i].first) * 0.03 << "," <<
-                " \"end\" : " << (frame_offset_ + times[i].second) * 0.03 << ", \"conf\" : " << conf[i] << "}";
-        if (i != size - 1)
-            ss << ",\n";
-        else
-            ss << "\n";
-    }
-    ss << " ], \"text\" : \"";
-    for (int i = 0; i < size; i++) {
-        ss << model_.word_syms_->Find(words[i]);
-        if (i != size - 1)
-            ss << " ";
-    }
-    ss << "\" }";
+        json::JSON word;
+        word["word"] = model_.word_syms_->Find(words[i]);
+        word["start"] = (frame_offset_ + times[i].first) * 0.03;
+        word["end"] = (frame_offset_ + times[i].second) * 0.03;
+        word["conf"] = conf[i];
+        obj["result"].append(word);
 
-    return ss.str();
+        if (i) {
+            text << " ";
+        }
+        text << model_.word_syms_->Find(words[i]);
+    }
+    obj["text"] = text.str();
+
+    return obj.dump();
 }
 
 std::string KaldiRecognizer::PartialResult()
 {
+    json::JSON res;
     if (decoder_->NumFramesDecoded() == 0) {
-        return "{\"partial\" : \"\"}";
+        res["partial"] = "";
+        return res.dump();
     }
 
     kaldi::Lattice lat;
@@ -181,17 +186,16 @@ std::string KaldiRecognizer::PartialResult()
     LatticeWeight weight;
     GetLinearSymbolSequence(lat, &alignment, &words, &weight);
 
-    std::ostringstream outss;
-    outss << "{\"partial\" : \"";
+    std::ostringstream text;
     for (size_t i = 0; i < words.size(); i++) {
         if (i) {
-            outss << " ";
+            text << " ";
         }
-        outss << model_.word_syms_->Find(words[i]);
+        text << model_.word_syms_->Find(words[i]);
     }
-    outss << "\"}";
+    res["partial"] = text.str();
 
-    return outss.str();
+    return res.dump();
 }
 
 std::string KaldiRecognizer::FinalResult()

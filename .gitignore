@@ -29,3 +29,4 @@ python/dist
 *.so
 java/org
 java/model-en
+java/*.cc
