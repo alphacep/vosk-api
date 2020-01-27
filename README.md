@@ -18,7 +18,9 @@ Please note that medium blog post about 64-bit is not relevant anymore, the scri
 
 ## Python installation from Pypi
 
-Make sure you have pip:
+The easiest way to install vosk api is with pip. You do not have to compile anything. We currently support only Linux on x86_64 and Raspberry Pi. Other systems (windows, mac) will come soon.
+
+Make sure you have newer pip and python:
 
   * Python version >= 3.4
   * pip version >= 19.0
@@ -26,10 +28,12 @@ Make sure you have pip:
 Uprade python and pip if needed. Then install vosk on Linux with a simple command
 
 ```
-pip install vosk
+pip3 install vosk
 ```
 
 ## Kaldi compilation for local python, node and java modules
+
+If you still want to build from scratch, you can compile Kaldi and Vosk yourself. The compilation is straightforward but might be a little confusing for newbie. In case you want to follow this, please watch the errors.
 
 ```
 git clone -b lookahead --single-branch https://github.com/alphacep/kaldi
