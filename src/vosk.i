@@ -18,6 +18,17 @@ namespace kaldi {
 %pybuffer_binary(const char *data, int len);
 %ignore KaldiRecognizer::AcceptWaveform(const short *sdata, int len);
 %ignore KaldiRecognizer::AcceptWaveform(const float *fdata, int len);
+%exception {
+  try {
+    $action
+  } catch (kaldi::KaldiFatalError &e) {
+    PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.KaldiMessage()));
+    SWIG_fail;
+  } catch (std::exception &e) {
+    PyErr_SetString(PyExc_RuntimeError, const_cast<char*>(e.what()));
+    SWIG_fail;
+  }
+}
 #endif
 
 #if SWIGJAVA
