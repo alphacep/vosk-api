@@ -43,3 +43,5 @@ swig_link_libraries(vosk
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
              ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a
              -lgfortran)
+
+set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE -s)
