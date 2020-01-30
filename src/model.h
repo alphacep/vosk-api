@@ -40,6 +40,9 @@ class Model {
 public:
     Model(const char *model_path);
     ~Model();
+    float GetSampleFrequency() const;
+    void SetAllowDownsample(bool val);
+    void SetAllowUpsample(bool val);
 
 protected:
     friend class KaldiRecognizer;
