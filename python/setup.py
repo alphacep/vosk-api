@@ -1,5 +1,6 @@
 import os
 import setuptools
+import subprocess
 from cmake import *
 
 with open("README.md", "r") as fh:
@@ -7,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="vosk", # Replace with your own username
-    version="0.3",
+    version=subprocess.check_output(["git", "describe"]).strip().decode("utf-8"),
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="API for Kaldi and Vosk",
