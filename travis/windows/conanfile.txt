@@ -1,0 +1,6 @@
+[requires]
+icu/64.2
+zlib/1.2.8
+
+[generators]
+cmake_paths

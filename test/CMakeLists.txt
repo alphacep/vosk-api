@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.10.1)
+set(Python_FIND_QUIETLY FALSE)
+#set(Python_EXECUTABLE "/opt/python/cp37-cp37m/bin/python3")
+set(Python_INCLUDE_DIR "/opt/python/cp37-cp37m/include/python3.7m")
+set(Python_LIBRARY "/opt/python/cp37-cp37m/include/python3.7m")
+# set(Python_EXECUTABLE "/opt/_internal/cpython-3.7.6/bin/python3.7")
+find_package (Python REQUIRED COMPONENTS Development)
+message(STATUS "Python found, Python_INCLUDE_DIRS=${Python_INCLUDE_DIRS} Python_LIBRARIES=${Python_LIBRARIES}")

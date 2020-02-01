@@ -24,6 +24,7 @@ wheelhouse
 __pycache__
 *.egg-info
 python/dist
+python/example/model
 
 # Java
 *.so
