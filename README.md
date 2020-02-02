@@ -31,9 +31,11 @@ Uprade python and pip if needed. Then install vosk on Linux with a simple comman
 pip3 install vosk
 ```
 
-## Kaldi compilation for local python, node and java modules
+## Compilation from source
 
 If you still want to build from scratch, you can compile Kaldi and Vosk yourself. The compilation is straightforward but might be a little confusing for newbie. In case you want to follow this, please watch the errors.
+
+#### Kaldi compilation for local python, node and java modules
 
 ```
 git clone -b lookahead --single-branch https://github.com/alphacep/kaldi
@@ -50,7 +52,7 @@ cd ../src
 make -j 10
 ```
 
-## Java example API build
+#### Java example API build
 
 ```
 cd java && KALDI_ROOT=<KALDI_ROOT> make
@@ -60,7 +62,7 @@ mv alphacep-model-android-en-us-0.3 model
 make run
 ```
 
-## Python module build
+#### Python module build
 
 Then build the python module
 
