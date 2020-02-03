@@ -172,7 +172,7 @@ Model::~Model() {
     delete g_fst_;
 }
 
-float Model::GetSampleFrequency() const {
+int Model::SampleFrequency() const {
     return feature_info_.mfcc_opts.frame_opts.samp_freq;
 }
 

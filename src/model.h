@@ -40,7 +40,7 @@ class Model {
 public:
     Model(const char *model_path);
     ~Model();
-    float GetSampleFrequency() const;
+    int SampleFrequency() const;
     void SetAllowDownsample(bool val);
     void SetAllowUpsample(bool val);
 
