@@ -21,10 +21,10 @@ build_python() {
 	prefix="/opt/python/cp${two_digit_version}-cp${two_digit_version}m"
 	tmpdir=$(mktemp -d)
 	cd $tmpdir
-	wget https://github.com/python/cpython/archive/${git_tag}.zip
-	unzip *.zip
+	wget -q https://github.com/python/cpython/archive/${git_tag}.zip
+	unzip -q *.zip
 	cd */
-	./configure --prefix="$prefix"
+	./configure --prefix="$prefix" --host=$CROSS_TRIPLE
 	make -j $(nproc) 2>&1 | tail -n $KEEP_LAST_N_LINES
 	make install 2>&1 | tail -n $KEEP_LAST_N_LINES
 	cd /
