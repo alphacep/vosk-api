@@ -14,7 +14,7 @@ ARG OPENBLAS_TARGET=NEHALEM
 
 WORKDIR /opt/OpenBLAS
 RUN git clone -b "${OPENBLAS_TAG}" --single-branch https://github.com/xianyi/OpenBLAS . \
-	&& make -j $(nproc) PREFIX=$(pwd)/install TARGET="${OPENBLAS_TARGET}" USE_LOCKING=1 USE_THREAD=0 HOSTCC=gcc all install \
+	&& make -j $(nproc) PREFIX=$(pwd)/install TARGET="${OPENBLAS_TARGET}" USE_LOCKING=1 USE_THREAD=0 HOSTCC=gcc all install 2>&1 | tail -n 100 \
 	# remove intermediate build files to keep image size reasonable
 	&& find -name "*.o" -exec rm {} \;
 
