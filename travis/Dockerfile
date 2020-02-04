@@ -23,7 +23,7 @@ RUN git clone -b "${KALDI_TAG}" --single-branch https://github.com/alphacep/kald
 	&& cd /opt/kaldi/tools \
 	&& ln -s /opt/OpenBLAS . \
 	&& sed -i 's:status=0:exit 0:g' extras/check_dependencies.sh \
-	&& make -j $(nproc) openfst \
+	&& make -j $(nproc) openfst OPENFST_CONFIGURE="--enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --host=$CROSS_TRIPLE" \
 	&& cd /opt/kaldi/src \
 	&& sed -i "s:TARGET_ARCH=\"\`uname -m\`\":TARGET_ARCH=$(echo $CROSS_TRIPLE|cut -d - -f 1):g" configure \
 	&& ./configure --mathlib=OPENBLAS --shared --static-fst=yes --use-cuda=no \
