@@ -13,9 +13,10 @@ for pypath in /opt/python/cp3*; do
     if [[ $DEFAULT_DOCKCROSS_IMAGE == *manylinux* ]]; then
         # Bundle external shared libraries into the wheels
         "${pypath}/bin/auditwheel" repair /opt/wheelhouse/*.whl -w /io/wheelhouse
+        rm /opt/wheelhouse/*.whl
     else
         # If not running on a manylinux-compatible image, we just have to hope for the best :)
         "${pypath}/bin/auditwheel" show /opt/wheelhouse/*.whl
-        cp /opt/wheelhouse/*.whl /io/wheelhouse
+        mv /opt/wheelhouse/*.whl /io/wheelhouse
     fi
 done
