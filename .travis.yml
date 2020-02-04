@@ -13,7 +13,7 @@ script:
   - export HELPER_IMAGE="${DOCKER_REGISTRY}/vosk-api-build:${DOCKCROSS_IMAGE}"
   - export VERSION="$(git describe --always)"
   - docker pull $HELPER_IMAGE || true
-  - docker build -t $HELPER_IMAGE --build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET" travis
+  - docker build --cache-from $HELPER_IMAGE -t $HELPER_IMAGE --build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET" travis
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push $HELPER_IMAGE
   - docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" $HELPER_IMAGE /io/travis/build-wheels.sh
