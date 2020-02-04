@@ -4,6 +4,9 @@ notifications:
 services:
   - docker
 
+git:
+  depth: false
+
 env:
   jobs:
     - DOCKCROSS_IMAGE=linux-armv7       OPENBLAS_TARGET=ARMV7
@@ -11,7 +14,7 @@ env:
 
 script:
   - export HELPER_IMAGE="${DOCKER_REGISTRY}/vosk-api-build:${DOCKCROSS_IMAGE}"
-  - export VERSION="$(git describe --always)"
+  - export VERSION="$(git describe --tags --always)"
   - docker pull $HELPER_IMAGE || true
   - docker build --cache-from $HELPER_IMAGE -t $HELPER_IMAGE --build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET" travis
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

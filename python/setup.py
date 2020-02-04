@@ -1,13 +1,18 @@
 import os
+import re
 import setuptools
 from cmake import *
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+version = os.getenv("VERSION", "unknown")
+if not re.match(r'^\d', version):
+    version = '0.' + version
+
 setuptools.setup(
     name="vosk",
-    version=os.getenv("VERSION", "unknown"),
+    version=version,
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="API for Kaldi and Vosk",
