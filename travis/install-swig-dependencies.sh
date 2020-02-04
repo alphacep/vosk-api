@@ -67,7 +67,7 @@ else
 	apt-get update
 	apt-get install -y --no-install-recommends unzip
 	build_deb_src zlib1g
-	build_deb_src libpcre3 --enable-shared=no
+	build_deb_src libpcre3 --enable-shared=no --host=$CROSS_TRIPLE
 	build_deb_src libffi --host=$CROSS_TRIPLE
 	build_libssl
 	build_python v3.7.6
