@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -e -x
+shopt -s extglob
 
 export KALDI_ROOT=/opt/kaldi
 
 # Compile wheels
-for pypath in /opt/python/cp3*; do
+for pypath in /opt/python/cp3!(4); do
     export WHEEL_FLAGS=`${pypath}/bin/python3-config --cflags`
     mkdir -p /opt/wheelhouse
-    "${pypath}/bin/pip3" install auditwheel typing
+    "${pypath}/bin/pip3" install auditwheel
     "${pypath}/bin/pip3" wheel /io/python -w /opt/wheelhouse
 
     if [[ $DEFAULT_DOCKCROSS_IMAGE == *manylinux* ]]; then
