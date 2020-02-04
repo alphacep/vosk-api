@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="vosk", # Replace with your own username
-    version="0.3",
+    name="vosk",
+    version=os.getenv("VERSION", "unknown"),
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="API for Kaldi and Vosk",

@@ -1,17 +1,26 @@
 notifications:
   email: false
 
-matrix:
-  include:
-    - sudo: required
-      services:
-        - docker
-      env: DOCKER_IMAGE=alphacep/kaldi-manylinux:latest
-           PLAT=manylinux2010_x86_64
+services:
+  - docker
 
-install:
-  - docker pull $DOCKER_IMAGE
+env:
+  jobs:
+    - DOCKCROSS_IMAGE=linux-armv7       OPENBLAS_TARGET=ARMV7
+    - DOCKCROSS_IMAGE=manylinux2010-x64 OPENBLAS_TARGET=NEHALEM
 
 script:
-  - docker run --rm -e PLAT=$PLAT -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
-  - ls wheelhouse/
+  - export HELPER_IMAGE="${DOCKER_REGISTRY}/vosk-api-build:${DOCKCROSS_IMAGE}"
+  - export VERSION="$(git describe --always)"
+  - docker pull $HELPER_IMAGE || true
+  - docker build -t $HELPER_IMAGE --build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET" travis
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push $HELPER_IMAGE
+  - docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" $HELPER_IMAGE /io/travis/build-wheels.sh
+
+deploy:
+  provider: releases
+  api_key: ${GITHUB_TOKEN}
+  file_glob: true
+  file: wheelhouse/*
+  draft: true
