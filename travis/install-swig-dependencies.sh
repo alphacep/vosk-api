@@ -12,6 +12,9 @@ set -xeuo pipefail
 #
 # Neither type of image has the PCRE library required for building SWIG
 
+# TravisCI kills jobs after they exceed 20000 lines of output
+KEEP_LAST_N_LINES=100
+
 build_python() {
 	git_tag=$1
 	two_digit_version=$(echo "${git_tag}" | sed -e 's:[^0-9]::g' | head -c 2)
@@ -22,8 +25,8 @@ build_python() {
 	unzip *.zip
 	cd */
 	./configure --prefix="$prefix"
-	make -j $(nproc)
-	make install
+	make -j $(nproc) 2>&1 | tail -n $KEEP_LAST_N_LINES
+	make install 2>&1 | tail -n $KEEP_LAST_N_LINES
 	cd /
 	rm -rf $tmpdir
 }
@@ -36,8 +39,8 @@ build_deb_src() {
 	apt-get source $pkg
 	cd */
 	./configure --prefix=$CROSS_ROOT $extra_config
-	make -j $(nproc)
-	make install
+	make -j $(nproc) 2>&1 | tail -n $KEEP_LAST_N_LINES
+	make install 2>&1 | tail -n $KEEP_LAST_N_LINES
 	cd /
 	rm -rf $tmpdir
 }
@@ -48,8 +51,8 @@ build_libssl() {
 	apt-get source libssl-dev
 	cd */
 	CROSS_COMPILE= MACHINE="${CROSS_TRIPLE/-*/}" ./config --prefix=$CROSS_ROOT
-	make -j $(nproc)
-	make install
+	make -j $(nproc) 2>&1 | tail -n $KEEP_LAST_N_LINES
+	make install 2>&1 | tail -n $KEEP_LAST_N_LINES
 	cd /
 	rm -rf $tmpdir
 }
