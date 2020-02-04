@@ -24,7 +24,7 @@ build_python() {
 	wget -q https://github.com/python/cpython/archive/${git_tag}.zip
 	unzip -q *.zip
 	cd */
-	./configure --prefix="$prefix" --host=$CROSS_TRIPLE
+	./configure --prefix="$prefix"
 	make -j $(nproc) 2>&1 | tail -n $KEEP_LAST_N_LINES
 	make install 2>&1 | tail -n $KEEP_LAST_N_LINES
 	cd /
