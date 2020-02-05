@@ -39,7 +39,8 @@ deploy:
   token: $GITHUB_TOKEN
   file: wheelhouse/*
   draft: true
-  tag_name: $TRAVIS_TAG
+  name: $VERSION
+  tag_name: $VERSION
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(master|travis)$
