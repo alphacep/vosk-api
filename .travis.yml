@@ -1,6 +1,8 @@
 notifications:
   email: false
 
+sudo: required
+
 services:
   - docker
 
@@ -15,6 +17,7 @@ env:
 script:
   - export HELPER_IMAGE="${DOCKER_REGISTRY}/vosk-api-build:${DOCKCROSS_IMAGE}"
   - export VERSION="$(git describe --tags --always)"
+  - docker run --rm --privileged multiarch/qemu-user-static:register
   - docker pull $HELPER_IMAGE || true
   - docker build --cache-from $HELPER_IMAGE -t $HELPER_IMAGE --build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET" travis
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
