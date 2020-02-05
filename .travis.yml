@@ -12,6 +12,7 @@ language: shell # https://config.travis-ci.com/ref/language
 
 env:
   jobs:
+    - DOCKCROSS_IMAGE=linux-armv6       OPENBLAS_TARGET=ARMV6
     - DOCKCROSS_IMAGE=linux-armv7       OPENBLAS_TARGET=ARMV7
     - DOCKCROSS_IMAGE=manylinux2010-x64 OPENBLAS_TARGET=NEHALEM
 
