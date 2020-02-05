@@ -17,10 +17,14 @@ script:
   - export VERSION="$(git describe --tags --always)"
   - docker run --rm --privileged multiarch/qemu-user-static:register
   - docker pull $HELPER_IMAGE || true
+  - date
   - docker build --cache-from $HELPER_IMAGE -t $HELPER_IMAGE --build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET" travis
+  - date
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push $HELPER_IMAGE
+  - date
   - docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" $HELPER_IMAGE /io/travis/build-wheels.sh
+  - date
 
 deploy:
   provider: releases
