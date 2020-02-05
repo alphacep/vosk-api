@@ -15,13 +15,6 @@ set -xeuo pipefail
 # TravisCI kills jobs after they exceed 20000 lines of output
 KEEP_LAST_N_LINES=100
 
-PREFIX=/opt/swig-dependencies
-mkdir $PREFIX
-
-export LDFLAGS="-L${PREFIX}/lib"
-export CFLAGS="-I${PREFIX}/include"
-export CPPFLAGS="${CFLAGS}"
-
 build_python() {
 	git_tag=$1
 	two_digit_version=$(echo "${git_tag}" | sed -e 's:[^0-9]::g' | head -c 2)
@@ -45,7 +38,7 @@ build_deb_src() {
 	cd $tmpdir
 	apt-get source $pkg
 	cd */
-	./configure --prefix=$PREFIX $extra_config
+	./configure --prefix=$CROSS_ROOT $extra_config
 	make -j $(nproc) 2>&1 | tail -n $KEEP_LAST_N_LINES
 	make install 2>&1 | tail -n $KEEP_LAST_N_LINES
 	cd /
@@ -57,12 +50,16 @@ build_libssl() {
 	cd $tmpdir
 	apt-get source libssl-dev
 	cd */
-	CROSS_COMPILE= MACHINE="${CROSS_TRIPLE/-*/}" ./config --prefix=$PREFIX
+	CROSS_COMPILE= MACHINE="${CROSS_TRIPLE/-*/}" ./config --prefix=$CROSS_ROOT
 	make -j $(nproc) 2>&1 | tail -n $KEEP_LAST_N_LINES
 	make install 2>&1 | tail -n $KEEP_LAST_N_LINES
 	cd /
 	rm -rf $tmpdir
 }
+
+export LDFLAGS="-L${CROSS_ROOT}/lib"
+export CFLAGS="-I${CROSS_ROOT}/include"
+export CPPFLAGS="${CFLAGS}"
 
 if [[ $DEFAULT_DOCKCROSS_IMAGE == *manylinux* ]]; then
 	yum -y update
