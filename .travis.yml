@@ -35,9 +35,11 @@ script:
 
 deploy:
   provider: releases
+  edge: true
   token: ${GITHUB_TOKEN}
   file: wheelhouse/*
-  draft: true
+  prerelease: '[ -n "$TRAVIS_TAG" ] && echo true || echo false'
+  name: "Python Binaries version=${VERSION} arch=${DOCKCROSS_IMAGE}"
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(master|travis)$
