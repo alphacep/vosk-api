@@ -33,12 +33,15 @@ script:
   # build wheels
   - date; docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" ${HELPER_IMAGE} /io/travis/build-wheels.sh
 
+before_deploy:
+  - export PRERELEASE=$([ -n "$TRAVIS_TAG" ] && echo false || echo true)
+
 deploy:
   provider: releases
   edge: true
-  token: ${GITHUB_TOKEN}
+  token: $GITHUB_TOKEN
   file: wheelhouse/*
-  prerelease: '[ -n "$TRAVIS_TAG" ] && echo true || echo false'
+  prerelease: $PRERELEASE
   name: "Python Binaries version=${VERSION} arch=${DOCKCROSS_IMAGE}"
   on:
     all_branches: true
