@@ -1,7 +1,7 @@
 # see https://github.com/dockcross/dockcross
 ARG DOCKCROSS_IMAGE=manylinux2010-x64
 
-FROM dockcross/${DOCKCROSS_IMAGE} AS build-kaldi
+FROM dockcross/${DOCKCROSS_IMAGE}
 
 # git ref to clone from https://github.com/alphacep/kaldi
 ARG KALDI_TAG=lookahead
@@ -11,6 +11,17 @@ ARG OPENBLAS_TAG=v0.3.7
 
 # see https://github.com/xianyi/OpenBLAS/blob/develop/TargetList.txt
 ARG OPENBLAS_TARGET=NEHALEM
+
+WORKDIR /tmp/swig
+COPY install-swig-dependencies.sh .
+RUN ./install-swig-dependencies.sh
+
+RUN wget --no-check-certificate -O - https://sourceforge.net/projects/swig/files/swig/swig-4.0.1/swig-4.0.1.tar.gz/download \
+	| tar xz --strip-components=1 \
+	&& ./configure --prefix=/usr/local --with-python3=/opt/python/cp37-cp37m/bin/python3 \
+	&& make -j $(nproc) \
+	&& make install \
+	&& rm -rf /tmp/swig
 
 WORKDIR /opt/OpenBLAS
 RUN git clone -b "${OPENBLAS_TAG}" --single-branch https://github.com/xianyi/OpenBLAS . \
@@ -30,20 +41,5 @@ RUN git clone -b "${KALDI_TAG}" --single-branch https://github.com/alphacep/kald
 	&& make -j $(nproc) online2 \
 	# remove intermediate build files to keep image size reasonable
 	&& find /opt/kaldi -type f -name '*.o' -exec rm {} \;
-
-FROM dockcross/${DOCKCROSS_IMAGE}
-
-WORKDIR /tmp/swig
-COPY install-swig-dependencies.sh .
-RUN ./install-swig-dependencies.sh
-
-RUN wget --no-check-certificate -O - https://sourceforge.net/projects/swig/files/swig/swig-4.0.1/swig-4.0.1.tar.gz/download \
-	| tar xz --strip-components=1 \
-	&& ./configure --prefix=/usr/local --with-python3=/opt/python/cp37-cp37m/bin/python3 \
-	&& make -j $(nproc) 2>&1 | tail -n 100 \
-	&& make install 2>&1 | tail -n 100 \
-	&& rm -rf /tmp/swig
-
-COPY --from=build-kaldi /opt /opt
 
 WORKDIR /io
