@@ -12,6 +12,13 @@ for pypath in /opt/python/cp3*; do
     export WHEEL_FLAGS=`${pypath}/bin/python3-config --cflags`
     mkdir -p /opt/wheelhouse
     mkdir -p /io/wheelhouse
+
+    # use _PYTHON_HOST_PLATFORM to tell distutils.util.get_platform() the actual platform
+    case $DEFAULT_DOCKCROSS_IMAGE in
+        *linux-armv6*)
+            export _PYTHON_HOST_PLATFORM=linux-armv6l
+    esac
+
     "${pypath}/bin/pip3" install --upgrade auditwheel
     "${pypath}/bin/pip3" wheel /io/python -w /opt/wheelhouse
 
