@@ -1,7 +1,20 @@
 # see https://github.com/dockcross/dockcross
 ARG DOCKCROSS_IMAGE=manylinux2010-x64
 
-FROM dockcross/${DOCKCROSS_IMAGE}
+FROM dockcross/${DOCKCROSS_IMAGE} AS build-swig
+
+WORKDIR /tmp/swig
+COPY install-swig-dependencies.sh .
+RUN ./install-swig-dependencies.sh
+
+RUN wget --no-check-certificate -O - https://sourceforge.net/projects/swig/files/swig/swig-4.0.1/swig-4.0.1.tar.gz/download \
+	| tar xz --strip-components=1 \
+	&& ./configure --prefix=/opt/swig --with-python3=/opt/python/cp37-cp37m/bin/python3 \
+	&& make -j $(nproc) 2>&1 | tail -n 100 \
+	&& make install 2>&1 | tail -n 100 \
+	&& rm -rf /tmp/swig
+
+FROM dockcross/${DOCKCROSS_IMAGE} AS build-kaldi
 
 # git ref to clone from https://github.com/alphacep/kaldi
 ARG KALDI_TAG=lookahead
@@ -31,15 +44,8 @@ RUN git clone -b "${KALDI_TAG}" --single-branch https://github.com/alphacep/kald
 	# remove intermediate build files to keep image size reasonable
 	&& find /opt/kaldi -type f -name '*.o' -exec rm {} \;
 
-WORKDIR /opt/swig
-COPY install-swig-dependencies.sh .
-RUN ./install-swig-dependencies.sh
-
-RUN wget --no-check-certificate -O - https://sourceforge.net/projects/swig/files/swig/swig-4.0.1/swig-4.0.1.tar.gz/download \
-	| tar xz --strip-components=1 \
-	&& ./configure --prefix=/usr --with-python3=/opt/python/cp37-cp37m/bin/python3 \
-	&& make -j $(nproc) \
-	&& make install \
-	&& rm -rf /opt/swig
-
+FROM dockcross/${DOCKCROSS_IMAGE}
+COPY --from=build-kaldi /opt /opt
+COPY --from=build-swig /opt /opt
+RUN ln -s /opt/swig/bin/* /usr/local/bin
 WORKDIR /io
