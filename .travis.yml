@@ -35,11 +35,9 @@ script:
 
 deploy:
   provider: releases
-  api_key: ${GITHUB_TOKEN}
-  file_glob: true
+  token: ${GITHUB_TOKEN}
   file: wheelhouse/*
   draft: true
-  skip_cleanup: true
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(master|travis)$
