@@ -1,16 +1,7 @@
 # see https://github.com/dockcross/dockcross
 ARG DOCKCROSS_IMAGE=manylinux2010-x64
 
-FROM dockcross/${DOCKCROSS_IMAGE}
-
-# git ref to clone from https://github.com/alphacep/kaldi
-ARG KALDI_TAG=lookahead
-
-# git ref to clone from https://github.com/xianyi/OpenBLAS
-ARG OPENBLAS_TAG=v0.3.7
-
-# see https://github.com/xianyi/OpenBLAS/blob/develop/TargetList.txt
-ARG OPENBLAS_TARGET=NEHALEM
+FROM dockcross/${DOCKCROSS_IMAGE} AS s1
 
 WORKDIR /tmp/swig
 COPY install-swig-dependencies.sh .
@@ -23,11 +14,21 @@ RUN wget --no-check-certificate -O - https://sourceforge.net/projects/swig/files
 	&& make install \
 	&& rm -rf /tmp/swig
 
+FROM s1 AS s2
+# git ref to clone from https://github.com/xianyi/OpenBLAS
+ARG OPENBLAS_TAG=v0.3.7
+# see https://github.com/xianyi/OpenBLAS/blob/develop/TargetList.txt
+ARG OPENBLAS_TARGET=NEHALEM
+
 WORKDIR /opt/OpenBLAS
 RUN git clone -b "${OPENBLAS_TAG}" --single-branch https://github.com/xianyi/OpenBLAS . \
 	&& make -j $(nproc) PREFIX=$(pwd)/install TARGET="${OPENBLAS_TARGET}" USE_LOCKING=1 USE_THREAD=0 HOSTCC=gcc all install 2>&1 | tail -n 100 \
 	# remove intermediate build files to keep image size reasonable
 	&& find -name "*.o" -exec rm {} \;
+
+FROM s2
+# git ref to clone from https://github.com/alphacep/kaldi
+ARG KALDI_TAG=lookahead
 
 WORKDIR /opt/kaldi
 RUN git clone -b "${KALDI_TAG}" --single-branch https://github.com/alphacep/kaldi . \

@@ -15,16 +15,23 @@ env:
 script:
   - export HELPER_IMAGE="${DOCKER_REGISTRY}/vosk-api-build:${DOCKCROSS_IMAGE}"
   - export VERSION="$(git describe --tags --always)"
-  - docker run --rm --privileged multiarch/qemu-user-static:register
-  - docker pull $HELPER_IMAGE || true
-  - date
-  - docker build --cache-from $HELPER_IMAGE -t $HELPER_IMAGE --build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET" travis
-  - date
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push $HELPER_IMAGE
-  - date
-  - docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" $HELPER_IMAGE /io/travis/build-wheels.sh
-  - date
+  - export DOCKER_BUILD_ARGS=--build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET"
+  - date; docker run --rm --privileged multiarch/qemu-user-static:register
+  - date; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  # stage s1
+  - date; docker pull ${HELPER_IMAGE}.s1 || true
+  - date; docker build --tag ${HELPER_IMAGE}.s1 --target s1 --cache-from ${HELPER_IMAGE}.s1 ${DOCKER_BUILD_ARGS} travis
+  - date; docker push ${HELPER_IMAGE}.s1
+  # stage s2
+  - date; docker pull ${HELPER_IMAGE}.s2 || true
+  - date; docker build --tag ${HELPER_IMAGE}.s2 --target s2 --cache-from ${HELPER_IMAGE}.s1 --cache-from ${HELPER_IMAGE}.s2 ${DOCKER_BUILD_ARGS} travis
+  - date; docker push ${HELPER_IMAGE}.s2
+  # final stage
+  - date; docker pull ${HELPER_IMAGE} || true
+  - date; docker build --tag ${HELPER_IMAGE} --cache-from ${HELPER_IMAGE}.s1 --cache-from ${HELPER_IMAGE}.s2 --cache-from ${HELPER_IMAGE} ${DOCKER_BUILD_ARGS} travis
+  - date; docker push ${HELPER_IMAGE}
+  # build wheels
+  - date; docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" ${HELPER_IMAGE} /io/travis/build-wheels.sh
 
 deploy:
   provider: releases
