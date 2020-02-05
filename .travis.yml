@@ -7,6 +7,9 @@ services:
 git:
   depth: false
 
+os: linux # https://config.travis-ci.com/ref/os
+language: shell # https://config.travis-ci.com/ref/language
+
 env:
   jobs:
     - DOCKCROSS_IMAGE=linux-armv7       OPENBLAS_TARGET=ARMV7
@@ -40,7 +43,6 @@ deploy:
   file: wheelhouse/*
   draft: true
   name: $VERSION
-  tag_name: $VERSION
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(master|travis)$
