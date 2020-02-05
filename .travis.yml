@@ -43,7 +43,7 @@ deploy:
   token: $GITHUB_TOKEN
   file: wheelhouse/*
   draft: true
-  name: $VERSION
+  name: "${VERSION} ${DOCKCROSS_IMAGE}"
   tag_name: $TRAVIS_TAG
   on:
     all_branches: true
