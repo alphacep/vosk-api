@@ -15,7 +15,7 @@ env:
 script:
   - export HELPER_IMAGE="${DOCKER_REGISTRY}/vosk-api-build:${DOCKCROSS_IMAGE}"
   - export VERSION="$(git describe --tags --always)"
-  - export DOCKER_BUILD_ARGS=--build-arg "DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE" --build-arg "OPENBLAS_TARGET=$OPENBLAS_TARGET"
+  - export DOCKER_BUILD_ARGS="--build-arg DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE --build-arg OPENBLAS_TARGET=$OPENBLAS_TARGET"
   - date; docker run --rm --privileged multiarch/qemu-user-static:register
   - date; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   # stage s1
