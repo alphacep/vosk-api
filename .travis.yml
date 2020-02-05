@@ -33,11 +33,15 @@ script:
   # build wheels
   - date; docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" ${HELPER_IMAGE} /io/travis/build-wheels.sh
 
+before_deploy:
+  - export DRAFT=$([ -n "$TRAVIS_TAG" ] && echo false || echo true)
+
 deploy:
   provider: releases
   edge: true
   token: $GITHUB_TOKEN
   file: wheelhouse/*
+  draft: $DRAFT
   name: "Python binaries: version=${VERSION} arch=${DOCKCROSS_IMAGE}"
   on:
     all_branches: true
