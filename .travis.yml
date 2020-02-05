@@ -30,6 +30,7 @@ deploy:
   file_glob: true
   file: wheelhouse/*
   draft: true
+  skip_cleanup: true
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(master|travis)$
