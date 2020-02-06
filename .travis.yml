@@ -55,7 +55,7 @@ deploy:
   # https://pypi.org/project/twine/
   - provider: script
     edge: true
-    script: bash -c "apt-get install twine && twine check wheelhouse/* && twine upload wheelhouse/*"
+    script: bash -c "sudo apt-get install twine && twine check wheelhouse/* && twine upload wheelhouse/*"
     on:
       all_branches: true
       condition: $TRAVIS_TAG && $TWINE_USERNAME && $TWINE_PASSWORD
