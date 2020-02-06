@@ -38,12 +38,24 @@ script:
   - date; docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" ${HELPER_IMAGE} /io/travis/build-wheels.sh
 
 deploy:
-  provider: releases
-  edge: true
-  token: $GITHUB_TOKEN
-  file: wheelhouse/*
-  draft: true
-  name: $VERSION
-  tag_name: $TRAVIS_TAG
-  on:
-    all_branches: true
+  # Draft a GitHib Release for each commit
+  # https://docs.travis-ci.com/user/deployment-v2/providers/releases/
+  - provider: releases
+    edge: true
+    token: $GITHUB_TOKEN
+    file: wheelhouse/*
+    draft: true
+    name: $VERSION
+    tag_name: $TRAVIS_TAG
+    on:
+      all_branches: true
+      condition: $GITHUB_TOKEN
+  # Upload to PyPI when building a tagged commit
+  # https://docs.travis-ci.com/user/deployment-v2/providers/script/
+  # https://pypi.org/project/twine/
+  - provider: script
+    edge: true
+    script: bash -c "python3 -m pip install twine && python3 -m twine check wheelhouse/* && python3 -m twine upload wheelhouse/*"
+    on:
+      all_branches: true
+      condition: $TRAVIS_TAG && $TWINE_USERNAME && $TWINE_PASSWORD
