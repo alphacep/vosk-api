@@ -57,7 +57,7 @@ deploy:
     edge: true
     # pass environment variables to the container without exposing them in the logs
     script: |
-      env | sed 's/^/export /g' > env.source && \
+      env | sed -re 's/^([^=]+)=(.*)$/export \1="\2"/g' > env.source && \
       docker run --rm \
       -v "$(pwd):/io" \
       -w /io \
