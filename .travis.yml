@@ -60,9 +60,10 @@ deploy:
       env | sed 's/^/export /g' > env && \
       docker run --rm \
       -v "$(pwd):/io" \
+      -w /io
       --entrypoint bash \
       library/python \
-      -c "source env && pip install twine && twine check /io/wheelhouse/* && twine upload /io/wheelhouse/*"
+      -c "source env && pip install twine && twine check wheelhouse/* && twine upload wheelhouse/*"
     on:
       all_branches: true
       condition: $TRAVIS_TAG && $TWINE_USERNAME && $TWINE_PASSWORD
