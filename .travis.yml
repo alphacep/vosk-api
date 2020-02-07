@@ -55,7 +55,15 @@ deploy:
   # https://pypi.org/project/twine/
   - provider: script
     edge: true
-    script: bash -c "sudo apt-get update && sudo apt-get install -y python3-pip python3-setuptools python3-wheel && python3 -m pip install twine && python3 -m twine check wheelhouse/* && python3 -m twine upload wheelhouse/*"
+    script: |
+      docker run --rm \
+      -v "$(pwd):/io" \
+      -e "TWINE_USERNAME=$TWINE_USERNAME" \
+      -e "TWINE_PASSWORD=$TWINE_PASSWORD" \
+      -e "TWINE_REPOSITORY_URL=$TWINE_REPOSITORY_URL" \
+      --entrypoint bash \
+      library/python \
+      -c "pip install twine && twine check /io/wheelhouse/* && twine upload /io/wheelhouse/*"
     on:
       all_branches: true
       condition: $TRAVIS_TAG && $TWINE_USERNAME && $TWINE_PASSWORD
