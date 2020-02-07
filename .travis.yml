@@ -60,7 +60,7 @@ deploy:
       env | sed 's/^/export /g' > env && \
       docker run --rm \
       -v "$(pwd):/io" \
-      -w /io
+      -w /io \
       --entrypoint bash \
       library/python \
       -c "source env && pip install twine && twine check wheelhouse/* && twine upload wheelhouse/*"
