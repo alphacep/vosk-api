@@ -6,17 +6,20 @@ import json
 import os
 import numpy as np
 
-if not os.path.exists("model"):
-    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'model' in the current folder.")
+model_path = "model-en"
+spk_model_path = "model-spk"
+
+if not os.path.exists(model_path):
+    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as {} in the current folder.".format(model_path))
     exit (1)
 
-if not os.path.exists("spk-model"):
-    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'spk-model' in the current folder.")
+if not os.path.exists(spk_model_path):
+    print ("Please download the speaker model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as {} in the current folder.".format(spk_model_path))
     exit (1)
 
-model = Model("model")
+model = Model(model_path)
 
-spk_model = SpkModel("spk-model")
+spk_model = SpkModel(spk_model_path)
 
 # Large vocabulary free form recognition
 rec = KaldiRecognizer(model, spk_model, 16000)
