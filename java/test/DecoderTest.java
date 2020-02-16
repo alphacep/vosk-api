@@ -10,6 +10,7 @@ import java.nio.*;
 
 import org.kaldi.KaldiRecognizer;
 import org.kaldi.Model;
+import org.kaldi.SpkModel;
 
 public class DecoderTest {
     static {
@@ -19,7 +20,8 @@ public class DecoderTest {
     public static void main(String args[]) throws IOException {
         FileInputStream ais = new FileInputStream(new File("../python/example/test.wav"));
         Model model = new Model("model-en");
-        KaldiRecognizer rec = new KaldiRecognizer(model, 16000.0f);
+        SpkModel spkModel = new SpkModel("model-spk");
+        KaldiRecognizer rec = new KaldiRecognizer(model, spkModel, 16000.0f);
 
         int nbytes;
         byte[] b = new byte[4096];

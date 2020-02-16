@@ -25,7 +25,14 @@ KALDI_LIBS = \
 
 all: libvosk_jni.so
 
-VOSK_SOURCES = vosk_wrap.cc ../src/kaldi_recognizer.cc ../src/kaldi_recognizer.h ../src/model.cc ../src/model.h
+VOSK_SOURCES = \
+	vosk_wrap.cc \
+	../src/kaldi_recognizer.cc \
+	../src/kaldi_recognizer.h \
+	../src/model.cc \
+	../src/model.h \
+	../src/spk_model.cc \
+	../src/spk_model.h
 
 libvosk_jni.so: $(VOSK_SOURCES)
 	$(CXX) -shared -o $@ $(CPPFLAGS) $(CFLAGS) $(VOSK_SOURCES) $(KALDI_LIBS)
