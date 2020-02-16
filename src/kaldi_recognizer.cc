@@ -20,7 +20,7 @@
 using namespace fst;
 using namespace kaldi::nnet3;
 
-KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(model), sample_frequency_(sample_frequency) {
+KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) {
 
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
@@ -83,11 +83,39 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char cons
     input_finalized_ = false;
 }
 
+
+KaldiRecognizer::KaldiRecognizer(Model &model, SpkModel *spk_model, float sample_frequency) : model_(model), spk_model_(spk_model), sample_frequency_(sample_frequency) {
+    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
+
+    decode_fst_ = NULL;
+
+    if (!model_.hclg_fst_) {
+        if (model_.hcl_fst_ && model_.g_fst_) {
+            decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, *model_.g_fst_, model_.disambig_);
+        } else {
+            KALDI_ERR << "Can't create decoding graph";
+        }
+    }
+
+    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
+            *model_.trans_model_,
+            *model_.decodable_info_,
+            model_.hclg_fst_ ? *model.hclg_fst_ : *decode_fst_,
+            feature_pipeline_);
+
+    frame_offset_ = 0;
+    input_finalized_ = false;
+
+    spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
+}
+
 KaldiRecognizer::~KaldiRecognizer() {
     delete feature_pipeline_;
     delete silence_weighting_;
     delete decoder_;
     delete decode_fst_;
+    delete spk_feature_;
 }
 
 void KaldiRecognizer::CleanUp()
@@ -150,12 +178,68 @@ bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
     UpdateSilenceWeights();
     decoder_->AdvanceDecoding();
 
+    if (spk_feature_) {
+        spk_feature_->AcceptWaveform(sample_frequency_, wdata);
+    }
+
     if (decoder_->EndpointDetected(model_.endpoint_config_)) {
         return true;
     }
 
     return false;
 }
+
+
+// Computes an xvector from a chunk of speech features.
+static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
+    const nnet3::Nnet &nnet, nnet3::CachingOptimizingCompiler *compiler,
+    Vector<BaseFloat> *xvector) 
+{
+    nnet3::ComputationRequest request;
+    request.need_model_derivative = false;
+    request.store_component_stats = false;
+    request.inputs.push_back(
+    nnet3::IoSpecification("input", 0, features.NumRows()));
+    nnet3::IoSpecification output_spec;
+    output_spec.name = "output";
+    output_spec.has_deriv = false;
+    output_spec.indexes.resize(1);
+    request.outputs.resize(1);
+    request.outputs[0].Swap(&output_spec);
+    std::shared_ptr<const nnet3::NnetComputation> computation = compiler->Compile(request);
+    nnet3::Nnet *nnet_to_update = NULL;  // we're not doing any update.
+    nnet3::NnetComputer computer(nnet3::NnetComputeOptions(), *computation,
+                    nnet, nnet_to_update);
+    CuMatrix<BaseFloat> input_feats_cu(features);
+    computer.AcceptInput("input", &input_feats_cu);
+    computer.Run();
+    CuMatrix<BaseFloat> cu_output;
+    computer.GetOutputDestructive("output", &cu_output);
+    xvector->Resize(cu_output.NumCols());
+    xvector->CopyFromVec(cu_output.Row(0));
+}
+
+
+void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
+{
+    int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
+    Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
+    for (int i = 0; i < num_frames; ++i) {
+       Vector<BaseFloat> feat(spk_feature_->Dim());
+       spk_feature_->GetFrame(i + frame_offset_ * 3, &feat);
+       mfcc.CopyRowFromVec(feat, i);
+    }
+    SlidingWindowCmnOptions cmvn_opts;
+    Matrix<BaseFloat> features(mfcc.NumRows(), mfcc.NumCols(), kUndefined);
+    SlidingWindowCmn(cmvn_opts, mfcc, &features);
+
+    nnet3::NnetSimpleComputationOptions opts;
+    nnet3::CachingOptimizingCompilerOptions compiler_config;
+    nnet3::CachingOptimizingCompiler compiler(spk_model_->speaker_nnet, opts.optimize_config, compiler_config);
+
+    RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
+}
+
 
 std::string KaldiRecognizer::Result()
 {
@@ -206,6 +290,14 @@ std::string KaldiRecognizer::Result()
         text << model_.word_syms_->Find(words[i]);
     }
     obj["text"] = text.str();
+
+    if (spk_model_) {
+        Vector<BaseFloat> xvector;
+        GetSpkVector(xvector);
+        for (int i = 0; i < xvector.Dim(); i++) {
+            obj["spk"].append(xvector(i));
+        }
+    }
 
     return obj.dump();
 }

@@ -25,12 +25,14 @@
 #include "nnet3/nnet-utils.h"
 
 #include "model.h"
+#include "spk_model.h"
 
 using namespace kaldi;
 
 class KaldiRecognizer {
     public:
         KaldiRecognizer(Model &model, float sample_frequency);
+        KaldiRecognizer(Model &model, SpkModel *spk_model, float sample_frequency);
         KaldiRecognizer(Model &model, float sample_frequency, char const *grammar);
         ~KaldiRecognizer();
         bool AcceptWaveform(const char *data, int len);
@@ -44,6 +46,7 @@ class KaldiRecognizer {
         void CleanUp();
         void UpdateSilenceWeights();
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
+        void GetSpkVector(Vector<BaseFloat> &xvector);
 
         Model &model_;
         SingleUtteranceNnet3Decoder *decoder_;
@@ -51,6 +54,9 @@ class KaldiRecognizer {
         fst::StdVectorFst g_fst_; // dynamically constructed grammar
         OnlineNnet2FeaturePipeline *feature_pipeline_;
         OnlineSilenceWeighting *silence_weighting_;
+
+        SpkModel *spk_model_;
+        OnlineBaseFeature *spk_feature_;
 
         float sample_frequency_;
         int32 frame_offset_;

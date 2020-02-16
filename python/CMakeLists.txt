@@ -21,7 +21,10 @@ include(${SWIG_USE_FILE})
 
 set_property(SOURCE "${TOP_SRCDIR}/src/vosk.i" PROPERTY CPLUSPLUS ON)
 swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" OUTFILE_DIR "."
-    SOURCES "${TOP_SRCDIR}/src/kaldi_recognizer.cc" "${TOP_SRCDIR}/src/vosk.i" "${TOP_SRCDIR}/src/model.cc")
+    SOURCES "${TOP_SRCDIR}/src/kaldi_recognizer.cc" 
+            "${TOP_SRCDIR}/src/spk_model.cc"
+            "${TOP_SRCDIR}/src/model.cc"
+            "${TOP_SRCDIR}/src/vosk.i")
 
 swig_link_libraries(vosk
              ${KALDI_ROOT}/src/online2/kaldi-online2.a

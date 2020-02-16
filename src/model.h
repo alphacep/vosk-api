@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef model_H_
-#define model_H_
+#ifndef MODEL_H_
+#define MODEL_H_
 
 #include "base/kaldi-common.h"
 #include "fstext/fstext-lib.h"
@@ -69,4 +69,4 @@ protected:
     fst::Fst<fst::StdArc> *g_fst_;
 };
 
-#endif /* model_H_ */
+#endif /* MODEL_H_ */
