@@ -9,7 +9,7 @@ else()
     add_compile_options(${PYTHON_CFLAGS})
     set(Python_INCLUDE_DIRS "")
     set(Python_LIBRARY "")
-    message(STATUS "Not searching for Python, since PYTHON_CFLAGS env var is set ($PYTHON_CFLAGS)")
+    message(STATUS "Not searching for Python, since PYTHON_CFLAGS env var is set (${PYTHON_CFLAGS})")
 endif()
 
 set(TOP_SRCDIR "$ENV{TOP_SRCDIR}")

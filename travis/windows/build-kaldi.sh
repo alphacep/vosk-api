@@ -53,8 +53,8 @@ find_sln() {
 		if [ ! -f variables.props ]; then
 			cp variables.props.dev variables.props
 			sed -ie "s~<OPENBLASDIR>.*</OPENBLASDIR>~<OPENBLASDIR>$(win_path "$OPENBLAS_ROOT")</OPENBLASDIR>~" variables.props
-			sed -ie "s~<KALDI>.*</KALDI>~<KALDI>$(win_path "$KALDI_ROOT")</KALDI>~" variables.props
-			sed -ie "s~<KALDILIB>.*</KALDILIB>~<KALDILIB>$(win_path "${KALDI_ROOT}/build64")</KALDILIB>~" variables.props
+			sed -ie "s~<OPENFST>.*</OPENFST>~<OPENFST>$(win_path "$OPENFST_ROOT")</OPENFST>~" variables.props
+			sed -ie "s~<OPENFSTLIB>.*</OPENFSTLIB>~<OPENFSTLIB>$(win_path "${OPENFST_ROOT}/build64")</OPENFSTLIB>~" variables.props
 		fi
 		echo "Listing $(readlink -f variables.props):"
 		cat variables.props
