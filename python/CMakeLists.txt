@@ -112,6 +112,8 @@ swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OU
 
 swig_link_libraries(vosk ${VOSK_LIBRARIES})
 
-set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE -s)
+if(NOT MSVC)
+    set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE -s)
+endif()
 
 file(INSTALL ${ADDITIONAL_LIBRARIES} DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
