@@ -1,2 +1,4 @@
-openfst
 kaldi
+mingw
+openblas
+openfst

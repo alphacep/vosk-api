@@ -10,7 +10,6 @@ from glob import glob
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.build_py import build_py
-from setuptools.command.install_lib import install_lib
 
 CMAKE_EXE = os.environ.get('CMAKE_EXE', shutil.which('cmake'))
 
@@ -88,10 +87,10 @@ class CMakeBuildExt(build_ext):
             super().build_extension(ext)
 
 
+
 class CMakeBuildExtFirst(build_py):
     def run(self):
         self.run_command("build_ext")
         return super().run()
-
 
 __all__ = ['CMakeBuildExt', 'CMakeExtension', 'CMakeBuildExtFirst']
