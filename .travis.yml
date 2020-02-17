@@ -37,8 +37,6 @@ jobs:
       env: DOCKCROSS_IMAGE=linux-armv6 OPENBLAS_TARGET=ARMV6
     - <<: *linux_job
       env: DOCKCROSS_IMAGE=linux-armv7 OPENBLAS_TARGET=ARMV7
-    - <<: *linux_job
-      env: DOCKCROSS_IMAGE=linux-arm64 OPENBLAS_TARGET=ARMV8
     - &windows_job
       os: windows
       cache:
