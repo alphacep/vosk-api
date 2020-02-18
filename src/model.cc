@@ -86,6 +86,7 @@ Model::Model(const char *model_path) {
 
     feature_info_.feature_type = "mfcc";
     ReadConfigFromFile(model_path_str + "/mfcc.conf", &feature_info_.mfcc_opts);
+    feature_info_.mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
 
     feature_info_.silence_weighting_config.silence_weight = 1e-3;
     feature_info_.silence_weighting_config.silence_phones_str = "1:2:3:4:5:6:7:8:9:10";

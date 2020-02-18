@@ -18,6 +18,7 @@ SpkModel::SpkModel(const char *speaker_path) {
     std::string speaker_path_str(speaker_path);
 
     ReadConfigFromFile(speaker_path_str + "/mfcc.conf", &spkvector_mfcc_opts);
+    spkvector_mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
 
     ReadKaldiObject(speaker_path_str + "/final.ext.raw", &speaker_nnet);
     SetBatchnormTestMode(true, &speaker_nnet);

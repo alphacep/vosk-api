@@ -2,32 +2,29 @@
 
 from vosk import Model, KaldiRecognizer
 import sys
-import json
 import os
+import wave
 
 if not os.path.exists("model-en"):
     print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'model' in the current folder.")
     exit (1)
 
+wf = wave.open(sys.argv[1], "rb")
+if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE":
+    print ("Audio file must be WAV format mono PCM.")
+    exit (1)
 
 model = Model("model-en")
-
 # You can also specify the possible word list
-rec = KaldiRecognizer(model, 16000, "zero oh one two three four five six seven eight nine")
-
-wf = open(sys.argv[1], "rb")
-wf.read(44) # skip header
+rec = KaldiRecognizer(model, wf.getframerate(), "zero oh one two three four five six seven eight nine")
 
 while True:
-    data = wf.read(2000)
+    data = wf.readframes(1000)
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):
-        res = json.loads(rec.Result())
-        print (res)
+        print(rec.Result())
     else:
-        res = json.loads(rec.PartialResult())
-        print (res)
+        print(rec.PartialResult())
 
-res = json.loads(rec.FinalResult())
-print (res)
+print(rec.FinalResult())
