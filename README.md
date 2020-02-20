@@ -81,7 +81,7 @@ cd vosk-api/python/example
 wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-model-android-en-us-0.3.tar.gz
 tar xf alphacep-model-android-en-us-0.3.tar.gz 
 mv alphacep-model-android-en-us-0.3 model
-python3 ./test_local.py test.wav
+python3 ./test_simple.py test.wav
 ```
 
 There are models for other languages available too.
