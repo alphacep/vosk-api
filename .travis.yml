@@ -1,17 +1,99 @@
 notifications:
   email: false
 
-matrix:
+git:
+  depth: false
+
+language: shell # https://config.travis-ci.com/ref/language
+
+jobs:
   include:
-    - sudo: required
+    - &linux_job
+      env: DOCKCROSS_IMAGE=manylinux2010-x64 OPENBLAS_TARGET=NEHALEM
+      os: linux
       services:
         - docker
-      env: DOCKER_IMAGE=alphacep/kaldi-manylinux:latest
-           PLAT=manylinux2010_x86_64
+      script:
+        - export HELPER_IMAGE="${DOCKER_REGISTRY}/vosk-api-build:${DOCKCROSS_IMAGE}"
+        - export VERSION="$(git describe --tags --always)"
+        - export DOCKER_BUILD_ARGS="--build-arg DOCKCROSS_IMAGE=$DOCKCROSS_IMAGE --build-arg OPENBLAS_TARGET=$OPENBLAS_TARGET"
+        - date; docker run --rm --privileged multiarch/qemu-user-static:register
+        - date; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        # stage s1
+        - date; docker pull ${HELPER_IMAGE}.s1 || true
+        - date; docker build --tag ${HELPER_IMAGE}.s1 --target s1 --cache-from ${HELPER_IMAGE}.s1 ${DOCKER_BUILD_ARGS} travis
+        - date; docker push ${HELPER_IMAGE}.s1
+        # stage s2
+        - date; docker pull ${HELPER_IMAGE}.s2 || true
+        - date; docker build --tag ${HELPER_IMAGE}.s2 --target s2 --cache-from ${HELPER_IMAGE}.s1 --cache-from ${HELPER_IMAGE}.s2 ${DOCKER_BUILD_ARGS} travis
+        - date; docker push ${HELPER_IMAGE}.s2
+        # final stage
+        - date; docker pull ${HELPER_IMAGE} || true
+        - date; docker build --tag ${HELPER_IMAGE} --cache-from ${HELPER_IMAGE}.s1 --cache-from ${HELPER_IMAGE}.s2 --cache-from ${HELPER_IMAGE} ${DOCKER_BUILD_ARGS} travis
+        - date; docker push ${HELPER_IMAGE}
+        # build wheels
+        - date; docker run --rm -v "$(pwd):/io" -e "VERSION=$VERSION" ${HELPER_IMAGE} /io/travis/build-wheels.sh
+    - <<: *linux_job
+      env: DOCKCROSS_IMAGE=linux-armv6 OPENBLAS_TARGET=ARMV6
+    - <<: *linux_job
+      env: DOCKCROSS_IMAGE=linux-armv7 OPENBLAS_TARGET=ARMV7
+    - &windows_job
+      os: windows
+      cache:
+        directories:
+          - $HOME/AppData/Local/Temp/chocolatey
+          - travis/openfst
+          - travis/kaldi
+      before_cache:
+        - find $HOME/AppData/Local/Temp/chocolatey -type f -name '*.log' -delete
+      install:
+        - choco install swig    --no-progress -y
+        - choco install python3 --no-progress -y --version 3.8.1
+        - C:/Python38/python -m pip install conan
+        - C:/Python38/Scripts/conan user
+        - C:/Python38/Scripts/conan install travis/windows
+      script:
+        - echo $PATH
+        - export TRAVIS_WILL_KILL_BUILD_AT=$(( $(date +%s) + 45 * 60 ))
+        - export CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+        - export MINGW_ROOT=$(travis/windows/build-mingw.sh)
+        - export OPENBLAS_ROOT=$(travis/windows/build-openblas.sh)
+        - export OPENFST_ROOT=$(travis/windows/build-openfst.sh)
+        - export KALDI_ROOT=$(travis/windows/build-kaldi.sh)
+        - export VERSION="$(git describe --tags --always)"
+        - travis/windows/build-wheel.sh 3.8.1 wheelhouse
+        - travis/windows/build-wheel.sh 3.7.6 wheelhouse
+        - travis/windows/build-wheel.sh 3.6.8 wheelhouse
+        - travis/windows/build-wheel.sh 3.5.4 wheelhouse
+        - 'true'
 
-install:
-  - docker pull $DOCKER_IMAGE
-
-script:
-  - docker run --rm -e PLAT=$PLAT -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
-  - ls wheelhouse/
+deploy:
+  # Draft a GitHib Release for each commit
+  # https://docs.travis-ci.com/user/deployment-v2/providers/releases/
+  - provider: releases
+    edge: true
+    token: $GITHUB_TOKEN
+    file: wheelhouse/*
+    draft: true
+    name: $VERSION
+    tag_name: $TRAVIS_TAG
+    on:
+      all_branches: true
+      condition: $GITHUB_TOKEN
+  # Upload to PyPI when building a tagged commit
+  # https://docs.travis-ci.com/user/deployment-v2/providers/script/
+  # https://pypi.org/project/twine/
+  - provider: script
+    edge: true
+    # pass environment variables to the container without exposing them in the logs
+    script: |
+      env | sed -re 's/^([^=]+)=(.*)$/export \1="\2"/g' > env.source && \
+      docker run --rm \
+      -v "$(pwd):/io" \
+      -w /io \
+      --entrypoint bash \
+      library/python \
+      -c "source env.source && pip install twine && twine check wheelhouse/* && twine upload wheelhouse/*"
+    on:
+      all_branches: true
+      condition: $TRAVIS_TAG && $TWINE_USERNAME && $TWINE_PASSWORD

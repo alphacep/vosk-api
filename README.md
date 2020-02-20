@@ -22,7 +22,7 @@ The easiest way to install vosk api is with pip. You do not have to compile anyt
 
 Make sure you have newer pip and python:
 
-  * Python version >= 3.4
+  * Python version >= 3.5
   * pip version >= 19.0
 
 Uprade python and pip if needed. Then install vosk on Linux with a simple command
