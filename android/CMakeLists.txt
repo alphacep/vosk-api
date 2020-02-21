@@ -21,6 +21,8 @@ set(API_SOURCES
 "${PROJECT_SOURCE_DIR}/../src/kaldi_recognizer.h"
 "${PROJECT_SOURCE_DIR}/../src/model.cc"
 "${PROJECT_SOURCE_DIR}/../src/model.h"
+"${PROJECT_SOURCE_DIR}/../src/spk_model.cc"
+"${PROJECT_SOURCE_DIR}/../src/spk_model.h"
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
