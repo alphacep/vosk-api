@@ -64,7 +64,7 @@ import java.nio.ByteOrder;
 CSHARP_ARRAYS(char, byte)
 %apply char INPUT[] {const char *data};
 %apply float INPUT[] {const float *fdata};
-%apply short INPUT[] {const float *sdata};
+%apply short INPUT[] {const short *sdata};
 #endif
 
 %include "kaldi_recognizer.h"
