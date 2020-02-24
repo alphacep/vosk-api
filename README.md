@@ -103,3 +103,12 @@ There are models for other languages (English, Chinese, Spanish, Portuguese, Ger
 To run with your audio file make sure it has proper format - PCM 16khz 16bit mono, otherwise decoding will not work.
 
 You can find other examples of using a microphone, decoding with a fixed small vocabulary or speaker identification setup in  [python/example subfolder](https://github.com/alphacep/vosk-api/tree/master/python/example)
+
+## Contact Us
+
+If you have any questions, feel free to
+
+   * Post an issue here on github
+   * Send us an e-mail at [contact@alphacephei.com](mailto:contact@alphacephei.com)
+   * Join our group dedicated to speech recognition on Telegram [@speech_recognition](https://t.me/speech_recognition)
+   
