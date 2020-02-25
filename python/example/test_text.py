@@ -5,12 +5,12 @@ import sys
 import json
 import os
 
-if not os.path.exists("model"):
-    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'model' in the current folder.")
+if not os.path.exists("model-en"):
+    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'model-en' in the current folder.")
     exit (1)
 
 
-model = Model("model")
+model = Model("model-en")
 
 # Large vocabulary free form recognition
 rec = KaldiRecognizer(model, 16000)

@@ -30,3 +30,8 @@ python/dist
 java/org
 java/model-en
 java/*.cc
+
+# CSharp
+csharp/gen
+csharp/*.exe
+csharp/*.cc
