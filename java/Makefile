@@ -52,6 +52,11 @@ model-en:
 	tar xf alphacep-model-android-en-us-0.3.tar.gz && rm alphacep-model-android-en-us-0.3.tar.gz
 	mv alphacep-model-android-en-us-0.3 model-en
 
-run: model-en
+model-spk:
+	wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-spk-model-0.3.tar.gz
+	tar xf alphacep-spk-model-0.3.tar.gz && rm alphacep-spk-model-0.3.tar.gz
+	mv alphacep-spk-model-0.3 model-spk
+
+run: model-en model-spk
 	javac test/*.java org/kaldi/*.java
 	java -Djava.library.path=. -cp . test.DecoderTest
