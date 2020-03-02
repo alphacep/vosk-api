@@ -338,6 +338,8 @@ std::string KaldiRecognizer::FinalResult()
         decoder_->AdvanceDecoding();
         decoder_->FinalizeDecoding();
         input_finalized_ = true;
+        return Result();
+    } else {
+        return "{\"text\": \"\"}";
     }
-    return Result();
 }
