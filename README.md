@@ -94,7 +94,7 @@ Run like this:
 cd vosk-api/python/example
 wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-model-android-en-us-0.3.tar.gz
 tar xf alphacep-model-android-en-us-0.3.tar.gz 
-mv alphacep-model-android-en-us-0.3 model
+mv alphacep-model-android-en-us-0.3 model-en
 python3 ./test_simple.py test.wav
 ```
 
