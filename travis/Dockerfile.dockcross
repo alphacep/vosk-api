@@ -21,6 +21,7 @@ RUN cd /opt \
     && rm -rf swig-4.0.1.tar.gz swig-4.0.1
 
 ARG OPENBLAS_ARCH=ARMV7
+ARG ARM_HARDWARE_OPTS="-mfloat-abi=hard -mfpu=neon"
 RUN cd /opt \
     && export OPENFST_CONFIGURE="--enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin --host=${CROSS_TRIPLE} --build=x86-linux-gnu" \
     && git clone -b lookahead --single-branch https://github.com/alphacep/kaldi \
@@ -31,6 +32,8 @@ RUN cd /opt \
     && make -j 10 openfst \
     && cd /opt/kaldi/src \
     && sed -i "s:TARGET_ARCH=\"\`uname -m\`\":TARGET_ARCH=$(echo $CROSS_TRIPLE|cut -d - -f 1):g" configure \
+    && sed -i "s:-mfloat-abi=hard -mfpu=neon:${ARM_HARDWARE_OPTS}:g" makefiles/linux_openblas_arm.mk \
+    && sed -i "s: -O1 : -O3 :g" makefiles/linux_openblas_arm.mk \
     && ./configure --mathlib=OPENBLAS --shared --use-cuda=no \
     && make -j 10 online2 \
     && find /opt/kaldi -name "*.o" -exec rm {} \;
