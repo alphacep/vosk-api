@@ -16,6 +16,8 @@ gradle build
 
 Please note that medium blog post about 64-bit is not relevant anymore, the script builds x86, arm64 and armv7 libraries automatically without any modifications.
 
+For example of Android application using Vosk-API check https://github.com/alphacep/kaldi-android-demo project
+
 ## Python installation from Pypi
 
 The easiest way to install vosk api is with pip. You do not have to compile anything. We currently support only Linux on x86_64 and Raspberry Pi. Other systems (windows, mac) will come soon.
@@ -30,6 +32,19 @@ Uprade python and pip if needed. Then install vosk on Linux with a simple comman
 ```
 pip3 install vosk
 ```
+
+## Websocket Server and GRPC server
+
+We also provide a websocket server and grpc server which can be used in telephony and other applications. With bigger models adapted for 8khz audio it provides more accuracy.
+
+The server is installed with docker and can run with a single command:
+
+```
+docker run -d -p 2700:2700 alphacep/kaldi-en:latest
+```
+
+For details see https://github.com/alphacep/vosk-server
+
 
 ## Compilation from source
 
