@@ -119,6 +119,10 @@ To run with your audio file make sure it has proper format - PCM 16khz 16bit mon
 
 You can find other examples of using a microphone, decoding with a fixed small vocabulary or speaker identification setup in  [python/example subfolder](https://github.com/alphacep/vosk-api/tree/master/python/example)
 
+## Models
+
+For information about models see [MODELS](https://github.com/alphacep/vosk-api/blob/master/MODELS.md)
+
 ## Contact Us
 
 If you have any questions, feel free to
