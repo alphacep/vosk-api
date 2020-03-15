@@ -121,7 +121,7 @@ You can find other examples of using a microphone, decoding with a fixed small v
 
 ## Models
 
-For information about models see [MODELS](https://github.com/alphacep/vosk-api/blob/master/MODELS.md)
+For information about models see [the documentation on available models](https://github.com/alphacep/vosk-api/blob/master/doc/models.md).
 
 ## Contact Us
 
