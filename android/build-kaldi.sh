@@ -125,6 +125,6 @@ CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cu
     --fst-root=${WORKDIR}/local --fst-version=${OPENFST_VERSION}
 
 make -j 8 depend
-make -j 8 online2
+make -j 8 online2 lm
 
 done
