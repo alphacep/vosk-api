@@ -1,9 +1,14 @@
 #!/usr/bin/python3
 
-from vosk import Model, KaldiRecognizer
+from vosk import Model, KaldiRecognizer, Gpu
 import sys
 import os
 import wave
+
+g = Gpu()
+g.Init()
+def thread_init():
+    g.Instantiate()
 
 if not os.path.exists("model-en"):
     print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'model-en' in the current folder.")

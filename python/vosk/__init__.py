@@ -1,1 +1,1 @@
-from .vosk import KaldiRecognizer, Model, SpkModel
+from .vosk import KaldiRecognizer, Model, SpkModel, Gpu
