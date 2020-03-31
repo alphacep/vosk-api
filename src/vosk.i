@@ -41,6 +41,7 @@ namespace kaldi {
 #include "kaldi_recognizer.h"
 #include "model.h"
 #include "spk_model.h"
+#include "gpu.h"
 %}
 
 #if SWIGJAVA
@@ -70,3 +71,4 @@ CSHARP_ARRAYS(char, byte)
 %include "kaldi_recognizer.h"
 %include "model.h"
 %include "spk_model.h"
+%include "gpu.h"

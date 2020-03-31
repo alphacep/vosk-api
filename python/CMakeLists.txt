@@ -12,8 +12,8 @@ else()
 endif()
 
 set(KALDI_ROOT "$ENV{KALDI_ROOT}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -DFST_NO_DYNAMIC_LINKING")
-include_directories("${TOP_SRCDIR}/src" "${KALDI_ROOT}/src" "${KALDI_ROOT}/tools/openfst/include" ${Python_INCLUDE_DIR})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -DFST_NO_DYNAMIC_LINKING -DHAVE_CUDA")
+include_directories("${TOP_SRCDIR}/src" "${KALDI_ROOT}/src" "${KALDI_ROOT}/tools/openfst/include" "${Python_INCLUDE_DIR}" "/usr/local/cuda/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{WHEEL_FLAGS}")
 
 find_package(SWIG REQUIRED)
@@ -24,6 +24,7 @@ swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OU
     SOURCES "${TOP_SRCDIR}/src/kaldi_recognizer.cc" 
             "${TOP_SRCDIR}/src/spk_model.cc"
             "${TOP_SRCDIR}/src/model.cc"
+            "${TOP_SRCDIR}/src/gpu.cc"
             "${TOP_SRCDIR}/src/vosk.i")
 
 swig_link_libraries(vosk
@@ -45,6 +46,6 @@ swig_link_libraries(vosk
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
              ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a
-             -lgfortran)
+             -lgfortran -L/usr/local/cuda/lib64 -lcublas -lcusparse -lcudart -lcurand -lcufft -lnvToolsExt  -lcusolver)
 
 set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE -s)
