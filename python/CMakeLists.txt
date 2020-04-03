@@ -19,11 +19,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{WHEEL_FLAGS}")
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
-set_property(SOURCE "${TOP_SRCDIR}/src/vosk.i" PROPERTY CPLUSPLUS ON)
 swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" OUTFILE_DIR "."
-    SOURCES "${TOP_SRCDIR}/src/kaldi_recognizer.cc" 
+    SOURCES "${TOP_SRCDIR}/src/kaldi_recognizer.cc"
             "${TOP_SRCDIR}/src/spk_model.cc"
             "${TOP_SRCDIR}/src/model.cc"
+            "${TOP_SRCDIR}/src/vosk_api.cc"
             "${TOP_SRCDIR}/src/vosk.i")
 
 swig_link_libraries(vosk
@@ -45,6 +45,6 @@ swig_link_libraries(vosk
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
              ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a
-             -lgfortran)
+             -lgfortran -lstdc++)
 
 set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE -s)

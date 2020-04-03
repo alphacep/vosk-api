@@ -44,14 +44,6 @@ public:
 protected:
     friend class KaldiRecognizer;
 
-    std::string nnet3_rxfilename_;
-    std::string hclg_fst_rxfilename_;
-    std::string hcl_fst_rxfilename_;
-    std::string g_fst_rxfilename_;
-    std::string word_syms_rxfilename_;
-    std::string winfo_rxfilename_;
-    std::string disambig_rxfilename_;
-
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
     kaldi::nnet3::NnetSimpleLoopedComputationOptions decodable_opts_;

@@ -26,7 +26,7 @@ public class DecoderTest {
         int nbytes;
         byte[] b = new byte[4096];
         while ((nbytes = ais.read(b)) >= 0) {
-            if (rec.AcceptWaveform(b, nbytes)) {
+            if (rec.AcceptWaveform(b)) {
                 System.out.println(rec.Result());
             } else {
                 System.out.println(rec.PartialResult());

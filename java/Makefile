@@ -32,14 +32,16 @@ VOSK_SOURCES = \
 	../src/model.cc \
 	../src/model.h \
 	../src/spk_model.cc \
-	../src/spk_model.h
+	../src/spk_model.h \
+	../src/vosk_api.cc \
+	../src/vosk_api.h
 
 libvosk_jni.so: $(VOSK_SOURCES)
 	$(CXX) -shared -o $@ $(CPPFLAGS) $(CFLAGS) $(VOSK_SOURCES) $(KALDI_LIBS)
 
 vosk_wrap.cc: ../src/vosk.i
 	mkdir -p org/kaldi
-	swig -I../src -c++ \
+	swig -c++ -I../src \
 		-java -package org.kaldi \
 		-outdir org/kaldi -o $@ $<
 

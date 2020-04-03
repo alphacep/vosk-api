@@ -25,6 +25,7 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
+    g_fst_ = NULL;
     decode_fst_ = NULL;
 
     if (!model_.hclg_fst_) {
@@ -51,12 +52,13 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char cons
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
+    g_fst_ = new StdVectorFst();
     if (model_.hcl_fst_) {
-        g_fst_.AddState();
-        g_fst_.SetStart(0);
-        g_fst_.AddState();
-        g_fst_.SetFinal(1, fst::TropicalWeight::One());
-        g_fst_.AddArc(1, StdArc(0, 0, fst::TropicalWeight::One(), 0));
+        g_fst_->AddState();
+        g_fst_->SetStart(0);
+        g_fst_->AddState();
+        g_fst_->SetFinal(1, fst::TropicalWeight::One());
+        g_fst_->AddArc(1, StdArc(0, 0, fst::TropicalWeight::One(), 0));
 
         // Create simple word loop FST
         std::stringstream ss(grammar);
@@ -64,11 +66,11 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char cons
 
         while (std::getline(ss, token, ' ')) {
             int32 id = model_.word_syms_->Find(token);
-            g_fst_.AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
+            g_fst_->AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
         }
-        ArcSort(&g_fst_, ILabelCompare<StdArc>());
+        ArcSort(g_fst_, ILabelCompare<StdArc>());
 
-        decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, g_fst_, model_.disambig_);
+        decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, *g_fst_, model_.disambig_);
     } else {
         decode_fst_ = NULL;
         KALDI_ERR << "Can't create decoding graph";
@@ -91,6 +93,7 @@ KaldiRecognizer::KaldiRecognizer(Model &model, SpkModel *spk_model, float sample
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
 
     decode_fst_ = NULL;
+    g_fst_ = NULL;
 
     if (!model_.hclg_fst_) {
         if (model_.hcl_fst_ && model_.g_fst_) {
@@ -116,6 +119,7 @@ KaldiRecognizer::~KaldiRecognizer() {
     delete feature_pipeline_;
     delete silence_weighting_;
     delete decoder_;
+    delete g_fst_;
     delete decode_fst_;
     delete spk_feature_;
 }
@@ -243,7 +247,7 @@ void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
 }
 
 
-std::string KaldiRecognizer::Result()
+const char* KaldiRecognizer::Result()
 {
 
     if (!input_finalized_) {
@@ -252,7 +256,8 @@ std::string KaldiRecognizer::Result()
     }
 
     if (decoder_->NumFramesDecoded() == 0) {
-        return "{\"text\": \"\"}";
+        last_result_ = "{\"text\": \"\"}";
+        return last_result_.c_str();
     }
 
     kaldi::CompactLattice clat;
@@ -301,15 +306,17 @@ std::string KaldiRecognizer::Result()
         }
     }
 
-    return obj.dump();
+    last_result_ = obj.dump();
+    return last_result_.c_str();
 }
 
-std::string KaldiRecognizer::PartialResult()
+const char* KaldiRecognizer::PartialResult()
 {
     json::JSON res;
     if (decoder_->NumFramesDecoded() == 0) {
         res["partial"] = "";
-        return res.dump();
+        last_result_ = res.dump();
+        return last_result_.c_str();
     }
 
     kaldi::Lattice lat;
@@ -327,10 +334,11 @@ std::string KaldiRecognizer::PartialResult()
     }
     res["partial"] = text.str();
 
-    return res.dump();
+    last_result_ = res.dump();
+    return last_result_.c_str();
 }
 
-std::string KaldiRecognizer::FinalResult()
+const char* KaldiRecognizer::FinalResult()
 {
     if (!input_finalized_) {
         feature_pipeline_->InputFinished();
@@ -340,6 +348,7 @@ std::string KaldiRecognizer::FinalResult()
         input_finalized_ = true;
         return Result();
     } else {
-        return "{\"text\": \"\"}";
+        last_result_ = "{\"text\": \"\"}";
+        return last_result_.c_str();
     }
 }

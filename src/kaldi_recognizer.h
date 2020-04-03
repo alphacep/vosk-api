@@ -38,9 +38,9 @@ class KaldiRecognizer {
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);
-        std::string Result();
-        std::string FinalResult();
-        std::string PartialResult();
+        const char* Result();
+        const char* FinalResult();
+        const char* PartialResult();
 
     private:
         void CleanUp();
@@ -51,7 +51,7 @@ class KaldiRecognizer {
         Model &model_;
         SingleUtteranceNnet3Decoder *decoder_;
         fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
-        fst::StdVectorFst g_fst_; // dynamically constructed grammar
+        fst::StdVectorFst *g_fst_; // dynamically constructed grammar
         OnlineNnet2FeaturePipeline *feature_pipeline_;
         OnlineSilenceWeighting *silence_weighting_;
 
@@ -61,4 +61,5 @@ class KaldiRecognizer {
         float sample_frequency_;
         int32 frame_offset_;
         bool input_finalized_;
+        std::string last_result_;
 };

@@ -107,39 +107,38 @@ Model::Model(const char *model_path) {
     feature_info_.use_ivectors = true;
     feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
 
-    nnet3_rxfilename_ = model_path_str + "/final.mdl";
-    hclg_fst_rxfilename_ = model_path_str + "/HCLG.fst";
-    hcl_fst_rxfilename_ = model_path_str + "/HCLr.fst";
-    g_fst_rxfilename_ = model_path_str + "/Gr.fst";
-    disambig_rxfilename_ = model_path_str + "/disambig_tid.int";
-    word_syms_rxfilename_ = model_path_str + "/words.txt";
-    winfo_rxfilename_ = model_path_str + "/word_boundary.int";
+    std::string nnet3_rxfilename = model_path_str + "/final.mdl";
+    std::string hclg_fst_rxfilename = model_path_str + "/HCLG.fst";
+    std::string hcl_fst_rxfilename = model_path_str + "/HCLr.fst";
+    std::string g_fst_rxfilename = model_path_str + "/Gr.fst";
+    std::string disambig_rxfilename = model_path_str + "/disambig_tid.int";
+    std::string word_syms_rxfilename = model_path_str + "/words.txt";
+    std::string winfo_rxfilename = model_path_str + "/word_boundary.int";
 
     trans_model_ = new kaldi::TransitionModel();
     nnet_ = new kaldi::nnet3::AmNnetSimple();
     {
         bool binary;
-        kaldi::Input ki(nnet3_rxfilename_, &binary);
+        kaldi::Input ki(nnet3_rxfilename, &binary);
         trans_model_->Read(ki.Stream(), binary);
         nnet_->Read(ki.Stream(), binary);
         SetBatchnormTestMode(true, &(nnet_->GetNnet()));
         SetDropoutTestMode(true, &(nnet_->GetNnet()));
         nnet3::CollapseModel(nnet3::CollapseModelConfig(), &(nnet_->GetNnet()));
     }
-
     decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
                                                                nnet_);
+
     struct stat buffer;
-    if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
-        hclg_fst_ = fst::ReadFstKaldiGeneric(hclg_fst_rxfilename_);
+    if (stat(hclg_fst_rxfilename.c_str(), &buffer) == 0) {
+        hclg_fst_ = fst::ReadFstKaldiGeneric(hclg_fst_rxfilename);
         hcl_fst_ = NULL;
         g_fst_ = NULL;
     } else {
         hclg_fst_ = NULL;
-        hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename_);
-        g_fst_ = fst::StdFst::Read(g_fst_rxfilename_);
-
-        ReadIntegerVectorSimple(disambig_rxfilename_, &disambig_);
+        hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename);
+        g_fst_ = fst::StdFst::Read(g_fst_rxfilename);
+        ReadIntegerVectorSimple(disambig_rxfilename, &disambig_);
     }
 
     word_syms_ = NULL;
@@ -149,15 +148,15 @@ Model::Model(const char *model_path) {
         word_syms_ = g_fst_->OutputSymbols();
     }
     if (!word_syms_) {
-        if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_)))
+        if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename)))
             KALDI_ERR << "Could not read symbol table from file "
-                      << word_syms_rxfilename_;
+                      << word_syms_rxfilename;
     }
     KALDI_ASSERT(word_syms_);
 
-    if (stat(winfo_rxfilename_.c_str(), &buffer) == 0) {
+    if (stat(winfo_rxfilename.c_str(), &buffer) == 0) {
         kaldi::WordBoundaryInfoNewOpts opts;
-        winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
+        winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename);
     } else {
         winfo_ = NULL;
     }

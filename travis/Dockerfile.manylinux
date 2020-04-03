@@ -37,4 +37,3 @@ RUN cd /opt \
     && ./configure --prefix=/usr && make -j 10 && make install \
     && cd .. \
     && rm -rf swig-4.0.1.tar.gz swig-4.0.1
-

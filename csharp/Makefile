@@ -35,7 +35,9 @@ VOSK_SOURCES = \
 	../src/model.cc \
 	../src/model.h \
 	../src/spk_model.cc \
-	../src/spk_model.h
+	../src/spk_model.h \
+	../src/vosk_api.cc \
+	../src/vosk_api.h
 
 libkaldiwrap.so: $(VOSK_SOURCES)
 	$(CXX) -fpermissive $(CFLAGS) $(CPPFLAGS) -shared -o $@ $(VOSK_SOURCES) $(KALDI_LIBS)
