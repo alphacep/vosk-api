@@ -34,4 +34,4 @@ java/*.cc
 # CSharp
 csharp/gen
 csharp/*.exe
-csharp/*.cc
+csharp/*.c
