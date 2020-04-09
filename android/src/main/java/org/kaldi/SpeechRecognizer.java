@@ -31,7 +31,7 @@ import android.util.Log;
 /**
  * Main class to access recognizer functions. After configuration this class
  * starts a listener thread which records the data and recognizes it using
- * Pocketsphinx engine. Recognition events are passed to a client using
+ * VOSK engine. Recognition events are passed to a client using
  * {@link RecognitionListener}
  * 
  */
