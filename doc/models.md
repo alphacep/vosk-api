@@ -15,7 +15,7 @@ To add a new model here create an issue on Github.
 
 | Model                                                                                                     | Size  | Accuracy   | Notes                                                                                        |
 |-----------------------------------------------------------------------------------------------------------|-------|------------|----------------------------------------------------------------------------------------------|
-| [kaldi-cn-0.1.tar.gz](http://alphacephei.com/kaldi/kaldi-cn-0.1.tar.gz.tar.gz)                            |  195M |   TBD      | Big narrowband Chinese model for server processing                                           |
+| [kaldi-cn-0.1.tar.gz](http://alphacephei.com/kaldi/kaldi-cn-0.1.tar.gz)                                   |  195M |   TBD      | Big narrowband Chinese model for server processing                                           |
 | [alphacep-model-android-cn-0.3](http://alphacephei.com/kaldi/alphacep-model-android-cn-0.3.tar.gz)        |  32M  |   TBD      | Lightweight wideband model for Android and RPi                                               |
 
 ### Russian
@@ -58,4 +58,4 @@ https://github.com/opensource-spraakherkenning-nl/Kaldi_NL
 
 | Model                                                                                                     | Size  | Accuracy   | Notes                                                                                        |
 |-----------------------------------------------------------------------------------------------------------|-------|------------|----------------------------------------------------------------------------------------------|
-| [kaldi-el-gr-0.6.tar.gz](http://alphacephei.com/kaldi/kaldi-el-gr-0.6.tar.gz.tar.gz)                      |  1.1G |   TBD      | Big narrowband Greek model for server processing, not extremely accurate though        |
+| [kaldi-el-gr-0.6.tar.gz](http://alphacephei.com/kaldi/kaldi-el-gr-0.6.tar.gz)                             |  1.1G |   TBD      | Big narrowband Greek model for server processing, not extremely accurate though        |
