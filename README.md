@@ -18,6 +18,10 @@ Please note that medium blog post about 64-bit is not relevant anymore, the scri
 
 For example of Android application using Vosk-API check https://github.com/alphacep/kaldi-android-demo project
 
+## iOS build
+
+Available on request. Drop as a mail at [contact@alphacephei.com](mailto:contact@alphacephei.com).
+
 ## Python installation from Pypi
 
 The easiest way to install vosk api is with pip. You do not have to compile anything. We currently support only Linux on x86_64 and Raspberry Pi. Other systems (windows, mac) will come soon.
