@@ -10,17 +10,25 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet var mainText: UITextView!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let vosk = Vosk();
-        vosk.run();
+    
+        DispatchQueue.global(qos: .userInitiated).async {
+            DispatchQueue.main.async {
+                 self.mainText.text =  "Processing file..."
+            }
+            let vosk = Vosk()
+            let res = vosk.recognizeFile()
+            DispatchQueue.main.async {
+                self.mainText.text = res
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-
-
 }
 
