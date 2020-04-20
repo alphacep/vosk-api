@@ -47,7 +47,7 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(
     spk_feature_ = NULL;
 }
 
-KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char const *grammar) : model_(model), spk_model_(0), sample_frequency_(sample_frequency), char const *grammar
+KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char const *grammar) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency), char const *grammar
 {
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
