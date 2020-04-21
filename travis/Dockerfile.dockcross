@@ -63,3 +63,20 @@ RUN cd /opt \
     && make -j $(nproc) \
     && make install \
     && rm -rf /opt/cpython-3.7.6 /opt/cpython-3.7.6-cross /opt/v3.7.6.tar.gz
+
+RUN cd /opt \
+    && wget -q https://github.com/python/cpython/archive/v3.6.10.tar.gz \
+    && tar xf v3.6.10.tar.gz \
+    && cp -r cpython-3.6.10 cpython-3.6.10-cross \
+    && cd /opt/cpython-3.6.10 \
+    && AR=/usr/bin/ar RANLIB=/usr/bin/ranlib CPP=/usr/bin/cpp CXX=/usr/bin/g++ CC=/usr/bin/gcc  ./configure --prefix="/opt/python/cp3.6-cp3.6m" \
+    && make -j $(nproc) \
+    && make install \
+    && /opt/python/cp3.6-cp3.6m/bin/pip3 install -U pip \
+    && /opt/python/cp3.6-cp3.6m/bin/pip3 install -U wheel \
+    && cd /opt/cpython-3.6.10-cross \
+    && export PATH=/opt/python/cp3.6-cp3.6m/bin:$PATH \
+    && ./configure --prefix=$CROSS_ROOT --with-openssl=$CROSS_ROOT --host=${CROSS_TRIPLE} --build=x86-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes \
+    && make -j $(nproc) \
+    && make install \
+    && rm -rf /opt/cpython-3.6.10 /opt/cpython-3.6.10-cross /opt/v3.6.10.tar.gz
