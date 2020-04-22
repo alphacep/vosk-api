@@ -1,4 +1,4 @@
-%module(package="vosk") vosk
+%module(package="vosk", "threads"=1) vosk
 
 %include <typemaps.i>
 
@@ -9,8 +9,6 @@
 #elif SWIGCSHARP
 %include <arrays_csharp.i>
 #endif
-
-
 
 #if SWIGPYTHON
 %pybuffer_binary(const char *data, int len);
