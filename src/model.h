@@ -39,9 +39,11 @@ class Model {
 
 public:
     Model(const char *model_path);
-    ~Model();
+    void Ref();
+    void Unref();
 
 protected:
+    ~Model();
     friend class KaldiRecognizer;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
@@ -59,6 +61,8 @@ protected:
     fst::Fst<fst::StdArc> *hclg_fst_;
     fst::Fst<fst::StdArc> *hcl_fst_;
     fst::Fst<fst::StdArc> *g_fst_;
+
+    int ref_cnt_;
 };
 
 #endif /* MODEL_H_ */

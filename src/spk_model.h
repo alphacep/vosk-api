@@ -27,12 +27,17 @@ class SpkModel {
 
 public:
     SpkModel(const char *spk_path);
+    void Ref();
+    void Unref();
 
 protected:
     friend class KaldiRecognizer;
+    ~SpkModel() {};
 
     kaldi::nnet3::Nnet speaker_nnet;
     MfccOptions spkvector_mfcc_opts;
+
+    int ref_cnt_;
 };
 
 #endif /* SPK_MODEL_H_ */

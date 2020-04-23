@@ -3,18 +3,18 @@ project(vosk)
 
 set(TOP_SRCDIR "${CMAKE_SOURCE_DIR}/..")
 if("x$ENV{WHEEL_FLAGS}" STREQUAL "x")
-    find_package (Python COMPONENTS Interpreter Development)
+    find_package (Python3 COMPONENTS Interpreter Development)
 else()
     # docker case
-    set(Python_INCLUDE_DIRS "")
+    set(Python3_INCLUDE_DIRS "")
     set(TOP_SRCDIR "/io")
 endif()
 
 set(KALDI_ROOT "$ENV{KALDI_ROOT}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFST_NO_DYNAMIC_LINKING")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} $ENV{WHEEL_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} -std=c++11")
-include_directories("${TOP_SRCDIR}/src" "${KALDI_ROOT}/src" "${KALDI_ROOT}/tools/openfst/include" ${Python_INCLUDE_DIRS})
+include_directories("${TOP_SRCDIR}/src" "${KALDI_ROOT}/src" "${KALDI_ROOT}/tools/openfst/include" ${Python3_INCLUDE_DIRS})
 
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})

@@ -160,6 +160,21 @@ Model::Model(const char *model_path) {
     } else {
         winfo_ = NULL;
     }
+
+    ref_cnt_ = 1;
+}
+
+void Model::Ref() 
+{
+    ref_cnt_++;
+}
+
+void Model::Unref() 
+{
+    ref_cnt_--;
+    if (ref_cnt_ == 0) {
+        delete this;
+    }
 }
 
 Model::~Model() {

@@ -31,9 +31,9 @@ using namespace kaldi;
 
 class KaldiRecognizer {
     public:
-        KaldiRecognizer(Model &model, float sample_frequency);
-        KaldiRecognizer(Model &model, SpkModel *spk_model, float sample_frequency);
-        KaldiRecognizer(Model &model, float sample_frequency, char const *grammar);
+        KaldiRecognizer(Model *model, float sample_frequency);
+        KaldiRecognizer(Model *model, SpkModel *spk_model, float sample_frequency);
+        KaldiRecognizer(Model *model, float sample_frequency, char const *grammar);
         ~KaldiRecognizer();
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
@@ -48,7 +48,7 @@ class KaldiRecognizer {
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
         void GetSpkVector(Vector<BaseFloat> &xvector);
 
-        Model &model_;
+        Model *model_;
         SingleUtteranceNnet3Decoder *decoder_;
         fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
         fst::StdVectorFst *g_fst_; // dynamically constructed grammar

@@ -20,26 +20,28 @@
 using namespace fst;
 using namespace kaldi::nnet3;
 
-KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) {
+KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) {
 
-    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
-    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
+    model_->Ref();
+
+    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_->feature_info_);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
     g_fst_ = NULL;
     decode_fst_ = NULL;
 
-    if (!model_.hclg_fst_) {
-        if (model_.hcl_fst_ && model_.g_fst_) {
-            decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, *model_.g_fst_, model_.disambig_);
+    if (!model_->hclg_fst_) {
+        if (model_->hcl_fst_ && model_->g_fst_) {
+            decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *model_->g_fst_, model_->disambig_);
         } else {
             KALDI_ERR << "Can't create decoding graph";
         }
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
-            *model_.trans_model_,
-            *model_.decodable_info_,
-            model_.hclg_fst_ ? *model.hclg_fst_ : *decode_fst_,
+    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+            *model_->trans_model_,
+            *model_->decodable_info_,
+            model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
             feature_pipeline_);
 
     frame_offset_ = 0;
@@ -47,13 +49,15 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency) : model_(
     spk_feature_ = NULL;
 }
 
-KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char const *grammar) : model_(model), spk_model_(0), sample_frequency_(sample_frequency)
+KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char const *grammar) : model_(model), spk_model_(0), sample_frequency_(sample_frequency)
 {
-    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
-    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
+    model_->Ref();
+
+    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_->feature_info_);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
     g_fst_ = new StdVectorFst();
-    if (model_.hcl_fst_) {
+    if (model_->hcl_fst_) {
         g_fst_->AddState();
         g_fst_->SetStart(0);
         g_fst_->AddState();
@@ -65,21 +69,21 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char cons
         std::string token;
 
         while (std::getline(ss, token, ' ')) {
-            int32 id = model_.word_syms_->Find(token);
+            int32 id = model_->word_syms_->Find(token);
             g_fst_->AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
         }
         ArcSort(g_fst_, ILabelCompare<StdArc>());
 
-        decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, *g_fst_, model_.disambig_);
+        decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *g_fst_, model_->disambig_);
     } else {
         decode_fst_ = NULL;
         KALDI_ERR << "Can't create decoding graph";
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
-            *model_.trans_model_,
-            *model_.decodable_info_,
-            model_.hclg_fst_ ? *model.hclg_fst_ : *decode_fst_,
+    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+            *model_->trans_model_,
+            *model_->decodable_info_,
+            model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
             feature_pipeline_);
 
     frame_offset_ = 0;
@@ -88,25 +92,29 @@ KaldiRecognizer::KaldiRecognizer(Model &model, float sample_frequency, char cons
 }
 
 
-KaldiRecognizer::KaldiRecognizer(Model &model, SpkModel *spk_model, float sample_frequency) : model_(model), spk_model_(spk_model), sample_frequency_(sample_frequency) {
-    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_.feature_info_);
-    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
+KaldiRecognizer::KaldiRecognizer(Model *model, SpkModel *spk_model, float sample_frequency) : model_(model), spk_model_(spk_model), sample_frequency_(sample_frequency) {
+
+    model_->Ref();
+    spk_model->Ref();
+
+    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_->feature_info_);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
     decode_fst_ = NULL;
     g_fst_ = NULL;
 
-    if (!model_.hclg_fst_) {
-        if (model_.hcl_fst_ && model_.g_fst_) {
-            decode_fst_ = LookaheadComposeFst(*model_.hcl_fst_, *model_.g_fst_, model_.disambig_);
+    if (!model_->hclg_fst_) {
+        if (model_->hcl_fst_ && model_->g_fst_) {
+            decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *model_->g_fst_, model_->disambig_);
         } else {
             KALDI_ERR << "Can't create decoding graph";
         }
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_.nnet3_decoding_config_,
-            *model_.trans_model_,
-            *model_.decodable_info_,
-            model_.hclg_fst_ ? *model.hclg_fst_ : *decode_fst_,
+    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+            *model_->trans_model_,
+            *model_->decodable_info_,
+            model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
             feature_pipeline_);
 
     frame_offset_ = 0;
@@ -122,12 +130,16 @@ KaldiRecognizer::~KaldiRecognizer() {
     delete g_fst_;
     delete decode_fst_;
     delete spk_feature_;
+
+    model_->Unref();
+    if (spk_model_)
+         spk_model_->Unref();
 }
 
 void KaldiRecognizer::CleanUp()
 {
     delete silence_weighting_;
-    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_.trans_model_, model_.feature_info_.silence_weighting_config, 3);
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
     frame_offset_ += decoder_->NumFramesDecoded();
     decoder_->InitDecoding(frame_offset_);
@@ -188,7 +200,7 @@ bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
         spk_feature_->AcceptWaveform(sample_frequency_, wdata);
     }
 
-    if (decoder_->EndpointDetected(model_.endpoint_config_)) {
+    if (decoder_->EndpointDetected(model_->endpoint_config_)) {
         return true;
     }
 
@@ -265,8 +277,8 @@ const char* KaldiRecognizer::Result()
     fst::ScaleLattice(fst::LatticeScale(8.0, 10.0), &clat);
 
     CompactLattice aligned_lat;
-    if (model_.winfo_) {
-        WordAlignLattice(clat, *model_.trans_model_, *model_.winfo_, 0, &aligned_lat);
+    if (model_->winfo_) {
+        WordAlignLattice(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
     } else {
         aligned_lat = clat;
     }
@@ -285,7 +297,7 @@ const char* KaldiRecognizer::Result()
     // Create JSON object
     for (int i = 0; i < size; i++) {
         json::JSON word;
-        word["word"] = model_.word_syms_->Find(words[i]);
+        word["word"] = model_->word_syms_->Find(words[i]);
         word["start"] = (frame_offset_ + times[i].first) * 0.03;
         word["end"] = (frame_offset_ + times[i].second) * 0.03;
         word["conf"] = conf[i];
@@ -294,7 +306,7 @@ const char* KaldiRecognizer::Result()
         if (i) {
             text << " ";
         }
-        text << model_.word_syms_->Find(words[i]);
+        text << model_->word_syms_->Find(words[i]);
     }
     obj["text"] = text.str();
 
@@ -330,7 +342,7 @@ const char* KaldiRecognizer::PartialResult()
         if (i) {
             text << " ";
         }
-        text << model_.word_syms_->Find(words[i]);
+        text << model_->word_syms_->Find(words[i]);
     }
     res["partial"] = text.str();
 

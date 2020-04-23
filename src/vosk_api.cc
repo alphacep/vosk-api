@@ -28,7 +28,7 @@ VoskModel *vosk_model_new(const char *model_path)
 
 void vosk_model_free(VoskModel *model)
 {
-    delete (Model *)model;
+    ((Model *)model)->Unref();
 }
 
 VoskSpkModel *vosk_spk_model_new(const char *model_path)
@@ -38,22 +38,22 @@ VoskSpkModel *vosk_spk_model_new(const char *model_path)
 
 void vosk_spk_model_free(VoskSpkModel *model)
 {
-    delete (SpkModel *)model;
+    ((SpkModel *)model)->Unref();
 }
 
 VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
 {
-    return (VoskRecognizer *)new KaldiRecognizer(*(Model *)model, sample_rate);
+    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate);
 }
 
 VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, VoskSpkModel *spk_model, float sample_rate)
 {
-    return (VoskRecognizer *)new KaldiRecognizer(*(Model *)model, (SpkModel *)spk_model, sample_rate);
+    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, (SpkModel *)spk_model, sample_rate);
 }
 
 VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, const char *grammar)
 {
-    return (VoskRecognizer *)new KaldiRecognizer(*(Model *)model, sample_rate, grammar);
+    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, grammar);
 }
 
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)

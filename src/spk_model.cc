@@ -24,4 +24,19 @@ SpkModel::SpkModel(const char *speaker_path) {
     SetBatchnormTestMode(true, &speaker_nnet);
     SetDropoutTestMode(true, &speaker_nnet);
     CollapseModel(nnet3::CollapseModelConfig(), &speaker_nnet);
+
+    ref_cnt_ = 1;
+}
+
+void SpkModel::Ref() 
+{
+    ref_cnt_++;
+}
+
+void SpkModel::Unref() 
+{
+    ref_cnt_--;
+    if (ref_cnt_ == 0) {
+        delete this;
+    }
 }
