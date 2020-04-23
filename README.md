@@ -6,14 +6,14 @@
 
 Vosk is a speech recognition toolkit. The best things in Vosk are:
 
-  1. Supports 8 languages - English, German, French, Spanish, Portuguese, Chinese, Russian, Vietnamese. More is coming.
-  1. Works offline even on lightweight devices - Raspberry Pi, Android, iOS
+  1. Supports 8 languages - English, German, French, Spanish, Portuguese, Chinese, Russian, Vietnamese. More to come.
+  1. Works offline, even on lightweight devices - Raspberry Pi, Android, iOS
   1. Installs with simple `pip3 install vosk`
-  1. Portable models per language is just only 50Mb but there are much bigger server models available.
-  1. Provides streaming API for the best user experience (unlike popular speech-recognition python package)
-  1. There bindings for different prograbmming languages too - java/csharp/javascript etc.
+  1. Portable per-language models are only 50Mb each, but there are much bigger server models available.
+  1. Provides streaming API for the best user experience (unlike popular speech-recognition python packages)
+  1. There are bindings for different programming languages, too - java/csharp/javascript etc.
   1. Allows quick reconfiguration of vocabulary for best accuracy.
-  1. Supports speaker identification beside simple speech recognition
+  1. Supports speaker identification beside simple speech recognition.
 
 ## Android build
 
