@@ -22,7 +22,7 @@ To add a new model here create an issue on Github.
 
 | Model                                                                                                     | Size  | Accuracy   | Notes                                                                                        |
 |-----------------------------------------------------------------------------------------------------------|-------|------------|----------------------------------------------------------------------------------------------|
-| [kaldi-ru-0.9.tar.gz](http://alphacephei.com/kaldi/kaldi-ru-0.9.tar.gz)                                   |  2.5G |   TBD      | Big narrowband Russian model for server processing                                           |
+| [kaldi-ru-0.10.tar.gz](http://alphacephei.com/kaldi/kaldi-ru-0.10.tar.gz)                                 |  2.5G |   TBD      | Big narrowband Russian model for server processing                                           |
 | [alphacep-model-android-ru-0.3](http://alphacephei.com/kaldi/alphacep-model-android-ru-0.3.tar.gz)        |  39M  |   TBD      | Lightweight wideband model for Android and RPi                                               |
 
 ### French

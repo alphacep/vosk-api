@@ -32,6 +32,7 @@
 #include "rnnlm/rnnlm-utils.h"
 
 using namespace kaldi;
+using namespace std;
 
 class KaldiRecognizer;
 
@@ -44,7 +45,20 @@ public:
 
 protected:
     ~Model();
+    void ConfigureV1();
+    void ConfigureV2();
+    void ReadDataFiles();
+
     friend class KaldiRecognizer;
+
+    string model_path_str_;
+    string nnet3_rxfilename_;
+    string hclg_fst_rxfilename_;
+    string hcl_fst_rxfilename_;
+    string g_fst_rxfilename_;
+    string disambig_rxfilename_;
+    string word_syms_rxfilename_;
+    string winfo_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
@@ -56,7 +70,7 @@ protected:
     kaldi::nnet3::AmNnetSimple *nnet_;
     const fst::SymbolTable *word_syms_;
     kaldi::WordBoundaryInfo *winfo_;
-    std::vector<int32> disambig_;
+    vector<int32> disambig_;
 
     fst::Fst<fst::StdArc> *hclg_fst_;
     fst::Fst<fst::StdArc> *hcl_fst_;

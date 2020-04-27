@@ -7,7 +7,7 @@ import json
 import os
 import numpy as np
 
-model_path = "model-en"
+model_path = "model"
 spk_model_path = "model-spk"
 
 if not os.path.exists(model_path):

@@ -19,7 +19,7 @@ public class DecoderTest {
 
     public static void main(String args[]) throws IOException {
         FileInputStream ais = new FileInputStream(new File("../python/example/test.wav"));
-        Model model = new Model("model-en");
+        Model model = new Model("model");
         SpkModel spkModel = new SpkModel("model-spk");
         KaldiRecognizer rec = new KaldiRecognizer(model, spkModel, 16000.0f);
 

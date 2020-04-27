@@ -65,10 +65,10 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char cons
         g_fst_->AddArc(1, StdArc(0, 0, fst::TropicalWeight::One(), 0));
 
         // Create simple word loop FST
-        std::stringstream ss(grammar);
-        std::string token;
+        stringstream ss(grammar);
+        string token;
 
-        while (std::getline(ss, token, ' ')) {
+        while (getline(ss, token, ' ')) {
             int32 id = model_->word_syms_->Find(token);
             g_fst_->AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
         }
@@ -149,7 +149,7 @@ void KaldiRecognizer::UpdateSilenceWeights()
 {
     if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0 &&
         feature_pipeline_->IvectorFeature() != NULL) {
-        std::vector<std::pair<int32, BaseFloat> > delta_weights;
+        vector<pair<int32, BaseFloat> > delta_weights;
         silence_weighting_->ComputeCurrentTraceback(decoder_->Decoder());
         silence_weighting_->GetDeltaWeights(feature_pipeline_->NumFramesReady(),
                                           frame_offset_ * 3,
@@ -224,7 +224,7 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
     output_spec.indexes.resize(1);
     request.outputs.resize(1);
     request.outputs[0].Swap(&output_spec);
-    std::shared_ptr<const nnet3::NnetComputation> computation = compiler->Compile(request);
+    shared_ptr<const nnet3::NnetComputation> computation = compiler->Compile(request);
     nnet3::Nnet *nnet_to_update = NULL;  // we're not doing any update.
     nnet3::NnetComputer computer(nnet3::NnetComputeOptions(), *computation,
                     nnet, nnet_to_update);
@@ -284,15 +284,15 @@ const char* KaldiRecognizer::Result()
     }
 
     MinimumBayesRisk mbr(aligned_lat);
-    const std::vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
-    const std::vector<int32> &words = mbr.GetOneBest();
-    const std::vector<std::pair<BaseFloat, BaseFloat> > &times =
+    const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
+    const vector<int32> &words = mbr.GetOneBest();
+    const vector<pair<BaseFloat, BaseFloat> > &times =
           mbr.GetOneBestTimes();
 
     int size = words.size();
 
     json::JSON obj;
-    std::stringstream text;
+    stringstream text;
 
     // Create JSON object
     for (int i = 0; i < size; i++) {
@@ -333,11 +333,11 @@ const char* KaldiRecognizer::PartialResult()
 
     kaldi::Lattice lat;
     decoder_->GetBestPath(false, &lat);
-    std::vector<kaldi::int32> alignment, words;
+    vector<kaldi::int32> alignment, words;
     LatticeWeight weight;
     GetLinearSymbolSequence(lat, &alignment, &words, &weight);
 
-    std::ostringstream text;
+    ostringstream text;
     for (size_t i = 0; i < words.size(); i++) {
         if (i) {
             text << " ";

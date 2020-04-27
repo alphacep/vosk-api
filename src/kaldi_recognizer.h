@@ -61,5 +61,5 @@ class KaldiRecognizer {
         float sample_frequency_;
         int32 frame_offset_;
         bool input_finalized_;
-        std::string last_result_;
+        string last_result_;
 };
