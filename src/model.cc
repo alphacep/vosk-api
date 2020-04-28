@@ -123,15 +123,22 @@ void Model::ConfigureV1()
     disambig_rxfilename_ = model_path_str_ + "/disambig_tid.int";
     word_syms_rxfilename_ = model_path_str_ + "/words.txt";
     winfo_rxfilename_ = model_path_str_ + "/word_boundary.int";
+    carpa_rxfilename_ = model_path_str_ + "/rescore/G.carpa";
+    std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
 }
 
 void Model::ConfigureV2()
 {
-    kaldi::ParseOptions po("");
+    kaldi::ParseOptions po("something");
     nnet3_decoding_config_.Register(&po);
     endpoint_config_.Register(&po);
     decodable_opts_.Register(&po);
     po.ReadConfigFile(model_path_str_ + "/conf/model.conf");
+
+    KALDI_LOG << "Decoding params beam=" << nnet3_decoding_config_.beam <<
+         " max-active=" << nnet3_decoding_config_.max_active <<
+         " lattice-beam=" << nnet3_decoding_config_.lattice_beam;
+    KALDI_LOG << "Silence phones " << endpoint_config_.silence_phones;
 
     feature_info_.feature_type = "mfcc";
     ReadConfigFromFile(model_path_str_ + "/conf/mfcc.conf", &feature_info_.mfcc_opts);
@@ -156,7 +163,9 @@ void Model::ConfigureV2()
     g_fst_rxfilename_ = model_path_str_ + "/graph/Gr.fst";
     disambig_rxfilename_ = model_path_str_ + "/graph/disambig_tid.int";
     word_syms_rxfilename_ = model_path_str_ + "/graph/words.txt";
-    winfo_rxfilename_ = model_path_str_ + "/word_boundary.int";
+    winfo_rxfilename_ = model_path_str_ + "/graph/phones/word_boundary.int";
+    carpa_rxfilename_ = model_path_str_ + "/rescore/G.carpa";
+    std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
 }
 
 void Model::ReadDataFiles()
@@ -178,10 +187,12 @@ void Model::ReadDataFiles()
                                                                nnet_);
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading HCLG from " << hclg_fst_rxfilename_;
         hclg_fst_ = fst::ReadFstKaldiGeneric(hclg_fst_rxfilename_);
         hcl_fst_ = NULL;
         g_fst_ = NULL;
     } else {
+        KALDI_LOG << "Loading HCL and G from " << hcl_fst_rxfilename_ << " " << g_fst_rxfilename_;
         hclg_fst_ = NULL;
         hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename_);
         g_fst_ = fst::StdFst::Read(g_fst_rxfilename_);
@@ -195,6 +206,7 @@ void Model::ReadDataFiles()
         word_syms_ = g_fst_->OutputSymbols();
     }
     if (!word_syms_) {
+        KALDI_LOG << "Loading words from " << word_syms_rxfilename_;
         if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_)))
             KALDI_ERR << "Could not read symbol table from file "
                       << word_syms_rxfilename_;
@@ -202,10 +214,24 @@ void Model::ReadDataFiles()
     KALDI_ASSERT(word_syms_);
 
     if (stat(winfo_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading winfo " << winfo_rxfilename_;
         kaldi::WordBoundaryInfoNewOpts opts;
         winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
     } else {
         winfo_ = NULL;
+    }
+
+    if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
+        std_lm_fst_ = fst::ReadFstKaldi(std_fst_rxfilename_);
+        fst::Project(std_lm_fst_, fst::PROJECT_OUTPUT);
+        if (std_lm_fst_->Properties(fst::kILabelSorted, true) == 0) {
+            fst::ILabelCompare<fst::StdArc> ilabel_comp;
+            fst::ArcSort(std_lm_fst_, ilabel_comp);
+        }
+        ReadKaldiObject(carpa_rxfilename_, &const_arpa_);
+    } else {
+        std_lm_fst_ = NULL;
     }
 }
 

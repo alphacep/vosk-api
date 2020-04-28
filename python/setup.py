@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="vosk", # Replace with your own username
-    version="0.3.5",
+    version="0.3.6",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="API for Kaldi and Vosk",

@@ -47,6 +47,8 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency) : model_(
     frame_offset_ = 0;
     input_finalized_ = false;
     spk_feature_ = NULL;
+
+    InitRescoring();
 }
 
 KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char const *grammar) : model_(model), spk_model_(0), sample_frequency_(sample_frequency)
@@ -89,8 +91,9 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char cons
     frame_offset_ = 0;
     input_finalized_ = false;
     spk_feature_ = NULL;
-}
 
+    InitRescoring();
+}
 
 KaldiRecognizer::KaldiRecognizer(Model *model, SpkModel *spk_model, float sample_frequency) : model_(model), spk_model_(spk_model), sample_frequency_(sample_frequency) {
 
@@ -121,6 +124,8 @@ KaldiRecognizer::KaldiRecognizer(Model *model, SpkModel *spk_model, float sample
     input_finalized_ = false;
 
     spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
+
+    InitRescoring();
 }
 
 KaldiRecognizer::~KaldiRecognizer() {
@@ -130,10 +135,23 @@ KaldiRecognizer::~KaldiRecognizer() {
     delete g_fst_;
     delete decode_fst_;
     delete spk_feature_;
+    delete lm_fst_;
 
     model_->Unref();
     if (spk_model_)
          spk_model_->Unref();
+}
+
+void KaldiRecognizer::InitRescoring()
+{
+    if (model_->std_lm_fst_) {
+        fst::CacheOptions cache_opts(true, 50000);
+        fst::MapFstOptions mapfst_opts(cache_opts);
+        fst::StdToLatticeMapper<kaldi::BaseFloat> mapper;
+        lm_fst_ = new fst::MapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> >(*model_->std_lm_fst_, mapper, mapfst_opts);
+    } else {
+        lm_fst_ = NULL;
+    }
 }
 
 void KaldiRecognizer::CleanUp()
@@ -207,7 +225,6 @@ bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
     return false;
 }
 
-
 // Computes an xvector from a chunk of speech features.
 static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
     const nnet3::Nnet &nnet, nnet3::CachingOptimizingCompiler *compiler,
@@ -237,7 +254,6 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
     xvector->CopyFromVec(cu_output.Row(0));
 }
 
-
 void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
 {
     int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
@@ -258,7 +274,6 @@ void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 }
 
-
 const char* KaldiRecognizer::Result()
 {
 
@@ -274,8 +289,31 @@ const char* KaldiRecognizer::Result()
 
     kaldi::CompactLattice clat;
     decoder_->GetLattice(true, &clat);
-    fst::ScaleLattice(fst::LatticeScale(8.0, 10.0), &clat);
 
+    if (model_->std_lm_fst_) {
+        Lattice lat1;
+
+        ConvertLattice(clat, &lat1);
+        fst::ScaleLattice(fst::GraphLatticeScale(-1.0), &lat1);
+        fst::ArcSort(&lat1, fst::OLabelCompare<kaldi::LatticeArc>());
+        kaldi::Lattice composed_lat;
+        fst::Compose(lat1, *lm_fst_, &composed_lat);
+        fst::Invert(&composed_lat);
+        kaldi::CompactLattice determinized_lat;
+        DeterminizeLattice(composed_lat, &determinized_lat);
+        fst::ScaleLattice(fst::GraphLatticeScale(-1), &determinized_lat);
+        fst::ArcSort(&determinized_lat, fst::OLabelCompare<kaldi::CompactLatticeArc>());
+
+        kaldi::ConstArpaLmDeterministicFst const_arpa_fst(model_->const_arpa_);
+        kaldi::CompactLattice composed_clat;
+        kaldi::ComposeCompactLatticeDeterministic(determinized_lat, &const_arpa_fst, &composed_clat);
+        kaldi::Lattice composed_lat1;
+        ConvertLattice(composed_clat, &composed_lat1);
+        fst::Invert(&composed_lat1);
+        DeterminizeLattice(composed_lat1, &clat);
+    }
+
+    fst::ScaleLattice(fst::LatticeScale(9.0, 10.0), &clat);
     CompactLattice aligned_lat;
     if (model_->winfo_) {
         WordAlignLattice(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);

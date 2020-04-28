@@ -59,6 +59,8 @@ protected:
     string disambig_rxfilename_;
     string word_syms_rxfilename_;
     string winfo_rxfilename_;
+    string carpa_rxfilename_;
+    string std_fst_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
@@ -75,6 +77,9 @@ protected:
     fst::Fst<fst::StdArc> *hclg_fst_;
     fst::Fst<fst::StdArc> *hcl_fst_;
     fst::Fst<fst::StdArc> *g_fst_;
+
+    fst::VectorFst<fst::StdArc> *std_lm_fst_;
+    kaldi::ConstArpaLm const_arpa_;
 
     int ref_cnt_;
 };

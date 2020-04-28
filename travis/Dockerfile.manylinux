@@ -27,7 +27,7 @@ RUN cd /opt \
     && make -j 10 openfst \
     && cd ../src \
     && ./configure --mathlib=OPENBLAS --shared --use-cuda=no \
-    && make -j 10 online2 \
+    && make -j 10 online2 lm \
     && find /opt/kaldi -name "*.o" -exec rm {} \;
 
 RUN cd /opt \
