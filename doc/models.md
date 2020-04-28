@@ -60,6 +60,14 @@ https://github.com/opensource-spraakherkenning-nl/Kaldi_NL
 |-----------------------------------------------------------------------------------------------------------|-------|------------|----------------------------------------------------------------------------------------------|
 | [kaldi-el-gr-0.6.tar.gz](http://alphacephei.com/kaldi/kaldi-el-gr-0.6.tar.gz)                             |  1.1G |   TBD      | Big narrowband Greek model for server processing, not extremely accurate though        |
 
+
+### Turkish
+
+| Model                                                                                                     | Size  | Accuracy   | Notes                                                                                        |
+|-----------------------------------------------------------------------------------------------------------|-------|------------|----------------------------------------------------------------------------------------------|
+| [alphacep-model-android-tr-0.3](http://alphacephei.com/kaldi/alphacep-model-android-tr-0.3.tar.gz)        |  35M  |   TBD      | Lightweight wideband model for Android and RPi                                               |
+
+
 ### Vietnamese
 
 | Model                                                                                                     | Size  | Accuracy   | Notes                                                                                        |
