@@ -11,11 +11,11 @@ model_path = "model"
 spk_model_path = "model-spk"
 
 if not os.path.exists(model_path):
-    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as {} in the current folder.".format(model_path))
+    print ("Please download the model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as {} in the current folder.".format(model_path))
     exit (1)
 
 if not os.path.exists(spk_model_path):
-    print ("Please download the speaker model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as {} in the current folder.".format(spk_model_path))
+    print ("Please download the speaker model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as {} in the current folder.".format(spk_model_path))
     exit (1)
 
 wf = wave.open(sys.argv[1], "rb")
