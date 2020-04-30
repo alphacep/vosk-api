@@ -44,7 +44,7 @@ libkaldiwrap.so: $(VOSK_SOURCES)
 	$(CXX) -fpermissive $(CFLAGS) $(CPPFLAGS) -shared -o $@ $(VOSK_SOURCES) $(KALDI_LIBS)
 
 vosk_wrap.c: ../src/vosk.i
-	swig -csharp -DSWIG_CSHARP_NO_EXCEPTION_HELPER -dllimport "libkaldiwrap.so" \
+	swig -csharp -DSWIG_CSHARP_NO_EXCEPTION_HELPER -dllimport "libkaldiwrap" \
 	    -namespace "Kaldi" -outdir gen -o vosk_wrap.c ../src/vosk.i
 
 run:
