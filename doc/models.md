@@ -33,6 +33,9 @@ To add a new model here create an issue on Github.
 | **Speaker identification model**                                                                          |       |            |                                                                                              |
 | [vosk-model-spk-0.3](http://alphacephei.com/kaldi/models/vosk-model-spk-0.3.zip)                          |  13M  |   TBD      | Model for speaker identification, should work for all languages                              |
 
+
+## Other models
+
 Other places where you can check for models which might be compatible:
 
   * http://kaldi-asr.org/models.html
@@ -40,3 +43,36 @@ Other places where you can check for models which might be compatible:
   * http://zamia-speech.org/asr/
   * https://github.com/opensource-spraakherkenning-nl/Kaldi_NL - Dutch model
   * https://montreal-forced-aligner.readthedocs.io/en/latest/pretrained_models.html (gmm models, not compatible but might be still useful)
+
+## Training your own model
+
+You can train your model with Kaldi toolkit. The training is pretty standard - you need tdnn nnet3 model with ivectors. You can
+check mini_librispeech recipe for details. Some notes on training:
+
+  * For smaller mobile models watch number of parameters
+  * Train the model without pitch. It might be helpful for small amount of data, but for large database it doesn't give the advantage
+but complicates the processing and increases response time.
+  * Train ivector of dim 30 instead of standard 100 to save memory of mobile models.
+
+## Model structure
+
+Once you trained the model arrange the files according to the following layout (see en-us-aspire for details):
+
+  * `am/final.mdl` - acoustic model
+  * `conf/mfcc.conf` - mfcc config file. Make sure you take mfcc_hires.conf version if you are using hires model (most external ones)
+  * `conf/model.conf` - provide default decoding beams and silence phones. you have to create this file yourself, it is not present in kaldi model
+  * `ivector/final.dubm` - take ivector files from ivector extractor
+  * `ivector/final.ie`
+  * `ivector/final.mat`
+  * `ivector/splice.conf`
+  * `ivector/global_cmvn.stats`
+  * `ivector/online_cmvn.conf`
+  * `graph/phones/word_boundary.int` - from the graph
+  * `graph/HCLG.fst` - this is the decoding graph, if you are not using lookahead
+  * `graph/HCLr.fst` - use Gr.fst and HCLr.fst instead of one big HCLG.fst if you want to run rescoring
+  * `graph/Gr.fst`
+  * `graph/phones.txt` - from the graph
+  * `graph/words.txt` - from the graph
+  * `rescore/G.carpa` - carpa rescoring is optional but helpful in big models. Usually located inside data/lang_test_rescore
+  * `rescore/G.fst` - also optional if you want to use rescoring
+
