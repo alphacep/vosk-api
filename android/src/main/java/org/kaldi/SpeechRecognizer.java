@@ -31,7 +31,7 @@ import android.util.Log;
 /**
  * Main class to access recognizer functions. After configuration this class
  * starts a listener thread which records the data and recognizes it using
- * Pocketsphinx engine. Recognition events are passed to a client using
+ * VOSK engine. Recognition events are passed to a client using
  * {@link RecognitionListener}
  * 
  */
@@ -148,8 +148,7 @@ public class SpeechRecognizer {
     public boolean stop() {
         boolean result = stopRecognizerThread();
         if (result) {
-            Log.i(TAG, "Stop recognition");
-            mainHandler.post(new ResultEvent(recognizer.FinalResult(), true));
+            mainHandler.post(new ResultEvent(recognizer.Result(), true));
         }
         return result;
     }
@@ -162,10 +161,7 @@ public class SpeechRecognizer {
      */
     public boolean cancel() {
         boolean result = stopRecognizerThread();
-        if (result) {
-            Log.i(TAG, "Cancel recognition");
-        }
-
+        recognizer.Result(); // Reset recognizer state
         return result;
     }
     
@@ -205,8 +201,6 @@ public class SpeechRecognizer {
                 mainHandler.post(new OnErrorEvent(ioe));
                 return;
             }
-
-            Log.d(TAG, "Starting decoding");
 
             short[] buffer = new short[bufferSize];
 

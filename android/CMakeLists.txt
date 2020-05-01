@@ -23,6 +23,8 @@ set(API_SOURCES
 "${PROJECT_SOURCE_DIR}/../src/model.h"
 "${PROJECT_SOURCE_DIR}/../src/spk_model.cc"
 "${PROJECT_SOURCE_DIR}/../src/spk_model.h"
+"${PROJECT_SOURCE_DIR}/../src/vosk_api.cc"
+"${PROJECT_SOURCE_DIR}/../src/vosk_api.h"
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
@@ -43,6 +45,7 @@ target_link_libraries( kaldi_jni
              ${KALDI_ROOT}/src/tree/kaldi-tree.a
              ${KALDI_ROOT}/src/feat/kaldi-feat.a
              ${KALDI_ROOT}/src/lat/kaldi-lat.a
+             ${KALDI_ROOT}/src/lm/kaldi-lm.a
              ${KALDI_ROOT}/src/hmm/kaldi-hmm.a
              ${KALDI_ROOT}/src/transform/kaldi-transform.a
              ${KALDI_ROOT}/src/cudamatrix/kaldi-cudamatrix.a

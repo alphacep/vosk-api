@@ -9,4 +9,4 @@ docker build --build-arg="DOCKCROSS_IMAGE=linux-arm64" --build-arg="OPENBLAS_ARC
 
 docker run --rm -v /home/shmyrev/travis/vosk-api/:/io alphacep/kaldi-dockcross-armv6 /io/travis/build-wheels-dockcross.sh
 docker run --rm -v /home/shmyrev/travis/vosk-api/:/io alphacep/kaldi-dockcross-armv7 /io/travis/build-wheels-dockcross.sh
-docker run --rm -v /home/shmyrev/travis/vosk-api/:/io alphacep/kaldi-dockcross-armv64 /io/travis/build-wheels-dockcross.sh
+docker run --rm -v /home/shmyrev/travis/vosk-api/:/io alphacep/kaldi-dockcross-arm64 /io/travis/build-wheels-dockcross.sh

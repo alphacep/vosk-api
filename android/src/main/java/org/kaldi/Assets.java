@@ -241,10 +241,6 @@ public class Assets {
             if (!items.get(path).equals(externalItems.get(path))
                     || !(new File(externalDir, path).exists()))
                 newItems.add(path);
-            else
-                Log.i(TAG,
-                        String.format("Skipping asset %s: checksums are equal", path));
-
         }
 
         unusedItems.addAll(externalItems.keySet());
@@ -252,13 +248,11 @@ public class Assets {
 
         for (String path : newItems) {
             File file = copy(path);
-            Log.i(TAG, String.format("Copying asset %s to %s", path, file));
         }
 
         for (String path : unusedItems) {
             File file = new File(externalDir, path);
             file.delete();
-            Log.i(TAG, String.format("Removing asset %s", file));
         }
 
         updateItemList(items);

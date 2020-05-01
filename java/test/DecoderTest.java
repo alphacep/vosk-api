@@ -11,6 +11,7 @@ import java.nio.*;
 import org.kaldi.KaldiRecognizer;
 import org.kaldi.Model;
 import org.kaldi.SpkModel;
+import org.kaldi.Vosk;
 
 public class DecoderTest {
     static {
@@ -18,15 +19,17 @@ public class DecoderTest {
     }
 
     public static void main(String args[]) throws IOException {
+        Vosk.SetLogLevel(-10);
+
         FileInputStream ais = new FileInputStream(new File("../python/example/test.wav"));
-        Model model = new Model("model-en");
+        Model model = new Model("model");
         SpkModel spkModel = new SpkModel("model-spk");
         KaldiRecognizer rec = new KaldiRecognizer(model, spkModel, 16000.0f);
 
         int nbytes;
         byte[] b = new byte[4096];
         while ((nbytes = ais.read(b)) >= 0) {
-            if (rec.AcceptWaveform(b, nbytes)) {
+            if (rec.AcceptWaveform(b)) {
                 System.out.println(rec.Result());
             } else {
                 System.out.println(rec.PartialResult());

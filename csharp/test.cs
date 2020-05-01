@@ -7,6 +7,7 @@ public class Test
    public static void Main()
    {
 
+        Vosk.SetLogLevel(0);
         Model model = new Model("model");
         KaldiRecognizer rec = new KaldiRecognizer(model, 16000.0f);
 

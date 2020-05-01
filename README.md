@@ -1,11 +1,19 @@
 [![Build Status](https://travis-ci.com/alphacep/vosk-api.svg?branch=master)](https://travis-ci.com/alphacep/vosk-api)
 
-Language bindings for Vosk and Kaldi to access speech recognition from various languages and on various platforms
+[РУС](README.ru.md)
 
-  * Python on Linux, Windows and RPi
-  * Node
-  * Android
-  * iOS
+[中文](README.zh.md)
+
+Vosk is a speech recognition toolkit. The best things in Vosk are:
+
+  1. Supports 9 languages - English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish, Vietnamese. More to come.
+  1. Works offline, even on lightweight devices - Raspberry Pi, Android, iOS
+  1. Installs with simple `pip3 install vosk`
+  1. Portable per-language models are only 50Mb each, but there are much bigger server models available.
+  1. Provides streaming API for the best user experience (unlike popular speech-recognition python packages)
+  1. There are bindings for different programming languages, too - java/csharp/javascript etc.
+  1. Allows quick reconfiguration of vocabulary for best accuracy.
+  1. Supports speaker identification beside simple speech recognition.
 
 ## Android build
 
@@ -17,6 +25,10 @@ gradle build
 Please note that medium blog post about 64-bit is not relevant anymore, the script builds x86, arm64 and armv7 libraries automatically without any modifications.
 
 For example of Android application using Vosk-API check https://github.com/alphacep/kaldi-android-demo project
+
+## iOS build
+
+Available on request. Drop as a mail at [contact@alphacephei.com](mailto:contact@alphacephei.com).
 
 ## Python installation from Pypi
 
@@ -77,14 +89,30 @@ cd python
 python3 setup.py install
 ```
 
+#### Running the example code with python
+
+Run like this:
+
+```
+cd vosk-api/python/example
+wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
+unzip alphacep-model-android-en-us-0.3.zip
+mv alphacep-model-android-en-us-0.3 model-en
+python3 ./test_simple.py test.wav
+```
+
+To run with your audio file make sure it has proper format - PCM 16khz 16bit mono, otherwise decoding will not work.
+
+You can find other examples of using a microphone, decoding with a fixed small vocabulary or speaker identification setup in  [python/example subfolder](https://github.com/alphacep/vosk-api/tree/master/python/example)
+
 #### Java example API build
 
 Or Java
 
 ```
 cd java && KALDI_ROOT=<KALDI_ROOT> make
-wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-model-android-en-us-0.3.tar.gz
-tar xf alphacep-model-android-en-us-0.3.tar.gz 
+wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
+unzip alphacep-model-android-en-us-0.3.zip
 mv alphacep-model-android-en-us-0.3 model
 make run
 ```
@@ -95,27 +123,11 @@ Or C#
 
 ```
 cd csharp && KALDI_ROOT=<KALDI_ROOT> make
-wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-model-android-en-us-0.3.tar.gz
-tar xf alphacep-model-android-en-us-0.3.tar.gz 
+wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
+unzip alphacep-model-android-en-us-0.3.zip
 mv alphacep-model-android-en-us-0.3 model
 mono test.exe
 ```
-
-## Running the example code with python
-
-Run like this:
-
-```
-cd vosk-api/python/example
-wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-model-android-en-us-0.3.tar.gz
-tar xf alphacep-model-android-en-us-0.3.tar.gz 
-mv alphacep-model-android-en-us-0.3 model-en
-python3 ./test_simple.py test.wav
-```
-
-To run with your audio file make sure it has proper format - PCM 16khz 16bit mono, otherwise decoding will not work.
-
-You can find other examples of using a microphone, decoding with a fixed small vocabulary or speaker identification setup in  [python/example subfolder](https://github.com/alphacep/vosk-api/tree/master/python/example)
 
 ## Models for different languages
 

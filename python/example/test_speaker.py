@@ -7,15 +7,15 @@ import json
 import os
 import numpy as np
 
-model_path = "model-en"
+model_path = "model"
 spk_model_path = "model-spk"
 
 if not os.path.exists(model_path):
-    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as {} in the current folder.".format(model_path))
+    print ("Please download the model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as {} in the current folder.".format(model_path))
     exit (1)
 
 if not os.path.exists(spk_model_path):
-    print ("Please download the speaker model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as {} in the current folder.".format(spk_model_path))
+    print ("Please download the speaker model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as {} in the current folder.".format(spk_model_path))
     exit (1)
 
 wf = wave.open(sys.argv[1], "rb")
@@ -38,7 +38,7 @@ def cosine_dist(x, y):
     return 1 - np.dot(nx, ny) / np.linalg.norm(nx) / np.linalg.norm(ny)
 
 while True:
-    data = wf.readframes(1000)
+    data = wf.readframes(4000)
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):
