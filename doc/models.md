@@ -38,11 +38,14 @@ To add a new model here create an issue on Github.
 
 Other places where you can check for models which might be compatible:
 
-  * http://kaldi-asr.org/models.html
-  * https://github.com/daanzu/kaldi-active-grammar/blob/master/docs/models.md
-  * http://zamia-speech.org/asr/
+  * http://kaldi-asr.org/models.html - variety of models from Kaldi - librispeech, aspire, chinese models
+  * https://github.com/daanzu/kaldi-active-grammar/blob/master/docs/models.md - Big dictation models
+  * http://zamia-speech.org/asr/ - German and English model from Zamia
+  * https://github.com/pguyot/zamia-speech/releases - French models for Zamia
   * https://github.com/opensource-spraakherkenning-nl/Kaldi_NL - Dutch model
-  * https://montreal-forced-aligner.readthedocs.io/en/latest/pretrained_models.html (gmm models, not compatible but might be still useful)
+  * https://montreal-forced-aligner.readthedocs.io/en/latest/pretrained_models.html (GMM models, not compatible but might be still useful)
+  * https://github.com/goodatlas/zeroth - Korean Kaldi (just a recipe and data to train)
+  * https://github.com/undertheseanlp/automatic_speech_recognition - Vietnamese Kaldi project
 
 ## Training your own model
 
