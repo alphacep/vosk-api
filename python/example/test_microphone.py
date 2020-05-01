@@ -17,7 +17,7 @@ model = Model("model")
 rec = KaldiRecognizer(model, 16000)
 
 while True:
-    data = stream.read(2000)
+    data = stream.read(4000)
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):

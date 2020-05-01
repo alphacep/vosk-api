@@ -1,4 +1,8 @@
+#if SWIGPYTHON
 %module(package="vosk", "threads"=1) vosk
+#else
+%module Vosk
+#endif
 
 %include <typemaps.i>
 
@@ -113,3 +117,6 @@ typedef struct {} KaldiRecognizer;
         return vosk_recognizer_final_result($self);
     }
 }
+
+%rename(SetLogLevel) vosk_set_log_level;
+void vosk_set_log_level(int level);

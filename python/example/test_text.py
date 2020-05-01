@@ -22,7 +22,7 @@ wf = open(sys.argv[1], "rb")
 wf.read(44) # skip header
 
 while True:
-    data = wf.read(2000)
+    data = wf.read(4000)
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):

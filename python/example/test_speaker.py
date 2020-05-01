@@ -38,7 +38,7 @@ def cosine_dist(x, y):
     return 1 - np.dot(nx, ny) / np.linalg.norm(nx) / np.linalg.norm(ny)
 
 while True:
-    data = wf.readframes(1000)
+    data = wf.readframes(4000)
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):

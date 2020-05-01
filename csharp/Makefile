@@ -47,7 +47,7 @@ vosk_wrap.c: ../src/vosk.i
 	swig -csharp -DSWIG_CSHARP_NO_EXCEPTION_HELPER -dllimport "libkaldiwrap" \
 	    -namespace "Kaldi" -outdir gen -o vosk_wrap.c ../src/vosk.i
 
-run:
+run: test.exe
 	mono test.exe
 
 clean:

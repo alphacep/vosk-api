@@ -19,7 +19,7 @@ model = Model("model")
 rec = KaldiRecognizer(model, wf.getframerate(), "zero oh one two three four five six seven eight nine")
 
 while True:
-    data = wf.readframes(1000)
+    data = wf.readframes(4000)
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):

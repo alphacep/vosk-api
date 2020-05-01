@@ -45,17 +45,51 @@ static FstRegisterer<NGramFst<StdArc>> NGramFst_StdArc_registerer;
 
 #ifdef __ANDROID__
 #include <android/log.h>
-static void AndroidLogHandler(const LogMessageEnvelope &env, const char *message)
+static void KaldiLogHandler(const LogMessageEnvelope &env, const char *message)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, "KaldiDemo", message, 1);
+    __android_log_print(ANDROID_LOG_VERBOSE, "VoskAPI", message);
+}
+#else
+static void KaldiLogHandler(const LogMessageEnvelope &env, const char *message)
+{
+  if (env.severity > GetVerboseLevel())
+      return;
+
+  // Modified default Kaldi logging so we can disable LOG messages.
+  std::stringstream full_message;
+  if (env.severity > LogMessageEnvelope::kInfo) {
+    full_message << "VLOG[" << env.severity << "] (";
+  } else {
+    switch (env.severity) {
+    case LogMessageEnvelope::kInfo:
+      full_message << "LOG (";
+      break;
+    case LogMessageEnvelope::kWarning:
+      full_message << "WARNING (";
+      break;
+    case LogMessageEnvelope::kAssertFailed:
+      full_message << "ASSERTION_FAILED (";
+      break;
+    case LogMessageEnvelope::kError:
+    default: // If not the ERROR, it still an error!
+      full_message << "ERROR (";
+      break;
+    }
+  }
+  // Add other info from the envelope and the message text.
+  full_message << "VoskAPI" << ':'
+               << env.func << "():" << env.file << ':'
+               << env.line << ") " << message;
+
+  // Print the complete message to stderr.
+  full_message << "\n";
+  std::cerr << full_message.str();
 }
 #endif
 
 Model::Model(const char *model_path) : model_path_str_(model_path) {
 
-#ifdef __ANDROID__
-    SetLogHandler(AndroidLogHandler);
-#endif
+    SetLogHandler(KaldiLogHandler);
 
     struct stat buffer;
     string am_path = model_path_str_ + "/am/final.mdl";
@@ -87,6 +121,8 @@ void Model::ConfigureV1()
         "--endpoint.rule2.min-trailing-silence=0.5",
         "--endpoint.rule3.min-trailing-silence=1.0",
         "--endpoint.rule4.min-trailing-silence=2.0",
+
+        "--print-args=false",
     };
 
     kaldi::ParseOptions po("");

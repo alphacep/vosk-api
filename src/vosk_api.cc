@@ -90,3 +90,8 @@ void vosk_recognizer_free(VoskRecognizer *recognizer)
 {
     delete (KaldiRecognizer *)(recognizer);
 }
+
+void vosk_set_log_level(int log_level)
+{
+    SetVerboseLevel(log_level);
+}

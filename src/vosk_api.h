@@ -41,6 +41,14 @@ const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer);
 const char *vosk_recognizer_final_result(VoskRecognizer *recognizer);
 void vosk_recognizer_free(VoskRecognizer *recognizer);
 
+/**
+ * Set log level for Kaldi messages
+ *   0 - default value to print info and error messages but no debug
+ *   less than 0 - don't print info messages
+ *   greather than 0 - more verbose mode
+ */
+void vosk_set_log_level(int log_level);
+
 #ifdef __cplusplus
 }
 #endif

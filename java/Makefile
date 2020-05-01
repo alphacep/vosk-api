@@ -50,16 +50,16 @@ clean:
 	$(RM) *.so *_wrap.cc *_wrap.o test/*.class
 	$(RM) -r org model-en
 
-model-en:
-	wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-model-android-en-us-0.3.tar.gz
-	tar xf alphacep-model-android-en-us-0.3.tar.gz && rm alphacep-model-android-en-us-0.3.tar.gz
-	mv alphacep-model-android-en-us-0.3 model-en
+model:
+	wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
+	unzip vosk-model-small-en-us-0.3.zip && rm vosk-model-small-en-us-0.3.zip
+	mv vosk-model-small-en-us-0.3 model
 
 model-spk:
-	wget https://github.com/alphacep/kaldi-android-demo/releases/download/2020-01/alphacep-spk-model-0.3.tar.gz
-	tar xf alphacep-spk-model-0.3.tar.gz && rm alphacep-spk-model-0.3.tar.gz
-	mv alphacep-spk-model-0.3 model-spk
+	wget https://alphacephei.com/kaldi/models/vosk-model-spk-0.3.zip
+	unzip vosk-model-spk-0.3.zip && rm vosk-model-spk-0.3.zip
+	mv vosk-model-spk-0.3 model-spk
 
-run: model-en model-spk
+run: model model-spk
 	javac test/*.java org/kaldi/*.java
 	java -Djava.library.path=. -cp . test.DecoderTest
