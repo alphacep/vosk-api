@@ -47,7 +47,35 @@ static FstRegisterer<NGramFst<StdArc>> NGramFst_StdArc_registerer;
 #include <android/log.h>
 static void KaldiLogHandler(const LogMessageEnvelope &env, const char *message)
 {
-    __android_log_print(ANDROID_LOG_VERBOSE, "VoskAPI", message);
+  int priority;
+  if (env.severity > GetVerboseLevel())
+      return;
+
+  if (env.severity > LogMessageEnvelope::kInfo) {
+    priority = ANDROID_LOG_VERBOSE;
+  } else {
+    switch (env.severity) {
+    case LogMessageEnvelope::kInfo:
+      priority = ANDROID_LOG_INFO;
+      break;
+    case LogMessageEnvelope::kWarning:
+      priority = ANDROID_LOG_WARN;
+      break;
+    case LogMessageEnvelope::kAssertFailed:
+      priority = ANDROID_LOG_FATAL;
+      break;
+    case LogMessageEnvelope::kError:
+    default: // If not the ERROR, it still an error!
+      priority = ANDROID_LOG_ERROR;
+      break;
+    }
+  }
+
+  std::stringstream full_message;
+  full_message << env.func << "():" << env.file << ':'
+               << env.line << ") " << message;
+
+  __android_log_print(priority, "VoskAPI", "%s", full_message.str().c_str());
 }
 #else
 static void KaldiLogHandler(const LogMessageEnvelope &env, const char *message)
