@@ -45,6 +45,14 @@ Uprade python and pip if needed. Then install vosk on Linux with a simple comman
 pip3 install vosk
 ```
 
+Please note that some platforms are not fully supported by pip, for example you have install on arm64  from released wheels:
+
+```
+pip3 install https://github.com/alphacep/vosk-api/releases/download/0.3.7/vosk-0.3.7-cp37-cp37m-linux_aarch64.whl
+```
+
+Also please note that vosk requires libgfortran which might be missing, you might need to install it package manager.
+
 ## Websocket Server and GRPC server
 
 We also provide a websocket server and grpc server which can be used in telephony and other applications. With bigger models adapted for 8khz audio it provides more accuracy.
@@ -86,7 +94,7 @@ Then build the python module
 ```
 export KALDI_ROOT=<KALDI_ROOT>
 cd python
-python3 setup.py install
+python3 setup.py install --user --single-version-externally-managed --root=/
 ```
 
 #### Running the example code with python
@@ -97,7 +105,7 @@ Run like this:
 cd vosk-api/python/example
 wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
 unzip alphacep-model-android-en-us-0.3.zip
-mv alphacep-model-android-en-us-0.3 model-en
+mv alphacep-model-android-en-us-0.3 model
 python3 ./test_simple.py test.wav
 ```
 
