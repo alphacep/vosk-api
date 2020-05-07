@@ -4,7 +4,7 @@ from vosk import Model, KaldiRecognizer, SetLogLevel
 import sys
 import os
 import wave
-import ffmpeg
+import subprocess
 
 SetLogLevel(0)
 
@@ -16,12 +16,10 @@ sample_rate=16000
 model = Model("model")
 rec = KaldiRecognizer(model, sample_rate)
 
-process = (
-    ffmpeg
-    .input(sys.argv[1])
-    .output('-', format='s16le', acodec='pcm_s16le', ac=1, ar=sample_rate,  loglevel='quiet')
-    .run_async(pipe_stdout=True)
-)
+process = subprocess.Popen(['ffmpeg', '-loglevel', 'quiet', '-i',
+                            sys.argv[1],
+                            '-ar', str(sample_rate) , '-ac', '1', '-f', 's16le', '-'],
+                            stdout=subprocess.PIPE)
 
 while True:
     data = process.stdout.read(4000)
