@@ -7,7 +7,6 @@ if("x$ENV{WHEEL_FLAGS}" STREQUAL "x")
 else()
     # docker case
     set(Python3_INCLUDE_DIRS "")
-    set(Python3_LIBRARIES "")
     set(TOP_SRCDIR "/io")
 endif()
 
@@ -28,8 +27,10 @@ swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OU
 
 if ("x${CMAKE_SYSTEM_NAME}" MATCHES "xLinux")
     set(MATH_LIBS ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran)
+    set(EXTRA_LINK_FLAGS "-s")
 else ("x${CMAKE_SYSTEM_NAME}" MATCHES "xOSX")
     set(MATH_LIBS "-framework Accelerate")
+    set(EXTRA_LINK_FLAGS "-s -Wl,-undefined,dynamic_lookup")
     SET(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 endif ("x${CMAKE_SYSTEM_NAME}" MATCHES "xLinux")
 
@@ -53,7 +54,6 @@ swig_link_libraries(vosk
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
              ${MATH_LIBS}
-             ${Python3_LIBRARIES}
               -lstdc++)
 
-set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE -s)
+set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE ${EXTRA_LINK_FLAGS})
