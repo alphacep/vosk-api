@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.12.0)
 project(vosk)
 
-set(TOP_SRCDIR "${CMAKE_SOURCE_DIR}/..")
 if("x$ENV{WHEEL_FLAGS}" STREQUAL "x")
-    find_package (Python3 COMPONENTS Interpreter Development)
+    find_package (Python3 COMPONENTS Development)
+    set(TOP_SRCDIR "${CMAKE_SOURCE_DIR}/..")
 else()
     # docker case
     set(Python3_INCLUDE_DIRS "")
+    set(Python3_LIBRARIES "")
     set(TOP_SRCDIR "/io")
 endif()
 
 set(KALDI_ROOT "$ENV{KALDI_ROOT}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFST_NO_DYNAMIC_LINKING")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} $ENV{WHEEL_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} $ENV{WHEEL_FLAGS} -DFST_NO_DYNAMIC_LINKING")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} -std=c++11")
 include_directories("${TOP_SRCDIR}/src" "${KALDI_ROOT}/src" "${KALDI_ROOT}/tools/openfst/include" ${Python3_INCLUDE_DIRS})
 
@@ -25,6 +25,13 @@ swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OU
             "${TOP_SRCDIR}/src/model.cc"
             "${TOP_SRCDIR}/src/vosk_api.cc"
             "${TOP_SRCDIR}/src/vosk.i")
+
+if ("x${CMAKE_SYSTEM_NAME}" MATCHES "xLinux")
+    set(MATH_LIBS "${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran")
+else ("x${CMAKE_SYSTEM_NAME}" MATCHES "xOSX")
+    set(MATH_LIBS "-framework Accelerate")
+    SET(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+endif ("x${CMAKE_SYSTEM_NAME}" MATCHES "xLinux")
 
 swig_link_libraries(vosk
              ${KALDI_ROOT}/src/online2/kaldi-online2.a
@@ -45,7 +52,8 @@ swig_link_libraries(vosk
              ${KALDI_ROOT}/src/base/kaldi-base.a
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
-             ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a
-             -lgfortran -lstdc++)
+             ${MATH_LIBS}
+             ${Python3_LIBRARIES}
+              -lstdc++)
 
 set_target_properties(_vosk PROPERTIES LINK_FLAGS_RELEASE -s)

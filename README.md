@@ -32,26 +32,36 @@ Available on request. Drop as a mail at [contact@alphacephei.com](mailto:contact
 
 ## Python installation from Pypi
 
-The easiest way to install vosk api is with pip. You do not have to compile anything. We currently support only Linux on x86_64 and Raspberry Pi. Other systems (windows, mac) will come soon.
+The easiest way to install vosk api is with pip. You do not have to compile anything. 
 
-Make sure you have newer pip and python:
+We currently support the following platforms:
 
-  * Python version >= 3.4
+  * Linux on x86_64
+  * Raspbian on Raspberry Pi
+  * Linux on arm64
+  * OSX
+  * Windows (will be fully supported soon).
+
+Make sure you have newer pip and python3:
+
+  * Python version >= 3.5
   * pip version >= 19.0
 
-Uprade python and pip if needed. Then install vosk on Linux with a simple command
+Uprade python and pip if needed. Then install vosk on Linux/Mac with a simple command
 
 ```
 pip3 install vosk
 ```
 
-Please note that some platforms are not fully supported by pip, for example you have install on arm64  from released wheels:
+Please note that some platforms are not fully supported by pip, for example you have install on arm64 from released wheels:
 
 ```
 pip3 install https://github.com/alphacep/vosk-api/releases/download/0.3.7/vosk-0.3.7-cp37-cp37m-linux_aarch64.whl
 ```
 
-Also please note that vosk requires libgfortran which might be missing, you might need to install it package manager.
+Also please note that Vosk requires libgfortran on some Linux builds
+which might be missing, you might need to install libgfortran with a
+package manager.
 
 ## Websocket Server and GRPC server
 
@@ -86,6 +96,10 @@ cd ../src
 ./configure --mathlib=OPENBLAS --shared --use-cuda=no
 make -j 10
 ```
+
+#### Kaldi compilation on OSX
+
+The process is about the same except you don't really need OpenBLAS. On OSX kaldi uses Accelerate framework.
 
 #### Python module build
 
