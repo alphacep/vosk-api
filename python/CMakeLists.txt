@@ -27,7 +27,7 @@ swig_add_library(vosk TYPE SHARED LANGUAGE Python OUTPUT_DIR "${CMAKE_LIBRARY_OU
             "${TOP_SRCDIR}/src/vosk.i")
 
 if ("x${CMAKE_SYSTEM_NAME}" MATCHES "xLinux")
-    set(MATH_LIBS "${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran")
+    set(MATH_LIBS ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran)
 else ("x${CMAKE_SYSTEM_NAME}" MATCHES "xOSX")
     set(MATH_LIBS "-framework Accelerate")
     SET(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
