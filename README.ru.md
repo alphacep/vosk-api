@@ -40,13 +40,12 @@ gradle build
   * Raspbian on Raspberry Pi
   * Linux on arm64
   * OSX
-  * Windows (will be fully supported soon).
-
+  * Windows
 
 Для начала убедитесь, что используются достаточно новые версии pip и Python:
 
-  * Python версия >= 3.5
-  * pip версия >= 19.0
+  * Python версии: 3.5-3.8 (Linux), 3.6-3.7 (ARM), 3.8 (OSX), 3.8 (Windows)
+  * pip версии: 19.0 и новее
 
 Обновите Python и Pip если нужно, а затем установите "Воск" такой командой:
 
@@ -65,6 +64,11 @@ pip3 install https://github.com/alphacep/vosk-api/releases/download/0.3.7/vosk-0
 Также учтите, что некотрые сборки требуют наличия libgfortran. Например, на RPi необходимо установить libgfortran с 
 помощью менеджера пакетов.
 
+В случае проблем с установкой, проверьте вывод следующих команд:
+
+  * python3 --version
+  * pip3 --version
+  * pip3 -v install vosk
 
 ## Сервер для протоколов Websocket и GRPC
 

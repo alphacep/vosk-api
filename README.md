@@ -40,12 +40,12 @@ We currently support the following platforms:
   * Raspbian on Raspberry Pi
   * Linux on arm64
   * OSX
-  * Windows (will be fully supported soon).
+  * Windows
 
 Make sure you have newer pip and python3:
 
-  * Python version >= 3.5
-  * pip version >= 19.0
+  * Python version: 3.5-3.8 (Linux), 3.6-3.7 (ARM), 3.8 (OSX), 3.8 (Windows)
+  * pip version: 19.0 and newer.
 
 Uprade python and pip if needed. Then install vosk on Linux/Mac with a simple command
 
@@ -59,9 +59,14 @@ Please note that some platforms are not fully supported by pip, for example you 
 pip3 install https://github.com/alphacep/vosk-api/releases/download/0.3.7/vosk-0.3.7-cp37-cp37m-linux_aarch64.whl
 ```
 
-Also please note that Vosk requires libgfortran on some Linux builds
-which might be missing, you might need to install libgfortran with a
+Also please note that Vosk requires libgfortran on some Linux builds which might be missing, you might need to install libgfortran with a
 package manager.
+
+In case of trouble installing, check the following
+
+  * python3 --version
+  * pip3 --version
+  * pip3 -v install vosk
 
 ## Websocket Server and GRPC server
 
