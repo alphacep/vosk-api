@@ -44,8 +44,7 @@ kaldi_link_args = ['-s']
 kaldi_libraries = []
 
 if sys.platform.startswith('darwin'):
-    kaldi_link_args.append('-Wl,-undefined,dynamic_lookup')
-    kaldi_link_args.append('-Wl,-undefined,dynamic_lookup', '-framework', 'Accelerate')
+    kaldi_link_args.extend(['-Wl,-undefined,dynamic_lookup', '-framework', 'Accelerate'])
 else:
     kaldi_static_libs.append('tools/OpenBLAS/libopenblas.a')
     kaldi_libraries.append('gfortran')
@@ -55,13 +54,12 @@ sources = ['kaldi_recognizer.cc', 'model.cc', 'spk_model.cc', 'vosk_api.cc', 'vo
 vosk_ext = Extension('vosk._vosk',
                     define_macros = [('FST_NO_DYNAMIC_LINKING', '1')],
                     include_dirs = [kaldi_root + '/src', kaldi_root + '/tools/openfst/include', 'vosk'],
-                    swig_opts=['-outdir', 'vosk'],
+                    swig_opts=['-outdir', 'vosk', '-c++'],
                     libraries = kaldi_libraries,
                     extra_objects = [kaldi_root + '/' + x for x in kaldi_static_libs],
                     sources = ['vosk/' + x for x in sources],
                     extra_link_args = kaldi_link_args,
-                    extra_compile_args = ['-O3', '-std=c++11', 
-                          '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
+                    extra_compile_args = ['-std=c++11', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
 
 setuptools.setup(
     name="vosk", # Replace with your own username
