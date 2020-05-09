@@ -24,6 +24,11 @@ wheelhouse
 __pycache__
 *.egg-info
 python/dist
+python/vosk/*.cc
+python/vosk/*.c
+python/vosk/*.h
+python/vosk/*.i
+python/vosk/vosk.py
 
 # Java
 *.so
