@@ -14,9 +14,10 @@ class build_py(_build_py):
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+source_path=os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../src")))
 distutils.log.set_verbosity(distutils.log.DEBUG)
 distutils.dir_util.copy_tree(
-    os.path.join(os.path.abspath(os.path.dirname(__file__)), "../src"),
+    source_path,
     "vosk",
     update=1,
     verbose=1)
