@@ -112,8 +112,7 @@ Then build the python module
 
 ```
 export KALDI_ROOT=<KALDI_ROOT>
-cd python
-python3 setup.py install --user --single-version-externally-managed --root=/
+python3 python/setup.py install --user --single-version-externally-managed --root=/
 ```
 
 #### Running the example code with python
