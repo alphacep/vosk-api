@@ -59,7 +59,21 @@ public class SpeechRecognizer {
      * @throws IOException thrown if audio recorder can not be created for some reason.
      */
     public SpeechRecognizer(Model model) throws IOException {
-        recognizer = new KaldiRecognizer(model, 16000.0f);
+        this(model,null);
+    }
+
+    /**
+     * Creates speech recognizer. Recognizer holds the AudioRecord object, so you
+     * need to call {@link release} in order to properly finalize it.
+     *
+     * @param grammar TODO add proper description
+     *
+     * @throws IOException thrown if audio recorder can not be created for some reason.
+     */
+    public SpeechRecognizer(Model model, String grammar) throws IOException {
+        recognizer = grammar == null
+                ? new KaldiRecognizer(model, 16000.0F)
+                : new KaldiRecognizer(model, 16000.0F, grammar);
         sampleRate = 16000;
         bufferSize = Math.round(sampleRate * BUFFER_SIZE_SECONDS);
         recorder = new AudioRecord(
