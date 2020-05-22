@@ -1,3 +1,5 @@
+[![Vosk Logo](https://alphacephei.com/img/logo_mini.png)](https://alphacephei.com)
+
 [![Build Status](https://travis-ci.com/alphacep/vosk-api.svg?branch=master)](https://travis-ci.com/alphacep/vosk-api)
 
 Vosk是言语识别工具包。Vosk最好的事情是：
@@ -10,3 +12,5 @@ Vosk是言语识别工具包。Vosk最好的事情是：
   1. 还有用于不同编程语言的包装器-java / csharp / javascript等
   1. 可以快速重新配置词汇以实现最佳准确性
   1. 支持说话人识别
+
+加入[微信](https://alphacephei.com/img/wechat/wechat.jpg)群讨论!
