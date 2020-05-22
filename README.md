@@ -167,3 +167,4 @@ If you have any questions, feel free to
    * Post an issue here on github
    * Send us an e-mail at [contact@alphacephei.com](mailto:contact@alphacephei.com)
    * Join our group dedicated to speech recognition on Telegram [@speech_recognition](https://t.me/speech_recognition)
+   * Join [Wechat group](https://alphacephei.com/img/wechat/wechat.jpg) for discussion in Chinese
