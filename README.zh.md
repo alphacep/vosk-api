@@ -13,4 +13,4 @@ Vosk是言语识别工具包。Vosk最好的事情是：
   1. 可以快速重新配置词汇以实现最佳准确性
   1. 支持说话人识别
 
-加入[微信](https://alphacephei.com/img/wechat/wechat.jpg)群讨论!
+加入[微信](https://alphacephei.com/img/wechat/wechat.jpg)论坛进行中文讨论!
