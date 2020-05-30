@@ -61,6 +61,8 @@ protected:
     string winfo_rxfilename_;
     string carpa_rxfilename_;
     string std_fst_rxfilename_;
+    string final_ie_rxfilename_;
+    string mfcc_conf_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;

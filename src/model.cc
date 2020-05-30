@@ -14,19 +14,7 @@
 
 
 //
-// Possible model layout:
-//
-// * Default kaldi model with HCLG.fst
-//
-// * Lookahead model with const G.fst
-//
-// * Lookahead model with ngram G.fst
-//
-// * File disambig_tid.int required only for lookadhead models
-//
-// * File word_boundary.int is required if we want to have precise word timing information
-//   otherwise we don't do any word alignment. Optionally lexicon alignment can be done
-//   with corresponding C++ code inside kaldi recognizer.
+// For details of possible model layout see doc/models.md section model-structure
 
 #include "model.h"
 
@@ -163,23 +151,6 @@ void Model::ConfigureV1()
     args.insert(args.end(), extra_args, extra_args + sizeof(extra_args) / sizeof(extra_args[0]));
     po.Read(args.size(), args.data());
 
-    feature_info_.feature_type = "mfcc";
-    ReadConfigFromFile(model_path_str_ + "/mfcc.conf", &feature_info_.mfcc_opts);
-    feature_info_.mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
-
-    feature_info_.silence_weighting_config.silence_weight = 1e-3;
-    feature_info_.silence_weighting_config.silence_phones_str = endpoint_config_.silence_phones;
-
-    OnlineIvectorExtractionConfig ivector_extraction_opts;
-    ivector_extraction_opts.splice_config_rxfilename = model_path_str_ + "/ivector/splice.conf";
-    ivector_extraction_opts.cmvn_config_rxfilename = model_path_str_ + "/ivector/online_cmvn.conf";
-    ivector_extraction_opts.lda_mat_rxfilename = model_path_str_ + "/ivector/final.mat";
-    ivector_extraction_opts.global_cmvn_stats_rxfilename = model_path_str_ + "/ivector/global_cmvn.stats";
-    ivector_extraction_opts.diag_ubm_rxfilename = model_path_str_ + "/ivector/final.dubm";
-    ivector_extraction_opts.ivector_extractor_rxfilename = model_path_str_ + "/ivector/final.ie";
-    feature_info_.use_ivectors = true;
-    feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
-
     nnet3_rxfilename_ = model_path_str_ + "/final.mdl";
     hclg_fst_rxfilename_ = model_path_str_ + "/HCLG.fst";
     hcl_fst_rxfilename_ = model_path_str_ + "/HCLr.fst";
@@ -189,6 +160,8 @@ void Model::ConfigureV1()
     winfo_rxfilename_ = model_path_str_ + "/word_boundary.int";
     carpa_rxfilename_ = model_path_str_ + "/rescore/G.carpa";
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
+    final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
+    mfcc_conf_rxfilename_ = model_path_str_ + "/mfcc.conf";
 }
 
 void Model::ConfigureV2()
@@ -204,23 +177,6 @@ void Model::ConfigureV2()
          " lattice-beam=" << nnet3_decoding_config_.lattice_beam;
     KALDI_LOG << "Silence phones " << endpoint_config_.silence_phones;
 
-    feature_info_.feature_type = "mfcc";
-    ReadConfigFromFile(model_path_str_ + "/conf/mfcc.conf", &feature_info_.mfcc_opts);
-    feature_info_.mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
-
-    feature_info_.silence_weighting_config.silence_weight = 1e-3;
-    feature_info_.silence_weighting_config.silence_phones_str = endpoint_config_.silence_phones;
-
-    OnlineIvectorExtractionConfig ivector_extraction_opts;
-    ivector_extraction_opts.splice_config_rxfilename = model_path_str_ + "/ivector/splice.conf";
-    ivector_extraction_opts.cmvn_config_rxfilename = model_path_str_ + "/ivector/online_cmvn.conf";
-    ivector_extraction_opts.lda_mat_rxfilename = model_path_str_ + "/ivector/final.mat";
-    ivector_extraction_opts.global_cmvn_stats_rxfilename = model_path_str_ + "/ivector/global_cmvn.stats";
-    ivector_extraction_opts.diag_ubm_rxfilename = model_path_str_ + "/ivector/final.dubm";
-    ivector_extraction_opts.ivector_extractor_rxfilename = model_path_str_ + "/ivector/final.ie";
-    feature_info_.use_ivectors = true;
-    feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
-
     nnet3_rxfilename_ = model_path_str_ + "/am/final.mdl";
     hclg_fst_rxfilename_ = model_path_str_ + "/graph/HCLG.fst";
     hcl_fst_rxfilename_ = model_path_str_ + "/graph/HCLr.fst";
@@ -230,11 +186,20 @@ void Model::ConfigureV2()
     winfo_rxfilename_ = model_path_str_ + "/graph/phones/word_boundary.int";
     carpa_rxfilename_ = model_path_str_ + "/rescore/G.carpa";
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
+    final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
+    mfcc_conf_rxfilename_ = model_path_str_ + "/conf/mfcc.conf";
 }
 
 void Model::ReadDataFiles()
 {
     struct stat buffer;
+
+    feature_info_.feature_type = "mfcc";
+    ReadConfigFromFile(mfcc_conf_rxfilename_, &feature_info_.mfcc_opts);
+    feature_info_.mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
+
+    feature_info_.silence_weighting_config.silence_weight = 1e-3;
+    feature_info_.silence_weighting_config.silence_phones_str = endpoint_config_.silence_phones;
 
     trans_model_ = new kaldi::TransitionModel();
     nnet_ = new kaldi::nnet3::AmNnetSimple();
@@ -249,6 +214,20 @@ void Model::ReadDataFiles()
     }
     decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
                                                                nnet_);
+
+    if (stat(final_ie_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading i-vector extractor from " << final_ie_rxfilename_;
+
+        OnlineIvectorExtractionConfig ivector_extraction_opts;
+        ivector_extraction_opts.splice_config_rxfilename = model_path_str_ + "/ivector/splice.conf";
+        ivector_extraction_opts.cmvn_config_rxfilename = model_path_str_ + "/ivector/online_cmvn.conf";
+        ivector_extraction_opts.lda_mat_rxfilename = model_path_str_ + "/ivector/final.mat";
+        ivector_extraction_opts.global_cmvn_stats_rxfilename = model_path_str_ + "/ivector/global_cmvn.stats";
+        ivector_extraction_opts.diag_ubm_rxfilename = model_path_str_ + "/ivector/final.dubm";
+        ivector_extraction_opts.ivector_extractor_rxfilename = model_path_str_ + "/ivector/final.ie";
+        feature_info_.use_ivectors = true;
+        feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
+    }
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading HCLG from " << hclg_fst_rxfilename_;

@@ -1,3 +1,5 @@
+[![Vosk Logo](https://alphacephei.com/img/logo_mini.png)](https://alphacephei.com)
+
 [![Build Status](https://travis-ci.com/alphacep/vosk-api.svg?branch=master)](https://travis-ci.com/alphacep/vosk-api)
 
 [РУС](README.ru.md)
@@ -32,18 +34,41 @@ Available on request. Drop as a mail at [contact@alphacephei.com](mailto:contact
 
 ## Python installation from Pypi
 
-The easiest way to install vosk api is with pip. You do not have to compile anything. We currently support only Linux on x86_64 and Raspberry Pi. Other systems (windows, mac) will come soon.
+The easiest way to install vosk api is with pip. You do not have to compile anything. 
 
-Make sure you have newer pip and python:
+We currently support the following platforms:
 
-  * Python version >= 3.4
-  * pip version >= 19.0
+  * Linux on x86_64
+  * Raspbian on Raspberry Pi
+  * Linux on arm64
+  * OSX
+  * Windows
 
-Uprade python and pip if needed. Then install vosk on Linux with a simple command
+Make sure you have newer pip and python3:
+
+  * Python version: 3.5-3.8 (Linux), 3.6-3.7 (ARM), 3.8 (OSX), 3.8 (Windows)
+  * pip version: 19.0 and newer.
+
+Uprade python and pip if needed. Then install vosk on Linux/Mac with a simple command
 
 ```
 pip3 install vosk
 ```
+
+Please note that some platforms are not fully supported by pip, for example you have install on arm64 from released wheels:
+
+```
+pip3 install https://github.com/alphacep/vosk-api/releases/download/0.3.7/vosk-0.3.7-cp37-cp37m-linux_aarch64.whl
+```
+
+Also please note that Vosk requires libgfortran on some Linux builds which might be missing, you might need to install libgfortran with a
+package manager.
+
+In case of trouble installing, check the following
+
+  * python3 --version
+  * pip3 --version
+  * pip3 -v install vosk
 
 ## Websocket Server and GRPC server
 
@@ -79,6 +104,10 @@ cd ../src
 make -j 10
 ```
 
+#### Kaldi compilation on OSX
+
+The process is about the same except you don't really need OpenBLAS. On OSX kaldi uses Accelerate framework.
+
 #### Python module build
 
 Then build the python module
@@ -86,7 +115,7 @@ Then build the python module
 ```
 export KALDI_ROOT=<KALDI_ROOT>
 cd python
-python3 setup.py install
+python3 setup.py install --user --single-version-externally-managed --root=/
 ```
 
 #### Running the example code with python
@@ -96,8 +125,8 @@ Run like this:
 ```
 cd vosk-api/python/example
 wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
-unzip alphacep-model-android-en-us-0.3.zip
-mv alphacep-model-android-en-us-0.3 model-en
+unzip alphacep-model-small-en-us-0.3.zip
+mv alphacep-model-small-en-us-0.3 model
 python3 ./test_simple.py test.wav
 ```
 
@@ -112,8 +141,8 @@ Or Java
 ```
 cd java && KALDI_ROOT=<KALDI_ROOT> make
 wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
-unzip alphacep-model-android-en-us-0.3.zip
-mv alphacep-model-android-en-us-0.3 model
+unzip alphacep-model-small-en-us-0.3.zip
+mv alphacep-model-small-en-us-0.3 model
 make run
 ```
 
@@ -124,8 +153,8 @@ Or C#
 ```
 cd csharp && KALDI_ROOT=<KALDI_ROOT> make
 wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
-unzip alphacep-model-android-en-us-0.3.zip
-mv alphacep-model-android-en-us-0.3 model
+unzip alphacep-model-small-en-us-0.3.zip
+mv alphacep-model-small-en-us-0.3 model
 mono test.exe
 ```
 
@@ -140,3 +169,4 @@ If you have any questions, feel free to
    * Post an issue here on github
    * Send us an e-mail at [contact@alphacephei.com](mailto:contact@alphacephei.com)
    * Join our group dedicated to speech recognition on Telegram [@speech_recognition](https://t.me/speech_recognition)
+   * Join [Wechat group](https://alphacephei.com/img/wechat/wechat.jpg) for discussion in Chinese

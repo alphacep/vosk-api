@@ -33,13 +33,14 @@ set -x
 
 ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
 ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
+WORKDIR_X86=`pwd`/build/kaldi_x86
 WORKDIR_X86_64=`pwd`/build/kaldi_x86_64
 WORKDIR_ARM32=`pwd`/build/kaldi_arm_32
 WORKDIR_ARM64=`pwd`/build/kaldi_arm_64
 PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
 OPENFST_VERSION=1.6.7
 
-mkdir -p $WORKDIR_ARM64/local/lib $WORKDIR_ARM32/local/lib $WORKDIR_X86_64/local/lib
+mkdir -p $WORKDIR_ARM64/local/lib $WORKDIR_ARM32/local/lib $WORKDIR_X86_64/local/lib $WORKDIR_X86/local/lib
 
 # Build standalone CLAPACK since gfortran is missing
 cd build
@@ -47,7 +48,7 @@ git clone https://github.com/simonlynen/android_libs
 cd android_libs/lapack
 sed -i 's/APP_STL := gnustl_static/APP_STL := c++_static/g' jni/Application.mk && \
 sed -i 's/android-10/android-21/g' project.properties && \
-sed -i 's/APP_ABI := armeabi armeabi-v7a/APP_ABI := armeabi-v7a arm64-v8a x86_64/g' jni/Application.mk && \
+sed -i 's/APP_ABI := armeabi armeabi-v7a/APP_ABI := armeabi-v7a arm64-v8a x86_64 x86/g' jni/Application.mk && \
 sed -i 's/LOCAL_MODULE:= testlapack/#LOCAL_MODULE:= testlapack/g' jni/Android.mk && \
 sed -i 's/LOCAL_SRC_FILES:= testclapack.cpp/#LOCAL_SRC_FILES:= testclapack.cpp/g' jni/Android.mk && \
 sed -i 's/LOCAL_STATIC_LIBRARIES := lapack/#LOCAL_STATIC_LIBRARIES := lapack/g' jni/Android.mk && \
@@ -56,11 +57,11 @@ ${ANDROID_NDK_HOME}/ndk-build && \
 cp obj/local/armeabi-v7a/*.a ${WORKDIR_ARM32}/local/lib && \
 cp obj/local/arm64-v8a/*.a ${WORKDIR_ARM64}/local/lib
 cp obj/local/x86_64/*.a ${WORKDIR_X86_64}/local/lib
+cp obj/local/x86/*.a ${WORKDIR_X86}/local/lib
 
 # Architecture-specific part
 
-
-for arch in arm32 arm64 x86_64; do
+for arch in arm32 arm64 x86_64 x86; do
 #for arch in x86_64; do
 
 case $arch in
@@ -89,6 +90,15 @@ case $arch in
           AR=x86_64-linux-android-ar
           CC=x86_64-linux-android21-clang
           CXX=x86_64-linux-android21-clang++
+          ARCHFLAGS=""
+          ;;
+    x86)
+          BLAS_ARCH=ATOM
+          WORKDIR=$WORKDIR_X86
+          HOST=i686-linux-android
+          AR=i686-linux-android-ar
+          CC=i686-linux-android21-clang
+          CXX=i686-linux-android21-clang++
           ARCHFLAGS=""
           ;;
 esac

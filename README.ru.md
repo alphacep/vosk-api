@@ -1,3 +1,5 @@
+[![Vosk Logo](https://alphacephei.com/img/logo_mini.png)](https://alphacephei.com)
+
 [![Build Status](https://travis-ci.com/alphacep/vosk-api.svg?branch=master)](https://travis-ci.com/alphacep/vosk-api)
 
 [EN](README.md)
@@ -30,14 +32,22 @@ gradle build
 
 Доступна позапросу. Напишите нам [contact@alphacephei.com](mailto:contact@alphacephei.com).
 
-## Установка для работы Python из Pypi
+## Установка в Python через Pypi
 
-Проще всего установить "Воск" с помощью pip. Собирать ничего не нужно. Мы поддерживаем платформы Linux, RPi и Windows. Сборка для OSX будет скоро доступна.
+Проще всего установить "Воск" с помощью pip. Собирать ничего не нужно.
+
+На настоящий момент мы поддерживаем следующие платформы:
+
+  * Linux on x86_64
+  * Raspbian on Raspberry Pi
+  * Linux on arm64
+  * OSX
+  * Windows
 
 Для начала убедитесь, что используются достаточно новые версии pip и Python:
 
-  * Python версия >= 3.5
-  * pip версия >= 19.0
+  * Python версии: 3.5-3.8 (Linux), 3.6-3.7 (ARM), 3.8 (OSX), 3.8 (Windows)
+  * pip версии: 19.0 и новее
 
 Обновите Python и Pip если нужно, а затем установите "Воск" такой командой:
 
@@ -47,11 +57,26 @@ pip3 install vosk
 
 Для использования "Воск" смотрите примеры ниже.
 
+Учтите, что некоторые платформы не поддерживаютя pip, например arm64. В этом случае можно установить пакет с github:
+
+```
+pip3 install https://github.com/alphacep/vosk-api/releases/download/0.3.7/vosk-0.3.7-cp37-cp37m-linux_aarch64.whl
+```
+
+Также учтите, что некотрые сборки требуют наличия libgfortran. Например, на RPi необходимо установить libgfortran с 
+помощью менеджера пакетов.
+
+В случае проблем с установкой, проверьте вывод следующих команд:
+
+  * python3 --version
+  * pip3 --version
+  * pip3 -v install vosk
+
 ## Сервер для протоколов Websocket и GRPC
 
-We also provide a websocket server and grpc server which can be used in telephony and other applications. With bigger models adapted for 8khz audio it provides more accuracy.
+Мы также разработали сервер для приложений, требующих обработки больших объёмов с большой точностью, например, для телефонии.
 
-The server is installed with docker and can run with a single command:
+Сервер устанавливается одной командой с помощью docker:
 
 ```
 docker run -d -p 2700:2700 alphacep/kaldi-en:latest
@@ -67,7 +92,7 @@ Kaldi самостоятельно. Сборка досаточно проста
 быть непривычной для начинающих. Обращайте внимания на сообщения об ошибках
 в процессе сборки.
 
-#### Сборка Kaldi для модулей на Python, Java, C#
+#### Сборка Kaldi для модулей на Python, Java, C# на Linux
 
 ```
 git clone https://github.com/kaldi-asr/kaldi
@@ -83,6 +108,10 @@ cd ../src
 ./configure --mathlib=OPENBLAS --shared --use-cuda=no
 make -j 10
 ```
+
+#### Kaldi compilation on OSX
+
+Процесс сборки почти такой же, как и на Linux, но нужно учесть что Kaldi в OSX использует Accelerate вместо OpenBlas
 
 #### Сборка модуля на Python
 
@@ -101,8 +130,8 @@ python3 setup.py install
 ```
 cd vosk-api/python/example
 wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
-unzip alphacep-model-android-en-us-0.3.zip
-mv alphacep-model-android-en-us-0.3 model-en
+unzip alphacep-model-small-en-us-0.3.zip
+mv alphacep-model-small-en-us-0.3 model-en
 python3 ./test_simple.py test.wav
 ```
 
@@ -117,8 +146,8 @@ python3 ./test_simple.py test.wav
 ```
 cd java && KALDI_ROOT=<KALDI_ROOT> make
 wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
-unzip alphacep-model-android-en-us-0.3.zip
-mv alphacep-model-android-en-us-0.3 model
+unzip alphacep-model-small-en-us-0.3.zip
+mv alphacep-model-small-en-us-0.3 model
 make run
 ```
 
@@ -129,8 +158,8 @@ make run
 ```
 cd csharp && KALDI_ROOT=<KALDI_ROOT> make
 wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
-unzip alphacep-model-android-en-us-0.3.zip
-mv alphacep-model-android-en-us-0.3 model
+unzip alphacep-model-small-en-us-0.3.zip
+mv alphacep-model-small-en-us-0.3 model
 mono test.exe
 ```
 
