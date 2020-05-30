@@ -11,10 +11,14 @@ class build_py(_build_py):
         self.run_command("build_ext")
         return super().run()
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+kaldi_root = os.getenv('KALDI_ROOT')
+kaldi_mkl = os.getenv('KALDI_MKL')
+source_path = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../src")))
 
-source_path=os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../src")))
+if kaldi_root == None:
+    print("Define KALDI_ROOT")
+    exit(1)
+
 distutils.log.set_verbosity(distutils.log.DEBUG)
 distutils.dir_util.copy_tree(
     source_path,
@@ -22,7 +26,9 @@ distutils.dir_util.copy_tree(
     update=1,
     verbose=1)
 
-kaldi_root = os.getenv('KALDI_ROOT')
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 kaldi_static_libs = ['src/online2/kaldi-online2.a',
              'src/decoder/kaldi-decoder.a',
              'src/ivector/kaldi-ivector.a',
@@ -46,6 +52,9 @@ kaldi_libraries = []
 
 if sys.platform.startswith('darwin'):
     kaldi_link_args.extend(['-Wl,-undefined,dynamic_lookup', '-framework', 'Accelerate'])
+elif kaldi_mkl != None:
+    kaldi_link_args.extend(['-L/opt/intel/mkl/lib/intel64', '-Wl,-rpath=/opt/intel/mkl/lib/intel64'])
+    kaldi_libraries.extend(['mkl_rt', 'mkl_intel_lp64', 'mkl_core', 'mkl_sequential'])
 else:
     kaldi_static_libs.append('tools/OpenBLAS/libopenblas.a')
     kaldi_libraries.append('gfortran')
