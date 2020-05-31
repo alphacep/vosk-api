@@ -159,6 +159,11 @@ void KaldiRecognizer::CleanUp()
     delete silence_weighting_;
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
+    if (spk_feature_) {
+        delete spk_feature_;
+        spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
+    }
+
     frame_offset_ += decoder_->NumFramesDecoded();
     decoder_->InitDecoding(frame_offset_);
 }
@@ -256,11 +261,22 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
 
 void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
 {
-    int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
+    vector<int32> nonsilence_frames;
+    if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0) {
+        silence_weighting_->ComputeCurrentTraceback(decoder_->Decoder(), true);
+        silence_weighting_->GetNonsilenceFrames(feature_pipeline_->NumFramesReady(),
+                                          frame_offset_ * 3,
+                                          &nonsilence_frames);
+    }
+
+    int num_frames = spk_feature_->NumFramesReady();
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
     for (int i = 0; i < num_frames; ++i) {
+       if (std::find(nonsilence_frames.begin(),
+                     nonsilence_frames.end(), i % 3) == nonsilence_frames.end())
+           continue;
        Vector<BaseFloat> feat(spk_feature_->Dim());
-       spk_feature_->GetFrame(i + frame_offset_ * 3, &feat);
+       spk_feature_->GetFrame(i, &feat);
        mfcc.CopyRowFromVec(feat, i);
     }
     SlidingWindowCmnOptions cmvn_opts;
