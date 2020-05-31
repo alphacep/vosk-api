@@ -47,5 +47,6 @@ nodejs/example/model
 nodejs/example/test.wav
 nodejs/node_modules
 nodejs/package-lock.json
+nodejs/build
 
 
