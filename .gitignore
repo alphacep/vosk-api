@@ -40,3 +40,12 @@ java/*.cc
 csharp/gen
 csharp/*.exe
 csharp/*.c
+
+# Node
+nodejs/vosk_wrap.cc
+nodejs/example/model
+nodejs/example/test.wav
+nodejs/node_modules
+nodejs/package-lock.json
+
+
