@@ -8,6 +8,7 @@ To add a new model here create an issue on Github.
 |-------------------------------------------------------------------------------------------------------------------------|-------|------------|----------------------------------------------------------------------------------------------|
 | **English**                                                                                               |       |            |  |
 | [vosk-model-en-us-aspire-0.2](http://alphacephei.com/kaldi/models/vosk-model-en-us-aspire-0.2.zip)        |  1.4G |   TBD      | Trained on Fisher + more or less recent LM. Should be pretty good for generic US English transcription |
+| [vosk-model-en-us-librispeech-0.2](http://alphacephei.com/kaldi/models/vosk-model-en-us-librispeech-0.2.zip) | 845M |   TBD      | Repackaged Kaldi model from http://kaldi-asr.org/models/m13 |
 | [vosk-model-small-en-us-0.3](http://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip)          |  36M  |   TBD      | Lightweight wideband model for Android and RPi                                               |
 | **Chinese**                                                                                                   |       |            |  |
 | [vosk-model-cn-0.1.zip](http://alphacephei.com/kaldi/models/vosk-model-cn-0.1.zip)                        |  195M |   TBD      | Big narrowband Chinese model for server processing                                           |
