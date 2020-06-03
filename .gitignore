@@ -29,17 +29,27 @@ python/vosk/*.c
 python/vosk/*.h
 python/vosk/*.i
 python/vosk/vosk.py
+python/vosk/vosk_wrap.cpp
+python/test/db
+python/test/hyp
+python/test/model
+python/test/ref
+python/test/result.txt
+python/test/wav.scp
 
 # Java
 *.so
 java/org
-java/model-en
 java/*.cc
+java/model-spk/
+java/model/
 
 # CSharp
 csharp/gen
 csharp/*.exe
 csharp/*.c
+csharp/model/
+csharp/test.wav
 
 # Node
 nodejs/vosk_wrap.cc
@@ -48,5 +58,3 @@ nodejs/example/test.wav
 nodejs/node_modules
 nodejs/package-lock.json
 nodejs/build
-
-
