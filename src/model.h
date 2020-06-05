@@ -32,6 +32,7 @@
 #include "rnnlm/rnnlm-utils.h"
 
 using namespace kaldi;
+using namespace std;
 
 class KaldiRecognizer;
 
@@ -39,18 +40,29 @@ class Model {
 
 public:
     Model(const char *model_path);
-    ~Model();
+    void Ref();
+    void Unref();
 
 protected:
+    ~Model();
+    void ConfigureV1();
+    void ConfigureV2();
+    void ReadDataFiles();
+
     friend class KaldiRecognizer;
 
-    std::string nnet3_rxfilename_;
-    std::string hclg_fst_rxfilename_;
-    std::string hcl_fst_rxfilename_;
-    std::string g_fst_rxfilename_;
-    std::string word_syms_rxfilename_;
-    std::string winfo_rxfilename_;
-    std::string disambig_rxfilename_;
+    string model_path_str_;
+    string nnet3_rxfilename_;
+    string hclg_fst_rxfilename_;
+    string hcl_fst_rxfilename_;
+    string g_fst_rxfilename_;
+    string disambig_rxfilename_;
+    string word_syms_rxfilename_;
+    string winfo_rxfilename_;
+    string carpa_rxfilename_;
+    string std_fst_rxfilename_;
+    string final_ie_rxfilename_;
+    string mfcc_conf_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
@@ -62,11 +74,16 @@ protected:
     kaldi::nnet3::AmNnetSimple *nnet_;
     const fst::SymbolTable *word_syms_;
     kaldi::WordBoundaryInfo *winfo_;
-    std::vector<int32> disambig_;
+    vector<int32> disambig_;
 
     fst::Fst<fst::StdArc> *hclg_fst_;
     fst::Fst<fst::StdArc> *hcl_fst_;
     fst::Fst<fst::StdArc> *g_fst_;
+
+    fst::VectorFst<fst::StdArc> *std_lm_fst_;
+    kaldi::ConstArpaLm const_arpa_;
+
+    int ref_cnt_;
 };
 
 #endif /* MODEL_H_ */

@@ -11,6 +11,7 @@ KALDI_LIBS = \
              ${KALDI_ROOT}/src/tree/kaldi-tree.a \
              ${KALDI_ROOT}/src/feat/kaldi-feat.a \
              ${KALDI_ROOT}/src/lat/kaldi-lat.a \
+             ${KALDI_ROOT}/src/lm/kaldi-lm.a \
              ${KALDI_ROOT}/src/hmm/kaldi-hmm.a \
              ${KALDI_ROOT}/src/transform/kaldi-transform.a \
              ${KALDI_ROOT}/src/cudamatrix/kaldi-cudamatrix.a \
@@ -21,7 +22,7 @@ KALDI_LIBS = \
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a \
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a \
              ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a \
-             -lgfortran
+             -lgfortran -lstdc++
 
 all: test.exe
 
@@ -29,20 +30,26 @@ test.exe: libkaldiwrap.so test.cs
 	mcs test.cs gen/*.cs
 
 VOSK_SOURCES = \
-	vosk_wrap.cc \
+	vosk_wrap.c \
 	../src/kaldi_recognizer.cc \
 	../src/kaldi_recognizer.h \
 	../src/model.cc \
 	../src/model.h \
 	../src/spk_model.cc \
-	../src/spk_model.h
+	../src/spk_model.h \
+	../src/vosk_api.cc \
+	../src/vosk_api.h
 
 libkaldiwrap.so: $(VOSK_SOURCES)
 	$(CXX) -fpermissive $(CFLAGS) $(CPPFLAGS) -shared -o $@ $(VOSK_SOURCES) $(KALDI_LIBS)
 
-vosk_wrap.cc: ../src/vosk.i
-	swig -csharp -dllimport "libkaldiwrap.so" \
-	    -namespace "Kaldi" -c++ -outdir gen -o vosk_wrap.cc ../src/vosk.i
+vosk_wrap.c: ../src/vosk.i
+	mkdir -p gen
+	swig -csharp -DSWIG_CSHARP_NO_EXCEPTION_HELPER -dllimport "libkaldiwrap" \
+	    -namespace "Kaldi" -outdir gen -o vosk_wrap.c ../src/vosk.i
+
+run: test.exe
+	mono test.exe
 
 clean:
-	$(RM) *.so vosk_wrap.cc *.o gen/*.cs test.exe
+	$(RM) *.so vosk_wrap.c *.o gen/*.cs test.exe

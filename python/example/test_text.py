@@ -1,16 +1,16 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from vosk import Model, KaldiRecognizer
 import sys
 import json
 import os
 
-if not os.path.exists("model-en"):
-    print ("Please download the model from https://github.com/alphacep/kaldi-android-demo/releases and unpack as 'model-en' in the current folder.")
+if not os.path.exists("model"):
+    print ("Please download the model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as 'model' in the current folder.")
     exit (1)
 
 
-model = Model("model-en")
+model = Model("model")
 
 # Large vocabulary free form recognition
 rec = KaldiRecognizer(model, 16000)
@@ -22,7 +22,7 @@ wf = open(sys.argv[1], "rb")
 wf.read(44) # skip header
 
 while True:
-    data = wf.read(2000)
+    data = wf.read(4000)
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):

@@ -1,3 +1,3 @@
-exports.printMsg = function() {
-  console.log("This is a message from the Vosk package");
-}
+const voskNativeModule = require('./build/Release/vosk.node');
+
+module.exports = voskNativeModule;

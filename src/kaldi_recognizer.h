@@ -31,34 +31,39 @@ using namespace kaldi;
 
 class KaldiRecognizer {
     public:
-        KaldiRecognizer(Model &model, float sample_frequency);
-        KaldiRecognizer(Model &model, SpkModel *spk_model, float sample_frequency);
-        KaldiRecognizer(Model &model, float sample_frequency, char const *grammar);
+        KaldiRecognizer(Model *model, float sample_frequency);
+        KaldiRecognizer(Model *model, SpkModel *spk_model, float sample_frequency);
+        KaldiRecognizer(Model *model, float sample_frequency, char const *grammar);
         ~KaldiRecognizer();
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);
-        std::string Result();
-        std::string FinalResult();
-        std::string PartialResult();
+        const char* Result();
+        const char* FinalResult();
+        const char* PartialResult();
 
     private:
+        void InitRescoring();
         void CleanUp();
         void UpdateSilenceWeights();
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
         void GetSpkVector(Vector<BaseFloat> &xvector);
 
-        Model &model_;
+        Model *model_;
         SingleUtteranceNnet3Decoder *decoder_;
         fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
-        fst::StdVectorFst g_fst_; // dynamically constructed grammar
+        fst::StdVectorFst *g_fst_; // dynamically constructed grammar
         OnlineNnet2FeaturePipeline *feature_pipeline_;
         OnlineSilenceWeighting *silence_weighting_;
 
         SpkModel *spk_model_;
         OnlineBaseFeature *spk_feature_;
 
+        fst::MapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_;
+
         float sample_frequency_;
         int32 frame_offset_;
+        int32 round_offset_;
         bool input_finalized_;
+        string last_result_;
 };
