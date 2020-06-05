@@ -227,6 +227,8 @@ void Model::ReadDataFiles()
         ivector_extraction_opts.ivector_extractor_rxfilename = model_path_str_ + "/ivector/final.ie";
         feature_info_.use_ivectors = true;
         feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
+    } else {
+        feature_info_.use_ivectors = false;
     }
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
