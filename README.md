@@ -1,12 +1,12 @@
-Vosk is a speech recognition toolkit which supports 9 languages -
-English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish,
-Vietnamese. Vosk works offline with very small 50 Mb but accurate model,
-zero-latency response with streaming API, reconfigurable vocabulary and
-speaker identification.
+Vosk is an open source speech recognition toolkit which supports 9
+languages - English, German, French, Spanish, Portuguese, Chinese,
+Russian, Turkish, Vietnamese. Vosk works offline with small (50 Mb), but
+accurate model, zero-latency response with streaming API, reconfigurable
+vocabulary and speaker identification.
 
 ### Installation and usage
 
-For installation instructions, examples and documentation visit https://alphacephei.com/vosk
+For Vosk installation instructions, examples and turorial and documentation visit https://alphacephei.com/vosk
 
 ### Build
 
