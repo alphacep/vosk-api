@@ -1,1 +1,1 @@
-See https://alphacephei.com/vosk/adpatation.html
+See https://alphacephei.com/vosk/adaptation.html
