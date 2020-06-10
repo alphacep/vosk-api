@@ -235,9 +235,13 @@ bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
         input_finalized_ = false;
     }
 
-    feature_pipeline_->AcceptWaveform(sample_frequency_, wdata);
-    UpdateSilenceWeights();
-    decoder_->AdvanceDecoding();
+    int step = static_cast<int>(sample_frequency_ * 0.2);
+    for (int i = 0; i < wdata.Dim(); i+= step) {
+        SubVector<BaseFloat> r = wdata.Range(i, std::min(step, wdata.Dim() - i));
+        feature_pipeline_->AcceptWaveform(sample_frequency_, r);
+        UpdateSilenceWeights();
+        decoder_->AdvanceDecoding();
+    }
 
     if (spk_feature_) {
         spk_feature_->AcceptWaveform(sample_frequency_, wdata);
