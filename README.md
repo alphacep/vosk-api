@@ -23,4 +23,4 @@ If you have any questions, feel free to:
    * Post an issue here on github
    * Send us an e-mail at [contact@alphacephei.com](mailto:contact@alphacephei.com)
    * Join our group dedicated to speech recognition on Telegram [@speech_recognition](https://t.me/speech_recognition)
-   * Join [Wechat group](https://alphacephei.com/img/wechat/wechat.jpg). If QR code doesn't work or expired, mail us to join the group.
+   * We have a Wechat group which is pretty big, so it is invitation-only. Mail us to join the group and provide some information about yourself.
