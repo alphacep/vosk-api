@@ -31,13 +31,14 @@ fi
 
 set -x
 
+OS_NAME=`echo $(uname -s) | tr '[:upper:]' '[:lower:]'`
 ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
-ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/`echo $(uname -s)|tr '[:upper:]' '[:lower:]'`-x86_64
+ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64
 WORKDIR_X86=`pwd`/build/kaldi_x86
 WORKDIR_X86_64=`pwd`/build/kaldi_x86_64
 WORKDIR_ARM32=`pwd`/build/kaldi_arm_32
 WORKDIR_ARM64=`pwd`/build/kaldi_arm_64
-PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/`echo $(uname -s)|tr '[:upper:]' '[:lower:]'`-x86_64/bin
+PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin
 OPENFST_VERSION=1.6.7
 
 mkdir -p $WORKDIR_ARM64/local/lib $WORKDIR_ARM32/local/lib $WORKDIR_X86_64/local/lib $WORKDIR_X86/local/lib
