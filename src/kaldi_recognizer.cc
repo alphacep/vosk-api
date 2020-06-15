@@ -45,7 +45,8 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency) : model_(
             feature_pipeline_);
 
     frame_offset_ = 0;
-    round_offset_ = 0;
+    samples_processed_ = 0;
+    samples_round_start_ = 0;
     input_finalized_ = false;
     spk_feature_ = NULL;
 
@@ -90,7 +91,8 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char cons
             feature_pipeline_);
 
     frame_offset_ = 0;
-    round_offset_ = 0;
+    samples_processed_ = 0;
+    samples_round_start_ = 0;
     input_finalized_ = false;
     spk_feature_ = NULL;
 
@@ -123,7 +125,8 @@ KaldiRecognizer::KaldiRecognizer(Model *model, SpkModel *spk_model, float sample
             feature_pipeline_);
 
     frame_offset_ = 0;
-    round_offset_ = 0;
+    samples_processed_ = 0;
+    samples_round_start_ = 0;
     input_finalized_ = false;
 
     spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
@@ -169,9 +172,12 @@ void KaldiRecognizer::CleanUp()
 
     frame_offset_ += decoder_->NumFramesDecoded();
 
-    // Each 10 minutes we drop the pipeline to save memory in continuous processing
+    // Each 10 minutes we drop the pipeline to save frontend memory in continuous processing
+    // here we drop few frames remaining in the feature pipeline but hope it will not
+    // cause a huge accuracy drop since it happens not very frequently.
+
     if (frame_offset_ > 20000) {
-        round_offset_ += frame_offset_;
+        samples_round_start_ += samples_processed_;
         frame_offset_ = 0;
 
         delete decoder_;
@@ -242,6 +248,7 @@ bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
         UpdateSilenceWeights();
         decoder_->AdvanceDecoding();
     }
+    samples_processed_ += wdata.Dim();
 
     if (spk_feature_) {
         spk_feature_->AcceptWaveform(sample_frequency_, wdata);
@@ -376,8 +383,8 @@ const char* KaldiRecognizer::Result()
     for (int i = 0; i < size; i++) {
         json::JSON word;
         word["word"] = model_->word_syms_->Find(words[i]);
-        word["start"] = (round_offset_ + frame_offset_ + times[i].first) * 0.03;
-        word["end"] = (round_offset_ + frame_offset_ + times[i].second) * 0.03;
+        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
+        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
         word["conf"] = conf[i];
         obj["result"].append(word);
 
