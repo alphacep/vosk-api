@@ -112,12 +112,9 @@ make -C OpenBLAS install PREFIX=$WORKDIR/local
 
 # tools directory --> we'll only compile OpenFST
 cd $WORKDIR
-wget -c -T 10 -t 1 http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-${OPENFST_VERSION}.tar.gz || \
-wget -c -T 10 -t 3 http://www.openslr.org/resources/2/openfst-${OPENFST_VERSION}.tar.gz
-
-tar -zxvf openfst-${OPENFST_VERSION}.tar.gz
-cd openfst-${OPENFST_VERSION}
-
+git clone https://github.com/alphacep/openfst
+cd openfst
+autoreconf -i
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --prefix=${WORKDIR}/local \
     --enable-shared --enable-static --with-pic --disable-bin \
     --enable-lookahead-fsts --enable-ngram-fsts --host=$HOST --build=x86-linux-gnu

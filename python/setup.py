@@ -73,7 +73,7 @@ vosk_ext = Extension('vosk._vosk',
 
 setuptools.setup(
     name="vosk", # Replace with your own username
-    version="0.3.8",
+    version="0.3.9",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="API for Kaldi and Vosk",
