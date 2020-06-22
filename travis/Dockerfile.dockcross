@@ -66,6 +66,23 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/cpython-3.6.10 /opt/cpython-3.6.10-cross /opt/v3.6.10.tar.gz
 
+RUN cd /opt \
+    && wget -q https://github.com/python/cpython/archive/v3.8.3.tar.gz \
+    && tar xf v3.8.3.tar.gz \
+    && cp -r cpython-3.8.3 cpython-3.8.3-cross \
+    && cd /opt/cpython-3.8.3 \
+    && AR=/usr/bin/ar RANLIB=/usr/bin/ranlib CPP=/usr/bin/cpp CXX=/usr/bin/g++ CC=/usr/bin/gcc  ./configure --prefix="/opt/python/cp3.8-cp3.8m" \
+    && make -j $(nproc) \
+    && make install \
+    && /opt/python/cp3.8-cp3.8m/bin/pip3 install -U pip \
+    && /opt/python/cp3.8-cp3.8m/bin/pip3 install -U wheel \
+    && cd /opt/cpython-3.8.3-cross \
+    && export PATH=/opt/python/cp3.8-cp3.8m/bin:$PATH \
+    && ./configure --prefix=$CROSS_ROOT --with-openssl=$CROSS_ROOT --host=${CROSS_TRIPLE} --build=x86-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes \
+    && make -j $(nproc) \
+    && make install \
+    && rm -rf /opt/cpython-3.8.3 /opt/cpython-3.8.3-cross /opt/v3.8.3.tar.gz
+
 ARG OPENBLAS_ARCH=ARMV7
 ARG ARM_HARDWARE_OPTS="-mfloat-abi=hard -mfpu=neon"
 RUN cd /opt \
