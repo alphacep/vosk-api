@@ -74,6 +74,22 @@ public class SpeechRecognizer {
         }
     }
 
+    public SpeechRecognizer(Model model, SpkModel spkModel) throws IOException {
+        recognizer = new KaldiRecognizer(model, spkModel, 16000.0f);
+        sampleRate = 16000;
+        bufferSize = Math.round(sampleRate * BUFFER_SIZE_SECONDS);
+        recorder = new AudioRecord(
+                AudioSource.VOICE_RECOGNITION, sampleRate,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT, bufferSize * 2);
+
+        if (recorder.getState() == AudioRecord.STATE_UNINITIALIZED) {
+            recorder.release();
+            throw new IOException(
+                    "Failed to initialize recorder. Microphone might be already in use.");
+        }
+    }
+
     /**
      * Adds listener.
      */
