@@ -176,7 +176,9 @@ void KaldiRecognizer::CleanUp()
     // here we drop few frames remaining in the feature pipeline but hope it will not
     // cause a huge accuracy drop since it happens not very frequently.
 
-    if (frame_offset_ > 20000) {
+    // Also restart if we retrieved final result already
+
+    if (frame_offset_ > 20000 || input_finalized_) {
         samples_round_start_ += samples_processed_;
         frame_offset_ = 0;
 
