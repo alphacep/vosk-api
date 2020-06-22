@@ -181,9 +181,8 @@ const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer);
 
 
 /** Returns speech recognition result. Same as result, but doesn't wait for silence
- *  You usually call it in the end of the stream to get final bits. You can not
- *  recognize data after final result is retrieved, you have to release the recognizer
- *  and create a new one.
+ *  You usually call it in the end of the stream to get final bits of audio. It
+ *  flushes the feature pipeline, so all remaining audio chunks got processed.
  *
  *  @returns speech result in JSON format.
  */
