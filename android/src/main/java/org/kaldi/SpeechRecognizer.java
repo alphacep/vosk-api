@@ -74,8 +74,8 @@ public class SpeechRecognizer {
         }
     }
 
-    public SpeechRecognizer(SpkModel model) throws IOException {
-        recognizer = new KaldiRecognizer(model, 16000.0f);
+    public SpeechRecognizer(Model model, SpkModel spkModel) throws IOException {
+        recognizer = new KaldiRecognizer(model, spkModel, 16000.0f);
         sampleRate = 16000;
         bufferSize = Math.round(sampleRate * BUFFER_SIZE_SECONDS);
         recorder = new AudioRecord(
