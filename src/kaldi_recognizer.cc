@@ -125,9 +125,9 @@ KaldiRecognizer::KaldiRecognizer(Model *model, SpkModel *spk_model, float sample
 }
 
 KaldiRecognizer::~KaldiRecognizer() {
+    delete decoder_;
     delete feature_pipeline_;
     delete silence_weighting_;
-    delete decoder_;
     delete g_fst_;
     delete decode_fst_;
     delete spk_feature_;
@@ -164,12 +164,13 @@ void KaldiRecognizer::CleanUp()
     delete silence_weighting_;
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
-    if (spk_feature_) {
+    if (spk_model_) {
         delete spk_feature_;
         spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
     }
 
-    frame_offset_ += decoder_->NumFramesDecoded();
+    if (decoder_)
+       frame_offset_ += decoder_->NumFramesDecoded();
 
     // Each 10 minutes we drop the pipeline to save frontend memory in continuous processing
     // here we drop few frames remaining in the feature pipeline but hope it will not
@@ -177,7 +178,7 @@ void KaldiRecognizer::CleanUp()
 
     // Also restart if we retrieved final result already
 
-    if (frame_offset_ > 20000 || state_ == RECOGNIZER_FINALIZED) {
+    if (decoder_ == NULL || state_ == RECOGNIZER_FINALIZED || frame_offset_ > 20000) {
         samples_round_start_ += samples_processed_;
         frame_offset_ = 0;
 
@@ -454,7 +455,21 @@ const char* KaldiRecognizer::FinalResult()
     decoder_->AdvanceDecoding();
     decoder_->FinalizeDecoding();
     state_ = RECOGNIZER_FINALIZED;
-    return GetResult();
+    GetResult();
+
+    // Free some memory while we are finalized, next
+    // iteration will reinitialize them anyway
+    delete decoder_;
+    delete feature_pipeline_;
+    delete silence_weighting_;
+    delete spk_feature_;
+
+    feature_pipeline_ = NULL;
+    silence_weighting_ = NULL;
+    decoder_ = NULL;
+    spk_feature_ = NULL;
+
+    return last_result_.c_str();
 }
 
 // Store result in recognizer and return as const string
