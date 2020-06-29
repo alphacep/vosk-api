@@ -180,6 +180,7 @@ void KaldiRecognizer::CleanUp()
 
     if (decoder_ == NULL || state_ == RECOGNIZER_FINALIZED || frame_offset_ > 20000) {
         samples_round_start_ += samples_processed_;
+        samples_processed_ = 0;
         frame_offset_ = 0;
 
         delete decoder_;
