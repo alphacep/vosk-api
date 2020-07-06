@@ -71,7 +71,11 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char cons
 
         while (getline(ss, token, ' ')) {
             int32 id = model_->word_syms_->Find(token);
-            g_fst_->AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
+            if (id == kNoSymbol) {
+                KALDI_WARN << "Ignoring word missing in vocabulary: '" << token << "'";
+            } else {
+                g_fst_->AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
+            }
         }
         ArcSort(g_fst_, ILabelCompare<StdArc>());
 
