@@ -10,17 +10,26 @@
          'vosk_wrap.cc',
       ],
       'cflags': [
-           '-std=c++11',
-           '-DFST_NO_DYNAMIC_LINKING',
-           '-Wno-deprecated-declarations',
-           '-Wno-sign-compare',
-           '-Wno-unused-local-typedefs',
-           '-Wno-ignored-quaifiers',
-           '-Wno-extra',
+          '-std=c++11',
+          '-DFST_NO_DYNAMIC_LINKING',
+          '-Wno-deprecated-declarations',
+          '-Wno-sign-compare',
+          '-Wno-unused-local-typedefs',
+          '-Wno-ignored-quaifiers',
+          '-Wno-extra',
       ],
       'cflags_cc!' : [
-           '-fno-rtti',
-           '-fno-exceptions',
+          '-fno-rtti',
+          '-fno-exceptions',
+      ],
+      'conditions': [
+          ['OS == "mac"', {
+              'xcode_settings': {
+                  'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+                  'GCC_ENABLE_CPP_RTTI': 'YES',
+                  'CLANG_CXX_LANGUAGE_STANDARD': 'c++11'
+              }
+          }]
       ],
       'actions': [
         {
