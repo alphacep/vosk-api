@@ -10,6 +10,9 @@ RUN apt-get update && \
         libffi-dev \
         libpcre3-dev \
         zlib1g-dev \
+        automake \
+        autoconf \
+        libtool \
     && rm -rf /var/lib/apt/lists/*
 
 RUN cd /opt \
@@ -63,16 +66,35 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/cpython-3.6.10 /opt/cpython-3.6.10-cross /opt/v3.6.10.tar.gz
 
+RUN cd /opt \
+    && wget -q https://github.com/python/cpython/archive/v3.8.3.tar.gz \
+    && tar xf v3.8.3.tar.gz \
+    && cp -r cpython-3.8.3 cpython-3.8.3-cross \
+    && cd /opt/cpython-3.8.3 \
+    && AR=/usr/bin/ar RANLIB=/usr/bin/ranlib CPP=/usr/bin/cpp CXX=/usr/bin/g++ CC=/usr/bin/gcc  ./configure --prefix="/opt/python/cp3.8-cp3.8m" \
+    && make -j $(nproc) \
+    && make install \
+    && /opt/python/cp3.8-cp3.8m/bin/pip3 install -U pip \
+    && /opt/python/cp3.8-cp3.8m/bin/pip3 install -U wheel \
+    && cd /opt/cpython-3.8.3-cross \
+    && export PATH=/opt/python/cp3.8-cp3.8m/bin:$PATH \
+    && ./configure --prefix=$CROSS_ROOT --with-openssl=$CROSS_ROOT --host=${CROSS_TRIPLE} --build=x86-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes \
+    && make -j $(nproc) \
+    && make install \
+    && rm -rf /opt/cpython-3.8.3 /opt/cpython-3.8.3-cross /opt/v3.8.3.tar.gz
+
 ARG OPENBLAS_ARCH=ARMV7
 ARG ARM_HARDWARE_OPTS="-mfloat-abi=hard -mfpu=neon"
 RUN cd /opt \
-    && export OPENFST_CONFIGURE="--enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin --host=${CROSS_TRIPLE} --build=x86-linux-gnu" \
     && git clone -b lookahead --single-branch https://github.com/alphacep/kaldi \
     && cd kaldi/tools \
     && git clone -b v0.3.7 --single-branch https://github.com/xianyi/OpenBLAS \
     && make PREFIX=$(pwd)/OpenBLAS/install TARGET="${OPENBLAS_ARCH}" HOSTCC=gcc USE_LOCKING=1 USE_THREAD=0 -C OpenBLAS all install \
-    && sed -i 's:status=0:exit 0:g' extras/check_dependencies.sh \
-    && make -j 10 openfst \
+    && git clone https://github.com/alphacep/openfst openfst \
+    && cd openfst \
+    && autoreconf -i \
+    && ./configure --prefix=/opt/kaldi/tools/openfst --enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin --host=${CROSS_TRIPLE} --build=x86-linux-gnu \
+    && make -j 10 && make install \
     && cd /opt/kaldi/src \
     && sed -i "s:TARGET_ARCH=\"\`uname -m\`\":TARGET_ARCH=$(echo $CROSS_TRIPLE|cut -d - -f 1):g" configure \
     && sed -i "s:-mfloat-abi=hard -mfpu=neon:${ARM_HARDWARE_OPTS}:g" makefiles/linux_openblas_arm.mk \

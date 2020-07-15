@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+from multiprocessing.dummy import Pool
 from vosk import Model, KaldiRecognizer
+
 import sys
 import os
 import wave
@@ -8,7 +10,7 @@ import json
 
 model = Model("model")
 
-for line in open(sys.argv[1]):
+def recognize(line):
     uid, fn = line.split()
     wf = wave.open(fn, "rb")
     rec = KaldiRecognizer(model, wf.getframerate())
@@ -23,5 +25,11 @@ for line in open(sys.argv[1]):
             text = text + " " + jres['text']
     jres = json.loads(rec.FinalResult())
     text = text + " " + jres['text']
-    print (uid + text)
+    return (uid + text)
 
+def main():
+    p = Pool(8)
+    texts = p.map(recognize, open(sys.argv[1]).readlines())
+    print ("\n".join(texts))
+
+main()

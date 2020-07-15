@@ -1,0 +1,3 @@
+build
+node_modules
+vosk_wrap.cc

@@ -125,10 +125,9 @@ Model::Model(const char *model_path) : model_path_str_(model_path) {
 void Model::ConfigureV1()
 {
     const char *extra_args[] = {
-        "--min-active=200",
-        "--max-active=3000",
-        "--beam=10.0",
-        "--lattice-beam=2.0",
+        "--max-active=7000",
+        "--beam=13.0",
+        "--lattice-beam=6.0",
         "--acoustic-scale=1.0",
 
         "--frame-subsampling-factor=3",
@@ -172,10 +171,6 @@ void Model::ConfigureV2()
     decodable_opts_.Register(&po);
     po.ReadConfigFile(model_path_str_ + "/conf/model.conf");
 
-    KALDI_LOG << "Decoding params beam=" << nnet3_decoding_config_.beam <<
-         " max-active=" << nnet3_decoding_config_.max_active <<
-         " lattice-beam=" << nnet3_decoding_config_.lattice_beam;
-    KALDI_LOG << "Silence phones " << endpoint_config_.silence_phones;
 
     nnet3_rxfilename_ = model_path_str_ + "/am/final.mdl";
     hclg_fst_rxfilename_ = model_path_str_ + "/graph/HCLG.fst";
@@ -193,6 +188,11 @@ void Model::ConfigureV2()
 void Model::ReadDataFiles()
 {
     struct stat buffer;
+
+    KALDI_LOG << "Decoding params beam=" << nnet3_decoding_config_.beam <<
+         " max-active=" << nnet3_decoding_config_.max_active <<
+         " lattice-beam=" << nnet3_decoding_config_.lattice_beam;
+    KALDI_LOG << "Silence phones " << endpoint_config_.silence_phones;
 
     feature_info_.feature_type = "mfcc";
     ReadConfigFromFile(mfcc_conf_rxfilename_, &feature_info_.mfcc_opts);
@@ -227,6 +227,8 @@ void Model::ReadDataFiles()
         ivector_extraction_opts.ivector_extractor_rxfilename = model_path_str_ + "/ivector/final.ie";
         feature_info_.use_ivectors = true;
         feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
+    } else {
+        feature_info_.use_ivectors = false;
     }
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {

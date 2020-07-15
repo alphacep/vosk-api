@@ -53,7 +53,7 @@ kaldi_libraries = []
 
 if sys.platform.startswith('darwin'):
     kaldi_link_args.extend(['-Wl,-undefined,dynamic_lookup', '-framework', 'Accelerate'])
-elif kaldi_mkl != None:
+elif kaldi_mkl == "1":
     kaldi_link_args.extend(['-L/opt/intel/mkl/lib/intel64', '-Wl,-rpath=/opt/intel/mkl/lib/intel64'])
     kaldi_libraries.extend(['mkl_rt', 'mkl_intel_lp64', 'mkl_core', 'mkl_sequential'])
 else:
@@ -83,7 +83,7 @@ vosk_ext = Extension('vosk._vosk',
 
 setuptools.setup(
     name="vosk", # Replace with your own username
-    version="0.3.7",
+    version="0.3.10",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="API for Kaldi and Vosk",

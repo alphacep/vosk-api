@@ -31,13 +31,14 @@ fi
 
 set -x
 
+OS_NAME=`echo $(uname -s) | tr '[:upper:]' '[:lower:]'`
 ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
-ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
+ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64
 WORKDIR_X86=`pwd`/build/kaldi_x86
 WORKDIR_X86_64=`pwd`/build/kaldi_x86_64
 WORKDIR_ARM32=`pwd`/build/kaldi_arm_32
 WORKDIR_ARM64=`pwd`/build/kaldi_arm_64
-PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
+PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin
 OPENFST_VERSION=1.6.7
 
 mkdir -p $WORKDIR_ARM64/local/lib $WORKDIR_ARM32/local/lib $WORKDIR_X86_64/local/lib $WORKDIR_X86/local/lib
@@ -46,13 +47,13 @@ mkdir -p $WORKDIR_ARM64/local/lib $WORKDIR_ARM32/local/lib $WORKDIR_X86_64/local
 cd build
 git clone https://github.com/simonlynen/android_libs
 cd android_libs/lapack
-sed -i 's/APP_STL := gnustl_static/APP_STL := c++_static/g' jni/Application.mk && \
-sed -i 's/android-10/android-21/g' project.properties && \
-sed -i 's/APP_ABI := armeabi armeabi-v7a/APP_ABI := armeabi-v7a arm64-v8a x86_64 x86/g' jni/Application.mk && \
-sed -i 's/LOCAL_MODULE:= testlapack/#LOCAL_MODULE:= testlapack/g' jni/Android.mk && \
-sed -i 's/LOCAL_SRC_FILES:= testclapack.cpp/#LOCAL_SRC_FILES:= testclapack.cpp/g' jni/Android.mk && \
-sed -i 's/LOCAL_STATIC_LIBRARIES := lapack/#LOCAL_STATIC_LIBRARIES := lapack/g' jni/Android.mk && \
-sed -i 's/include $(BUILD_SHARED_LIBRARY)/#include $(BUILD_SHARED_LIBRARY)/g' jni/Android.mk && \
+sed -i.bak -e 's/APP_STL := gnustl_static/APP_STL := c++_static/g' jni/Application.mk && \
+sed -i.bak -e 's/android-10/android-21/g' project.properties && \
+sed -i.bak -e 's/APP_ABI := armeabi armeabi-v7a/APP_ABI := armeabi-v7a arm64-v8a x86_64 x86/g' jni/Application.mk && \
+sed -i.bak -e 's/LOCAL_MODULE:= testlapack/#LOCAL_MODULE:= testlapack/g' jni/Android.mk && \
+sed -i.bak -e 's/LOCAL_SRC_FILES:= testclapack.cpp/#LOCAL_SRC_FILES:= testclapack.cpp/g' jni/Android.mk && \
+sed -i.bak -e 's/LOCAL_STATIC_LIBRARIES := lapack/#LOCAL_STATIC_LIBRARIES := lapack/g' jni/Android.mk && \
+sed -i.bak -e 's/include $(BUILD_SHARED_LIBRARY)/#include $(BUILD_SHARED_LIBRARY)/g' jni/Android.mk && \
 ${ANDROID_NDK_HOME}/ndk-build && \
 cp obj/local/armeabi-v7a/*.a ${WORKDIR_ARM32}/local/lib && \
 cp obj/local/arm64-v8a/*.a ${WORKDIR_ARM64}/local/lib
@@ -111,12 +112,9 @@ make -C OpenBLAS install PREFIX=$WORKDIR/local
 
 # tools directory --> we'll only compile OpenFST
 cd $WORKDIR
-wget -c -T 10 -t 1 http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-${OPENFST_VERSION}.tar.gz || \
-wget -c -T 10 -t 3 http://www.openslr.org/resources/2/openfst-${OPENFST_VERSION}.tar.gz
-
-tar -zxvf openfst-${OPENFST_VERSION}.tar.gz
-cd openfst-${OPENFST_VERSION}
-
+git clone https://github.com/alphacep/openfst
+cd openfst
+autoreconf -i
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --prefix=${WORKDIR}/local \
     --enable-shared --enable-static --with-pic --disable-bin \
     --enable-lookahead-fsts --enable-ngram-fsts --host=$HOST --build=x86-linux-gnu
@@ -127,6 +125,9 @@ make install
 cd $WORKDIR
 git clone -b android-mix --single-branch https://github.com/alphacep/kaldi
 cd $WORKDIR/kaldi/src
+if [ "`uname`" == "Darwin"  ]; then
+  sed -i.bak -e 's/libfst.dylib/libfst.a/' configure
+fi
 
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS --shared \

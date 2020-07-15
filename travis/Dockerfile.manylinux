@@ -7,6 +7,9 @@ RUN yum -y update && yum -y install \
     wget \
     openssl-devel \
     pcre-devel \
+    automake \
+    autoconf \
+    libtool \
     && yum clean all
 
 RUN cd /opt \
@@ -18,15 +21,16 @@ RUN cd /opt \
     && rm -rf swig-4.0.1.tar.gz swig-4.0.1
 
 RUN cd /opt \
-    && export OPENFST_CONFIGURE="--enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin" \
     && git clone -b lookahead --single-branch https://github.com/alphacep/kaldi \
     && cd kaldi/tools \
     && git clone -b v0.3.7 --single-branch https://github.com/xianyi/OpenBLAS \
     && make PREFIX=$(pwd)/OpenBLAS/install TARGET=NEHALEM USE_LOCKING=1 USE_THREAD=0 -C OpenBLAS all install \
-    && sed -i 's:status=0:exit 0:g' extras/check_dependencies.sh \
-    && make -j 10 openfst \
-    && cd ../src \
+    && git clone https://github.com/alphacep/openfst openfst \
+    && cd openfst \
+    && autoreconf -i \
+    && ./configure --prefix=/opt/kaldi/tools/openfst --enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin \
+    && make -j 10 && make install \
+    && cd /opt/kaldi/src \
     && ./configure --mathlib=OPENBLAS --shared --use-cuda=no \
     && make -j 10 online2 lm \
     && find /opt/kaldi -name "*.o" -exec rm {} \;
-

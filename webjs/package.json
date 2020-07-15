@@ -1,0 +1,20 @@
+{
+  "name": "vosk-js",
+  "version": "0.3.0",
+  "description": "Node binding for continuous voice recoginition through vosk-api.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alphacep/vosk-api.git"
+  },
+  "main": "index.js",
+  "keywords": [
+    "speech",
+    "speech recognition",
+    "voice"
+  ],
+  "author": "Alpha Cephei Inc.",
+  "license": "Apache 2.0",
+  "engines": {
+    "node": ">= 12.x.x"
+  }
+}

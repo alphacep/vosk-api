@@ -44,6 +44,14 @@ CSHARP_ARRAYS(char, byte)
 #endif
 
 
+#if SWIGJAVASCRIPT
+%begin %{
+#include <v8.h>
+#include <node.h>
+#include <node_buffer.h>
+%}
+#endif
+
 %{
 #include "vosk_api.h"
 typedef struct VoskModel Model;
@@ -100,6 +108,12 @@ typedef struct {} KaldiRecognizer;
 #elif SWIGJAVA
     bool AcceptWaveform(const char *data, int len) {
         return vosk_recognizer_accept_waveform($self, data, len);
+    }
+#elif SWIGJAVASCRIPT
+    bool AcceptWaveform(SWIG_Object ptr) {
+        char* data = (char*) node::Buffer::Data(ptr);
+        size_t length = node::Buffer::Length(ptr);
+        return vosk_recognizer_accept_waveform($self, data, length);
     }
 #else
     int AcceptWaveform(const char *data, int len) {

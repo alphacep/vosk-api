@@ -29,6 +29,13 @@
 
 using namespace kaldi;
 
+enum KaldiRecognizerState {
+    RECOGNIZER_INITIALIZED,
+    RECOGNIZER_RUNNING,
+    RECOGNIZER_ENDPOINT,
+    RECOGNIZER_FINALIZED
+};
+
 class KaldiRecognizer {
     public:
         KaldiRecognizer(Model *model, float sample_frequency);
@@ -43,11 +50,14 @@ class KaldiRecognizer {
         const char* PartialResult();
 
     private:
+        void InitState();
         void InitRescoring();
         void CleanUp();
         void UpdateSilenceWeights();
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
         void GetSpkVector(Vector<BaseFloat> &xvector);
+        const char *GetResult();
+        const char *StoreReturn(const string &res);
 
         Model *model_;
         SingleUtteranceNnet3Decoder *decoder_;
@@ -63,6 +73,10 @@ class KaldiRecognizer {
 
         float sample_frequency_;
         int32 frame_offset_;
-        bool input_finalized_;
+
+        int64 samples_processed_;
+        int64 samples_round_start_;
+
+        KaldiRecognizerState state_;
         string last_result_;
 };

@@ -1,7 +1,7 @@
 {
   "name": "vosk",
-  "version": "0.1.0",
-  "description": "Node binding for continuous voice recoginition through pocketsphinx.",
+  "version": "0.3.8",
+  "description": "Node binding for continuous offline voice recoginition with Vosk library.",
   "repository": {
     "type": "git",
     "url": "git://github.com/alphacep/vosk-api.git"
@@ -13,6 +13,12 @@
     "voice"
   ],
   "author": "Alpha Cephei Inc.",
-  "license": "Apache 2.0",
-  "engines": { "node" : ">= 12.x.x" }
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 10.x.x"
+  },
+  "dependencies": {
+    "node-gyp": "^5.1.1",
+    "wav": "^1.0.2"
+  }
 }
