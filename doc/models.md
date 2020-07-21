@@ -1,1 +1,1 @@
-See https://alphacephei.com/vosk/models.html
+See https://alphacephei.com/vosk/models
