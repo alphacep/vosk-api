@@ -416,6 +416,8 @@ const char* KaldiRecognizer::GetResult()
             for (int i = 0; i < xvector.Dim(); i++) {
                 obj["spk"].append(xvector(i));
             }
+        } else {
+            obj["spk"] = json::JSON();
         }
     }
 
