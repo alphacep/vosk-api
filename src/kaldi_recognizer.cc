@@ -298,7 +298,9 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
     xvector->CopyFromVec(cu_output.Row(0));
 }
 
-void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
+#define MIN_SPK_FEATS 30
+
+bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
 {
     vector<int32> nonsilence_frames;
     if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0) {
@@ -310,14 +312,25 @@ void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
 
     int num_frames = spk_feature_->NumFramesReady();
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
+
+    // Not very efficient, would be nice to have faster search
+    int k = 0;
     for (int i = 0; i < num_frames; ++i) {
        if (std::find(nonsilence_frames.begin(),
-                     nonsilence_frames.end(), i % 3) == nonsilence_frames.end())
+                     nonsilence_frames.end(), i / 3) == nonsilence_frames.end()) {
            continue;
+       }
        Vector<BaseFloat> feat(spk_feature_->Dim());
        spk_feature_->GetFrame(i, &feat);
-       mfcc.CopyRowFromVec(feat, i);
+       mfcc.CopyRowFromVec(feat, k);
+       k++;
     }
+
+    // Don't extract vector if not enough data
+    mfcc.Resize(k, spk_feature_->Dim());
+    if (mfcc.NumRows() < MIN_SPK_FEATS)
+        return false;
+
     SlidingWindowCmnOptions cmvn_opts;
     Matrix<BaseFloat> features(mfcc.NumRows(), mfcc.NumCols(), kUndefined);
     SlidingWindowCmn(cmvn_opts, mfcc, &features);
@@ -327,6 +340,7 @@ void KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
     nnet3::CachingOptimizingCompiler compiler(spk_model_->speaker_nnet, opts.optimize_config, compiler_config);
 
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
+    return true;
 }
 
 const char* KaldiRecognizer::GetResult()
@@ -398,9 +412,10 @@ const char* KaldiRecognizer::GetResult()
 
     if (spk_model_) {
         Vector<BaseFloat> xvector;
-        GetSpkVector(xvector);
-        for (int i = 0; i < xvector.Dim(); i++) {
-            obj["spk"].append(xvector(i));
+        if (GetSpkVector(xvector)) {
+            for (int i = 0; i < xvector.Dim(); i++) {
+                obj["spk"].append(xvector(i));
+            }
         }
     }
 
