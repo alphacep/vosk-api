@@ -49,5 +49,5 @@ while True:
 
 res = json.loads(rec.FinalResult())
 print ("Text:", res['text'])
+print ("X-vector:", res['spk'])
 print ("Speaker distance:", cosine_dist(spk_sig, res['spk']))
-
