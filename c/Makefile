@@ -22,7 +22,12 @@ LIBS= \
 	$(KALDI_ROOT)/tools/openfst/lib/libfst.a \
 	$(KALDI_ROOT)/tools/openfst/lib/libfstngram.a
 
+all: test_vosk test_vosk_speaker
+
 test_vosk: test_vosk.o libvosk.a
+	g++ $^ -o $@ $(LIBS) -lgfortran -lpthread
+
+test_vosk_speaker: test_vosk_speaker.o libvosk.a
 	g++ $^ -o $@ $(LIBS) -lgfortran -lpthread
 
 libvosk.a: $(VOSK_SOURCES:.cc=.o)
