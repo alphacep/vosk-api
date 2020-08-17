@@ -311,6 +311,8 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
     }
 
     int num_frames = spk_feature_->NumFramesReady();
+    if (num_frames == 0 || spk_feature_->Dim() == 0)
+        return false;
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
 
     // Not very efficient, would be nice to have faster search
@@ -331,6 +333,8 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
         return false;
 
     mfcc.Resize(num_nonsilence_frames, spk_feature_->Dim());
+    if (mfcc.NumRows() == 0 || mfcc.NumCols() == 0)
+        return false;
 
     SlidingWindowCmnOptions cmvn_opts;
     Matrix<BaseFloat> features(mfcc.NumRows(), mfcc.NumCols(), kUndefined);
