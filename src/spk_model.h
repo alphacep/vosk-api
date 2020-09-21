@@ -35,6 +35,9 @@ protected:
     ~SpkModel() {};
 
     kaldi::nnet3::Nnet speaker_nnet;
+    kaldi::Vector<BaseFloat> mean;
+    kaldi::Matrix<BaseFloat> transform;
+
     MfccOptions spkvector_mfcc_opts;
 
     int ref_cnt_;

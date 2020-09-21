@@ -168,11 +168,6 @@ void KaldiRecognizer::CleanUp()
     delete silence_weighting_;
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
-    if (spk_model_) {
-        delete spk_feature_;
-        spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
-    }
-
     if (decoder_)
        frame_offset_ += decoder_->NumFramesDecoded();
 
@@ -196,6 +191,11 @@ void KaldiRecognizer::CleanUp()
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
             feature_pipeline_);
+
+        if (spk_model_) {
+            delete spk_feature_;
+            spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
+        }
     } else {
         decoder_->InitDecoding(frame_offset_);
     }
@@ -298,9 +298,9 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
     xvector->CopyFromVec(cu_output.Row(0));
 }
 
-#define MIN_SPK_FEATS 30
+#define MIN_SPK_FEATS 50
 
-bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
+bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_frames)
 {
     vector<int32> nonsilence_frames;
     if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0) {
@@ -310,29 +310,36 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
                                           &nonsilence_frames);
     }
 
-    int num_frames = spk_feature_->NumFramesReady();
+    int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
 
     // Not very efficient, would be nice to have faster search
     int num_nonsilence_frames = 0;
+    Vector<BaseFloat> feat(spk_feature_->Dim());
+
     for (int i = 0; i < num_frames; ++i) {
        if (std::find(nonsilence_frames.begin(),
                      nonsilence_frames.end(), i / 3) == nonsilence_frames.end()) {
            continue;
        }
-       Vector<BaseFloat> feat(spk_feature_->Dim());
-       spk_feature_->GetFrame(i, &feat);
+
+       spk_feature_->GetFrame(i + frame_offset_ * 3, &feat);
        mfcc.CopyRowFromVec(feat, num_nonsilence_frames);
        num_nonsilence_frames++;
     }
 
-    // Don't extract vector if not enough data
-    if (num_nonsilence_frames < MIN_SPK_FEATS)
-        return false;
+    *num_spk_frames = num_nonsilence_frames;
 
-    mfcc.Resize(num_nonsilence_frames, spk_feature_->Dim());
+    // Don't extract vector if not enough data
+    if (num_nonsilence_frames < MIN_SPK_FEATS) {
+        return false;
+    }
+
+    mfcc.Resize(num_nonsilence_frames, spk_feature_->Dim(), kCopyData);
 
     SlidingWindowCmnOptions cmvn_opts;
+    cmvn_opts.center = true;
+    cmvn_opts.cmn_window = 300;
     Matrix<BaseFloat> features(mfcc.NumRows(), mfcc.NumCols(), kUndefined);
     SlidingWindowCmn(cmvn_opts, mfcc, &features);
 
@@ -340,7 +347,21 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &xvector)
     nnet3::CachingOptimizingCompilerOptions compiler_config;
     nnet3::CachingOptimizingCompiler compiler(spk_model_->speaker_nnet, opts.optimize_config, compiler_config);
 
+    Vector<BaseFloat> xvector;
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
+
+    // Whiten the vector with global mean and transform and normalize mean
+    xvector.AddVec(-1.0, spk_model_->mean);
+
+    out_xvector.Resize(spk_model_->transform.NumRows(), kSetZero);
+    out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
+
+    BaseFloat norm = out_xvector.Norm(2.0);
+    BaseFloat ratio = norm / sqrt(out_xvector.Dim()); // how much larger it is
+                                                  // than it would be, in
+                                                  // expectation, if normally
+    out_xvector.Scale(1.0 / ratio);
+
     return true;
 }
 
@@ -413,10 +434,12 @@ const char* KaldiRecognizer::GetResult()
 
     if (spk_model_) {
         Vector<BaseFloat> xvector;
-        if (GetSpkVector(xvector)) {
+        int num_spk_frames;
+        if (GetSpkVector(xvector, &num_spk_frames)) {
             for (int i = 0; i < xvector.Dim(); i++) {
                 obj["spk"].append(xvector(i));
             }
+            obj["spk_frames"] = num_spk_frames;
         }
     }
 
