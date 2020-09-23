@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef VOSK_KALDI_RECOGNIZER_H
+#define VOSK_KALDI_RECOGNIZER_H
+
 #include "base/kaldi-common.h"
 #include "util/common-utils.h"
 #include "fstext/fstext-lib.h"
@@ -80,3 +83,5 @@ class KaldiRecognizer {
         KaldiRecognizerState state_;
         string last_result_;
 };
+
+#endif /* VOSK_KALDI_RECOGNIZER_H */

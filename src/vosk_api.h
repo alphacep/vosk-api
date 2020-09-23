@@ -14,8 +14,8 @@
 
 /* This header contains the C API for Vosk speech recognition system */
 
-#ifndef _VOSK_API_H_
-#define _VOSK_API_H_
+#ifndef VOSK_API_H
+#define VOSK_API_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -207,4 +207,4 @@ void vosk_set_log_level(int log_level);
 }
 #endif
 
-#endif /* _VOSK_API_H_ */
+#endif /* VOSK_API_H */

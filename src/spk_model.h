@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SPK_MODEL_H_
-#define SPK_MODEL_H_
+#ifndef VOSK_SPK_MODEL_H
+#define VOSK_SPK_MODEL_H
 
 #include "base/kaldi-common.h"
 #include "online2/online-feature-pipeline.h"
@@ -43,4 +43,4 @@ protected:
     int ref_cnt_;
 };
 
-#endif /* SPK_MODEL_H_ */
+#endif /* VOSK_SPK_MODEL_H */

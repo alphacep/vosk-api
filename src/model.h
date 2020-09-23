@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MODEL_H_
-#define MODEL_H_
+#ifndef VOSK_MODEL_H
+#define VOSK_MODEL_H
 
 #include "base/kaldi-common.h"
 #include "fstext/fstext-lib.h"
@@ -86,4 +86,4 @@ protected:
     int ref_cnt_;
 };
 
-#endif /* MODEL_H_ */
+#endif /* VOSK_MODEL_H */
