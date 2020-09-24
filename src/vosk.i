@@ -34,6 +34,11 @@ import java.nio.ByteOrder;
     return AcceptWaveform(bdata, bdata.length);
   }
 %}
+%pragma(java) jniclasscode=%{
+    static {
+        System.loadLibrary("vosk_jni");
+    }
+%}
 #endif
 
 #if SWIGCSHARP

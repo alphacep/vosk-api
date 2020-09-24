@@ -25,6 +25,9 @@ SpkModel::SpkModel(const char *speaker_path) {
     SetDropoutTestMode(true, &speaker_nnet);
     CollapseModel(nnet3::CollapseModelConfig(), &speaker_nnet);
 
+    ReadKaldiObject(speaker_path_str + "/mean.vec", &mean);
+    ReadKaldiObject(speaker_path_str + "/transform.mat", &transform);
+
     ref_cnt_ = 1;
 }
 

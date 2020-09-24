@@ -29,19 +29,18 @@ import android.os.Looper;
 import android.util.Log;
 
 /**
- * Main class to access recognizer functions. After configuration this class
- * starts a listener thread which records the data and recognizes it using
- * VOSK engine. Recognition events are passed to a client using
+ * Service that records audio in a thread, passes it to a recognizer and emits 
+ * recognition results. Recognition events are passed to a client using
  * {@link RecognitionListener}
- * 
+ *
  */
-public class SpeechRecognizer {
+public class SpeechService {
 
-    protected static final String TAG = SpeechRecognizer.class.getSimpleName();
+    protected static final String TAG = SpeechService.class.getSimpleName();
 
     private final KaldiRecognizer recognizer;
 
-    private final int sampleRate;        
+    private final int sampleRate;
     private final static float BUFFER_SIZE_SECONDS = 0.4f;
     private int bufferSize;
     private final AudioRecord recorder;
@@ -53,33 +52,18 @@ public class SpeechRecognizer {
     private final Collection<RecognitionListener> listeners = new HashSet<RecognitionListener>();
     
     /**
-     * Creates speech recognizer. Recognizer holds the AudioRecord object, so you 
+     * Creates speech service. Service holds the AudioRecord object, so you 
      * need to call {@link release} in order to properly finalize it.
      * 
      * @throws IOException thrown if audio recorder can not be created for some reason.
      */
-    public SpeechRecognizer(Model model) throws IOException {
-        recognizer = new KaldiRecognizer(model, 16000.0f);
-        sampleRate = 16000;
-        bufferSize = Math.round(sampleRate * BUFFER_SIZE_SECONDS);
-        recorder = new AudioRecord(
-                AudioSource.VOICE_RECOGNITION, sampleRate,
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT, bufferSize * 2);
+    public SpeechService(KaldiRecognizer recognizer, float sampleRate) throws IOException {
+        this.recognizer = recognizer;
+        this.sampleRate = (int)sampleRate;
 
-        if (recorder.getState() == AudioRecord.STATE_UNINITIALIZED) {
-            recorder.release();
-            throw new IOException(
-                    "Failed to initialize recorder. Microphone might be already in use.");
-        }
-    }
-
-    public SpeechRecognizer(Model model, SpkModel spkModel) throws IOException {
-        recognizer = new KaldiRecognizer(model, spkModel, 16000.0f);
-        sampleRate = 16000;
-        bufferSize = Math.round(sampleRate * BUFFER_SIZE_SECONDS);
+        bufferSize = Math.round(this.sampleRate * BUFFER_SIZE_SECONDS);
         recorder = new AudioRecord(
-                AudioSource.VOICE_RECOGNITION, sampleRate,
+                AudioSource.VOICE_RECOGNITION, this.sampleRate,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, bufferSize * 2);
 
@@ -187,9 +171,9 @@ public class SpeechRecognizer {
     public void shutdown() {
         recorder.release();
     }
-    
+
     private final class RecognizerThread extends Thread {
-        
+
         private int remainingSamples;
         private int timeoutSamples;
         private final static int NO_TIMEOUT = -1;

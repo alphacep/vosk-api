@@ -5,8 +5,16 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
     }
 }
+
+plugins {
+    id "com.jfrog.bintray" version "1.8.5"
+}
+
+def archiveName = "vosk-android"
+def libVersion = "0.3.13"
 
 allprojects {
   repositories {
@@ -16,15 +24,16 @@ allprojects {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 29
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 5
-        versionName "5.2"
-        setProperty("archivesBaseName", "kaldi-android-$versionName")
+        versionCode 6
+        versionName = libVersion
+        archivesBaseName = archiveName
         externalNativeBuild {
             cmake {
                 arguments "-DCMAKE_VERBOSE_MAKEFILE=ON", "-DANDROID_ARM_NEON=TRUE", "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
@@ -43,6 +52,39 @@ android {
        cmake {
            path "CMakeLists.txt"
        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    pkg {
+        repo = 'vosk'
+        name = 'vosk-android'
+        userOrg = "alphacep"
+        licenses = ['Apache2.0']
+        websiteUrl = 'https://github.com/alphacep/vosk-api'
+        issueTrackerUrl = 'https://github.com/alphacep/vosk-api/issues'
+        vcsUrl = 'https://github.com/alphacep/vosk-api'
+        version {
+            name = libVersion
+            vcsTag = libVersion
+        }
+    }
+    publications = ['aar']
+}
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId 'com.alphacep'
+            artifactId archiveName
+            version libVersion
+            artifact("$buildDir/outputs/aar/$archiveName-release.aar")
+        }
     }
 }
 

@@ -14,9 +14,6 @@ import org.kaldi.SpkModel;
 import org.kaldi.Vosk;
 
 public class DecoderTest {
-    static {
-        System.loadLibrary("vosk_jni");
-    }
 
     public static void main(String args[]) throws IOException {
         Vosk.SetLogLevel(-10);
