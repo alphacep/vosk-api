@@ -1,9 +1,9 @@
 This is a Python module for Vosk.
 
 Vosk is an offline open source speech recognition toolkit. It enables
-speech recognition models for 14 languages and dialects - English, Indian
+speech recognition models for 15 languages and dialects - English, Indian
 English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish,
-Vietnamese, Italian, Dutch, Catalan, Arabic.
+Vietnamese, Italian, Dutch, Catalan, Arabic, Greek.
 
 Vosk models are small (50 Mb) but provide continuous large vocabulary
 transcription, zero-latency response with streaming API, reconfigurable
