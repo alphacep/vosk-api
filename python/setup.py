@@ -69,7 +69,7 @@ vosk_ext = Extension('vosk._vosk',
                     extra_objects = [kaldi_root + '/' + x for x in kaldi_static_libs],
                     sources = ['vosk/' + x for x in sources],
                     extra_link_args = kaldi_link_args,
-                    extra_compile_args = ['-g', '-O0', '-std=c++11', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
+                    extra_compile_args = ['-std=c++11', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
 
 setuptools.setup(
     name="vosk",
