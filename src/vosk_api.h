@@ -88,10 +88,10 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate);
 VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, VoskSpkModel *spk_model, float sample_rate);
 
 
-/** Creates the recognizer object with the grammar
+/** Creates the recognizer object with the phrase list
  *
  *  Sometimes when you want to improve recognition accuracy and when you don't need
- *  to recognize large vocabulary you can specify a list of words to recognize. This
+ *  to recognize large vocabulary you can specify a list of phrases to recognize. This
  *  will improve recognizer speed and accuracy but might return [unk] if user said
  *  something different.
  *
@@ -99,7 +99,8 @@ VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, VoskSpkModel *spk_mode
  *  Precompiled HCLG graph models are not supported.
  *
  *  @param sample_rate The sample rate of the audio you going to feed into the recognizer
- *  @param grammar The string with the list of words to recognize, for example "one two three four five [unk]"
+ *  @param grammar The string with the list of phrases to recognize as JSON array of strings,
+ *                 for example "["one two three four five", "[unk]"]".
  *
  *  @returns recognizer object */
 VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, const char *grammar);
