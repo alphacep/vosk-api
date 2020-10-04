@@ -30,6 +30,8 @@ VOSK_SOURCES = \
 	vosk_wrap.cc \
 	../src/kaldi_recognizer.cc \
 	../src/kaldi_recognizer.h \
+	../src/language_model.cc \
+	../src/language_model.h \
 	../src/model.cc \
 	../src/model.h \
 	../src/spk_model.cc \

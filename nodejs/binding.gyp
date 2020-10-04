@@ -5,6 +5,7 @@
       'sources': [
          '../src/kaldi_recognizer.cc',
          '../src/model.cc',
+         '../src/language_model.cc',
          '../src/spk_model.cc',
          '../src/vosk_api.cc',
          'vosk_wrap.cc',

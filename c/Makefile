@@ -1,5 +1,12 @@
 KALDI_ROOT=$(HOME)/travis/kaldi
-VOSK_SOURCES=../src/kaldi_recognizer.cc ../src/model.cc ../src/spk_model.cc ../src/vosk_api.cc
+
+VOSK_SOURCES= \
+    ../src/kaldi_recognizer.cc \
+    ../src/language_model.cc \
+    ../src/model.cc \
+    ../src/spk_model.cc \
+    ../src/vosk_api.cc
+
 CFLAGS=-g -O2 -DFST_NO_DYNAMIC_LINKING -I../src -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \

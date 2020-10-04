@@ -16,6 +16,7 @@
 #include "json.h"
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
+#include "language_model.h"
 
 using namespace fst;
 using namespace kaldi::nnet3;
@@ -57,32 +58,49 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char cons
     feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_->feature_info_);
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
-    g_fst_ = new StdVectorFst();
     if (model_->hcl_fst_) {
-        g_fst_->AddState();
-        g_fst_->SetStart(0);
-        g_fst_->AddState();
-        g_fst_->SetFinal(1, fst::TropicalWeight::One());
-        g_fst_->AddArc(1, StdArc(0, 0, fst::TropicalWeight::One(), 0));
+        json::JSON obj;
+        obj = json::JSON::Load(grammar);
 
-        // Create simple word loop FST
-        stringstream ss(grammar);
-        string token;
+        if (obj.length() <= 0) {
+            KALDI_WARN << "Expecting array of strings, got: '" << grammar << "'";
+        } else {
+            KALDI_LOG << obj;
 
-        while (getline(ss, token, ' ')) {
-            int32 id = model_->word_syms_->Find(token);
-            if (id == kNoSymbol) {
-                KALDI_WARN << "Ignoring word missing in vocabulary: '" << token << "'";
-            } else {
-                g_fst_->AddArc(0, StdArc(id, id, fst::TropicalWeight::One(), 1));
+            LanguageModelOptions opts;
+
+            opts.ngram_order = 2;
+            opts.discount = 0.5;
+
+            LanguageModelEstimator estimator(opts);
+            for (int i = 0; i < obj.length(); i++) {
+                bool ok;
+                string line = obj[i].ToString(ok);
+                if (!ok) {
+                    KALDI_ERR << "Expecting array of strings, got: '" << obj << "'";
+                }
+
+                std::vector<int32> sentence;
+                stringstream ss(line);
+                string token;
+                while (getline(ss, token, ' ')) {
+                    int32 id = model_->word_syms_->Find(token);
+                    if (id == kNoSymbol) {
+                        KALDI_WARN << "Ignoring word missing in vocabulary: '" << token << "'";
+                    } else {
+                        sentence.push_back(id);
+                    }
+                }
+                estimator.AddCounts(sentence);
             }
-        }
-        ArcSort(g_fst_, ILabelCompare<StdArc>());
+            g_fst_ = new StdVectorFst();
+            estimator.Estimate(g_fst_);
 
-        decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *g_fst_, model_->disambig_);
+            decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *g_fst_, model_->disambig_);
+        }
     } else {
         decode_fst_ = NULL;
-        KALDI_ERR << "Can't create decoding graph";
+        KALDI_ERR << "Runtime graphs are not supported by this model";
     }
 
     decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,

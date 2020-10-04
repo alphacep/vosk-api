@@ -22,6 +22,8 @@ set(LIB_ROOT "${PROJECT_SOURCE_DIR}/build/kaldi_${KALDI_SUFFIX}/local")
 set(API_SOURCES
 "${PROJECT_SOURCE_DIR}/../src/kaldi_recognizer.cc"
 "${PROJECT_SOURCE_DIR}/../src/kaldi_recognizer.h"
+"${PROJECT_SOURCE_DIR}/../src/language_model.cc"
+"${PROJECT_SOURCE_DIR}/../src/language_model.h"
 "${PROJECT_SOURCE_DIR}/../src/model.cc"
 "${PROJECT_SOURCE_DIR}/../src/model.h"
 "${PROJECT_SOURCE_DIR}/../src/spk_model.cc"

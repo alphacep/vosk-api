@@ -35,12 +35,14 @@ test.exe: libkaldiwrap.so test.cs
 VOSK_SOURCES = \
 	vosk_wrap.c \
 	../src/kaldi_recognizer.cc \
+	../src/language_model.cc \
 	../src/model.cc \
 	../src/spk_model.cc \
 	../src/vosk_api.cc
 
 VOSK_HEADERS = \
 	../src/kaldi_recognizer.h \
+	../src/language_model.h \
 	../src/model.h \
 	../src/vosk_api.h \
 	../src/spk_model.h
