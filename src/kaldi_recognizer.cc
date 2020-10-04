@@ -100,7 +100,7 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char cons
         }
     } else {
         decode_fst_ = NULL;
-        KALDI_ERR << "Runtime graphs are not supported by this model";
+        KALDI_WARN << "Runtime graphs are not supported by this model";
     }
 
     decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
