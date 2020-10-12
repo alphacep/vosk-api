@@ -225,6 +225,8 @@ void Model::ReadDataFiles()
         ivector_extraction_opts.global_cmvn_stats_rxfilename = model_path_str_ + "/ivector/global_cmvn.stats";
         ivector_extraction_opts.diag_ubm_rxfilename = model_path_str_ + "/ivector/final.dubm";
         ivector_extraction_opts.ivector_extractor_rxfilename = model_path_str_ + "/ivector/final.ie";
+        ivector_extraction_opts.max_count = 100;
+
         feature_info_.use_ivectors = true;
         feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
     } else {
