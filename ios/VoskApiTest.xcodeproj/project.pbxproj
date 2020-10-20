@@ -16,55 +16,10 @@
 		9237523C240C642000DD6076 /* libkaldiwrap.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9237523A240C642000DD6076 /* libkaldiwrap.a */; };
 		92375244240C6DAF00DD6076 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92375243240C6DAF00DD6076 /* Accelerate.framework */; };
 		92375246240C6DC900DD6076 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 92375245240C6DC900DD6076 /* libstdc++.tbd */; };
-		92375266240C6EFE00DD6076 /* disambig_tid.int in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375248240C6E3D00DD6076 /* disambig_tid.int */; };
-		92375267240C6EFE00DD6076 /* final.mdl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375249240C6E3D00DD6076 /* final.mdl */; };
-		92375268240C6EFE00DD6076 /* Gr.fst in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9237524A240C6E3D00DD6076 /* Gr.fst */; };
-		92375269240C6EFE00DD6076 /* HCLr.fst in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9237524B240C6E3D00DD6076 /* HCLr.fst */; };
-		9237526A240C6EFE00DD6076 /* mfcc.conf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375253240C6E3D00DD6076 /* mfcc.conf */; };
-		9237526B240C6EFE00DD6076 /* word_boundary.int in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375254240C6E3D00DD6076 /* word_boundary.int */; };
-		9237526C240C6EFE00DD6076 /* words.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375255240C6E3D00DD6076 /* words.txt */; };
-		9237526E240C6F1500DD6076 /* final.dubm in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9237524D240C6E3D00DD6076 /* final.dubm */; };
-		9237526F240C6F1500DD6076 /* final.ie in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9237524E240C6E3D00DD6076 /* final.ie */; };
-		92375270240C6F1500DD6076 /* final.mat in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9237524F240C6E3D00DD6076 /* final.mat */; };
-		92375271240C6F1500DD6076 /* global_cmvn.stats in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375250240C6E3D00DD6076 /* global_cmvn.stats */; };
-		92375272240C6F1500DD6076 /* online_cmvn.conf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375251240C6E3D00DD6076 /* online_cmvn.conf */; };
-		92375273240C6F1500DD6076 /* splice.conf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92375252240C6E3D00DD6076 /* splice.conf */; };
 		92375274240C6F1E00DD6076 /* 10001-90210-01803.wav in Resources */ = {isa = PBXBuildFile; fileRef = 92375256240C6E3D00DD6076 /* 10001-90210-01803.wav */; };
+		92D86BD5253F823F0040D53F /* vosk-model-small-en-us-0.4 in Resources */ = {isa = PBXBuildFile; fileRef = 92D86BD3253F823E0040D53F /* vosk-model-small-en-us-0.4 */; };
+		92D86BD6253F823F0040D53F /* vosk-model-spk-0.4 in Resources */ = {isa = PBXBuildFile; fileRef = 92D86BD4253F823F0040D53F /* vosk-model-spk-0.4 */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		92375265240C6ECF00DD6076 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "model-en";
-			dstSubfolderSpec = 7;
-			files = (
-				92375266240C6EFE00DD6076 /* disambig_tid.int in CopyFiles */,
-				92375267240C6EFE00DD6076 /* final.mdl in CopyFiles */,
-				92375268240C6EFE00DD6076 /* Gr.fst in CopyFiles */,
-				92375269240C6EFE00DD6076 /* HCLr.fst in CopyFiles */,
-				9237526A240C6EFE00DD6076 /* mfcc.conf in CopyFiles */,
-				9237526B240C6EFE00DD6076 /* word_boundary.int in CopyFiles */,
-				9237526C240C6EFE00DD6076 /* words.txt in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9237526D240C6F0400DD6076 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "model-en/ivector";
-			dstSubfolderSpec = 7;
-			files = (
-				9237526E240C6F1500DD6076 /* final.dubm in CopyFiles */,
-				9237526F240C6F1500DD6076 /* final.ie in CopyFiles */,
-				92375270240C6F1500DD6076 /* final.mat in CopyFiles */,
-				92375271240C6F1500DD6076 /* global_cmvn.stats in CopyFiles */,
-				92375272240C6F1500DD6076 /* online_cmvn.conf in CopyFiles */,
-				92375273240C6F1500DD6076 /* splice.conf in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		9237521E240C550B00DD6076 /* VoskApiTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoskApiTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,22 +33,11 @@
 		9237523A240C642000DD6076 /* libkaldiwrap.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libkaldiwrap.a; sourceTree = "<group>"; };
 		92375243240C6DAF00DD6076 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		92375245240C6DC900DD6076 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
-		92375248240C6E3D00DD6076 /* disambig_tid.int */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = disambig_tid.int; sourceTree = "<group>"; };
-		92375249240C6E3D00DD6076 /* final.mdl */ = {isa = PBXFileReference; lastKnownFileType = file; path = final.mdl; sourceTree = "<group>"; };
-		9237524A240C6E3D00DD6076 /* Gr.fst */ = {isa = PBXFileReference; lastKnownFileType = file; path = Gr.fst; sourceTree = "<group>"; };
-		9237524B240C6E3D00DD6076 /* HCLr.fst */ = {isa = PBXFileReference; lastKnownFileType = file; path = HCLr.fst; sourceTree = "<group>"; };
-		9237524D240C6E3D00DD6076 /* final.dubm */ = {isa = PBXFileReference; lastKnownFileType = file; path = final.dubm; sourceTree = "<group>"; };
-		9237524E240C6E3D00DD6076 /* final.ie */ = {isa = PBXFileReference; lastKnownFileType = file; path = final.ie; sourceTree = "<group>"; };
-		9237524F240C6E3D00DD6076 /* final.mat */ = {isa = PBXFileReference; lastKnownFileType = file; path = final.mat; sourceTree = "<group>"; };
-		92375250240C6E3D00DD6076 /* global_cmvn.stats */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = global_cmvn.stats; sourceTree = "<group>"; };
-		92375251240C6E3D00DD6076 /* online_cmvn.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = online_cmvn.conf; sourceTree = "<group>"; };
-		92375252240C6E3D00DD6076 /* splice.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = splice.conf; sourceTree = "<group>"; };
-		92375253240C6E3D00DD6076 /* mfcc.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mfcc.conf; sourceTree = "<group>"; };
-		92375254240C6E3D00DD6076 /* word_boundary.int */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = word_boundary.int; sourceTree = "<group>"; };
-		92375255240C6E3D00DD6076 /* words.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = words.txt; sourceTree = "<group>"; };
 		92375256240C6E3D00DD6076 /* 10001-90210-01803.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "10001-90210-01803.wav"; sourceTree = "<group>"; };
 		92AA22AD244CDD1200DA464B /* vosk_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vosk_api.h; sourceTree = "<group>"; };
 		92AA22AE244CDD5200DA464B /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
+		92D86BD3253F823E0040D53F /* vosk-model-small-en-us-0.4 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "vosk-model-small-en-us-0.4"; sourceTree = "<group>"; };
+		92D86BD4253F823F0040D53F /* vosk-model-spk-0.4 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "vosk-model-spk-0.4"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,7 +90,8 @@
 		92375239240C642000DD6076 /* Vosk */ = {
 			isa = PBXGroup;
 			children = (
-				92375247240C6E3D00DD6076 /* model-android */,
+				92D86BD3253F823E0040D53F /* vosk-model-small-en-us-0.4 */,
+				92D86BD4253F823F0040D53F /* vosk-model-spk-0.4 */,
 				92375256240C6E3D00DD6076 /* 10001-90210-01803.wav */,
 				92AA22AD244CDD1200DA464B /* vosk_api.h */,
 				9237523A240C642000DD6076 /* libkaldiwrap.a */,
@@ -164,34 +109,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		92375247240C6E3D00DD6076 /* model-android */ = {
-			isa = PBXGroup;
-			children = (
-				92375248240C6E3D00DD6076 /* disambig_tid.int */,
-				92375249240C6E3D00DD6076 /* final.mdl */,
-				9237524A240C6E3D00DD6076 /* Gr.fst */,
-				9237524B240C6E3D00DD6076 /* HCLr.fst */,
-				9237524C240C6E3D00DD6076 /* ivector */,
-				92375253240C6E3D00DD6076 /* mfcc.conf */,
-				92375254240C6E3D00DD6076 /* word_boundary.int */,
-				92375255240C6E3D00DD6076 /* words.txt */,
-			);
-			path = "model-android";
-			sourceTree = "<group>";
-		};
-		9237524C240C6E3D00DD6076 /* ivector */ = {
-			isa = PBXGroup;
-			children = (
-				9237524D240C6E3D00DD6076 /* final.dubm */,
-				9237524E240C6E3D00DD6076 /* final.ie */,
-				9237524F240C6E3D00DD6076 /* final.mat */,
-				92375250240C6E3D00DD6076 /* global_cmvn.stats */,
-				92375251240C6E3D00DD6076 /* online_cmvn.conf */,
-				92375252240C6E3D00DD6076 /* splice.conf */,
-			);
-			path = ivector;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -202,8 +119,6 @@
 				9237521A240C550B00DD6076 /* Sources */,
 				9237521B240C550B00DD6076 /* Frameworks */,
 				9237521C240C550B00DD6076 /* Resources */,
-				92375265240C6ECF00DD6076 /* CopyFiles */,
-				9237526D240C6F0400DD6076 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -257,7 +172,9 @@
 				92375274240C6F1E00DD6076 /* 10001-90210-01803.wav in Resources */,
 				9237522C240C550B00DD6076 /* LaunchScreen.storyboard in Resources */,
 				92375229240C550B00DD6076 /* Assets.xcassets in Resources */,
+				92D86BD6253F823F0040D53F /* vosk-model-spk-0.4 in Resources */,
 				92375227240C550B00DD6076 /* Main.storyboard in Resources */,
+				92D86BD5253F823F0040D53F /* vosk-model-small-en-us-0.4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,7 +329,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = VoskApiTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -434,7 +351,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = VoskApiTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
