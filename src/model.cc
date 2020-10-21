@@ -295,6 +295,15 @@ void Model::Unref()
     }
 }
 
+int32 Model::IsWordRecognizable(const char *word)
+{
+    int32 symbol_code = -1;
+    if (word_syms_) {
+        symbol_code = word_syms_->Find(word);
+    }
+    return symbol_code;
+}
+
 Model::~Model() {
     delete decodable_info_;
     delete trans_model_;
