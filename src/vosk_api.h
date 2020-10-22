@@ -60,7 +60,7 @@ void vosk_model_free(VoskModel *model);
  * @returns the word symbol if @param word exists inside the model
  * or -1 otherwise.
  * Reminding that word symbol 0 is for <epsilon> */
-int IsWordRecognizable(VoskModel *model, const char *word);
+int vosk_model_find_word(VoskModel *model, const char *word);
 
 
 /** Loads speaker model data from the file and returns the model object

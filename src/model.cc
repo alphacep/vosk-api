@@ -295,7 +295,7 @@ void Model::Unref()
     }
 }
 
-int32 Model::IsWordRecognizable(const char *word)
+int32 Model::findWord(const char *word)
 {
     int32 symbol_code = -1;
     if (word_syms_) {

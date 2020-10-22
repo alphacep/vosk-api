@@ -31,9 +31,9 @@ void vosk_model_free(VoskModel *model)
     ((Model *)model)->Unref();
 }
 
-int IsWordRecognizable(VoskModel *model, const char *word)
+int vosk_model_find_word(VoskModel *model, const char *word)
 {
-    return (int) ((Model *)model)->IsWordRecognizable(word);
+    return (int) ((Model *)model)->findWord(word);
 }
 
 VoskSpkModel *vosk_spk_model_new(const char *model_path)
