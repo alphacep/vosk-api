@@ -42,6 +42,7 @@ public:
     Model(const char *model_path);
     void Ref();
     void Unref();
+    int32 findWord(const char *word);
 
 protected:
     ~Model();

@@ -75,6 +75,9 @@ typedef struct {} KaldiRecognizer;
     ~Model() {
         vosk_model_free($self);
     }
+    int vosk_model_find_word(const char* word) {
+        return vosk_model_find_word($self, word);
+    }
 }
 
 %extend SpkModel {
