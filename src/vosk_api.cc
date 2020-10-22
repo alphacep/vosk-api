@@ -33,7 +33,7 @@ void vosk_model_free(VoskModel *model)
 
 int vosk_model_find_word(VoskModel *model, const char *word)
 {
-    return (int) ((Model *)model)->findWord(word);
+    return (int) ((Model *)model)->FindWord(word);
 }
 
 VoskSpkModel *vosk_spk_model_new(const char *model_path)

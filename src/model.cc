@@ -161,6 +161,7 @@ void Model::ConfigureV1()
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
     mfcc_conf_rxfilename_ = model_path_str_ + "/mfcc.conf";
+    global_cmvn_stats_rxfilename_ = model_path_str_ + "/global_cmvn.stats";
 }
 
 void Model::ConfigureV2()
@@ -183,6 +184,7 @@ void Model::ConfigureV2()
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
     mfcc_conf_rxfilename_ = model_path_str_ + "/conf/mfcc.conf";
+    global_cmvn_stats_rxfilename_ = model_path_str_ + "/am/global_cmvn.stats";
 }
 
 void Model::ReadDataFiles()
@@ -232,6 +234,13 @@ void Model::ReadDataFiles()
     } else {
         feature_info_.use_ivectors = false;
     }
+
+    if (stat(global_cmvn_stats_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Reading CMVN stats from " << global_cmvn_stats_rxfilename_;
+        feature_info_.use_cmvn = true;
+        ReadKaldiObject(global_cmvn_stats_rxfilename_, &feature_info_.global_cmvn_stats);
+    }
+
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading HCLG from " << hclg_fst_rxfilename_;
@@ -295,13 +304,12 @@ void Model::Unref()
     }
 }
 
-int32 Model::findWord(const char *word)
+int Model::FindWord(const char *word)
 {
-    int32 symbol_code = -1;
-    if (word_syms_) {
-        symbol_code = word_syms_->Find(word);
-    }
-    return symbol_code;
+    if (!word_syms_)
+        return -1;
+
+    return word_syms_->Find(word);
 }
 
 Model::~Model() {
