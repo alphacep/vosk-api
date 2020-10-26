@@ -53,6 +53,7 @@ csharp/*.exe
 csharp/*.c
 csharp/model/
 csharp/test.wav
+Vosk.dll
 
 # Node
 nodejs/vosk_wrap.cc

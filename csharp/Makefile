@@ -30,7 +30,8 @@ MATH_LIBS = ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran
 all: test.exe
 
 test.exe: libkaldiwrap.so test.cs
-	mcs test.cs gen/*.cs
+	mcs -out:Vosk.dll -target:library gen/*.cs
+	mcs test.cs -r:Vosk.dll -out:test.exe
 
 VOSK_SOURCES = \
 	vosk_wrap.c \
@@ -59,4 +60,4 @@ run: test.exe
 	mono test.exe
 
 clean:
-	$(RM) *.so vosk_wrap.c *.o gen/*.cs test.exe
+	$(RM) *.so vosk_wrap.c *.o gen/*.cs test.exe *.dll
