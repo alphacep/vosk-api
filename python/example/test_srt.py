@@ -25,6 +25,8 @@ process = subprocess.Popen(['ffmpeg', '-loglevel', 'quiet', '-i',
                             stdout=subprocess.PIPE)
 
 
+WORDS_PER_LINE = 7
+
 def transcribe():
     results = []
     subs = []
@@ -38,11 +40,14 @@ def transcribe():
 
     for i, res in enumerate(results):
        jres = json.loads(res)
-       s = srt.Subtitle(index=i, 
-                   content=jres['text'], 
-                   start=datetime.timedelta(seconds=jres['result'][0]['start']), 
-                   end=datetime.timedelta(seconds=jres['result'][-1]['end']))
-       subs.append(s)
+       words = jres['result']
+       for j in range(0, len(words), WORDS_PER_LINE):
+           line = words[j : j + WORDS_PER_LINE] 
+           s = srt.Subtitle(index=len(subs), 
+                   content=" ".join([l['word'] for l in line]),
+                   start=datetime.timedelta(seconds=line[0]['start']), 
+                   end=datetime.timedelta(seconds=line[-1]['end']))
+           subs.append(s)
     return subs
 
 print (srt.compose(transcribe()))
