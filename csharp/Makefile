@@ -20,28 +20,36 @@ KALDI_LIBS = \
              ${KALDI_ROOT}/src/util/kaldi-util.a \
              ${KALDI_ROOT}/src/base/kaldi-base.a \
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a \
-             ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a \
-             ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a \
-             -lgfortran -lstdc++
+             ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
+
+# On Linux
+MATH_LIBS = ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran
+# On OSX
+# MATH_LIBS = -framework Accelerate
 
 all: test.exe
 
 test.exe: libkaldiwrap.so test.cs
-	mcs test.cs gen/*.cs
+	mcs -out:Vosk.dll -target:library gen/*.cs
+	mcs test.cs -r:Vosk.dll -out:test.exe
 
 VOSK_SOURCES = \
 	vosk_wrap.c \
 	../src/kaldi_recognizer.cc \
-	../src/kaldi_recognizer.h \
+	../src/language_model.cc \
 	../src/model.cc \
-	../src/model.h \
 	../src/spk_model.cc \
-	../src/spk_model.h \
-	../src/vosk_api.cc \
-	../src/vosk_api.h
+	../src/vosk_api.cc
 
-libkaldiwrap.so: $(VOSK_SOURCES)
-	$(CXX) -fpermissive $(CFLAGS) $(CPPFLAGS) -shared -o $@ $(VOSK_SOURCES) $(KALDI_LIBS)
+VOSK_HEADERS = \
+	../src/kaldi_recognizer.h \
+	../src/language_model.h \
+	../src/model.h \
+	../src/vosk_api.h \
+	../src/spk_model.h
+
+libkaldiwrap.so: $(VOSK_SOURCES) $(VOSK_HEADERS)
+	$(CXX) -fpermissive $(CFLAGS) $(CPPFLAGS) -shared -o $@ $(VOSK_SOURCES) $(KALDI_LIBS) $(MATH_LIBS)
 
 vosk_wrap.c: ../src/vosk.i
 	mkdir -p gen
@@ -52,4 +60,4 @@ run: test.exe
 	mono test.exe
 
 clean:
-	$(RM) *.so vosk_wrap.c *.o gen/*.cs test.exe
+	$(RM) *.so vosk_wrap.c *.o gen/*.cs test.exe *.dll

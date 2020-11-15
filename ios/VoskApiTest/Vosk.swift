@@ -14,10 +14,15 @@ public final class Vosk {
         var sres = ""
         if let resourcePath = Bundle.main.resourcePath {
 
-            let modelPath = resourcePath + "/model-en"
+            // Set to -1 to disable logs
+            vosk_set_log_level(0);
 
-            let model = vosk_model_new(modelPath);
-            let recognizer = vosk_recognizer_new(model, 16000.0)
+            let modelPath = resourcePath + "/vosk-model-small-en-us-0.4"
+            let spkModelPath = resourcePath + "/vosk-model-spk-0.4"
+
+            let model = vosk_model_new(modelPath)
+            let spkModel = vosk_spk_model_new(spkModelPath)
+            let recognizer = vosk_recognizer_new_spk(model, spkModel, 16000.0)
 
             let audioFile = URL(fileURLWithPath: resourcePath + "/10001-90210-01803.wav")
             if let data = try? Data(contentsOf: audioFile) {

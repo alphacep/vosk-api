@@ -69,7 +69,7 @@ if kaldi_cuda != None:
     kaldi_link_args.append('-L/usr/local/cuda/lib64')
     kaldi_libraries.extend(['cublas', 'cusparse', 'cudart', 'curand', 'cufft', 'nvToolsExt', 'cusolver'])
 
-sources = ['kaldi_recognizer.cc', 'model.cc', 'spk_model.cc', 'vosk_api.cc', 'vosk.i']
+sources = ['kaldi_recognizer.cc', 'model.cc', 'spk_model.cc', 'vosk_api.cc', 'language_model.cc', 'vosk.i']
 
 vosk_ext = Extension('vosk._vosk',
                     define_macros = define_macros,
@@ -82,11 +82,11 @@ vosk_ext = Extension('vosk._vosk',
                     extra_compile_args = ['-std=c++11', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
 
 setuptools.setup(
-    name="vosk", # Replace with your own username
-    version="0.3.10",
+    name="vosk",
+    version="0.3.15",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
-    description="API for Kaldi and Vosk",
+    description="Offline open source speech recognition API based on Kaldi and Vosk",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/alphacep/vosk-api",

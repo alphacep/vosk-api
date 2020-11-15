@@ -13,7 +13,7 @@ thread_init()
 SetLogLevel(0)
 
 if not os.path.exists("model"):
-    print ("Please download the model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as 'model' in the current folder.")
+    print ("Please download the model from https://alphacephei.com/vosk/models and unpack as 'model' in the current folder.")
     exit (1)
 
 wf = wave.open(sys.argv[1], "rb")

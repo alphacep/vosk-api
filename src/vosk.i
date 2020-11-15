@@ -34,6 +34,11 @@ import java.nio.ByteOrder;
     return AcceptWaveform(bdata, bdata.length);
   }
 %}
+%pragma(java) jniclasscode=%{
+    static {
+        System.loadLibrary("vosk_jni");
+    }
+%}
 #endif
 
 #if SWIGCSHARP
@@ -69,6 +74,9 @@ typedef struct {} KaldiRecognizer;
     }
     ~Model() {
         vosk_model_free($self);
+    }
+    int vosk_model_find_word(const char* word) {
+        return vosk_model_find_word($self, word);
     }
 }
 

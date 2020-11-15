@@ -31,6 +31,11 @@ void vosk_model_free(VoskModel *model)
     ((Model *)model)->Unref();
 }
 
+int vosk_model_find_word(VoskModel *model, const char *word)
+{
+    return (int) ((Model *)model)->FindWord(word);
+}
+
 VoskSpkModel *vosk_spk_model_new(const char *model_path)
 {
     return (VoskSpkModel *)new SpkModel(model_path);

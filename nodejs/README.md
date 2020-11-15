@@ -9,7 +9,7 @@ Still, you need swig of newest version 4.0.1
 Build like this
 
 ```
-npm install --kaldi_root=/home/suser/kaldi
+npm install --kaldi_root=/home/user/kaldi
 ```
 
 Then test with

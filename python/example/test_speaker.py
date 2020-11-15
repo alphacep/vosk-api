@@ -11,11 +11,11 @@ model_path = "model"
 spk_model_path = "model-spk"
 
 if not os.path.exists(model_path):
-    print ("Please download the model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as {} in the current folder.".format(model_path))
+    print ("Please download the model from https://alphacephei.com/vosk/models and unpack as {} in the current folder.".format(model_path))
     exit (1)
 
 if not os.path.exists(spk_model_path):
-    print ("Please download the speaker model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as {} in the current folder.".format(spk_model_path))
+    print ("Please download the speaker model from https://alphacephei.com/vosk/models and unpack as {} in the current folder.".format(spk_model_path))
     exit (1)
 
 wf = wave.open(sys.argv[1], "rb")
@@ -30,7 +30,7 @@ rec = KaldiRecognizer(model, spk_model, wf.getframerate())
 
 # We compare speakers with cosine distance. We can keep one or several fingerprints for the speaker in a database
 # to distingusih among users.
-spk_sig = [4.658117, 1.277387, 3.346158, -1.473036, -2.15727, 2.461757, 3.76756, -1.241252, 2.333765, 0.642588, -2.848165, 1.229534, 3.907015, 1.726496, -1.188692, 1.16322, -0.668811, -0.623309, 4.628018, 0.407197, 0.089955, 0.920438, 1.47237, -0.311365, -0.437051, -0.531738, -1.591781, 3.095415, 0.439524, -0.274787, 4.03165, 2.665864, 4.815553, 1.581063, 1.078242, 5.017717, -0.089395, -3.123428, 5.34038, 0.456982, 2.465727, 2.131833, 4.056272, 1.178392, -2.075712, -1.568503, 0.847139, 0.409214, 1.84727, 0.986758, 4.222116, 2.235512, 1.369377, 4.283126, 2.278125, -1.467577, -0.999971, 3.070041, 1.462214, 0.423204, 2.143578, 0.567174, -2.294655, 1.864723, 4.307356, 2.610872, -1.238721, 0.551861, 2.861954, 0.59613, -0.715396, -1.395357, 2.706177, -2.004444, 2.055255, 0.458283, 1.231968, 3.48234, 2.993858, 0.402819, 0.940885, 0.360162, -2.173674, -2.504609, 0.329541, 3.653913, 3.638025, -1.406409, 2.14059, 1.662765, -0.991323, 0.770921, 0.010094, 3.775469, 1.847511, 2.074432, -1.928593, 0.807414, 2.964505, 0.128597, 1.297962, 2.645227, 0.136405, -2.543087, 0.932246, 2.405783, -2.122267, 3.044013, 0.486728, 4.395338, 0.474267, 0.781297, 1.694144, -0.831078, -0.462362, -0.964715, 3.187863, 6.008708, 1.725954, 3.667886, -1.467623, 3.370667, 2.72555, -0.796541, 2.416543, 0.675401, -0.737634, -1.709676]
+spk_sig = [-1.110417,0.09703002,1.35658,0.7798632,-0.305457,-0.339204,0.6186931,-0.4521213,0.3982236,-0.004530723,0.7651616,0.6500852,-0.6664245,0.1361499,0.1358056,-0.2887807,-0.1280468,-0.8208137,-1.620276,-0.4628615,0.7870904,-0.105754,0.9739769,-0.3258137,-0.7322628,-0.6212429,-0.5531687,-0.7796484,0.7035915,1.056094,-0.4941756,-0.6521456,-0.2238328,-0.003737517,0.2165709,1.200186,-0.7737719,0.492015,1.16058,0.6135428,-0.7183084,0.3153541,0.3458071,-1.418189,-0.9624157,0.4168292,-1.627305,0.2742135,-0.6166027,0.1962581,-0.6406527,0.4372789,-0.4296024,0.4898657,-0.9531326,-0.2945702,0.7879696,-1.517101,-0.9344181,-0.5049928,-0.005040941,-0.4637912,0.8223695,-1.079849,0.8871287,-0.9732434,-0.5548235,1.879138,-1.452064,-0.1975368,1.55047,0.5941782,-0.52897,1.368219,0.6782904,1.202505,-0.9256122,-0.9718158,-0.9570228,-0.5563112,-1.19049,-1.167985,2.606804,-2.261825,0.01340385,0.2526799,-1.125458,-1.575991,-0.363153,0.3270262,1.485984,-1.769565,1.541829,0.7293826,0.1743717,-0.4759418,1.523451,-2.487134,-1.824067,-0.626367,0.7448186,-1.425648,0.3524166,-0.9903384,3.339342,0.4563958,-0.2876643,1.521635,0.9508078,-0.1398541,0.3867955,-0.7550205,0.6568405,0.09419366,-1.583935,1.306094,-0.3501927,0.1794427,-0.3768163,0.9683866,-0.2442541,-1.696921,-1.8056,-0.6803037,-1.842043,0.3069353,0.9070363,-0.486526]
 
 def cosine_dist(x, y):
     nx = np.array(x)
@@ -45,9 +45,12 @@ while True:
         res = json.loads(rec.Result())
         print ("Text:", res['text'])
         print ("X-vector:", res['spk'])
-        print ("Speaker distance:", cosine_dist(spk_sig, res['spk']))
+        print ("Speaker distance:", cosine_dist(spk_sig, res['spk']), "based on", res['spk_frames'], "frames")
+
+print ("Note that second distance is not very reliable because utterance is too short. Utterances longer than 4 seconds give better xvector")
 
 res = json.loads(rec.FinalResult())
 print ("Text:", res['text'])
-print ("Speaker distance:", cosine_dist(spk_sig, res['spk']))
+print ("X-vector:", res['spk'])
+print ("Speaker distance:", cosine_dist(spk_sig, res['spk']), "based on", res['spk_frames'], "frames")
 

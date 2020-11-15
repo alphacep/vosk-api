@@ -90,7 +90,7 @@ RUN cd /opt \
     && cd kaldi/tools \
     && git clone -b v0.3.7 --single-branch https://github.com/xianyi/OpenBLAS \
     && make PREFIX=$(pwd)/OpenBLAS/install TARGET="${OPENBLAS_ARCH}" HOSTCC=gcc USE_LOCKING=1 USE_THREAD=0 -C OpenBLAS all install \
-    && git clone https://github.com/alphacep/openfst openfst \
+    && git clone -b old-gcc --single-branch https://github.com/alphacep/openfst openfst \
     && cd openfst \
     && autoreconf -i \
     && ./configure --prefix=/opt/kaldi/tools/openfst --enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin --host=${CROSS_TRIPLE} --build=x86-linux-gnu \
