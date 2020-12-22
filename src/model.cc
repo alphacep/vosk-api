@@ -280,7 +280,7 @@ void Model::ReadDataFiles()
     if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
         std_lm_fst_ = fst::ReadFstKaldi(std_fst_rxfilename_);
-        fst::Project(std_lm_fst_, fst::ProjectType::OUTPUT);
+        fst::Project(std_lm_fst_, fst::PROJECT_OUTPUT);
         if (std_lm_fst_->Properties(fst::kILabelSorted, true) == 0) {
             fst::ILabelCompare<fst::StdArc> ilabel_comp;
             fst::ArcSort(std_lm_fst_, ilabel_comp);
