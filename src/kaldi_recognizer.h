@@ -72,7 +72,7 @@ class KaldiRecognizer {
         SpkModel *spk_model_;
         OnlineBaseFeature *spk_feature_;
 
-        fst::MapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_;
+        fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_;
 
         float sample_frequency_;
         int32 frame_offset_;

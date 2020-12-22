@@ -24,5 +24,6 @@ int main() {
 
     vosk_recognizer_free(recognizer);
     vosk_model_free(model);
+    fclose(wavin);
     return 0;
 }

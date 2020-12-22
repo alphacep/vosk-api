@@ -11,7 +11,7 @@
          'vosk_wrap.cc',
       ],
       'cflags': [
-          '-std=c++11',
+          '-std=c++17',
           '-DFST_NO_DYNAMIC_LINKING',
           '-Wno-deprecated-declarations',
           '-Wno-sign-compare',
@@ -22,13 +22,14 @@
       'cflags_cc!' : [
           '-fno-rtti',
           '-fno-exceptions',
+          '-std=gnu++1y',
       ],
       'conditions': [
           ['OS == "mac"', {
               'xcode_settings': {
                   'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
                   'GCC_ENABLE_CPP_RTTI': 'YES',
-                  'CLANG_CXX_LANGUAGE_STANDARD': 'c++11'
+                  'CLANG_CXX_LANGUAGE_STANDARD': 'c++17'
               }
           }]
       ],

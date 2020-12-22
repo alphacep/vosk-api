@@ -1,5 +1,5 @@
 KALDI_ROOT ?= $(HOME)/kaldi
-CFLAGS :=  -std=c++11 -g -O2 -DPIC -fPIC -Wno-unused-function
+CFLAGS :=  -std=c++17 -g -O2 -DPIC -fPIC -Wno-unused-function
 CPPFLAGS := -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include -I../src -DFST_NO_DYNAMIC_LINKING
 
 KALDI_LIBS = \

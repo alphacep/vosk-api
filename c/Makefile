@@ -44,7 +44,7 @@ libvosk.a: $(VOSK_SOURCES:.cc=.o)
 	g++ $(CFLAGS) -c -o $@ $<
 
 %.o: %.cc
-	g++ -std=c++11 $(CFLAGS) -c -o $@ $<
+	g++ -std=c++17 $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o *.a test_vosk
+	rm -f *.o *.a test_vosk test_vosk_speaker
