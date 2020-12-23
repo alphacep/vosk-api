@@ -44,13 +44,15 @@ while True:
     if rec.AcceptWaveform(data):
         res = json.loads(rec.Result())
         print ("Text:", res['text'])
-        print ("X-vector:", res['spk'])
-        print ("Speaker distance:", cosine_dist(spk_sig, res['spk']), "based on", res['spk_frames'], "frames")
+        if 'spk' in res:
+            print ("X-vector:", res['spk'])
+            print ("Speaker distance:", cosine_dist(spk_sig, res['spk']), "based on", res['spk_frames'], "frames")
 
 print ("Note that second distance is not very reliable because utterance is too short. Utterances longer than 4 seconds give better xvector")
 
 res = json.loads(rec.FinalResult())
 print ("Text:", res['text'])
-print ("X-vector:", res['spk'])
-print ("Speaker distance:", cosine_dist(spk_sig, res['spk']), "based on", res['spk_frames'], "frames")
+if 'spk' in res:
+   print ("X-vector:", res['spk'])
+   print ("Speaker distance:", cosine_dist(spk_sig, res['spk']), "based on", res['spk_frames'], "frames")
 
