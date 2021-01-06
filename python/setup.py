@@ -47,7 +47,7 @@ kaldi_static_libs = ['src/online2/kaldi-online2.a',
              'src/base/kaldi-base.a',
              'tools/openfst/lib/libfst.a',
              'tools/openfst/lib/libfstngram.a']
-kaldi_link_args = ['-s']
+kaldi_link_args = ['-s', '-latomic', '-lpthread', '-lm']
 kaldi_libraries = []
 
 if sys.platform.startswith('darwin'):
@@ -71,7 +71,7 @@ vosk_ext = Extension('vosk._vosk',
                     extra_objects = [kaldi_root + '/' + x for x in kaldi_static_libs],
                     sources = ['vosk/' + x for x in sources],
                     extra_link_args = kaldi_link_args,
-                    extra_compile_args = ['-std=c++17', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
+                    extra_compile_args = ['-O3', '-std=c++17', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
 
 setuptools.setup(
     name="vosk",

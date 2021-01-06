@@ -13,6 +13,9 @@ for pyver in 3.6 3.7 3.8; do
     if [ $pyver == "3.8" ]; then
          sysconfig_bit=""
     fi
+    if [ $pyver == "3.9" ]; then
+         sysconfig_bit=""
+    fi
 
     case $CROSS_TRIPLE in
         *arm-*)
