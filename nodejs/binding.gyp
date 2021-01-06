@@ -70,7 +70,10 @@
              '<@(kaldi_root)/src/base/kaldi-base.a',
              '<@(kaldi_root)/tools/openfst/lib/libfst.a',
              '<@(kaldi_root)/tools/openfst/lib/libfstngram.a',
-             '<@(kaldi_root)/tools/OpenBLAS/libopenblas.a',
+             '<@(kaldi_root)/tools/OpenBLAS/install/lib/libopenblas.a',
+             '<@(kaldi_root)/tools/OpenBLAS/install/lib/liblapack.a',
+             '<@(kaldi_root)/tools/OpenBLAS/install/lib/libblas.a',
+             '<@(kaldi_root)/tools/OpenBLAS/install/lib/libf2c.a',
           ],
          'library_dirs': [
                '/usr/lib',

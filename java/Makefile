@@ -21,8 +21,13 @@ KALDI_LIBS = \
              ${KALDI_ROOT}/src/base/kaldi-base.a \
              ${KALDI_ROOT}/tools/openfst/lib/libfst.a \
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a \
-             ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a \
-             -lgfortran
+
+# On Linux
+MATH_LIBS = \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libopenblas.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/liblapack.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libblas.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libf2c.a
 
 all: libvosk_jni.so
 
@@ -40,7 +45,7 @@ VOSK_SOURCES = \
 	../src/vosk_api.h
 
 libvosk_jni.so: $(VOSK_SOURCES)
-	$(CXX) -shared -o $@ $(CPPFLAGS) $(CFLAGS) $(VOSK_SOURCES) $(KALDI_LIBS)
+	$(CXX) -shared -o $@ $(CPPFLAGS) $(CFLAGS) $(VOSK_SOURCES) $(KALDI_LIBS) $(MATH_LIBS)
 
 vosk_wrap.cc: ../src/vosk.i
 	mkdir -p org/kaldi

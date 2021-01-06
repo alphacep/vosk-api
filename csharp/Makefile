@@ -23,7 +23,12 @@ KALDI_LIBS = \
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
 
 # On Linux
-MATH_LIBS = ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran
+MATH_LIBS = \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libopenblas.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/liblapack.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libblas.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libf2c.a
+
 # On OSX
 # MATH_LIBS = -framework Accelerate
 

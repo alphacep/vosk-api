@@ -56,8 +56,10 @@ elif kaldi_mkl == "1":
     kaldi_link_args.extend(['-L/opt/intel/mkl/lib/intel64', '-Wl,-rpath=/opt/intel/mkl/lib/intel64'])
     kaldi_libraries.extend(['mkl_rt', 'mkl_intel_lp64', 'mkl_core', 'mkl_sequential'])
 else:
-    kaldi_static_libs.append('tools/OpenBLAS/libopenblas.a')
-    kaldi_libraries.append('gfortran')
+    kaldi_static_libs.extend(['tools/OpenBLAS/install/lib/libopenblas.a',
+                             'tools/OpenBLAS/install/lib/liblapack.a',
+                             'tools/OpenBLAS/install/lib/libblas.a',
+                             'tools/OpenBLAS/install/lib/libf2c.a'])
 
 sources = ['kaldi_recognizer.cc', 'model.cc', 'spk_model.cc', 'vosk_api.cc', 'language_model.cc', 'vosk.i']
 
