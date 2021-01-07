@@ -1,5 +1,5 @@
-ARG DOCKCROSS_IMAGE=linux-armv7
-FROM dockcross/${DOCKCROSS_IMAGE}
+ARG DOCKCROSS_IMAGE=alphacep/dockcross-linux-armv7
+FROM ${DOCKCROSS_IMAGE}
 
 LABEL description="A docker image for building portable Python linux binary wheels and Kaldi on other architectures"
 LABEL maintainer="contact@alphacephei.com"
