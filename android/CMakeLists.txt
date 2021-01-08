@@ -60,7 +60,7 @@ target_link_libraries( vosk_jni
              ${KALDI_ROOT}/src/base/kaldi-base.a
              ${LIB_ROOT}/lib/libfst.a
              ${LIB_ROOT}/lib/libfstngram.a
-             ${LIB_ROOT}/lib/libopenblas_${OPENBLAS_ARCH}-r0.3.7.a
+             ${LIB_ROOT}/lib/libopenblas.a
              ${LIB_ROOT}/lib/libclapack.a
              ${LIB_ROOT}/lib/liblapack.a
              ${LIB_ROOT}/lib/libblas.a

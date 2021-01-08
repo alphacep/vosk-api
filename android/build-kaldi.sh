@@ -39,7 +39,7 @@ WORKDIR_X86_64=`pwd`/build/kaldi_x86_64
 WORKDIR_ARM32=`pwd`/build/kaldi_arm_32
 WORKDIR_ARM64=`pwd`/build/kaldi_arm_64
 PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin
-OPENFST_VERSION=1.6.7
+OPENFST_VERSION=1.8.0
 
 mkdir -p $WORKDIR_ARM64/local/lib $WORKDIR_ARM32/local/lib $WORKDIR_X86_64/local/lib $WORKDIR_X86/local/lib
 
@@ -106,7 +106,7 @@ esac
 
 # openblas first
 cd $WORKDIR
-git clone -b v0.3.7 --single-branch https://github.com/xianyi/OpenBLAS
+git clone -b v0.3.13 --single-branch https://github.com/xianyi/OpenBLAS
 make -C OpenBLAS TARGET=$BLAS_ARCH ONLY_CBLAS=1 AR=$AR CC=$CC HOSTCC=gcc ARM_SOFTFP_ABI=1 USE_THREAD=0 NUM_THREADS=1 -j4
 make -C OpenBLAS install PREFIX=$WORKDIR/local
 
@@ -130,7 +130,7 @@ if [ "`uname`" == "Darwin"  ]; then
 fi
 
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
-    --mathlib=OPENBLAS --shared \
+    --mathlib=OPENBLAS_CLAPACK --shared \
     --android-incdir=${ANDROID_TOOLCHAIN_PATH}/sysroot/usr/include \
     --host=$HOST --openblas-root=${WORKDIR}/local \
     --fst-root=${WORKDIR}/local --fst-version=${OPENFST_VERSION}
