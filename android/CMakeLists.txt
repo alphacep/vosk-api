@@ -32,7 +32,7 @@ set(API_SOURCES
 "${PROJECT_SOURCE_DIR}/../src/vosk_api.h"
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -O3 -DFST_NO_DYNAMIC_LINKING")
 
 add_library( vosk_jni SHARED
              build/generated-src/cpp/vosk_wrap.cc
