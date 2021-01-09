@@ -14,7 +14,7 @@ plugins {
 }
 
 def archiveName = "vosk-model-en"
-def libVersion = "0.3.16"
+def libVersion = "0.3.17"
 
 allprojects {
   repositories {

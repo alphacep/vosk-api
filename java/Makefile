@@ -58,14 +58,14 @@ clean:
 	$(RM) -r org model-en
 
 model:
-	wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.zip
-	unzip vosk-model-small-en-us-0.3.zip && rm vosk-model-small-en-us-0.3.zip
-	mv vosk-model-small-en-us-0.3 model
+	wget https://alphacephei.com/kaldi/models/vosk-model-small-en-us-0.3.15.zip
+	unzip vosk-model-small-en-us-0.3.zip && rm vosk-model-small-en-us-0.15.zip
+	mv vosk-model-small-en-us-0.3.15 model
 
 model-spk:
-	wget https://alphacephei.com/kaldi/models/vosk-model-spk-0.3.zip
-	unzip vosk-model-spk-0.3.zip && rm vosk-model-spk-0.3.zip
-	mv vosk-model-spk-0.3 model-spk
+	wget https://alphacephei.com/kaldi/models/vosk-model-spk-0.4.zip
+	unzip vosk-model-spk-0.3.zip && rm vosk-model-spk-0.4.zip
+	mv vosk-model-spk-0.4 model-spk
 
 run: model model-spk
 	javac test/*.java org/kaldi/*.java

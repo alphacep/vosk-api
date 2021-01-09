@@ -75,7 +75,7 @@ vosk_ext = Extension('vosk._vosk',
 
 setuptools.setup(
     name="vosk",
-    version="0.3.16",
+    version="0.3.17",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="Offline open source speech recognition API based on Kaldi and Vosk",

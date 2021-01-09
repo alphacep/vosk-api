@@ -14,7 +14,7 @@ plugins {
 }
 
 def archiveName = "vosk-android"
-def libVersion = "0.3.16"
+def libVersion = "0.3.17"
 
 allprojects {
   repositories {
