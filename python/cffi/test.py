@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 from cffi import FFI
+import os
 ffi = FFI()
 ffi.set_source("_vosk", None)
-ffi.cdef(open("vosk_api.h.prep").read())
+ffi.cdef(os.popen("cpp ../../src/vosk_api.h").read())
 ffi.compile()
 
 C = ffi.dlopen("libvosk.so")

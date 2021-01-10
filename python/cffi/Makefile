@@ -32,13 +32,10 @@ LIBS= \
 	$(KALDI_ROOT)/tools/openfst/lib/libfst.a \
 	$(KALDI_ROOT)/tools/openfst/lib/libfstngram.a
 
-all: libvosk.so vosk_api.h.prep
+all: libvosk.so
 
 libvosk.so: $(VOSK_SOURCES:.cc=.o)
 	g++ --shared -o $@ $^ $(LIBS) -lm -latomic
-
-vosk_api.h.prep: ../../src/vosk_api.h
-	gcc -E ../../src/vosk_api.h > vosk_api.h.prep
 
 %.o: %.c
 	g++ $(CFLAGS) -c -o $@ $<
@@ -47,5 +44,4 @@ vosk_api.h.prep: ../../src/vosk_api.h
 	g++ -std=c++17 $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o *.so ../../src/*.o vosk_api.h.prep
-
+	rm -f *.o *.so ../../src/*.o
