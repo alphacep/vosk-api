@@ -2,10 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../VoskApiTest/Vosk/vosk-model-small-en-us-0.4">
-   </FileRef>
-   <FileRef
-      location = "group:../VoskApiTest/Vosk/vosk-model-spk-0.4">
+      location = "group:/Users/shmyrev/Documents/IOS/VoskApiTest/VoskApiTest/Vosk/vosk-model-small-en-us-0.15">
    </FileRef>
    <FileRef
       location = "self:">

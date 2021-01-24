@@ -17,7 +17,8 @@
 		92375244240C6DAF00DD6076 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92375243240C6DAF00DD6076 /* Accelerate.framework */; };
 		92375246240C6DC900DD6076 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 92375245240C6DC900DD6076 /* libstdc++.tbd */; };
 		92375274240C6F1E00DD6076 /* 10001-90210-01803.wav in Resources */ = {isa = PBXBuildFile; fileRef = 92375256240C6E3D00DD6076 /* 10001-90210-01803.wav */; };
-		92D86BD5253F823F0040D53F /* vosk-model-small-en-us-0.4 in Resources */ = {isa = PBXBuildFile; fileRef = 92D86BD3253F823E0040D53F /* vosk-model-small-en-us-0.4 */; };
+		92BACED125BE125A00B5CC93 /* vosk-model-small-en-us-0.15 in Resources */ = {isa = PBXBuildFile; fileRef = 928CC50C25BE124400490481 /* vosk-model-small-en-us-0.15 */; };
+		92D6B8D325BDFEAC007FF08D /* VoskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D6B8D225BDFEAC007FF08D /* VoskModel.swift */; };
 		92D86BD6253F823F0040D53F /* vosk-model-spk-0.4 in Resources */ = {isa = PBXBuildFile; fileRef = 92D86BD4253F823F0040D53F /* vosk-model-spk-0.4 */; };
 /* End PBXBuildFile section */
 
@@ -34,9 +35,10 @@
 		92375243240C6DAF00DD6076 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		92375245240C6DC900DD6076 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		92375256240C6E3D00DD6076 /* 10001-90210-01803.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "10001-90210-01803.wav"; sourceTree = "<group>"; };
+		928CC50C25BE124400490481 /* vosk-model-small-en-us-0.15 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "vosk-model-small-en-us-0.15"; path = "/Users/shmyrev/Documents/IOS/VoskApiTest/VoskApiTest/Vosk/vosk-model-small-en-us-0.15"; sourceTree = "<absolute>"; };
 		92AA22AD244CDD1200DA464B /* vosk_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vosk_api.h; sourceTree = "<group>"; };
 		92AA22AE244CDD5200DA464B /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
-		92D86BD3253F823E0040D53F /* vosk-model-small-en-us-0.4 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "vosk-model-small-en-us-0.4"; sourceTree = "<group>"; };
+		92D6B8D225BDFEAC007FF08D /* VoskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoskModel.swift; sourceTree = "<group>"; };
 		92D86BD4253F823F0040D53F /* vosk-model-spk-0.4 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "vosk-model-spk-0.4"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -83,6 +85,7 @@
 				9237522A240C550B00DD6076 /* LaunchScreen.storyboard */,
 				9237522D240C550B00DD6076 /* Info.plist */,
 				92375233240C558900DD6076 /* Vosk.swift */,
+				92D6B8D225BDFEAC007FF08D /* VoskModel.swift */,
 			);
 			path = VoskApiTest;
 			sourceTree = "<group>";
@@ -90,7 +93,7 @@
 		92375239240C642000DD6076 /* Vosk */ = {
 			isa = PBXGroup;
 			children = (
-				92D86BD3253F823E0040D53F /* vosk-model-small-en-us-0.4 */,
+				928CC50C25BE124400490481 /* vosk-model-small-en-us-0.15 */,
 				92D86BD4253F823F0040D53F /* vosk-model-spk-0.4 */,
 				92375256240C6E3D00DD6076 /* 10001-90210-01803.wav */,
 				92AA22AD244CDD1200DA464B /* vosk_api.h */,
@@ -169,12 +172,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92BACED125BE125A00B5CC93 /* vosk-model-small-en-us-0.15 in Resources */,
 				92375274240C6F1E00DD6076 /* 10001-90210-01803.wav in Resources */,
 				9237522C240C550B00DD6076 /* LaunchScreen.storyboard in Resources */,
 				92375229240C550B00DD6076 /* Assets.xcassets in Resources */,
 				92D86BD6253F823F0040D53F /* vosk-model-spk-0.4 in Resources */,
 				92375227240C550B00DD6076 /* Main.storyboard in Resources */,
-				92D86BD5253F823F0040D53F /* vosk-model-small-en-us-0.4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,6 +190,7 @@
 			files = (
 				92375224240C550B00DD6076 /* ViewController.swift in Sources */,
 				92375222240C550B00DD6076 /* AppDelegate.swift in Sources */,
+				92D6B8D325BDFEAC007FF08D /* VoskModel.swift in Sources */,
 				92375234240C558900DD6076 /* Vosk.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
