@@ -7,7 +7,7 @@ VOSK_SOURCES= \
     ../src/spk_model.cc \
     ../src/vosk_api.cc
 
-CFLAGS=-g -O2 -DFST_NO_DYNAMIC_LINKING -I../src -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include
+CFLAGS=-g -O2 -std=c++17 -DFST_NO_DYNAMIC_LINKING -I../src -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \
 	$(KALDI_ROOT)/src/decoder/kaldi-decoder.a \
@@ -50,4 +50,4 @@ libvosk.a: $(VOSK_SOURCES:.cc=.o)
 	g++ -std=c++17 $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o *.a test_vosk test_vosk_speaker
+	rm -f ../src/*.o *.o *.a test_vosk test_vosk_speaker
