@@ -173,9 +173,9 @@ void KaldiRecognizer::InitRescoring()
 {
     if (model_->std_lm_fst_) {
         fst::CacheOptions cache_opts(true, 50000);
-        fst::MapFstOptions mapfst_opts(cache_opts);
+        fst::ArcMapFstOptions mapfst_opts(cache_opts);
         fst::StdToLatticeMapper<kaldi::BaseFloat> mapper;
-        lm_fst_ = new fst::MapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> >(*model_->std_lm_fst_, mapper, mapfst_opts);
+        lm_fst_ = new fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> >(*model_->std_lm_fst_, mapper, mapfst_opts);
     } else {
         lm_fst_ = NULL;
     }

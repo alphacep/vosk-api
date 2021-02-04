@@ -48,7 +48,7 @@ kaldi_static_libs = ['src/online2/kaldi-online2.a',
              'src/base/kaldi-base.a',
              'tools/openfst/lib/libfst.a',
              'tools/openfst/lib/libfstngram.a']
-kaldi_link_args = ['-s']
+kaldi_link_args = ['-s', '-latomic', '-lpthread', '-lm']
 kaldi_libraries = []
 
 if sys.platform.startswith('darwin'):
@@ -57,8 +57,10 @@ elif kaldi_mkl == "1":
     kaldi_link_args.extend(['-L/opt/intel/mkl/lib/intel64', '-Wl,-rpath=/opt/intel/mkl/lib/intel64'])
     kaldi_libraries.extend(['mkl_rt', 'mkl_intel_lp64', 'mkl_core', 'mkl_sequential'])
 else:
-    kaldi_static_libs.append('tools/OpenBLAS/libopenblas.a')
-    kaldi_libraries.append('gfortran')
+    kaldi_static_libs.extend(['tools/OpenBLAS/install/lib/libopenblas.a',
+                             'tools/OpenBLAS/install/lib/liblapack.a',
+                             'tools/OpenBLAS/install/lib/libblas.a',
+                             'tools/OpenBLAS/install/lib/libf2c.a'])
 
 define_macros = [('FST_NO_DYNAMIC_LINKING', '1')]
 include_dirs = [kaldi_root + '/src', kaldi_root + '/tools/openfst/include', 'vosk']
@@ -79,11 +81,11 @@ vosk_ext = Extension('vosk._vosk',
                     extra_objects = [kaldi_root + '/' + x for x in kaldi_static_libs],
                     sources = ['vosk/' + x for x in sources],
                     extra_link_args = kaldi_link_args,
-                    extra_compile_args = ['-std=c++11', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
+                    extra_compile_args = ['-O3', '-std=c++17', '-Wno-sign-compare', '-Wno-unused-variable', '-Wno-unused-local-typedefs'])
 
 setuptools.setup(
     name="vosk",
-    version="0.3.15",
+    version="0.3.17",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="Offline open source speech recognition API based on Kaldi and Vosk",

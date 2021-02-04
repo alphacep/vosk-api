@@ -1,5 +1,5 @@
 KALDI_ROOT ?= $(HOME)/kaldi
-CFLAGS :=  -std=c++11 -g -O2 -DPIC -fPIC -Wno-unused-function
+CFLAGS :=  -std=c++17 -g -O2 -DPIC -fPIC -Wno-unused-function
 CPPFLAGS := -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include -I../src -DFST_NO_DYNAMIC_LINKING
 
 KALDI_LIBS = \
@@ -23,7 +23,12 @@ KALDI_LIBS = \
              ${KALDI_ROOT}/tools/openfst/lib/libfstngram.a
 
 # On Linux
-MATH_LIBS = ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a -lgfortran
+MATH_LIBS = \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libopenblas.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/liblapack.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libblas.a \
+    ${KALDI_ROOT}/tools/OpenBLAS/install/lib/libf2c.a
+
 # On OSX
 # MATH_LIBS = -framework Accelerate
 

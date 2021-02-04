@@ -1,13 +1,13 @@
 KALDI_ROOT=$(HOME)/travis/kaldi
 
 VOSK_SOURCES= \
-    ../src/kaldi_recognizer.cc \
-    ../src/language_model.cc \
-    ../src/model.cc \
-    ../src/spk_model.cc \
-    ../src/vosk_api.cc
+    ../../src/kaldi_recognizer.cc \
+    ../../src/language_model.cc \
+    ../../src/model.cc \
+    ../../src/spk_model.cc \
+    ../../src/vosk_api.cc
 
-CFLAGS=-g -O2 -std=c++17 -DFST_NO_DYNAMIC_LINKING -I../src -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include
+CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING -I../src -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \
 	$(KALDI_ROOT)/src/decoder/kaldi-decoder.a \
@@ -32,16 +32,10 @@ LIBS= \
 	$(KALDI_ROOT)/tools/openfst/lib/libfst.a \
 	$(KALDI_ROOT)/tools/openfst/lib/libfstngram.a
 
-all: test_vosk test_vosk_speaker
+all: libvosk.so
 
-test_vosk: test_vosk.o libvosk.a
-	g++ $^ -o $@ $(LIBS) -lpthread
-
-test_vosk_speaker: test_vosk_speaker.o libvosk.a
-	g++ $^ -o $@ $(LIBS) -lpthread
-
-libvosk.a: $(VOSK_SOURCES:.cc=.o)
-	ar rcs $@ $^
+libvosk.so: $(VOSK_SOURCES:.cc=.o)
+	g++ --shared -o $@ $^ $(LIBS) -lm -latomic
 
 %.o: %.c
 	g++ $(CFLAGS) -c -o $@ $<
@@ -50,4 +44,4 @@ libvosk.a: $(VOSK_SOURCES:.cc=.o)
 	g++ -std=c++17 $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f ../src/*.o *.o *.a test_vosk test_vosk_speaker
+	rm -f *.o *.so ../../src/*.o

@@ -40,6 +40,8 @@ def transcribe():
 
     for i, res in enumerate(results):
        jres = json.loads(res)
+       if not 'result' in jres:
+           continue
        words = jres['result']
        for j in range(0, len(words), WORDS_PER_LINE):
            line = words[j : j + WORDS_PER_LINE] 
@@ -51,4 +53,3 @@ def transcribe():
     return subs
 
 print (srt.compose(transcribe()))
-

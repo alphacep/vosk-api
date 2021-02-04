@@ -32,7 +32,7 @@ set(API_SOURCES
 "${PROJECT_SOURCE_DIR}/../src/vosk_api.h"
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DFST_NO_DYNAMIC_LINKING")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -O3 -DFST_NO_DYNAMIC_LINKING")
 
 add_library( vosk_jni SHARED
              build/generated-src/cpp/vosk_wrap.cc
@@ -60,7 +60,7 @@ target_link_libraries( vosk_jni
              ${KALDI_ROOT}/src/base/kaldi-base.a
              ${LIB_ROOT}/lib/libfst.a
              ${LIB_ROOT}/lib/libfstngram.a
-             ${LIB_ROOT}/lib/libopenblas_${OPENBLAS_ARCH}-r0.3.7.a
+             ${LIB_ROOT}/lib/libopenblas.a
              ${LIB_ROOT}/lib/libclapack.a
              ${LIB_ROOT}/lib/liblapack.a
              ${LIB_ROOT}/lib/libblas.a
