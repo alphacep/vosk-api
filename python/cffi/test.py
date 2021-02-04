@@ -7,7 +7,7 @@ ffi.set_source("_vosk", None)
 ffi.cdef(os.popen("cpp ../../src/vosk_api.h").read())
 ffi.compile()
 
-C = ffi.dlopen("libvosk.so")
+C = ffi.dlopen("./libvosk.so")
 
 model = C.vosk_model_new("model".encode('utf-8'))
 rec = C.vosk_recognizer_new(model, 16000)
