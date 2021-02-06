@@ -63,3 +63,10 @@ nodejs/example/test.wav
 nodejs/node_modules
 nodejs/package-lock.json
 nodejs/build
+
+# C
+c/test_vosk
+c/test_vosk_speaker
+c/oprofile_data
+c/model
+c/test.wav
