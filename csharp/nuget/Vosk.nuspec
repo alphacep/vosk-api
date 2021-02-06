@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Vosk</id>
-    <version>0.3.17</version>
+    <version>0.3.18</version>
     <authors>Alpha Cephei Inc</authors>
     <owners>Alpha Cephei Inc</owners>
     <license type="expression">Apache-2.0</license>
@@ -24,4 +24,7 @@ Vosk scales from small devices like Raspberry Pi or Android smartphone to big cl
       <group targetFramework=".NETStandard2.0"/>
     </dependencies>
   </metadata>
+  <files>
+    <file src="**" exclude="src/*.cs;build.sh;**/.keep-me;*.nupkg" />
+  </files>
 </package>

@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Kaldi;
+using Vosk;
 
 public class Test
 {
    public static void Main()
    {
 
-        Vosk.SetLogLevel(0);
+        Vosk.Vosk.SetLogLevel(0);
         Model model = new Model("model");
-        KaldiRecognizer rec = new KaldiRecognizer(model, 16000.0f);
+        VoskRecognizer rec = new VoskRecognizer(model, 16000.0f);
 
         using(Stream source = File.OpenRead("test.wav")) {
             byte[] buffer = new byte[4096];
@@ -24,7 +24,7 @@ public class Test
         }
         Console.WriteLine(rec.FinalResult());
 
-        rec = new KaldiRecognizer(model, 16000.0f);
+        rec = new VoskRecognizer(model, 16000.0f);
 
         using(Stream source = File.OpenRead("test.wav")) {
             byte[] buffer = new byte[4096];

@@ -48,12 +48,13 @@ java/model-spk/
 java/model/
 
 # CSharp
-csharp/gen
-csharp/*.exe
-csharp/*.c
-csharp/model/
-csharp/test.wav
 *.dll
+*.so
+*.nupkg
+csharp/demo/model
+csharp/demo/test.wav
+csharp/demo/bin
+csharp/demo/obj
 
 # Node
 nodejs/vosk_wrap.cc
