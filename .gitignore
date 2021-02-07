@@ -27,12 +27,8 @@ wheelhouse
 __pycache__
 *.egg-info
 python/dist
-python/vosk/*.cc
-python/vosk/*.c
-python/vosk/*.h
-python/vosk/*.i
-python/vosk/vosk.py
-python/vosk/vosk_wrap.cpp
+python/build
+python/vosk/*.so
 python/test/db
 python/test/hyp
 python/test/model

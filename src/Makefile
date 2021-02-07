@@ -38,7 +38,7 @@ LIBS= \
 all: libvosk.$(EXT)
 
 libvosk.$(EXT): $(VOSK_SOURCES:.cc=.o)
-	$(CXX) --shared -o $@ $^ $(LIBS) -lm -latomic
+	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic
 
 %.o: %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $<
