@@ -4,9 +4,6 @@ LABEL description="A docker image for building portable Python linux binary whee
 LABEL maintainer="contact@alphacephei.com"
 
 RUN yum -y update && yum -y install \
-    wget \
-    openssl-devel \
-    pcre-devel \
     devtoolset-8-libatomic-devel \
     automake \
     autoconf \

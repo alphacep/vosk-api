@@ -14,75 +14,12 @@ RUN apt-get update && \
         autoconf \
         libtool \
         cmake \
+        python3 \
+        python3-pip \
+        python3-wheel \
+        python3-setuptools \
+        python3-cffi \
     && rm -rf /var/lib/apt/lists/*
-
-RUN cd /opt \
-    && wget -O swig-4.0.1.tar.gz https://sourceforge.net/projects/swig/files/swig/swig-4.0.1/swig-4.0.1.tar.gz/download \
-    && tar xf swig-4.0.1.tar.gz \
-    && cd swig-4.0.1 \
-    && CPP=/usr/bin/cpp CXX=/usr/bin/g++ CC=/usr/bin/gcc ./configure --prefix=/usr && make -j 10 && make install \
-    && cd .. \
-    && rm -rf swig-4.0.1.tar.gz swig-4.0.1
-
-RUN cd /opt \
-    && wget -q https://github.com/openssl/openssl/archive/OpenSSL_1_0_2u.tar.gz \
-    && tar xf OpenSSL_1_0_2u.tar.gz \
-    && cd openssl-OpenSSL_1_0_2u \
-    && CROSS_COMPILE= MACHINE="$(echo $CROSS_TRIPLE|cut -d - -f 1)" ./config --prefix=$CROSS_ROOT shared \
-    && make -j $(nproc) \
-    && make install \
-    && rm -rf /opt/openssl-OpenSSL_1_0_2u /opt/OpenSSL_1_0_2u.tar.gz
-
-RUN cd /opt \
-    && wget -q https://github.com/python/cpython/archive/v3.7.6.tar.gz \
-    && tar xf v3.7.6.tar.gz \
-    && cp -r cpython-3.7.6 cpython-3.7.6-cross \
-    && cd /opt/cpython-3.7.6 \
-    && AR=/usr/bin/ar RANLIB=/usr/bin/ranlib CPP=/usr/bin/cpp CXX=/usr/bin/g++ CC=/usr/bin/gcc  ./configure --prefix="/opt/python/cp3.7-cp3.7m" \
-    && make -j $(nproc) \
-    && make install \
-    && /opt/python/cp3.7-cp3.7m/bin/pip3 install -U pip \
-    && /opt/python/cp3.7-cp3.7m/bin/pip3 install -U wheel \
-    && cd /opt/cpython-3.7.6-cross \
-    && export PATH=/opt/python/cp3.7-cp3.7m/bin:$PATH \
-    && ./configure --prefix=$CROSS_ROOT --with-openssl=$CROSS_ROOT --host=${CROSS_TRIPLE} --build=x86-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes \
-    && make -j $(nproc) \
-    && make install \
-    && rm -rf /opt/cpython-3.7.6 /opt/cpython-3.7.6-cross /opt/v3.7.6.tar.gz
-
-RUN cd /opt \
-    && wget -q https://github.com/python/cpython/archive/v3.6.10.tar.gz \
-    && tar xf v3.6.10.tar.gz \
-    && cp -r cpython-3.6.10 cpython-3.6.10-cross \
-    && cd /opt/cpython-3.6.10 \
-    && AR=/usr/bin/ar RANLIB=/usr/bin/ranlib CPP=/usr/bin/cpp CXX=/usr/bin/g++ CC=/usr/bin/gcc  ./configure --prefix="/opt/python/cp3.6-cp3.6m" \
-    && make -j $(nproc) \
-    && make install \
-    && /opt/python/cp3.6-cp3.6m/bin/pip3 install -U pip \
-    && /opt/python/cp3.6-cp3.6m/bin/pip3 install -U wheel \
-    && cd /opt/cpython-3.6.10-cross \
-    && export PATH=/opt/python/cp3.6-cp3.6m/bin:$PATH \
-    && ./configure --prefix=$CROSS_ROOT --with-openssl=$CROSS_ROOT --host=${CROSS_TRIPLE} --build=x86-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes \
-    && make -j $(nproc) \
-    && make install \
-    && rm -rf /opt/cpython-3.6.10 /opt/cpython-3.6.10-cross /opt/v3.6.10.tar.gz
-
-RUN cd /opt \
-    && wget -q https://github.com/python/cpython/archive/v3.8.3.tar.gz \
-    && tar xf v3.8.3.tar.gz \
-    && cp -r cpython-3.8.3 cpython-3.8.3-cross \
-    && cd /opt/cpython-3.8.3 \
-    && AR=/usr/bin/ar RANLIB=/usr/bin/ranlib CPP=/usr/bin/cpp CXX=/usr/bin/g++ CC=/usr/bin/gcc  ./configure --prefix="/opt/python/cp3.8-cp3.8m" \
-    && make -j $(nproc) \
-    && make install \
-    && /opt/python/cp3.8-cp3.8m/bin/pip3 install -U pip \
-    && /opt/python/cp3.8-cp3.8m/bin/pip3 install -U wheel \
-    && cd /opt/cpython-3.8.3-cross \
-    && export PATH=/opt/python/cp3.8-cp3.8m/bin:$PATH \
-    && ./configure --prefix=$CROSS_ROOT --with-openssl=$CROSS_ROOT --host=${CROSS_TRIPLE} --build=x86-linux-gnu --disable-ipv6 ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_have_long_long_format=yes \
-    && make -j $(nproc) \
-    && make install \
-    && rm -rf /opt/cpython-3.8.3 /opt/cpython-3.8.3-cross /opt/v3.8.3.tar.gz
 
 ARG OPENBLAS_ARCH=ARMV7
 ARG ARM_HARDWARE_OPTS="-mfloat-abi=hard -mfpu=neon"
