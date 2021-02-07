@@ -3,12 +3,39 @@ import sys
 import setuptools
 import shutil
 import glob
+import platform
 
+# Figure out environment for cross-compile
 vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-print(vosk_source)
+system = os.environ.get('VOSK_PLATFORM', platform.system())
+architecture = os.environ.get('VOSK_ARCHITECTURE', platform.architecture()[0])
+
+# Copy precompmilled libraries
 for lib in glob.glob(os.path.join(vosk_source, "src/lib*.*")):
     print ("Adding library", lib)
     shutil.copy(lib, "vosk")
+
+# Create OS-dependent, but Python-independent wheels.
+try:
+    from wheel.bdist_wheel import bdist_wheel
+except ImportError:
+    cmdclass = {}
+else:
+    class bdist_wheel_half_pure(bdist_wheel):
+        def get_tag(self):
+            abi = 'none'
+            if system == 'Darwin':
+                oses = 'macosx_10_6_x86_64'
+            elif system == 'Windows' and architecture == '32bit':
+                oses = 'win32'
+            elif system == 'Windows' and architecture == '64bit':
+                oses = 'win_amd64'
+            elif system == 'Linux':
+                oses = 'linux_x86_64'
+            else:
+                raise TypeError("Unknown build environment")
+            return 'py3', abi, oses
+    cmdclass = {'bdist_wheel': bdist_wheel_half_pure}
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -33,6 +60,7 @@ setuptools.setup(
         'Operating System :: MacOS :: MacOS X',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
+    cmdclass=cmdclass,
     python_requires='>=3',
     zip_safe=False, # Since we load so file from the filesystem, we can not run from zip file
     setup_requires=['cffi>=1.0'],

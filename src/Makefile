@@ -1,8 +1,8 @@
-KALDI_ROOT=$(HOME)/travis/kaldi
-OPENFST_ROOT=$(KALDI_ROOT)/tools/openfst
-OPENBLAS_ROOT=$(KALDI_ROOT)/tools/OpenBLAS/install
-EXT=so
-CXX=g++
+KALDI_ROOT?=$(HOME)/travis/kaldi
+OPENFST_ROOT?=$(KALDI_ROOT)/tools/openfst
+OPENBLAS_ROOT?=$(KALDI_ROOT)/tools/OpenBLAS/install
+EXT?=so
+CXX?=g++
 VOSK_SOURCES= \
     kaldi_recognizer.cc \
     language_model.cc \
