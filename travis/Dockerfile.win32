@@ -10,6 +10,10 @@ RUN apt-get update && \
         wget \
         git \
         python3 \
+        python3-pip \
+        python3-wheel \
+        python3-setuptools \
+        python3-cffi \
         zlib1g-dev \
         patch \
         cmake \
@@ -58,8 +62,3 @@ RUN cd /opt/kaldi \
         --fst-root=/opt/kaldi/local --fst-version=1.8.0 \
     && make depend -j \
     && make -j $(nproc) online2 lm
-
-RUN cd /opt/kaldi \
-    && git clone https://github.com/alphacep/vosk-api \
-    && cd vosk-api/src \
-    && make -j $(nproc) CXX=i686-w64-mingw32-g++-posix EXT=dll KALDI_ROOT=/opt/kaldi/kaldi OPENFST_ROOT=/opt/kaldi/local OPENBLAS_ROOT=/opt/kaldi/local

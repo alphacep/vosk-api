@@ -11,6 +11,9 @@ RUN apt-get update && \
         git \
         python3 \
         python3-pip \
+        python3-wheel \
+        python3-setuptools \
+        python3-cffi \
         zlib1g-dev \
         patch \
         cmake \

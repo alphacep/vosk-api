@@ -13,5 +13,4 @@ cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll /opt/vosk-api/src
 export VOSK_SOURCE=/opt/vosk-api
 export VOSK_PLATFORM=Windows
 export VOSK_ARCHITECTURE=64bit
-pip3 install wheel setuptools
 python3 -m pip -v wheel /opt/vosk-api/python --no-deps -w /io/wheelhouse
