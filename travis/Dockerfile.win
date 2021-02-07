@@ -60,3 +60,8 @@ RUN cd /opt/kaldi \
     && make depend -j \
     && make -j $(nproc) online2 lm
 
+RUN cd /opt/kaldi \
+    && git clone https://github.com/alphacep/vosk-api \
+    && cd vosk-api/src \
+    && make -j $(nproc) CXX=x86_64-w64-mingw32-g++-posix EXT=dll KALDI_ROOT=/opt/kaldi/kaldi OPENFST_ROOT=/opt/kaldi/local OPENBLAS_ROOT=/opt/kaldi/local
+
