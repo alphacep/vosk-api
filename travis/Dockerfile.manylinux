@@ -15,14 +15,6 @@ RUN yum -y update && yum -y install \
     && yum clean all
 
 RUN cd /opt \
-    && wget -O swig-4.0.1.tar.gz https://sourceforge.net/projects/swig/files/swig/swig-4.0.1/swig-4.0.1.tar.gz/download \
-    && tar xf swig-4.0.1.tar.gz \
-    && cd swig-4.0.1 \
-    && ./configure --prefix=/usr && make -j 10 && make install \
-    && cd .. \
-    && rm -rf swig-4.0.1.tar.gz swig-4.0.1
-
-RUN cd /opt \
     && git clone -b lookahead-1.8.0 --single-branch https://github.com/alphacep/kaldi \
     && cd /opt/kaldi/tools \
     && git clone -b v0.3.13 --single-branch https://github.com/xianyi/OpenBLAS \

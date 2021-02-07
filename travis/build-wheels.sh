@@ -1,17 +1,16 @@
 #!/bin/bash
 set -e -x
 
-export KALDI_ROOT=/opt/kaldi
+cd /opt
+git clone https://github.com/alphacep/vosk-api
+cd vosk-api/src
+KALDI_ROOT=/opt/kaldi OPENFST_ROOT=/opt/kaldi/tools/openfst OPENBLAS_ROOT=/opt/kaldi/tools/OpenBLAS/install make -j $(nproc)
 
-# Compile wheels
-for pypath in /opt/python/cp3[6789]*; do
-    export VOSK_SOURCE=/io/src
-    mkdir -p /opt/wheelhouse
-    rm -rf /io/python/build
-    "${pypath}/bin/pip" -v wheel /io/python -w /opt/wheelhouse
-done
+mkdir -p /opt/wheelhouse
+export VOSK_SOURCE=/opt/vosk-api
+/opt/python/cp37*/bin/pip -v wheel /opt/vosk-api/python --no-deps -w /opt/wheelhouse
 
-# Bundle external shared libraries into the wheels
 for whl in /opt/wheelhouse/*.whl; do
-    auditwheel repair "$whl" --plat $PLAT -w /io/wheelhouse/
+    cp $whl /io/wheelhouse
+    auditwheel repair "$whl" --plat manylinux2010_x86_64 -w /io/wheelhouse
 done
