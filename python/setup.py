@@ -21,7 +21,7 @@ try:
 except ImportError:
     cmdclass = {}
 else:
-    class bdist_wheel_half_pure(bdist_wheel):
+    class bdist_wheel_tag_name(bdist_wheel):
         def get_tag(self):
             abi = 'none'
             if system == 'Darwin':
@@ -30,12 +30,14 @@ else:
                 oses = 'win32'
             elif system == 'Windows' and architecture == '64bit':
                 oses = 'win_amd64'
-            elif system == 'Linux':
+            elif system == 'Linux' and architecture == '64bit':
                 oses = 'linux_x86_64'
+            elif system == 'Linux':
+                oses = 'linux_' + architecture
             else:
                 raise TypeError("Unknown build environment")
             return 'py3', abi, oses
-    cmdclass = {'bdist_wheel': bdist_wheel_half_pure}
+    cmdclass = {'bdist_wheel': bdist_wheel_tag_name}
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
