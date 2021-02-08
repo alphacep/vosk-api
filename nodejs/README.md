@@ -1,20 +1,9 @@
-Installation requires vosk-api checkout, it doesn't yet work with `npm
-install vosk`. We have to figure out how to properly distribute native
-modules for Vosk.
+This is an FFI-NAPI wrapper for the Vosk library.
 
-The build tested with node-0.10.15, node-0.12 is not yet supported by swig.
+It mostly follows Vosk interface, some methods are not yet fully implemented.
 
-Still, you need swig of newest version 4.0.1
+To use it you need to compile libvosk library, see Python module build
+instructions for details. You can find prebuilt library inside python
+wheel.
 
-Build like this
-
-```
-npm install --kaldi_root=/home/user/kaldi
-```
-
-Then test with
-
-```
-cd example
-node test.js
-```
+TODO: write proper wrapper prototypes
