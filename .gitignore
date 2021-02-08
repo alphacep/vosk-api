@@ -53,7 +53,6 @@ csharp/demo/bin
 csharp/demo/obj
 
 # Node
-nodejs/vosk_wrap.cc
 nodejs/example/model
 nodejs/example/test.wav
 nodejs/node_modules
