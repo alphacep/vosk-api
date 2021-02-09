@@ -1,9 +1,9 @@
-var ffi = require('ffi-napi');
-var ref = require('ref-napi');
+'use strict'
 
-const fs = require("fs");
-const { Readable } = require("stream");
-const wav = require("wav");
+const os = require('os');
+const path = require('path');
+const ffi = require('ffi-napi');
+const ref = require('ref-napi');
 
 const vosk_model = ref.types.void;
 const vosk_model_ptr = ref.refType(vosk_model);
@@ -11,8 +11,15 @@ const vosk_spk_model = ref.types.void;
 const vosk_spk_model_ptr = ref.refType(vosk_spk_model);
 const vosk_recognizer = ref.types.void;
 const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
- 
-const libvosk = ffi.Library('./libvosk', {
+
+var soname;
+if (os.platform == 'win32') {
+    soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
+} else {
+    soname = path.join(__dirname, "lib", "linux-x86_64", "libvosk.so")
+}
+
+const libvosk = ffi.Library(soname, {
   'vosk_set_log_level': [ 'void', [ 'int' ] ],
   'vosk_model_new': [ vosk_model_ptr, [ 'string' ] ],
   'vosk_model_free': [ 'void', [ vosk_model_ptr ] ],
@@ -23,27 +30,48 @@ const libvosk = ffi.Library('./libvosk', {
   'vosk_recognizer_final_result': ['string', [vosk_recognizer_ptr ] ],
 });
 
-libvosk.vosk_set_log_level(0);
-const model = libvosk.vosk_model_new("model");
-const rec = libvosk.vosk_recognizer_new(model, 16000.0);
+function setLogLevel(level) {
+    libvosk.vosk_set_log_level(level);
+}
 
-const wfStream = fs.createReadStream("test.wav", {'highWaterMark': 4096});
-const wfReader = new wav.Reader();
+function Model(model_path) {
 
-wfReader.on('format', async ({ audioFormat, sampleRate, channels }) => {
-    if (audioFormat != 1 || channels != 1) {
-        console.error("Audio file must be WAV format mono PCM.");
-        process.exit(1);
+    this.handle = libvosk.vosk_model_new(model_path);
+
+    this.free = function() {
+        libvosk.vosk_model_free(this.handle);
     }
-    for await (const data of new Readable().wrap(wfReader)) {
-        const result = libvosk.vosk_recognizer_accept_waveform(rec, data, data.length);
-        if (result) {
-              console.log(libvosk.vosk_recognizer_result(rec));
-        }
-    }
-    console.log(libvosk.vosk_recognizer_final_result(rec));
-    libvosk.vosk_recognizer_free(rec);
-    libvosk.vosk_model_free(model);
-});
 
-wfStream.pipe(wfReader);
+    this.getHandle = function() {
+        return this.handle;
+    }
+}
+
+
+function Recognizer(model, sample_rate) {
+    this.handle = libvosk.vosk_recognizer_new(model.getHandle(), sample_rate);
+
+    this.free = function() {
+        libvosk.vosk_recognizer_free(this.handle);
+    }
+
+    this.acceptWaveform = function(data) {
+       return libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
+    }
+
+    this.result = function() {
+        return libvosk.vosk_recognizer_result(this.handle);
+    }
+
+    this.partialResult = function() {
+        return libvosk.vosk_recognizer_partial_result(this.handle);
+    }
+
+    this.finalResult = function() {
+        return libvosk.vosk_recognizer_final_result(this.handle);
+    }
+}
+
+exports.setLogLevel = setLogLevel
+exports.Model = Model
+exports.Recognizer = Recognizer

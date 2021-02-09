@@ -53,11 +53,11 @@ csharp/demo/bin
 csharp/demo/obj
 
 # Node
-nodejs/example/model
-nodejs/example/test.wav
+nodejs/demo/model
+nodejs/demo/model-spk
+nodejs/demo/test.wav
 nodejs/node_modules
 nodejs/package-lock.json
-nodejs/build
 
 # C
 c/test_vosk
