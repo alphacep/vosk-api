@@ -7,11 +7,10 @@ matrix:
       services:
         - docker
       env: DOCKER_IMAGE=alphacep/kaldi-manylinux:latest
-           PLAT=manylinux2010_x86_64
 
 install:
   - docker pull $DOCKER_IMAGE
 
 script:
-  - docker run --rm -e PLAT=$PLAT -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
+  - docker run --rm -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
   - ls wheelhouse/
