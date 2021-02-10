@@ -1,0 +1,11 @@
+apply plugin: "application"
+
+mainClassName = "test.DecoderTest"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'com.github.jnr', name: 'jnr-ffi', version: '2.2.1'
+}
