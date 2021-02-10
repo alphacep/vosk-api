@@ -1,11 +1,12 @@
 apply plugin: "application"
 
 mainClassName = "test.DecoderTest"
+applicationDefaultJvmArgs = ['-Djna.library.path=.']
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation group: 'com.github.jnr', name: 'jnr-ffi', version: '2.2.1'
+    implementation group: 'net.java.dev.jna', name: 'jna', version: '4.5.0'
 }
