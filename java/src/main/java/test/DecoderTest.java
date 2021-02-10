@@ -15,7 +15,7 @@ public class DecoderTest {
         Pointer vosk_model_new(String path);
         void vosk_model_free(Pointer model);
         Pointer vosk_recognizer_new(Pointer model, float sample_rate);
-        boolean vosk_recognizer_accept_waveform(Pointer recognizer, Buffer data, int len);
+        boolean vosk_recognizer_accept_waveform(Pointer recognizer, byte[] data, int len);
         String vosk_recognizer_result(Pointer recognizer);
         String vosk_recognizer_final_result(Pointer recognizer);
         String vosk_recognizer_partial_result(Pointer recognizer);
@@ -34,8 +34,7 @@ public class DecoderTest {
         int nbytes;
         byte[] b = new byte[4096];
         while ((nbytes = ais.read(b)) >= 0) {
-            Buffer buf = ByteBuffer.wrap(b);
-            if (libvosk.vosk_recognizer_accept_waveform(rec, buf, nbytes)) {
+            if (libvosk.vosk_recognizer_accept_waveform(rec, b, nbytes)) {
                 System.out.println(libvosk.vosk_recognizer_result(rec));
             } else {
                 System.out.println(libvosk.vosk_recognizer_partial_result(rec));
