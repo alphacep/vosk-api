@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Vosk</id>
-    <version>0.3.18</version>
+    <version>0.3.19</version>
     <authors>Alpha Cephei Inc</authors>
     <owners>Alpha Cephei Inc</owners>
     <license type="expression">Apache-2.0</license>

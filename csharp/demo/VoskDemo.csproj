@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Vosk" Version="0.3.18" />
+    <PackageReference Include="Vosk" Version="0.3.19" />
   </ItemGroup>
 
 </Project>
