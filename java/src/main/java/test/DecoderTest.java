@@ -6,11 +6,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.*;
 
-import jnr.ffi.LibraryLoader;
-import jnr.ffi.Pointer;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.Platform;
+import com.sun.jna.Pointer;
 
 public class DecoderTest {
-    public static interface LibVosk {
+    public interface LibVosk extends Library {
+        static LibVosk INSTANCE = (LibVosk) Native.loadLibrary("vosk", LibVosk.class);
+
         void vosk_set_log_level(int level);
         Pointer vosk_model_new(String path);
         void vosk_model_free(Pointer model);
@@ -23,26 +27,23 @@ public class DecoderTest {
     }
 
     public static void main(String[] args) throws IOException {
-        LibVosk libvosk = LibraryLoader.create(LibVosk.class).search(".").load("vosk");
-
-        libvosk.vosk_set_log_level(0);
-        Pointer model = libvosk.vosk_model_new("model");
+        LibVosk.INSTANCE.vosk_set_log_level(0);
+        Pointer model = LibVosk.INSTANCE.vosk_model_new("model");
 
         FileInputStream ais = new FileInputStream(new File("../python/example/test.wav"));
-        Pointer rec = libvosk.vosk_recognizer_new(model, 16000.0f);
+        Pointer rec = LibVosk.INSTANCE.vosk_recognizer_new(model, 16000.0f);
 
         int nbytes;
         byte[] b = new byte[4096];
         while ((nbytes = ais.read(b)) >= 0) {
-            if (libvosk.vosk_recognizer_accept_waveform(rec, b, nbytes)) {
-                System.out.println(libvosk.vosk_recognizer_result(rec));
+            if (LibVosk.INSTANCE.vosk_recognizer_accept_waveform(rec, b, nbytes)) {
+                System.out.println(LibVosk.INSTANCE.vosk_recognizer_result(rec));
             } else {
-                System.out.println(libvosk.vosk_recognizer_partial_result(rec));
+                System.out.println(LibVosk.INSTANCE.vosk_recognizer_partial_result(rec));
             }
          }
-        System.out.println(libvosk.vosk_recognizer_final_result(rec));
-        libvosk.vosk_recognizer_free(rec);
-        libvosk.vosk_model_free(model);
-
+        System.out.println(LibVosk.INSTANCE.vosk_recognizer_final_result(rec));
+        LibVosk.INSTANCE.vosk_recognizer_free(rec);
+        LibVosk.INSTANCE.vosk_model_free(model);
     }
 }
