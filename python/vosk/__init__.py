@@ -4,13 +4,17 @@ import sys
 from .vosk_cffi import ffi as _ffi
 
 def open_dll():
+    dlldir = os.path.abspath(os.path.dirname(__file__))
     if sys.platform == 'win32':
-        os.environ["PATH"] += os.pathsep + os.path.dirname(__file__)
+        # We want to load dependencies too
+        os.environ["PATH"] = dlldir + os.pathsep + os.environ['PATH']
+        if hasattr(os, 'add_dll_directory'):
+            os.add_dll_directory(dlldir)
         return _ffi.dlopen("libvosk.dll")
     elif sys.platform == 'linux':
-        return _ffi.dlopen(os.path.dirname(__file__) + "/libvosk.so")
+        return _ffi.dlopen(os.path.join(dlldir, "libvosk.so"))
     elif sys.platform == 'darwin':
-        return _ffi.dlopen(os.path.dirname(__file__) + "/libvosk.dyld")
+        return _ffi.dlopen(os.path.join(dlldir, "libvosk.dyld"))
     else:
         raise TypeError("Unsupported platform")
 
