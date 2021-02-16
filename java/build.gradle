@@ -1,7 +1,6 @@
 apply plugin: "application"
 
 mainClassName = "test.DecoderTest"
-applicationDefaultJvmArgs = ['-Djna.library.path=.']
 
 repositories {
     mavenCentral()

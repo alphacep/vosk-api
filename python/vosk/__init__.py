@@ -10,7 +10,7 @@ def open_dll():
         os.environ["PATH"] = dlldir + os.pathsep + os.environ['PATH']
         if hasattr(os, 'add_dll_directory'):
             os.add_dll_directory(dlldir)
-        return _ffi.dlopen("libvosk.dll")
+        return _ffi.dlopen(os.path.join(dlldir, "libvosk.dll"))
     elif sys.platform == 'linux':
         return _ffi.dlopen(os.path.join(dlldir, "libvosk.so"))
     elif sys.platform == 'darwin':
