@@ -13,7 +13,7 @@ public class DecoderTest {
 
 
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
-        final LibVosk libVosk = new LibVosk(LogLevel.DEBUG);
+        LibVosk.setLogLevel(LogLevel.DEBUG);
 
         try (Model model = new Model("model");
              InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../python/example/test.wav")));

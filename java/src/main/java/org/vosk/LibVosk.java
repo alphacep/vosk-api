@@ -8,14 +8,6 @@ public class LibVosk {
         Native.register("vosk");
     }
 
-    public LibVosk() {
-        
-    }
-
-    public LibVosk(LogLevel logLevel) {
-        vosk_set_log_level(logLevel.getValue());
-    }
-
     public static native void vosk_set_log_level(int level);
 
     public static native Pointer vosk_model_new(String path);
