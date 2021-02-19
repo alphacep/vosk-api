@@ -40,7 +40,7 @@ public class LibVosk {
 
         private final int value;
 
-        private LogLevel(int value) {
+        LogLevel(int value) {
             this.value = value;
         }
 
@@ -84,12 +84,12 @@ public class LibVosk {
     }
 
     public static class Recognizer extends PointerType implements AutoCloseable {
-        public Recognizer(Model model, float sampleRate) {
-            super(vosk_recognizer_new(model, sampleRate));
+        public Recognizer(Model model) {
+            super(vosk_recognizer_new(model, 16000));
         }
 
-        public Recognizer(Model model, SpeakerModel spkrModel, float sampleRate) {
-            super(vosk_recognizer_new_spk(model.getPointer(), spkrModel.getPointer(), sampleRate));
+        public Recognizer(Model model, SpeakerModel spkrModel) {
+            super(vosk_recognizer_new_spk(model.getPointer(), spkrModel.getPointer(), 16000));
         }
 
         public boolean acceptWaveForm(byte[] data, int len) {
