@@ -1,4 +1,4 @@
-package test;
+package org.vosk;
 
 public enum LogLevel {
     WARNINGS(-1),  // Print warning and errors

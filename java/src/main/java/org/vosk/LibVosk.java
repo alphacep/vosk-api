@@ -1,4 +1,4 @@
-package test;
+package org.vosk;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -8,11 +8,11 @@ public class LibVosk {
         Native.register("vosk");
     }
 
-    LibVosk() {
+    public LibVosk() {
         
     }
 
-    LibVosk(LogLevel logLevel) {
+    public LibVosk(LogLevel logLevel) {
         vosk_set_log_level(logLevel.getValue());
     }
 
@@ -40,7 +40,7 @@ public class LibVosk {
 
     public static native void vosk_recognizer_free(Pointer recognizer);
 
-    public void setLogLevel(LogLevel loglevel) {
+    public static void setLogLevel(LogLevel loglevel) {
         vosk_set_log_level(loglevel.getValue());
     }
 

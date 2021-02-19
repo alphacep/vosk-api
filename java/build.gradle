@@ -1,6 +1,6 @@
 apply plugin: "application"
 
-mainClassName = "test.DecoderTest"
+mainClassName = "org.vosk.DecoderTest"
 
 repositories {
     mavenCentral()
