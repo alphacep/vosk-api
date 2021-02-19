@@ -277,6 +277,7 @@ void Model::ReadDataFiles()
         winfo_ = NULL;
     }
 
+    std_lm_fst_ = NULL;
     if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
         std_lm_fst_ = fst::ReadFstKaldi(std_fst_rxfilename_);
@@ -286,8 +287,6 @@ void Model::ReadDataFiles()
             fst::ArcSort(std_lm_fst_, ilabel_comp);
         }
         ReadKaldiObject(carpa_rxfilename_, &const_arpa_);
-    } else {
-        std_lm_fst_ = NULL;
     }
 }
 
@@ -316,8 +315,10 @@ Model::~Model() {
     delete decodable_info_;
     delete trans_model_;
     delete nnet_;
+    delete word_syms_;
     delete winfo_;
     delete hclg_fst_;
     delete hcl_fst_;
     delete g_fst_;
+    delete std_lm_fst_;
 }
