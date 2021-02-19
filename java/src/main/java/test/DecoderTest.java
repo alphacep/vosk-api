@@ -13,12 +13,11 @@ public class DecoderTest {
 
 
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
-        final LibVosk libVosk = new LibVosk();
-        libVosk.setLogLevel(LibVosk.LogLevel.DEBUG);
+        final LibVosk libVosk = new LibVosk(LogLevel.DEBUG);
 
-        try (LibVosk.Model model = new LibVosk.Model("model");
+        try (Model model = new Model("model");
              InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../python/example/test.wav")));
-             LibVosk.Recognizer recognizer = new LibVosk.Recognizer(model)) {
+             Recognizer recognizer = new Recognizer(model)) {
 
             int nbytes;
             byte[] b = new byte[4096];
