@@ -1,0 +1,11 @@
+apply plugin: "application"
+
+mainClassName = "test.DecoderTest"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'net.java.dev.jna', name: 'jna', version: '4.5.0'
+}

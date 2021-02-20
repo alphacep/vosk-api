@@ -10,7 +10,7 @@
 
 # Gradle files
 .gradle/
-build/
+android/build/
 gradlew
 gradlew.bat
 gradle
@@ -27,12 +27,8 @@ wheelhouse
 __pycache__
 *.egg-info
 python/dist
-python/vosk/*.cc
-python/vosk/*.c
-python/vosk/*.h
-python/vosk/*.i
-python/vosk/vosk.py
-python/vosk/vosk_wrap.cpp
+python/build
+python/vosk/*.so
 python/test/db
 python/test/hyp
 python/test/model
@@ -48,17 +44,24 @@ java/model-spk/
 java/model/
 
 # CSharp
-csharp/gen
-csharp/*.exe
-csharp/*.c
-csharp/model/
-csharp/test.wav
-Vosk.dll
+*.dll
+*.so
+*.nupkg
+csharp/demo/model
+csharp/demo/test.wav
+csharp/demo/bin
+csharp/demo/obj
 
 # Node
-nodejs/vosk_wrap.cc
-nodejs/example/model
-nodejs/example/test.wav
+nodejs/demo/model
+nodejs/demo/model-spk
+nodejs/demo/test.wav
 nodejs/node_modules
 nodejs/package-lock.json
-nodejs/build
+
+# C
+c/test_vosk
+c/test_vosk_speaker
+c/oprofile_data
+c/model
+c/test.wav

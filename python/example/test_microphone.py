@@ -75,6 +75,7 @@ try:
             rec = vosk.KaldiRecognizer(model, args.samplerate)
             while True:
                 data = q.get()
+                data = bytes(data)
                 if rec.AcceptWaveform(data):
                     print(rec.Result())
                 else:

@@ -1,20 +1,33 @@
-Installation requires vosk-api checkout, it doesn't yet work with `npm
-install vosk`. We have to figure out how to properly distribute native
-modules for Vosk.
+This is an FFI-NAPI wrapper for the Vosk library.
 
-The build tested with node-0.10.15, node-0.12 is not yet supported by swig.
+## Usage
 
-Still, you need swig of newest version 4.0.1
+It mostly follows Vosk interface, some methods are not yet fully implemented.
 
-Build like this
+To use it you need to compile libvosk library, see Python module build
+instructions for details. You can find prebuilt library inside python
+wheel.
 
-```
-npm install --kaldi_root=/home/user/kaldi
-```
+## About
 
-Then test with
+Vosk is an offline open source speech recognition toolkit. It enables
+speech recognition models for 17 languages and dialects - English, Indian
+English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish,
+Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino.
 
-```
-cd example
-node test.js
-```
+Vosk models are small (50 Mb) but provide continuous large vocabulary
+transcription, zero-latency response with streaming API, reconfigurable
+vocabulary and speaker identification.
+
+Vosk supplies speech recognition for chatbots, smart home appliances,
+virtual assistants. It can also create subtitles for movies,
+transcription for lectures and interviews.
+
+Vosk scales from small devices like Raspberry Pi or Android smartphone to
+big clusters.
+
+# Documentation
+
+For installation instructions, examples and documentation visit [Vosk
+Website](https://alphacephei.com/vosk). See also our project on
+[Github](https://github.com/alphacep/vosk-api).
