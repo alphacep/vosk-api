@@ -65,3 +65,6 @@ c/test_vosk_speaker
 c/oprofile_data
 c/model
 c/test.wav
+
+.idea
+python/example/model

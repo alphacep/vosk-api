@@ -1,6 +1,8 @@
 KALDI_ROOT?=$(HOME)/travis/kaldi
 OPENFST_ROOT?=$(KALDI_ROOT)/tools/openfst
 OPENBLAS_ROOT?=$(KALDI_ROOT)/tools/OpenBLAS/install
+CUDA_ROOT?=/usr/local/cuda
+
 EXT?=so
 CXX?=g++
 VOSK_SOURCES= \
@@ -10,7 +12,7 @@ VOSK_SOURCES= \
     spk_model.cc \
     vosk_api.cc
 
-CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING -I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include -I$(OPENBLAS_ROOT)/include
+CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING -DHAVE_CUDA=1 -I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include -I$(OPENBLAS_ROOT)/include -I$(CUDA_ROOT)/include -L$(CUDA_ROOT)/lib64
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \
 	$(KALDI_ROOT)/src/decoder/kaldi-decoder.a \
@@ -38,7 +40,7 @@ LIBS= \
 all: libvosk.$(EXT)
 
 libvosk.$(EXT): $(VOSK_SOURCES:.cc=.o)
-	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic
+	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic -lcublas -lcusparse -lcudart -lcurand -lcufft -lnvToolsExt -lcusolver
 
 %.o: %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $<
