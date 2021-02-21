@@ -1,6 +1,9 @@
 KALDI_ROOT?=$(HOME)/travis/kaldi
 OPENFST_ROOT?=$(KALDI_ROOT)/tools/openfst
 OPENBLAS_ROOT?=$(KALDI_ROOT)/tools/OpenBLAS/install
+CUDA_ROOT?=/usr/local/cuda
+HAVE_CUDA?=0
+
 EXT?=so
 CXX?=g++
 VOSK_SOURCES= \
@@ -34,6 +37,21 @@ LIBS= \
 	$(OPENBLAS_ROOT)/lib/libf2c.a \
 	$(OPENFST_ROOT)/lib/libfst.a \
 	$(OPENFST_ROOT)/lib/libfstngram.a
+
+ifeq ($(HAVE_CUDA), 1)
+    LIBS+= \
+		-L$(CUDA_ROOT)/lib64 \
+        -lcublas \
+        -lcusparse \
+        -lcudart \
+        -lcurand \
+        -lcufft \
+        -lcusolver \
+        -lnvToolsExt
+    CFLAGS+= \
+    	-DHAVE_CUDA=$(HAVE_CUDA) \
+    	-I$(CUDA_ROOT)/include
+endif
 
 all: libvosk.$(EXT)
 

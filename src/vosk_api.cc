@@ -100,3 +100,22 @@ void vosk_set_log_level(int log_level)
 {
     SetVerboseLevel(log_level);
 }
+
+#if HAVE_CUDA
+#include "cudamatrix/cu-device.h"
+#endif
+
+void vosk_gpu_init()
+{
+#if HAVE_CUDA
+    kaldi::CuDevice::Instantiate().SelectGpuId("yes");
+    kaldi::CuDevice::Instantiate().AllowMultithreading();
+#endif
+}
+
+void vosk_gpu_thread_init()
+{
+#if HAVE_CUDA
+    kaldi::CuDevice::Instantiate();
+#endif
+}

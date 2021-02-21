@@ -69,3 +69,11 @@ class KaldiRecognizer(object):
 
 def SetLogLevel(level):
     return _c.vosk_set_log_level(level)
+
+
+def GpuInit():
+    _c.vosk_gpu_init()
+
+
+def GpuThreadInit():
+    _c.vosk_gpu_thread_init()
