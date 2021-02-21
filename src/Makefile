@@ -12,7 +12,8 @@ VOSK_SOURCES= \
     spk_model.cc \
     vosk_api.cc
 
-CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING -DHAVE_CUDA=1 -I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include -I$(OPENBLAS_ROOT)/include -I$(CUDA_ROOT)/include -L$(CUDA_ROOT)/lib64
+# Since CUDA 10.1 some libs are located in /usr/lib/[ARCH]. So you should symlink them with $(CUDA_ROOT)/lib64 or adjust ld.so.conf.
+CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING -DHAVE_CUDA=1 -I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include -I$(OPENBLAS_ROOT)/include -I$(CUDA_ROOT)/include
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \
 	$(KALDI_ROOT)/src/decoder/kaldi-decoder.a \
@@ -35,12 +36,20 @@ LIBS= \
 	$(OPENBLAS_ROOT)/lib/libblas.a \
 	$(OPENBLAS_ROOT)/lib/libf2c.a \
 	$(OPENFST_ROOT)/lib/libfst.a \
-	$(OPENFST_ROOT)/lib/libfstngram.a
+	$(OPENFST_ROOT)/lib/libfstngram.a \
+	-L$(CUDA_ROOT)/lib64 \
+	-lcublas \
+	-lcusparse \
+	-lcudart \
+	-lcurand\
+	-lcufft \
+	-lnvToolsExt \
+	-lcusolver
 
 all: libvosk.$(EXT)
 
 libvosk.$(EXT): $(VOSK_SOURCES:.cc=.o)
-	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic -lcublas -lcusparse -lcudart -lcurand -lcufft -lnvToolsExt -lcusolver
+	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic
 
 %.o: %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $<
