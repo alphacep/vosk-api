@@ -3,12 +3,12 @@ package org.vosk;
 import com.sun.jna.PointerType;
 
 public class Recognizer extends PointerType implements AutoCloseable {
-    public Recognizer(Model model) {
-        super(LibVosk.vosk_recognizer_new(model, 16000));
+    public Recognizer(Model model, float sampleRate) {
+        super(LibVosk.vosk_recognizer_new(model, sampleRate));
     }
 
-    public Recognizer(Model model, SpeakerModel spkrModel) {
-        super(LibVosk.vosk_recognizer_new_spk(model.getPointer(), spkrModel.getPointer(), 16000));
+    public Recognizer(Model model, SpeakerModel spkrModel, float sampleRate) {
+        super(LibVosk.vosk_recognizer_new_spk(model.getPointer(), spkrModel.getPointer(), sampleRate));
     }
 
     public boolean acceptWaveForm(byte[] data, int len) {
