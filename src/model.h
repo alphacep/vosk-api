@@ -1,4 +1,4 @@
-// Copyright 2019 Alpha Cephei Inc.
+// Copyright 2019-2021 Alpha Cephei Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@ protected:
     kaldi::TransitionModel *trans_model_;
     kaldi::nnet3::AmNnetSimple *nnet_;
     const fst::SymbolTable *word_syms_;
+    bool word_syms_loaded_;
     kaldi::WordBoundaryInfo *winfo_;
     vector<int32> disambig_;
 

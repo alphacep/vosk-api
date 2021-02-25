@@ -17,6 +17,10 @@
 #include "model.h"
 #include "spk_model.h"
 
+#if HAVE_CUDA
+#include "cudamatrix/cu-device.h"
+#endif
+
 #include <string.h>
 
 using namespace kaldi;
@@ -100,10 +104,6 @@ void vosk_set_log_level(int log_level)
 {
     SetVerboseLevel(log_level);
 }
-
-#if HAVE_CUDA
-#include "cudamatrix/cu-device.h"
-#endif
 
 void vosk_gpu_init()
 {

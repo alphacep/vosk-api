@@ -1,4 +1,4 @@
-// Copyright 2019 Alpha Cephei Inc.
+// Copyright 2019-2021 Alpha Cephei Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -256,6 +256,7 @@ void Model::ReadDataFiles()
     }
 
     word_syms_ = NULL;
+    word_syms_loaded_ = false;
     if (hclg_fst_ && hclg_fst_->OutputSymbols()) {
         word_syms_ = hclg_fst_->OutputSymbols();
     } else if (g_fst_ && g_fst_->OutputSymbols()) {
@@ -266,6 +267,7 @@ void Model::ReadDataFiles()
         if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_)))
             KALDI_ERR << "Could not read symbol table from file "
                       << word_syms_rxfilename_;
+        word_syms_loaded_ = word_syms_;
     }
     KALDI_ASSERT(word_syms_);
 
@@ -315,7 +317,8 @@ Model::~Model() {
     delete decodable_info_;
     delete trans_model_;
     delete nnet_;
-    delete word_syms_;
+    if (word_syms_loaded_)
+        delete word_syms_;
     delete winfo_;
     delete hclg_fst_;
     delete hcl_fst_;
