@@ -162,6 +162,7 @@ void Model::ConfigureV1()
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
     mfcc_conf_rxfilename_ = model_path_str_ + "/mfcc.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/global_cmvn.stats";
+    pitch_conf_rxfilename_ = model_path_str_ + "/pitch.conf";
 }
 
 void Model::ConfigureV2()
@@ -185,6 +186,7 @@ void Model::ConfigureV2()
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
     mfcc_conf_rxfilename_ = model_path_str_ + "/conf/mfcc.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/am/global_cmvn.stats";
+    pitch_conf_rxfilename_ = model_path_str_ + "/conf/pitch.conf";
 }
 
 void Model::ReadDataFiles()
@@ -241,6 +243,11 @@ void Model::ReadDataFiles()
         ReadKaldiObject(global_cmvn_stats_rxfilename_, &feature_info_.global_cmvn_stats);
     }
 
+    if (stat(pitch_conf_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Using pitch in feature pipeline";
+        feature_info_.add_pitch = true;
+        ReadConfigFromFile(pitch_conf_rxfilename_, &feature_info_.pitch_opts);
+    }
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading HCLG from " << hclg_fst_rxfilename_;
