@@ -65,6 +65,7 @@ protected:
     string final_ie_rxfilename_;
     string mfcc_conf_rxfilename_;
     string global_cmvn_stats_rxfilename_;
+    string pitch_conf_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
