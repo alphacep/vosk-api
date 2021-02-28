@@ -4,6 +4,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 public class LibVosk {
+
     static {
         Native.register("vosk");
     }
@@ -35,5 +36,4 @@ public class LibVosk {
     public static void setLogLevel(LogLevel loglevel) {
         vosk_set_log_level(loglevel.getValue());
     }
-
 }
