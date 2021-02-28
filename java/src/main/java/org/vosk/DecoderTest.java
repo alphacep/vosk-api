@@ -16,8 +16,8 @@ public class DecoderTest {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
         try (Model model = new Model("model");
-             InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../python/example/test.wav")));
-             Recognizer recognizer = new Recognizer(model, 16000)) {
+                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../python/example/test.wav")));
+                    Recognizer recognizer = new Recognizer(model, 16000)) {
 
             int nbytes;
             byte[] b = new byte[4096];
