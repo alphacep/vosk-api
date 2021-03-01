@@ -20,7 +20,7 @@ def callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
-    q.put(indata)
+    q.put(bytes(indata))
 
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument(
@@ -75,7 +75,6 @@ try:
             rec = vosk.KaldiRecognizer(model, args.samplerate)
             while True:
                 data = q.get()
-                data = bytes(data)
                 if rec.AcceptWaveform(data):
                     print(rec.Result())
                 else:
