@@ -5,6 +5,8 @@ HAVE_CUDA?=0
 CUDA_ROOT?=/usr/local/cuda
 EXT?=so
 CXX?=g++
+HAVE_OPENBLAS_CLAPACK=1
+HAVE_ACCELERATE=0
 
 VOSK_SOURCES= \
 	kaldi_recognizer.cc \
@@ -33,12 +35,22 @@ LIBS= \
 	$(KALDI_ROOT)/src/fstext/kaldi-fstext.a \
 	$(KALDI_ROOT)/src/util/kaldi-util.a \
 	$(KALDI_ROOT)/src/base/kaldi-base.a \
+	$(OPENFST_ROOT)/lib/libfst.a \
+	$(OPENFST_ROOT)/lib/libfstngram.a
+
+
+ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
+LIBS += \
 	$(OPENBLAS_ROOT)/lib/libopenblas.a \
 	$(OPENBLAS_ROOT)/lib/liblapack.a \
 	$(OPENBLAS_ROOT)/lib/libblas.a \
-	$(OPENBLAS_ROOT)/lib/libf2c.a \
-	$(OPENFST_ROOT)/lib/libfst.a \
-	$(OPENFST_ROOT)/lib/libfstngram.a
+	$(OPENBLAS_ROOT)/lib/libf2c.a
+endif
+
+ifeq ($(HAVE_ACCELERATE), 1)
+LIBS += \
+	-framework Accelerate
+endif
 
 ifeq ($(HAVE_CUDA), 1)
 CFLAGS+=-DHAVE_CUDA=1 -I$(CUDA_ROOT)/include
