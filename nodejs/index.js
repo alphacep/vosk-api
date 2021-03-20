@@ -1,8 +1,14 @@
 'use strict'
 
+/**
+ * @module vosk
+ */
+
 const os = require('os');
 const path = require('path');
+/** @type {import('ffi-napi')} */
 const ffi = require('ffi-napi');
+/** @type {import('ref-napi')} */
 const ref = require('ref-napi');
 
 const vosk_model = ref.types.void;
@@ -11,6 +17,25 @@ const vosk_spk_model = ref.types.void;
 const vosk_spk_model_ptr = ref.refType(vosk_spk_model);
 const vosk_recognizer = ref.types.void;
 const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
+
+/**
+ * @typedef {Object} WordResult
+ * @property {number} conf The confidence rate in the detection
+ * @property {number} start The start of the timeframe when the word is pronounced
+ * @property {number} end The end of the timeframe when the word is pronounced
+ * @property {string} word The word detected
+ */
+
+/**
+ * @typedef {Object} RecognitionResults
+ * @property {WordResult[]} result Details about the words that have been detected
+ * @property {string} text The complete sentence that have been detected
+ */
+
+/**
+ * @typedef {Object} PartialResults
+ * @property {string} partial The partial sentence that have been detected until now
+ */
 
 var soname;
 if (os.platform == 'win32') {
@@ -33,9 +58,8 @@ const libvosk = ffi.Library(soname, {
 });
 
 /**
- * Set the level of details of logs
- * What are the possible values?
- * @param {number} level No idea. The higher the most detailed? Or is it the opposite?
+ * Set log level for Kaldi messages
+ * @param {number} level The higher, the more verbose. 0 for infos and errors. Less than 0 for silence. 
  */
 function setLogLevel(level) {
     libvosk.vosk_set_log_level(level);
@@ -53,15 +77,21 @@ class Model {
 
     /**
      * Return the handle.
-     * Probably just needed internally I guess?
-     * @returns {unknown} A handle... What is it?
+     * For internal use only
+     * @returns {unknown} A reference to the internal representation of the Model
      */
      getHandle() {
         return this.handle
     }
 
-    /** Free up the memory */
-    free() {
+    /**
+     * Releases the model memory
+     *
+     * The model object is reference-counted so if some recognizer
+     * depends on this model, model might still stay alive. When
+     * last recognizer is released, model will be released too.
+     */
+     free() {
         libvosk.vosk_model_free(this.handle);
     }
 }
@@ -76,42 +106,122 @@ class Recognizer {
         this.handle = libvosk.vosk_recognizer_new(model.getHandle(), sample_rate);
     }
 
-    /** Free up the memory */
+    /**
+     * Releases the model memory
+     *
+     * The model object is reference-counted so if some recognizer
+     * depends on this model, model might still stay alive. When
+     * last recognizer is released, model will be released too.
+     */
     free () {
         libvosk.vosk_recognizer_free(this.handle);
     }
 
-    /**
-     * Well, for sure, it does something with some data. I probably got that right.
-     * @param {unkown} data something
-     * @returns {unkown} something else
+    /** 
+     * Accept voice data
+     *
+     * accept and process new chunk of voice data
+     *
+     * @param data - audio data in PCM 16-bit mono format
+     * @returns true if silence is occured and you can retrieve a new utterance with result method
      */
     acceptWaveform (data) {
         return libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
     };
 
-    /**
-     * Retrieves the results, but I have no idea what shape to expect
-     * @returns {unkown} The results I guess?
+    /** Returns speech recognition result
+     *
+     * @deprecated Use {@link Recognizer#resultObject} to retrieve the correct data type
+     * @returns the result in JSON format which contains decoded line, decoded
+     *          words, times in seconds and confidences. You can parse this result
+     *          with any json parser
+     *
+     * <pre>
+     * {
+     *   "result" : [{
+     *       "conf" : 1.000000,
+     *       "end" : 1.110000,
+     *       "start" : 0.870000,
+     *       "word" : "what"
+     *     }, {
+     *       "conf" : 1.000000,
+     *       "end" : 1.530000,
+     *       "start" : 1.110000,
+     *       "word" : "zero"
+     *     }, {
+     *       "conf" : 1.000000,
+     *       "end" : 1.950000,
+     *       "start" : 1.530000,
+     *       "word" : "zero"
+     *     }, {
+     *       "conf" : 1.000000,
+     *       "end" : 2.340000,
+     *       "start" : 1.950000,
+     *       "word" : "zero"
+     *     }, {
+     *       "conf" : 1.000000,
+     *      "end" : 2.610000,
+     *       "start" : 2.340000,
+     *       "word" : "one"
+     *     }],
+     *   "text" : "what zero zero zero one"
+     *  }
+     * </pre>
      */
     result () {
         return libvosk.vosk_recognizer_result(this.handle);
     };
 
     /**
-     * Maybe I'll get some letters from the actual sentence, for those who want to play the hangman game?
-     * @returns {unkown} Partial results?
+     * Returns speech recognition results
+     * @returns {RecognitionResults} The results
+     */
+    resultObject () {
+        return JSON.parse(libvosk.vosk_recognizer_result(this.handle));
+    };
+
+    /**
+     * speech recognition text which is not yet finalized.
+     * result may change as recognizer process more data.
+     * 
+     * @deprecated Use {@link Recognizer#partialResultObject} to retrieve the correct data type
+     * @returns {string} The partial result in JSON format
      */
     partialResult = function () {
         return libvosk.vosk_recognizer_partial_result(this.handle);
     };
 
     /**
-     * That definitely looks definitive.
-     * @returns {unkown} Yet another result
+     * speech recognition text which is not yet finalized.
+     * result may change as recognizer process more data.
+     * 
+     * @returns {PartialResults} The partial results
+     */
+    partialResultObject = function () {
+        return JSON.parse(libvosk.vosk_recognizer_partial_result(this.handle));
+    };
+
+    /** 
+     * Returns speech recognition result. Same as result, but doesn't wait for silence
+     * You usually call it in the end of the stream to get final bits of audio. It
+     * flushes the feature pipeline, so all remaining audio chunks got processed.
+     *
+     * @deprecated Use {@link Recognizer#finalResultObject} to retrieve the correct data type
+     * @returns {string} speech result in JSON format.
      */
     finalResult () {
         return libvosk.vosk_recognizer_final_result(this.handle);
+    };
+
+    /** 
+     * Returns speech recognition result. Same as result, but doesn't wait for silence
+     * You usually call it in the end of the stream to get final bits of audio. It
+     * flushes the feature pipeline, so all remaining audio chunks got processed.
+     *
+     * @returns {RecognitionResults} speech result.
+     */
+    finalResultObject () {
+        return JSON.parse(libvosk.vosk_recognizer_final_result(this.handle));
     };
 }
 
