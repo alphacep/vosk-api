@@ -20,9 +20,9 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
 /**
  * @typedef {Object} WordResult
- * @property {number} conf The confidence rate in the detection
- * @property {number} start The start of the timeframe when the word is pronounced
- * @property {number} end The end of the timeframe when the word is pronounced
+ * @property {number} conf The confidence rate in the detection. 0 For unlikely, and 1 for totally accurate.
+ * @property {number} start The start of the timeframe when the word is pronounced in seconds
+ * @property {number} end The end of the timeframe when the word is pronounced in seconds
  * @property {string} word The word detected
  */
 
@@ -65,11 +65,16 @@ function setLogLevel(level) {
     libvosk.vosk_set_log_level(level);
 }
 
+/**
+ * Build a Model from a model file.
+ * @see [models](https://alphacephei.com/vosk/models)
+ */
 class Model {
     /**
      * Build a Model to be used with the voice recognition. Each language should have it's own Model
      * for the speech recognition to work.
      * @param {string} model_path The abstract pathname to the model
+     * @see [models](https://alphacephei.com/vosk/models)
      */
     constructor(model_path) {
         this.handle = libvosk.vosk_model_new(model_path);
@@ -96,7 +101,11 @@ class Model {
     }
 }
 
-class Recognizer {
+/**
+ * Create a Recognizer that will be able to transform audio streams into text using a Model.
+ * @see Model
+ */
+ class Recognizer {
     /**
      * Create a Recognizer that will handle speech to text recognition.
      * @param {Model} model The language model to be used 
@@ -122,7 +131,7 @@ class Recognizer {
      *
      * accept and process new chunk of voice data
      *
-     * @param data - audio data in PCM 16-bit mono format
+     * @param {Buffer} data audio data in PCM 16-bit mono format
      * @returns true if silence is occured and you can retrieve a new utterance with result method
      */
     acceptWaveform (data) {
