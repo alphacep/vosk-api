@@ -301,4 +301,5 @@ class SpeakerModel {
 
 exports.setLogLevel = setLogLevel
 exports.Model = Model
+exports.SpeakerModel = SpeakerModel
 exports.Recognizer = Recognizer
