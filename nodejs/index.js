@@ -107,12 +107,13 @@ class Model {
 /**
  * Build a Speaker Model from a speaker model file.
  * The Speaker Model enables speaker identification.
+ * @see [models](https://alphacephei.com/vosk/models)
  */
 class SpeakerModel {
     /**
      * Loads speaker model data from the file and returns the model object
      *
-     * @param {string} modelPath: the path of the model on the filesystem
+     * @param {string} modelPath the path of the model on the filesystem
      * @see [models](https://alphacephei.com/vosk/models)
      */
     constructor (modelPath) {
@@ -149,11 +150,10 @@ class SpeakerModel {
  class Recognizer {
     /**
      * Create a Recognizer that will handle speech to text recognition.
+     * @constructor
      * @param {Model | SpeakerModel} model The language model to be used 
      * @param {number} sampleRate The sample rate. Most models are trained at 16kHz
-     */
-    constructor (model, sampleRate)
-    /** Creates the recognizer object with the phrase list
+     *//** Creates the recognizer object with the phrase list
      *
      *  Sometimes when you want to improve recognition accuracy and when you don't need
      *  to recognize large vocabulary you can specify a list of phrases to recognize. This
@@ -163,9 +163,10 @@ class SpeakerModel {
      *  Only recognizers with lookahead models support this type of quick configuration.
      *  Precompiled HCLG graph models are not supported.
      *
+     * @constructor
      * @param {Model | SpeakerModel} model The language model to be used 
-     * @param {string} sampleRate The sample rate of the audio you going to feed into the recognizer
-     * @param {string[]} grammar The list of phrases to be recognized.
+     * @param {number} sampleRate The sample rate of the audio you going to feed into the recognizer
+     * @param {string[]=} grammar The list of phrases to be recognized.
      */
     constructor (model, sampleRate, grammar) {
         /**
