@@ -12,10 +12,10 @@ const vosk_spk_model_ptr = ref.refType(vosk_spk_model);
 const vosk_recognizer = ref.types.void;
 const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
-var soname;
-if (os.platform == 'win32') {
+let soname;
+if (os.platform() === 'win32') {
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
-} else if (os.platform == 'darwin') {
+} else if (os.platform() === 'darwin') {
     soname = path.join(__dirname, "lib", "osx-x86_64", "libvosk.dylib")
 } else {
     soname = path.join(__dirname, "lib", "linux-x86_64", "libvosk.so")
