@@ -22,14 +22,15 @@ if (os.platform() === 'win32') {
 }
 
 const libvosk = ffi.Library(soname, {
-  'vosk_set_log_level': [ 'void', [ 'int' ] ],
-  'vosk_model_new': [ vosk_model_ptr, [ 'string' ] ],
-  'vosk_model_free': [ 'void', [ vosk_model_ptr ] ],
-  'vosk_recognizer_new': [ vosk_recognizer_ptr, [ vosk_model_ptr, 'float' ] ],
-  'vosk_recognizer_free': [ 'void', [ vosk_recognizer_ptr ] ],
-  'vosk_recognizer_accept_waveform': [ 'bool', [ vosk_recognizer_ptr, 'pointer', 'int' ] ],
-  'vosk_recognizer_result': ['string', [vosk_recognizer_ptr ] ],
-  'vosk_recognizer_final_result': ['string', [vosk_recognizer_ptr ] ],
+    'vosk_set_log_level': [ 'void', [ 'int' ] ],
+    'vosk_model_new': [ vosk_model_ptr, [ 'string' ] ],
+    'vosk_model_free': [ 'void', [ vosk_model_ptr ] ],
+    'vosk_recognizer_new': [ vosk_recognizer_ptr, [ vosk_model_ptr, 'float' ] ],
+    'vosk_recognizer_free': [ 'void', [ vosk_recognizer_ptr ] ],
+    'vosk_recognizer_accept_waveform': [ 'bool', [ vosk_recognizer_ptr, 'pointer', 'int' ] ],
+    'vosk_recognizer_result': [ 'string', [ vosk_recognizer_ptr ] ],
+    'vosk_recognizer_partial_result': [ 'string', [ vosk_recognizer_ptr ] ],
+    'vosk_recognizer_final_result': [ 'string', [ vosk_recognizer_ptr ] ],
 });
 
 function setLogLevel(level) {
