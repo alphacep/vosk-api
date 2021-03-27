@@ -46,6 +46,7 @@ java/model/
 # CSharp
 *.dll
 *.so
+*.dylib
 *.nupkg
 csharp/demo/model
 csharp/demo/test.wav
