@@ -1,6 +1,11 @@
-apply plugin: "application"
+plugins {
+    id 'java-library'
+}
 
-mainClassName = "org.vosk.DecoderTest"
+jar {
+    archiveBaseName = 'vosk'
+    archiveVersion =  '0.3.31'
+}
 
 repositories {
     mavenCentral()
@@ -8,4 +13,5 @@ repositories {
 
 dependencies {
     implementation group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
+    testImplementation 'junit:junit:4.13'
 }

@@ -1,18 +1,25 @@
-package org.vosk;
+package org.vosk.test;
 
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.Test;
+import org.junit.Assert;
+
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.vosk.LogLevel;
+import org.vosk.Recognizer;
+import org.vosk.LibVosk;
+import org.vosk.Model;
 
 public class DecoderTest {
 
-
-    public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
+    @Test
+    public void decoderTest() throws IOException, UnsupportedAudioFileException {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
         try (Model model = new Model("model");
@@ -31,5 +38,6 @@ public class DecoderTest {
 
             System.out.println(recognizer.getFinalResult());
         }
+        Assert.assertTrue(true);
     }
 }
