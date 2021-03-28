@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
+archivesBaseName = 'vosk'
 group = 'com.alphacephei'
 version = '0.3.21'
 
