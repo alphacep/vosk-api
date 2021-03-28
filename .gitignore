@@ -37,11 +37,10 @@ python/test/result.txt
 python/test/wav.scp
 
 # Java
-*.so
-java/org
-java/*.cc
-java/model-spk/
-java/model/
+java/lib/model
+java/demo/model
+java/lib/build
+java/demo/build
 
 # CSharp
 *.dll
