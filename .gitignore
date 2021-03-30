@@ -1,22 +1,24 @@
-# Built application files
-*.apk
-*.ap_
-
-# Java class files
-*.class
-
 # Object files
 *.o
 
+# Temp files
+nohup.out
+
 # Gradle files
 .gradle/
-android/build/
 gradlew
 gradlew.bat
 gradle
-
-# Local configuration file (sdk path, etc)
 local.properties
+
+# Android
+android/build
+android/lib/build
+android/model-en/build
+android/model-en/src/main/assets/vosk-model-en
+android/repo
+*.apk
+*.ap_
 
 # Cmake
 .cxx
@@ -37,6 +39,7 @@ python/test/result.txt
 python/test/wav.scp
 
 # Java
+*.class
 java/lib/model
 java/demo/model
 java/lib/build

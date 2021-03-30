@@ -14,76 +14,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ "x$ANDROID_SDK_HOME" == "x" ]; then
-    echo "ANDROID_SDK_HOME environment variable is undefined, define it with local.properties or with export"
+if [ "x$ANDROID_NDK_HOME" == "x" ]; then
+    echo "ANDROID_NDK_HOME environment variable is undefined, define it with local.properties or with export"
     exit 1
 fi
 
-if [ ! -d "$ANDROID_SDK_HOME" ]; then
-    echo "ANDROID_SDK_HOME ($ANDROID_SDK_HOME) is missing. Make sure you have sdk installed"
-    exit 1
-fi
-
-if [ ! -d "$ANDROID_SDK_HOME/ndk-bundle" ]; then
-    echo "$ANDROID_SDK_HOME/ndk-bundle is missing. Make sure you have ndk installed within sdk"
+if [ ! -d "$ANDROID_NDK_HOME" ]; then
+    echo "ANDROID_NDK_HOME ($ANDROID_NDK_HOME) is missing. Make sure you have ndk installed"
     exit 1
 fi
 
 set -x
 
 OS_NAME=`echo $(uname -s) | tr '[:upper:]' '[:lower:]'`
-ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
 ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64
-WORKDIR_X86=`pwd`/build/kaldi_x86
-WORKDIR_X86_64=`pwd`/build/kaldi_x86_64
-WORKDIR_ARM32=`pwd`/build/kaldi_arm_32
-WORKDIR_ARM64=`pwd`/build/kaldi_arm_64
+WORKDIR_BASE=`pwd`/build
 PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin
 OPENFST_VERSION=1.8.0
 
-for arch in arm32 arm64 x86_64 x86; do
-#for arch in arm32; do
+for arch in armeabi-v7a arm64-v8a x86_64 x86; do
+
+WORKDIR=${WORKDIR_BASE}/kaldi_${arch}
 
 case $arch in
-    arm32)
+    armeabi-v7a)
           BLAS_ARCH=ARMV7
-          WORKDIR=$WORKDIR_ARM32
           HOST=arm-linux-androideabi
           AR=arm-linux-androideabi-ar
           CC=armv7a-linux-androideabi21-clang
           CXX=armv7a-linux-androideabi21-clang++
           ARCHFLAGS="-mfloat-abi=softfp -mfpu=neon"
-          ABI=armeabi-v7a
           ;;
-    arm64)
+    arm64-v8a)
           BLAS_ARCH=ARMV8
-          WORKDIR=$WORKDIR_ARM64
           HOST=aarch64-linux-android
           AR=aarch64-linux-android-ar
           CC=aarch64-linux-android21-clang
           CXX=aarch64-linux-android21-clang++
           ARCHFLAGS=""
-          ABI=arm64-v8a
           ;;
     x86_64)
           BLAS_ARCH=ATOM
-          WORKDIR=$WORKDIR_X86_64
           HOST=x86_64-linux-android
           AR=x86_64-linux-android-ar
           CC=x86_64-linux-android21-clang
           CXX=x86_64-linux-android21-clang++
           ARCHFLAGS=""
-          ABI=x86_64
           ;;
     x86)
           BLAS_ARCH=ATOM
-          WORKDIR=$WORKDIR_X86
           HOST=i686-linux-android
           AR=i686-linux-android-ar
           CC=i686-linux-android21-clang
           CXX=i686-linux-android21-clang++
           ARCHFLAGS=""
-          ABI=x86
           ;;
 esac
 
@@ -103,9 +87,9 @@ cmake -DCMAKE_C_FLAGS=$ARCHFLAGS -DCMAKE_C_COMPILER_TARGET=$HOST \
     -DCMAKE_C_COMPILER=$CC -DCMAKE_SYSTEM_NAME=Generic -DCMAKE_AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin/$AR \
     -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
     -DCMAKE_CROSSCOMPILING=True ..
-make -C F2CLIBS/libf2c
-make -C BLAS/SRC
-make -C SRC
+make -j 8 -C F2CLIBS/libf2c
+make -j 8 -C BLAS/SRC
+make -j 8 -C SRC
 find . -name "*.a" | xargs cp -t $WORKDIR/local/lib
 
 # tools directory --> we'll only compile OpenFST
@@ -123,9 +107,6 @@ make install
 cd $WORKDIR
 git clone -b android-mix --single-branch https://github.com/alphacep/kaldi
 cd $WORKDIR/kaldi/src
-if [ "`uname`" == "Darwin"  ]; then
-  sed -i.bak -e 's/libfst.dylib/libfst.a/' configure
-fi
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS_CLAPACK --shared \
     --android-incdir=${ANDROID_TOOLCHAIN_PATH}/sysroot/usr/include \
@@ -141,6 +122,6 @@ cd vosk-api/src
 make -j 8 KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
 
 # Copy JNI library to sources
-cp $WORKDIR/vosk-api/src/libvosk.so $WORKDIR/../../src/main/jniLibs/$ABI/libvosk.so
+cp $WORKDIR/vosk-api/src/libvosk.so $WORKDIR/../../src/main/jniLibs/$arch/libvosk.so
 
 done

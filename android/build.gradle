@@ -4,55 +4,55 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.3'
     }
 }
-
-def archiveName = "vosk-android"
-def libVersion = "0.3.17"
 
 allprojects {
-  repositories {
-      google()
-      jcenter()
-  }
+    version = '0.3.21'
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
+subprojects {
 
-android {
-    compileSdkVersion 29
-    defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 6
-        versionName = libVersion
-        archivesBaseName = archiveName
+    apply plugin: 'com.android.library'
+    apply plugin: 'maven-publish'
+
+    repositories {
+        google()
+        jcenter()
     }
-}
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-publishing {
-    publications {
-        aar(MavenPublication) {
-            groupId 'com.alphacep'
-            artifactId archiveName
-            version libVersion
-            artifact("$buildDir/outputs/aar/$archiveName-release.aar")
+    publishing {
+        publications {
+            aar(MavenPublication) {
+                groupId 'com.alphacep'
+                version version
+                pom {
+                    url = 'http://www.alphacephei.com.com/vosk/'
+                        licenses {
+                            license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'alphacephei'
+                            name = 'Alpha Cephei Inc'
+                            email = 'contact@alphacephei.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://github.com/alphacep/vosk-api.git'
+                        url = 'https://github.com/alphacep/vosk-api/'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                url = "$rootDir/repo"
+            }
         }
     }
 }
-
-task kaldi(type: Exec) {
-    commandLine './build-kaldi.sh'
-    environment ANDROID_SDK_HOME: android.getSdkDirectory()
-}
-
-dependencies {
-    implementation 'net.java.dev.jna:jna:4.4.0@aar'
-}
-
-//preBuild.dependsOn kaldi
