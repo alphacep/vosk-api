@@ -53,6 +53,7 @@ case $arch in
           CC=armv7a-linux-androideabi21-clang
           CXX=armv7a-linux-androideabi21-clang++
           ARCHFLAGS="-mfloat-abi=softfp -mfpu=neon"
+          ABI=armeabi-v7a
           ;;
     arm64)
           BLAS_ARCH=ARMV8
@@ -62,6 +63,7 @@ case $arch in
           CC=aarch64-linux-android21-clang
           CXX=aarch64-linux-android21-clang++
           ARCHFLAGS=""
+          ABI=arm64-v8a
           ;;
     x86_64)
           BLAS_ARCH=ATOM
@@ -71,6 +73,7 @@ case $arch in
           CC=x86_64-linux-android21-clang
           CXX=x86_64-linux-android21-clang++
           ARCHFLAGS=""
+          ABI=x86_64
           ;;
     x86)
           BLAS_ARCH=ATOM
@@ -80,9 +83,9 @@ case $arch in
           CC=i686-linux-android21-clang
           CXX=i686-linux-android21-clang++
           ARCHFLAGS=""
+          ABI=x86
           ;;
 esac
-
 
 mkdir -p $WORKDIR/local/lib
 
@@ -131,9 +134,13 @@ CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cu
 make -j 8 depend
 make -j 8 online2 lm
 
+# Vosk-api
 cd $WORKDIR
 git clone -b master --single-branch https://github.com/alphacep/vosk-api
 cd vosk-api/src
-make KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX
+make -j 8 KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
+
+# Copy JNI library to sources
+cp $WORKDIR/vosk-api/src/libvosk.so $WORKDIR/../../src/main/jniLibs/$ABI/libvosk.so
 
 done

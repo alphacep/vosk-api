@@ -210,11 +210,10 @@ public class SpeechService {
             while (!interrupted()
                     && ((timeoutSamples == NO_TIMEOUT) || (remainingSamples > 0))) {
                 int nread = recorder.read(buffer, 0, buffer.length);
-                byte[] tmp = new byte[nread];
                 if (nread < 0) {
                     throw new RuntimeException("error reading audio buffer");
                 } else {
-                    boolean isFinal = recognizer.acceptWaveForm(tmp, nread);
+                    boolean isFinal = recognizer.acceptWaveForm(buffer, nread);
                     if (isFinal) {
                         mainHandler.post(new ResultEvent(recognizer.getResult(), true));
                     } else {

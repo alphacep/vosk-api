@@ -6,7 +6,7 @@ import com.sun.jna.Pointer;
 public class LibVosk {
 
     static {
-        Native.register("vosk");
+        Native.register(LibVosk.class, "vosk");
     }
 
     public static native void vosk_set_log_level(int level);
@@ -24,6 +24,10 @@ public class LibVosk {
     public static native Pointer vosk_recognizer_new_spk(Pointer model, Pointer spkModel, float sample_rate);
 
     public static native boolean vosk_recognizer_accept_waveform(Pointer recognizer, byte[] data, int len);
+
+    public static native boolean vosk_recognizer_accept_waveform_s(Pointer recognizer, short[] data, int len);
+
+    public static native boolean vosk_recognizer_accept_waveform_f(Pointer recognizer, float[] data, int len);
 
     public static native String vosk_recognizer_result(Pointer recognizer);
 
