@@ -7,8 +7,12 @@ public class Recognizer extends PointerType implements AutoCloseable {
         super(LibVosk.vosk_recognizer_new(model, sampleRate));
     }
 
-    public Recognizer(Model model, SpeakerModel spkrModel, float sampleRate) {
-        super(LibVosk.vosk_recognizer_new_spk(model.getPointer(), spkrModel.getPointer(), sampleRate));
+    public Recognizer(Model model, SpeakerModel spkModel, float sampleRate) {
+        super(LibVosk.vosk_recognizer_new_spk(model.getPointer(), spkModel.getPointer(), sampleRate));
+    }
+
+    public Recognizer(Model model, float sampleRate, String grammar) {
+        super(LibVosk.vosk_recognizer_new_grm(model.getPointer(), sampleRate, grammar));
     }
 
     public boolean acceptWaveForm(byte[] data, int len) {
