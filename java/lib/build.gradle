@@ -51,3 +51,8 @@ publishing {
         }
     }
 }
+
+test {
+    dependsOn cleanTest
+    testLogging.showStandardStreams = true
+}
