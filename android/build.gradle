@@ -25,7 +25,7 @@ subprojects {
     publishing {
         publications {
             aar(MavenPublication) {
-                groupId 'com.alphacep'
+                groupId 'com.alphacephei'
                 version version
                 pom {
                     url = 'http://www.alphacephei.com.com/vosk/'
@@ -37,7 +37,7 @@ subprojects {
                     }
                     developers {
                         developer {
-                            id = 'alphacephei'
+                            id = 'com.alphacephei'
                             name = 'Alpha Cephei Inc'
                             email = 'contact@alphacephei.com'
                         }
