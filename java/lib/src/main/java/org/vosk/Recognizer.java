@@ -15,6 +15,14 @@ public class Recognizer extends PointerType implements AutoCloseable {
         return LibVosk.vosk_recognizer_accept_waveform(this.getPointer(), data, len);
     }
 
+    public boolean acceptWaveForm(short[] data, int len) {
+        return LibVosk.vosk_recognizer_accept_waveform_s(this.getPointer(), data, len);
+    }
+
+    public boolean acceptWaveForm(float[] data, int len) {
+        return LibVosk.vosk_recognizer_accept_waveform_f(this.getPointer(), data, len);
+    }
+
     public String getResult() {
         return LibVosk.vosk_recognizer_result(this.getPointer());
     }
