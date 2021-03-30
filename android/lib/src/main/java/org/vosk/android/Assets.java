@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.kaldi;
+package org.vosk.android;
 
 import java.io.BufferedReader;
 import java.io.File;

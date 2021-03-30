@@ -67,4 +67,27 @@ public class DecoderTest {
         }
         Assert.assertTrue(true);
     }
+
+    @Test
+    public void decoderTestGrammar() throws IOException, UnsupportedAudioFileException {
+        LibVosk.setLogLevel(LogLevel.DEBUG);
+
+        try (Model model = new Model("model");
+                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
+                    Recognizer recognizer = new Recognizer(model, 16000, "[\"one two three four five six seven eight nine zero oh\"]")) {
+
+            int nbytes;
+            byte[] b = new byte[4096];
+            while ((nbytes = ais.read(b)) >= 0) {
+                if (recognizer.acceptWaveForm(b, nbytes)) {
+                    System.out.println(recognizer.getResult());
+                } else {
+                    System.out.println(recognizer.getPartialResult());
+                }
+            }
+
+            System.out.println(recognizer.getFinalResult());
+        }
+        Assert.assertTrue(true);
+    }
 }

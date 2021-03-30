@@ -1,6 +1,6 @@
-def archiveName = "vosk-model-en"
-def pomName = "Vosk English Model"
-def pomDescription = "Small English model for Android"
+def archiveName = "vosk-android"
+def pomName = "Vosk Android"
+def pomDescription = "Vosk speech recognition library for Android"
 
 android {
     compileSdkVersion 29
@@ -12,6 +12,17 @@ android {
         archivesBaseName = archiveName
     }
 }
+
+task buildVosk(type: Exec) {
+    commandLine './build-vosk.sh'
+    environment ANDROID_NDK_HOME: android.getSdkDirectory()
+}
+
+dependencies {
+    implementation 'net.java.dev.jna:jna:4.4.0@aar'
+}
+
+//preBuild.dependsOn buildVosk
 
 publishing {
     publications {
