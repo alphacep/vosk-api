@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.kaldi;
+package org.vosk.android;
 
 import static java.lang.String.format;
 
@@ -28,6 +28,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import org.vosk.Model;
+import org.vosk.Recognizer;
+
 /**
  * Service that records audio in a thread, passes it to a recognizer and emits 
  * recognition results. Recognition events are passed to a client using
@@ -38,7 +41,7 @@ public class SpeechService {
 
     protected static final String TAG = SpeechService.class.getSimpleName();
 
-    private final KaldiRecognizer recognizer;
+    private final Recognizer recognizer;
 
     private final int sampleRate;
     private final static float BUFFER_SIZE_SECONDS = 0.4f;
@@ -57,7 +60,7 @@ public class SpeechService {
      * 
      * @throws IOException thrown if audio recorder can not be created for some reason.
      */
-    public SpeechService(KaldiRecognizer recognizer, float sampleRate) throws IOException {
+    public SpeechService(Recognizer recognizer, float sampleRate) throws IOException {
         this.recognizer = recognizer;
         this.sampleRate = (int)sampleRate;
 
@@ -148,7 +151,7 @@ public class SpeechService {
     public boolean stop() {
         boolean result = stopRecognizerThread();
         if (result) {
-            mainHandler.post(new ResultEvent(recognizer.Result(), true));
+            mainHandler.post(new ResultEvent(recognizer.getResult(), true));
         }
         return result;
     }
@@ -161,7 +164,7 @@ public class SpeechService {
      */
     public boolean cancel() {
         boolean result = stopRecognizerThread();
-        recognizer.Result(); // Reset recognizer state
+        recognizer.getResult(); // Reset recognizer state
         return result;
     }
     
@@ -207,15 +210,14 @@ public class SpeechService {
             while (!interrupted()
                     && ((timeoutSamples == NO_TIMEOUT) || (remainingSamples > 0))) {
                 int nread = recorder.read(buffer, 0, buffer.length);
-
                 if (nread < 0) {
                     throw new RuntimeException("error reading audio buffer");
                 } else {
-                    boolean isFinal = recognizer.AcceptWaveform(buffer, nread);
+                    boolean isFinal = recognizer.acceptWaveForm(buffer, nread);
                     if (isFinal) {
-                        mainHandler.post(new ResultEvent(recognizer.Result(), true));
+                        mainHandler.post(new ResultEvent(recognizer.getResult(), true));
                     } else {
-                        mainHandler.post(new ResultEvent(recognizer.PartialResult(), false));
+                        mainHandler.post(new ResultEvent(recognizer.getPartialResult(), false));
                     }
                 }
 
