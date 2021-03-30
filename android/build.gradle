@@ -4,13 +4,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.3'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
+        classpath 'com.android.tools.build:gradle:4.1.0'
     }
-}
-
-plugins {
-    id "com.jfrog.bintray" version "1.8.5"
 }
 
 def archiveName = "vosk-android"
@@ -34,48 +29,11 @@ android {
         versionCode 6
         versionName = libVersion
         archivesBaseName = archiveName
-        externalNativeBuild {
-            cmake {
-                arguments "-DCMAKE_VERBOSE_MAKEFILE=ON", "-DANDROID_ARM_NEON=TRUE", "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
-            }
-        }
-        ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64', 'x86'
-        }
-    }
-    sourceSets {
-         main {
-              java.srcDirs = ['src/main/java', 'build/generated-src']
-         }
-    }
-    externalNativeBuild {
-       cmake {
-           path "CMakeLists.txt"
-       }
     }
 }
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    pkg {
-        repo = 'vosk'
-        name = 'vosk-android'
-        userOrg = "alphacep"
-        licenses = ['Apache2.0']
-        websiteUrl = 'https://github.com/alphacep/vosk-api'
-        issueTrackerUrl = 'https://github.com/alphacep/vosk-api/issues'
-        vcsUrl = 'https://github.com/alphacep/vosk-api'
-        version {
-            name = libVersion
-            vcsTag = libVersion
-        }
-    }
-    publications = ['aar']
-}
 
 publishing {
     publications {
@@ -88,23 +46,13 @@ publishing {
     }
 }
 
-task swig {
-    doLast {
-        mkdir 'build/generated-src/java'
-        mkdir 'build/generated-src/cpp'
-        exec {
-            commandLine 'swig',
-            "-c++",
-            "-java", "-package", "org.kaldi",
-            "-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/vosk_wrap.cc",
-            "../src/vosk.i"
-        }
-    }
-}
-
 task kaldi(type: Exec) {
     commandLine './build-kaldi.sh'
     environment ANDROID_SDK_HOME: android.getSdkDirectory()
 }
 
-preBuild.dependsOn kaldi, swig
+dependencies {
+    implementation 'net.java.dev.jna:jna:4.4.0@aar'
+}
+
+//preBuild.dependsOn kaldi

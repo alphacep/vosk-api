@@ -4,13 +4,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.3'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
+        classpath 'com.android.tools.build:gradle:4.1.0'
     }
-}
-
-plugins {
-    id "com.jfrog.bintray"
 }
 
 def archiveName = "vosk-model-en"
@@ -35,28 +30,6 @@ android {
         versionName = libVersion
         archivesBaseName = archiveName
     }
-}
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    pkg {
-        repo = 'vosk'
-        name = 'vosk-model-en'
-        userOrg = "alphacep"
-        licenses = ['Apache2.0']
-        websiteUrl = 'https://github.com/alphacep/vosk-api'
-        issueTrackerUrl = 'https://github.com/alphacep/vosk-api/issues'
-        vcsUrl = 'https://github.com/alphacep/vosk-api'
-        version {
-            name = libVersion
-            vcsTag = libVersion
-        }
-    }
-    publications = ['aar']
 }
 
 publishing {
