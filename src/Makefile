@@ -7,6 +7,8 @@ EXT?=so
 CXX?=g++
 HAVE_OPENBLAS_CLAPACK=1
 HAVE_ACCELERATE=0
+EXTRA_CFLGAS?=
+EXTRA_LDFLAGS?=
 
 VOSK_SOURCES= \
 	kaldi_recognizer.cc \
@@ -15,7 +17,7 @@ VOSK_SOURCES= \
 	spk_model.cc \
 	vosk_api.cc
 
-CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING \
+CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING $(EXTRA_CFLAGS) \
 	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include -I$(OPENBLAS_ROOT)/include
 
 LIBS= \
@@ -60,7 +62,7 @@ endif
 all: libvosk.$(EXT)
 
 libvosk.$(EXT): $(VOSK_SOURCES:.cc=.o)
-	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic
+	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic $(EXTRA_LDFLAGS)
 
 %.o: %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $<
