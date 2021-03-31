@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.junit.Test;
 import org.junit.Assert;
@@ -25,6 +27,54 @@ public class DecoderTest {
         try (Model model = new Model("model");
                     InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
                     Recognizer recognizer = new Recognizer(model, 16000)) {
+
+            int nbytes;
+            byte[] b = new byte[4096];
+            while ((nbytes = ais.read(b)) >= 0) {
+                if (recognizer.acceptWaveForm(b, nbytes)) {
+                    System.out.println(recognizer.getResult());
+                } else {
+                    System.out.println(recognizer.getPartialResult());
+                }
+            }
+
+            System.out.println(recognizer.getFinalResult());
+        }
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void decoderTestShort() throws IOException, UnsupportedAudioFileException {
+        LibVosk.setLogLevel(LogLevel.DEBUG);
+
+        try (Model model = new Model("model");
+                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
+                    Recognizer recognizer = new Recognizer(model, 16000)) {
+
+            int nbytes;
+            byte[] b = new byte[4096];
+            short[] s = new short[2048];
+            while ((nbytes = ais.read(b)) >= 0) {
+                ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(s);
+                if (recognizer.acceptWaveForm(s, nbytes / 2)) {
+                    System.out.println(recognizer.getResult());
+                } else {
+                    System.out.println(recognizer.getPartialResult());
+                }
+            }
+
+            System.out.println(recognizer.getFinalResult());
+        }
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void decoderTestGrammar() throws IOException, UnsupportedAudioFileException {
+        LibVosk.setLogLevel(LogLevel.DEBUG);
+
+        try (Model model = new Model("model");
+                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
+                    Recognizer recognizer = new Recognizer(model, 16000, "[\"one two three four five six seven eight nine zero oh\"]")) {
 
             int nbytes;
             byte[] b = new byte[4096];

@@ -1,14 +1,12 @@
 package org.vosk;
 
 import com.sun.jna.Native;
-import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 
 public class LibVosk {
 
     static {
-
-        Native.register(Platform.isWindows() ? "libvosk" : "vosk");
+        Native.register(LibVosk.class, "vosk");
     }
 
     public static native void vosk_set_log_level(int level);
