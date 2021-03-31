@@ -8,7 +8,7 @@ public class LibVosk {
 
     static {
 
-        Native.register(Platform.isWindows() ? "libvosk" : "vosk");
+        Native.register(LibVosk.class, Platform.isWindows() ? "libvosk" : "vosk");
     }
 
     public static native void vosk_set_log_level(int level);
