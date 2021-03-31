@@ -36,7 +36,6 @@ public class VoskDemo
                 }
                 if (rec.AcceptWaveform(fbuffer, fbuffer.Length)) {
                     Console.WriteLine(rec.Result());
-                    GC.Collect();
                 } else {
                     Console.WriteLine(rec.PartialResult());
                 }

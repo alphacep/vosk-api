@@ -1,0 +1,58 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+archivesBaseName = 'vosk'
+group = 'com.alphacephei'
+version = '0.3.21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
+    testImplementation 'junit:junit:4.13'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'vosk'
+            from components.java
+            pom {
+                name = 'Vosk'
+                description = 'Speech recognition library'
+                url = 'http://www.alphacephei.com.com/vosk/'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'alphacephei'
+                        name = 'Alpha Cephei Inc'
+                        email = 'contact@alphacephei.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/alphacep/vosk-api.git'
+                    url = 'https://github.com/alphacep/vosk-api/'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = "$buildDir/repo"
+        }
+    }
+}
+
+test {
+    dependsOn cleanTest
+    testLogging.showStandardStreams = true
+}

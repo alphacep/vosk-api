@@ -1,0 +1,19 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'org.vosk.demo.DecoderDemo'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://alphacephei.com/maven/'
+    }
+}
+
+dependencies {
+    implementation group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
+    implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.21+'
+}

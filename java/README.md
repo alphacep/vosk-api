@@ -1,5 +1,7 @@
-Java Vosk API using jnr-ffi
+Java bindings for Vosk API using jnr-ffi
 
-Still needs classes to wrap C code
+See demo project for details, build it with Gradle.
 
-Run with simple gradle build. Unpack model and put libvosk library in current folder.
+Download model and unpack as "model" folder in the demo project.
+
+Make sure you are using recent JDK and Gradle.

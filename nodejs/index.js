@@ -51,7 +51,7 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
 /** @typedef {string[]} Grammar The list of strings to be recognized */
 
-var soname;
+let soname;
 if (os.platform() == 'win32') {
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
 } else if (os.platform() == 'darwin') {
