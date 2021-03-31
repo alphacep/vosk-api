@@ -160,7 +160,7 @@ class Recognizer {
      * @constructor
      * @param {Model} model The language model to be used 
      * @param {number} sampleRate The sample rate. Most models are trained at 16kHz
-     * @param {T=} grammarOrModel The SpeakerModel that will enable speaker identification, or the list of phrases to be recognized.
+     * @param {T=} option The SpeakerModel that will enable speaker identification, or the list of phrases to be recognized.
      *
      *  Sometimes when you want to improve recognition accuracy and when you don't need
      *  to recognize large vocabulary you can specify a list of phrases to recognize. This
@@ -170,17 +170,17 @@ class Recognizer {
      *  Only recognizers with lookahead models support this type of quick configuration.
      *  Precompiled HCLG graph models are not supported.
      */
-    constructor(model, sampleRate, grammarOrModel) {
+    constructor(model, sampleRate, option) {
         /**
          * Store the handle.
          * For internal use only
          * @type {unknown}
          */
-        this.handle = grammarOrModel instanceof SpeakerModel
-            ? libvosk.vosk_recognizer_new_spk(model.handle, grammarOrModel.handle, sampleRate)
-            : grammarOrModel
+        this.handle = option instanceof SpeakerModel
+            ? libvosk.vosk_recognizer_new_spk(model.handle, option.handle, sampleRate)
+            : option
                 ? libvosk.vosk_recognizer_new(model.handle, sampleRate)
-                : libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(grammarOrModel));
+                : libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(option));
     }
 
     /**
