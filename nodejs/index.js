@@ -1,3 +1,4 @@
+// @ts-check
 'use strict'
 
 /**
@@ -40,9 +41,9 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 /** @typedef {string[]} Grammar The list of strings to be recognized */
 
 var soname;
-if (os.platform == 'win32') {
+if (os.platform() == 'win32') {
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
-} else if (os.platform == 'darwin') {
+} else if (os.platform() == 'darwin') {
     soname = path.join(__dirname, "lib", "osx-x86_64", "libvosk.dylib")
 } else {
     soname = path.join(__dirname, "lib", "linux-x86_64", "libvosk.so")
@@ -56,7 +57,7 @@ const libvosk = ffi.Library(soname, {
     'vosk_spk_model_free': ['void', [vosk_spk_model_ptr]],
     'vosk_recognizer_new': [vosk_recognizer_ptr, [vosk_model_ptr, 'float']],
     'vosk_recognizer_new_spk': [vosk_recognizer_ptr, [vosk_model_ptr, vosk_spk_model_ptr, 'float']],
-    'vosk_recognizer_new_grm': [vosk_recognizer_ptr, [vosk_model_ptr, 'float', string]],
+    'vosk_recognizer_new_grm': [vosk_recognizer_ptr, [vosk_model_ptr, 'float', 'string']],
     'vosk_recognizer_free': ['void', [vosk_recognizer_ptr]],
     'vosk_recognizer_accept_waveform': ['bool', [vosk_recognizer_ptr, 'pointer', 'int']],
     'vosk_recognizer_result': ['string', [vosk_recognizer_ptr]],
@@ -68,22 +69,22 @@ const libvosk = ffi.Library(soname, {
  * Set log level for Kaldi messages
  * @param {number} level The higher, the more verbose. 0 for infos and errors. Less than 0 for silence. 
  */
-function setLogLevel (level) {
+function setLogLevel(level) {
     libvosk.vosk_set_log_level(level);
 }
 
 /**
  * Build a Model from a model file.
- * @see [models](https://alphacephei.com/vosk/models)
+ * @see models [models](https://alphacephei.com/vosk/models)
  */
 class Model {
     /**
      * Build a Model to be used with the voice recognition. Each language should have it's own Model
      * for the speech recognition to work.
      * @param {string} modelPath The abstract pathname to the model
-     * @see [models](https://alphacephei.com/vosk/models)
+     * @see models [models](https://alphacephei.com/vosk/models)
      */
-    constructor (modelPath) {
+    constructor(modelPath) {
         /**
          * Store the handle.
          * For internal use only
@@ -99,7 +100,7 @@ class Model {
      * depends on this model, model might still stay alive. When
      * last recognizer is released, model will be released too.
      */
-     free () {
+    free() {
         libvosk.vosk_model_free(this.handle);
     }
 }
@@ -107,16 +108,16 @@ class Model {
 /**
  * Build a Speaker Model from a speaker model file.
  * The Speaker Model enables speaker identification.
- * @see [models](https://alphacephei.com/vosk/models)
+ * @see models [models](https://alphacephei.com/vosk/models)
  */
 class SpeakerModel {
     /**
      * Loads speaker model data from the file and returns the model object
      *
      * @param {string} modelPath the path of the model on the filesystem
-     * @see [models](https://alphacephei.com/vosk/models)
+     * @see models [models](https://alphacephei.com/vosk/models)
      */
-    constructor (modelPath) {
+    constructor(modelPath) {
         /**
          * Store the handle.
          * For internal use only
@@ -138,7 +139,7 @@ class SpeakerModel {
      * depends on this model, model might still stay alive. When
      * last recognizer is released, model will be released too.
      */
-     free () {
+    free() {
         libvosk.vosk_spk_model_free(this.handle);
     }
 }
@@ -147,38 +148,38 @@ class SpeakerModel {
  * Create a Recognizer that will be able to transform audio streams into text using a Model.
  * @see Model
  */
- class Recognizer {
+class Recognizer {
     /**
      * Create a Recognizer that will handle speech to text recognition.
      * @constructor
      * @param {Model | SpeakerModel} model The language model to be used 
      * @param {number} sampleRate The sample rate. Most models are trained at 16kHz
      *//** Creates the recognizer object with the phrase list
-     *
-     *  Sometimes when you want to improve recognition accuracy and when you don't need
-     *  to recognize large vocabulary you can specify a list of phrases to recognize. This
-     *  will improve recognizer speed and accuracy but might return [unk] if user said
-     *  something different.
-     *
-     *  Only recognizers with lookahead models support this type of quick configuration.
-     *  Precompiled HCLG graph models are not supported.
-     *
-     * @constructor
-     * @param {Model | SpeakerModel} model The language model to be used 
-     * @param {number} sampleRate The sample rate of the audio you going to feed into the recognizer
-     * @param {string[]=} grammar The list of phrases to be recognized.
-     */
-    constructor (model, sampleRate, grammar) {
+*
+*  Sometimes when you want to improve recognition accuracy and when you don't need
+*  to recognize large vocabulary you can specify a list of phrases to recognize. This
+*  will improve recognizer speed and accuracy but might return [unk] if user said
+*  something different.
+*
+*  Only recognizers with lookahead models support this type of quick configuration.
+*  Precompiled HCLG graph models are not supported.
+*
+* @constructor
+* @param {Model | SpeakerModel} model The language model to be used 
+* @param {number} sampleRate The sample rate of the audio you going to feed into the recognizer
+* @param {string[]=} grammar The list of phrases to be recognized.
+*/
+    constructor(model, sampleRate, grammar) {
         /**
          * Store the handle.
          * For internal use only
          * @type {unknown}
          */
-       this.handle = model instanceof SpeakerModel
+        this.handle = model instanceof SpeakerModel
             ? libvosk.vosk_recognizer_new_spk(model.model, model.handle, sampleRate)
             : grammar
-            ? libvosk.vosk_recognizer_new(model.handle, sampleRate)
-            : libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(grammar));
+                ? libvosk.vosk_recognizer_new(model.handle, sampleRate)
+                : libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(grammar));
     }
 
     /**
@@ -188,7 +189,7 @@ class SpeakerModel {
      * depends on this model, model might still stay alive. When
      * last recognizer is released, model will be released too.
      */
-    free () {
+    free() {
         libvosk.vosk_recognizer_free(this.handle);
     }
 
@@ -200,7 +201,7 @@ class SpeakerModel {
      * @param {Buffer} data audio data in PCM 16-bit mono format
      * @returns true if silence is occured and you can retrieve a new utterance with result method
      */
-    acceptWaveform (data) {
+    acceptWaveform(data) {
         return libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
     };
 
@@ -243,7 +244,7 @@ class SpeakerModel {
      *  }
      * </pre>
      */
-    result () {
+    result() {
         return libvosk.vosk_recognizer_result(this.handle);
     };
 
@@ -251,7 +252,7 @@ class SpeakerModel {
      * Returns speech recognition results
      * @returns {RecognitionResults} The results
      */
-    resultObject () {
+    resultObject() {
         return JSON.parse(libvosk.vosk_recognizer_result(this.handle));
     };
 
@@ -284,7 +285,7 @@ class SpeakerModel {
      * @deprecated Use {@link Recognizer#finalResultObject} to retrieve the correct data type
      * @returns {string} speech result in JSON format.
      */
-    finalResult () {
+    finalResult() {
         return libvosk.vosk_recognizer_final_result(this.handle);
     };
 
@@ -295,7 +296,7 @@ class SpeakerModel {
      *
      * @returns {RecognitionResults} speech result.
      */
-    finalResultObject () {
+    finalResultObject() {
         return JSON.parse(libvosk.vosk_recognizer_final_result(this.handle));
     };
 }
