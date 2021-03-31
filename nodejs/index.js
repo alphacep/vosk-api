@@ -34,6 +34,17 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
  */
 
 /**
+ * @typedef {Object} SpeakerResults
+ * @property {number[]} spk Speaker vectors... Whatever that might mean 
+ * @property {number} spk_frames Speaker frames... I suppose
+ */
+
+/**
+ * @template {string[] | SpeakerModel | undefined} T
+ * @typedef {T extends SpeakerModel ? SpeakerResults & RecognitionResults : RecognitionResults} Result
+ */
+
+/**
  * @typedef {Object} PartialResults
  * @property {string} partial The partial sentence that have been detected until now
  */
@@ -124,12 +135,6 @@ class SpeakerModel {
          * @type {unknown}
          */
         this.handle = libvosk.vosk_spk_model_new(modelPath);
-        /**
-         * Store the Model.
-         * For internal use only
-         * @type {Model}
-         */
-        this.model = new Model(modelPath)
     }
 
     /**
@@ -146,40 +151,36 @@ class SpeakerModel {
 
 /**
  * Create a Recognizer that will be able to transform audio streams into text using a Model.
+ * @template {string[] | SpeakerModel | undefined} T extra parameter
  * @see Model
  */
 class Recognizer {
     /**
      * Create a Recognizer that will handle speech to text recognition.
      * @constructor
-     * @param {Model | SpeakerModel} model The language model to be used 
+     * @param {Model} model The language model to be used 
      * @param {number} sampleRate The sample rate. Most models are trained at 16kHz
-     *//** Creates the recognizer object with the phrase list
-*
-*  Sometimes when you want to improve recognition accuracy and when you don't need
-*  to recognize large vocabulary you can specify a list of phrases to recognize. This
-*  will improve recognizer speed and accuracy but might return [unk] if user said
-*  something different.
-*
-*  Only recognizers with lookahead models support this type of quick configuration.
-*  Precompiled HCLG graph models are not supported.
-*
-* @constructor
-* @param {Model | SpeakerModel} model The language model to be used 
-* @param {number} sampleRate The sample rate of the audio you going to feed into the recognizer
-* @param {string[]=} grammar The list of phrases to be recognized.
-*/
-    constructor(model, sampleRate, grammar) {
+     * @param {T=} grammarOrModel The SpeakerModel that will enable speaker identification, or the list of phrases to be recognized.
+     *
+     *  Sometimes when you want to improve recognition accuracy and when you don't need
+     *  to recognize large vocabulary you can specify a list of phrases to recognize. This
+     *  will improve recognizer speed and accuracy but might return [unk] if user said
+     *  something different.
+     *
+     *  Only recognizers with lookahead models support this type of quick configuration.
+     *  Precompiled HCLG graph models are not supported.
+     */
+    constructor(model, sampleRate, grammarOrModel) {
         /**
          * Store the handle.
          * For internal use only
          * @type {unknown}
          */
-        this.handle = model instanceof SpeakerModel
-            ? libvosk.vosk_recognizer_new_spk(model.model, model.handle, sampleRate)
-            : grammar
+        this.handle = grammarOrModel instanceof SpeakerModel
+            ? libvosk.vosk_recognizer_new_spk(model.handle, grammarOrModel.handle, sampleRate)
+            : grammarOrModel
                 ? libvosk.vosk_recognizer_new(model.handle, sampleRate)
-                : libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(grammar));
+                : libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(grammarOrModel));
     }
 
     /**
@@ -250,7 +251,7 @@ class Recognizer {
 
     /**
      * Returns speech recognition results
-     * @returns {RecognitionResults} The results
+     * @returns {Result<T>} The results
      */
     resultObject() {
         return JSON.parse(libvosk.vosk_recognizer_result(this.handle));
@@ -294,7 +295,7 @@ class Recognizer {
      * You usually call it in the end of the stream to get final bits of audio. It
      * flushes the feature pipeline, so all remaining audio chunks got processed.
      *
-     * @returns {RecognitionResults} speech result.
+     * @returns {Result<T>} speech result.
      */
     finalResultObject() {
         return JSON.parse(libvosk.vosk_recognizer_final_result(this.handle));
