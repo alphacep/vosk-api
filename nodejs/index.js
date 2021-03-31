@@ -35,8 +35,8 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
 /**
  * @typedef {Object} SpeakerResults
- * @property {number[]} spk Speaker vectors... Whatever that might mean 
- * @property {number} spk_frames Speaker frames... I suppose
+ * @property {number[]} spk A floating vector representing speaker identity. It is usually about 128 numbers which uniquely represent speaker voice.
+ * @property {number} spk_frames The number of frames used to extract speaker vector. The more frames you have the more reliable is speaker vector.
  */
 
 /**
