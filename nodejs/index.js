@@ -47,7 +47,7 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
 /**
  * @typedef {Object} GrammarRecognizerParam
- * @property {string[]?} grammar The list of sentences to be recognized.
+ * @property {string[]} grammar The list of sentences to be recognized.
  */
 
 /**
@@ -192,7 +192,7 @@ function hasOwnProperty(obj, prop) {
 
 /**
  * Create a Recognizer that will be able to transform audio streams into text using a Model.
- * @template {XOR<SpeakerRecognizerParam, GrammarRecognizerParam>} T extra parameter
+ * @template {XOR<SpeakerRecognizerParam, Partial<GrammarRecognizerParam>>} T extra parameter
  * @see Model
  */
 class Recognizer {
