@@ -250,13 +250,11 @@ class Recognizer {
         return libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
     };
 
-    /** Returns speech recognition result
+    /** Returns speech recognition result in a string
      *
-     * @deprecated Use {@link Recognizer#resultObject} to retrieve the correct data type
      * @returns the result in JSON format which contains decoded line, decoded
      *          words, times in seconds and confidences. You can parse this result
      *          with any json parser
-     *
      * <pre>
      * {
      *   "result" : [{
@@ -289,7 +287,7 @@ class Recognizer {
      *  }
      * </pre>
      */
-    result() {
+    resultString() {
         return libvosk.vosk_recognizer_result(this.handle);
     };
 
@@ -297,7 +295,7 @@ class Recognizer {
      * Returns speech recognition results
      * @returns {Result<T>} The results
      */
-    resultObject() {
+    result() {
         return JSON.parse(libvosk.vosk_recognizer_result(this.handle));
     };
 
@@ -307,7 +305,7 @@ class Recognizer {
      * 
      * @returns {PartialResults} The partial results
      */
-    partialResult = function () {
+    partialResult() {
         return JSON.parse(libvosk.vosk_recognizer_partial_result(this.handle));
     };
 

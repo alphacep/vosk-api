@@ -6,7 +6,7 @@ const wav = require("wav");
 
 vosk.setLogLevel(0);
 const model = new vosk.Model("model");
-const rec = new vosk.Recognizer(model, 16000.0);
+const rec = new vosk.Recognizer({model: model, sampleRate: 16000.0});
 
 const wfStream = fs.createReadStream("test.wav", {'highWaterMark': 4096});
 const wfReader = new wav.Reader();
