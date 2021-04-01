@@ -40,8 +40,24 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
  */
 
 /**
- * @template {string[] | SpeakerModel | undefined} T
- * @typedef {T extends SpeakerModel ? SpeakerResults & RecognitionResults : RecognitionResults} Result
+ * @typedef {Object} BaseRecognizerParam
+ * @property {Model} model The language model to be used 
+ * @property {number} sampleRate The sample rate. Most models are trained at 16kHz
+ */
+
+/**
+ * @typedef {Object} GrammarRecognizerParam
+ * @property {string[]?} grammar The list of sentences to be recognized.
+ */
+
+/**
+ * @typedef {Object} SpeakerRecognizerParam
+ * @property {SpeakerModel} speakerModel The SpeakerModel that will enable speaker identification
+ */
+
+/**
+ * @template {SpeakerRecognizerParam | GrammarRecognizerParam} T
+ * @typedef {T extends SpeakerRecognizerParam ? SpeakerResults & RecognitionResults : RecognitionResults} Result
  */
 
 /**
@@ -150,17 +166,40 @@ class SpeakerModel {
 }
 
 /**
+ * Helper to narrow down type while using `hasOwnProperty`.
+ * @see hasOwnProperty [typescript issue](https://fettblog.eu/typescript-hasownproperty/)
+ * @template {Object} Obj
+ * @template {PropertyKey} Key
+ * @param {Obj} obj 
+ * @param {Key} prop 
+ * @returns {obj is Obj & Record<Key, unknown>}
+ */
+function hasOwnProperty(obj, prop) {
+    return obj.hasOwnProperty(prop)
+}
+
+/**
+ * @template T
+ * @template U
+ * @typedef {{ [P in Exclude<keyof T, keyof U>]?: never }} Without
+ */
+
+/**
+ * @template T
+ * @template U
+ * @typedef {(T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U} XOR
+ */
+
+/**
  * Create a Recognizer that will be able to transform audio streams into text using a Model.
- * @template {string[] | SpeakerModel | undefined} T extra parameter
+ * @template {XOR<SpeakerRecognizerParam, GrammarRecognizerParam>} T extra parameter
  * @see Model
  */
 class Recognizer {
     /**
      * Create a Recognizer that will handle speech to text recognition.
      * @constructor
-     * @param {Model} model The language model to be used 
-     * @param {number} sampleRate The sample rate. Most models are trained at 16kHz
-     * @param {T=} option The SpeakerModel that will enable speaker identification, or the list of phrases to be recognized.
+     * @param {T & BaseRecognizerParam} param The Recognizer parameters 
      *
      *  Sometimes when you want to improve recognition accuracy and when you don't need
      *  to recognize large vocabulary you can specify a list of phrases to recognize. This
@@ -170,17 +209,22 @@ class Recognizer {
      *  Only recognizers with lookahead models support this type of quick configuration.
      *  Precompiled HCLG graph models are not supported.
      */
-    constructor(model, sampleRate, option) {
+    constructor(param) {
+        const { model, sampleRate } = param
+        // Prevent the user to receive unpredictable results
+        if (hasOwnProperty(param, 'speakerModel') && hasOwnProperty(param, 'grammar')) {
+            throw new Error('grammar and speakerModel cannot be used together for now.')
+        }
         /**
          * Store the handle.
          * For internal use only
          * @type {unknown}
          */
-        this.handle = option instanceof SpeakerModel
-            ? libvosk.vosk_recognizer_new_spk(model.handle, option.handle, sampleRate)
-            : option
-                ? libvosk.vosk_recognizer_new(model.handle, sampleRate)
-                : libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(option));
+        this.handle = hasOwnProperty(param, 'speakerModel')
+            ? libvosk.vosk_recognizer_new_spk(model.handle, param.speakerModel, sampleRate)
+            : hasOwnProperty(param, 'grammar')
+                ? libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(param.grammar))
+                : libvosk.vosk_recognizer_new(model.handle, sampleRate);
     }
 
     /**
@@ -261,33 +305,10 @@ class Recognizer {
      * speech recognition text which is not yet finalized.
      * result may change as recognizer process more data.
      * 
-     * @deprecated Use {@link Recognizer#partialResultObject} to retrieve the correct data type
-     * @returns {string} The partial result in JSON format
-     */
-    partialResult = function () {
-        return libvosk.vosk_recognizer_partial_result(this.handle);
-    };
-
-    /**
-     * speech recognition text which is not yet finalized.
-     * result may change as recognizer process more data.
-     * 
      * @returns {PartialResults} The partial results
      */
-    partialResultObject = function () {
+    partialResult = function () {
         return JSON.parse(libvosk.vosk_recognizer_partial_result(this.handle));
-    };
-
-    /** 
-     * Returns speech recognition result. Same as result, but doesn't wait for silence
-     * You usually call it in the end of the stream to get final bits of audio. It
-     * flushes the feature pipeline, so all remaining audio chunks got processed.
-     *
-     * @deprecated Use {@link Recognizer#finalResultObject} to retrieve the correct data type
-     * @returns {string} speech result in JSON format.
-     */
-    finalResult() {
-        return libvosk.vosk_recognizer_final_result(this.handle);
     };
 
     /** 
@@ -297,7 +318,7 @@ class Recognizer {
      *
      * @returns {Result<T>} speech result.
      */
-    finalResultObject() {
+    finalResult() {
         return JSON.parse(libvosk.vosk_recognizer_final_result(this.handle));
     };
 }
