@@ -14,55 +14,43 @@
 
 package org.vosk.android;
 
-import static java.lang.String.format;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
-import org.vosk.Model;
 import org.vosk.Recognizer;
 
+import java.io.IOException;
+
 /**
- * Service that records audio in a thread, passes it to a recognizer and emits 
+ * Service that records audio in a thread, passes it to a recognizer and emits
  * recognition results. Recognition events are passed to a client using
  * {@link RecognitionListener}
- *
  */
 public class SpeechService {
-
-    protected static final String TAG = SpeechService.class.getSimpleName();
 
     private final Recognizer recognizer;
 
     private final int sampleRate;
-    private final static float BUFFER_SIZE_SECONDS = 0.4f;
-    private int bufferSize;
+    private final static float BUFFER_SIZE_SECONDS = 0.2f;
+    private final int bufferSize;
     private final AudioRecord recorder;
-    
-    private Thread recognizerThread;
+
+    private RecognizerThread recognizerThread;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    
-    private final Collection<RecognitionListener> listeners = new HashSet<RecognitionListener>();
-    
+
     /**
-     * Creates speech service. Service holds the AudioRecord object, so you 
-     * need to call {@link release} in order to properly finalize it.
-     * 
+     * Creates speech service. Service holds the AudioRecord object, so you
+     * need to call {@link #shutdown()} in order to properly finalize it.
+     *
      * @throws IOException thrown if audio recorder can not be created for some reason.
      */
     public SpeechService(Recognizer recognizer, float sampleRate) throws IOException {
         this.recognizer = recognizer;
-        this.sampleRate = (int)sampleRate;
+        this.sampleRate = (int) sampleRate;
 
         bufferSize = Math.round(this.sampleRate * BUFFER_SIZE_SECONDS);
         recorder = new AudioRecord(
@@ -77,34 +65,17 @@ public class SpeechService {
         }
     }
 
-    /**
-     * Adds listener.
-     */
-    public void addListener(RecognitionListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
-    }
-
-    /**
-     * Removes listener.
-     */
-    public void removeListener(RecognitionListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
-    }
 
     /**
      * Starts recognition. Does nothing if recognition is active.
-     * 
+     *
      * @return true if recognition was actually started
      */
-    public boolean startListening() {
+    public boolean startListening(RecognitionListener listener) {
         if (null != recognizerThread)
             return false;
 
-        recognizerThread = new RecognizerThread();
+        recognizerThread = new RecognizerThread(listener);
         recognizerThread.start();
         return true;
     }
@@ -112,16 +83,16 @@ public class SpeechService {
     /**
      * Starts recognition. After specified timeout listening stops and the
      * endOfSpeech signals about that. Does nothing if recognition is active.
-     * 
-     * @timeout - timeout in milliseconds to listen.
-     * 
+     * <p>
+     * timeout - timeout in milliseconds to listen.
+     *
      * @return true if recognition was actually started
      */
-    public boolean startListening(int timeout) {
+    public boolean startListening(RecognitionListener listener, int timeout) {
         if (null != recognizerThread)
             return false;
 
-        recognizerThread = new RecognizerThread(timeout);
+        recognizerThread = new RecognizerThread(listener, timeout);
         recognizerThread.start();
         return true;
     }
@@ -143,31 +114,28 @@ public class SpeechService {
     }
 
     /**
-     * Stops recognition. All listeners should receive final result if there is
+     * Stops recognition. Listener should receive final result if there is
      * any. Does nothing if recognition is not active.
-     * 
+     *
      * @return true if recognition was actually stopped
      */
     public boolean stop() {
-        boolean result = stopRecognizerThread();
-        if (result) {
-            mainHandler.post(new ResultEvent(recognizer.getResult(), true));
-        }
-        return result;
+        return stopRecognizerThread();
     }
 
     /**
-     * Cancels recognition. Listeners do not receive final result. Does nothing
-     * if recognition is not active.
-     * 
-     * @return true if recognition was actually canceled
+     * Cancel recognition. Do not post any new events, simply cancel processing.
+     * Does nothing if recognition is not active.
+     *
+     * @return true if recognition was actually stopped
      */
     public boolean cancel() {
-        boolean result = stopRecognizerThread();
-        recognizer.getResult(); // Reset recognizer state
-        return result;
+        if (recognizerThread != null) {
+            recognizerThread.setPause(true);
+        }
+        return stopRecognizerThread();
     }
-    
+
     /**
      * Shutdown the recognizer and release the recorder
      */
@@ -175,13 +143,23 @@ public class SpeechService {
         recorder.release();
     }
 
+    public void setPause(boolean paused) {
+        if (recognizerThread != null) {
+            recognizerThread.setPause(paused);
+        }
+    }
+
     private final class RecognizerThread extends Thread {
 
         private int remainingSamples;
-        private int timeoutSamples;
+        private final int timeoutSamples;
         private final static int NO_TIMEOUT = -1;
+        private volatile boolean paused = false;
 
-        public RecognizerThread(int timeout) {
+        RecognitionListener listener;
+
+        public RecognizerThread(RecognitionListener listener, int timeout) {
+            this.listener = listener;
             if (timeout != NO_TIMEOUT)
                 this.timeoutSamples = timeout * sampleRate / 1000;
             else
@@ -189,8 +167,18 @@ public class SpeechService {
             this.remainingSamples = this.timeoutSamples;
         }
 
-        public RecognizerThread() {
-            this(NO_TIMEOUT);
+        public RecognizerThread(RecognitionListener listener) {
+            this(listener, NO_TIMEOUT);
+        }
+
+        /**
+         * When we are paused, don't process audio by the recognizer and don't emit
+         * any listener results
+         *
+         * @param paused the status of pause
+         */
+        public void setPause(boolean paused) {
+            this.paused = paused;
         }
 
         @Override
@@ -201,8 +189,7 @@ public class SpeechService {
                 recorder.stop();
                 IOException ioe = new IOException(
                         "Failed to start recording. Microphone might be already in use.");
-                mainHandler.post(new OnErrorEvent(ioe));
-                return;
+                mainHandler.post(() -> listener.onError(ioe));
             }
 
             short[] buffer = new short[bufferSize];
@@ -210,15 +197,20 @@ public class SpeechService {
             while (!interrupted()
                     && ((timeoutSamples == NO_TIMEOUT) || (remainingSamples > 0))) {
                 int nread = recorder.read(buffer, 0, buffer.length);
-                if (nread < 0) {
+
+                if (paused) {
+                    continue;
+                }
+
+                if (nread < 0)
                     throw new RuntimeException("error reading audio buffer");
+
+                if (recognizer.acceptWaveForm(buffer, nread)) {
+                    final String result = recognizer.getResult();
+                    mainHandler.post(() -> listener.onResult(result));
                 } else {
-                    boolean isFinal = recognizer.acceptWaveForm(buffer, nread);
-                    if (isFinal) {
-                        mainHandler.post(new ResultEvent(recognizer.getResult(), true));
-                    } else {
-                        mainHandler.post(new ResultEvent(recognizer.getPartialResult(), false));
-                    }
+                    final String partialResult = recognizer.getPartialResult();
+                    mainHandler.post(() -> listener.onPartialResult(partialResult));
                 }
 
                 if (timeoutSamples != NO_TIMEOUT) {
@@ -228,61 +220,16 @@ public class SpeechService {
 
             recorder.stop();
 
-            // Remove all pending notifications.
-            mainHandler.removeCallbacksAndMessages(null);
-
-            // If we met timeout signal that speech ended
-            if (timeoutSamples != NO_TIMEOUT && remainingSamples <= 0) {
-                mainHandler.post(new TimeoutEvent());
+            if (!paused) {
+                // If we met timeout signal that speech ended
+                if (timeoutSamples != NO_TIMEOUT && remainingSamples <= 0) {
+                    mainHandler.post(() -> listener.onTimeout());
+                } else {
+                    final String finalResult = recognizer.getFinalResult();
+                    mainHandler.post(() -> listener.onFinalResult(finalResult));
+                }
             }
-        }
-    }
 
-    private abstract class RecognitionEvent implements Runnable {
-        public void run() {
-            RecognitionListener[] emptyArray = new RecognitionListener[0];
-            for (RecognitionListener listener : listeners.toArray(emptyArray))
-                execute(listener);
-        }
-
-        protected abstract void execute(RecognitionListener listener);
-    }
-
-    private class ResultEvent extends RecognitionEvent {
-        protected final String hypothesis;
-        private final boolean finalResult;
-
-        ResultEvent(String hypothesis, boolean finalResult) {
-            this.hypothesis = hypothesis;
-            this.finalResult = finalResult;
-        }
-
-        @Override
-        protected void execute(RecognitionListener listener) {
-            if (finalResult)
-                listener.onResult(hypothesis);
-            else
-                listener.onPartialResult(hypothesis);
-        }
-    }
-
-    private class OnErrorEvent extends RecognitionEvent {
-        private final Exception exception;
-
-        OnErrorEvent(Exception exception) {
-            this.exception = exception;
-        }
-
-        @Override
-        protected void execute(RecognitionListener listener) {
-            listener.onError(exception);
-        }
-    }
-
-    private class TimeoutEvent extends RecognitionEvent {
-        @Override
-        protected void execute(RecognitionListener listener) {
-            listener.onTimeout();
         }
     }
 }
