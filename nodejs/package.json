@@ -1,6 +1,6 @@
 {
   "name": "vosk",
-  "version": "0.3.23",
+  "version": "0.3.24",
   "description": "Node binding for continuous offline voice recoginition with Vosk library.",
   "repository": {
     "type": "git",
@@ -18,8 +18,8 @@
     "node": ">= 12.x.x"
   },
   "dependencies": {
-    "ffi-napi": "^3.1.0",
-    "ref-napi": "^3.0.0",
+    "ffi-napi": "^4.0.3",
+    "ref-napi": ">=2.0.0",
     "wav": "^1.0.2"
   }
 }
