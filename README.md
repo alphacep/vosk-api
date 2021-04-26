@@ -1,3 +1,4 @@
+EN | [FA](README-FA.md)
 # About
 
 Vosk is an offline open source speech recognition toolkit. It enables
