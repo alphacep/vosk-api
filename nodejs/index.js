@@ -250,6 +250,26 @@ class Recognizer {
         return libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
     };
 
+    /** 
+     * Accept voice data
+     *
+     * accept and process new chunk of voice data
+     *
+     * @param {Buffer} data audio data in PCM 16-bit mono format
+     * @returns true if silence is occured and you can retrieve a new utterance with result method
+     */
+    acceptWaveformAsync(data) {
+        return new Promise((resolve, reject) => {
+            libvosk.vosk_recognizer_accept_waveform.async(this.handle, data, data.length, function(err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    };
+
     /** Returns speech recognition result in a string
      *
      * @returns the result in JSON format which contains decoded line, decoded
