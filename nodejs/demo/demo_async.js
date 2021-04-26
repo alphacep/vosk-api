@@ -9,16 +9,18 @@ const wav = require("wav");
 files = ["test.wav", "test.wav", "test.wav", "test.wav"]
 const model = new vosk.Model("model");
 
-async.filter(files, function(filePath) {
-    const rec = new vosk.Recognizer({model: model, sampleRate: 16000.0});
+async.filter(files, function(filePath, callback) {
     const wfStream = fs.createReadStream("test.wav", {'highWaterMark': 4096});
     const wfReader = new wav.Reader();
+    const wfReadable = new Readable().wrap(wfReader);
+
     wfReader.on('format', async ({ audioFormat, sampleRate, channels }) => {
+        const rec = new vosk.Recognizer({model: model, sampleRate: sampleRate});
         if (audioFormat != 1 || channels != 1) {
             console.error("Audio file must be WAV format mono PCM.");
             process.exit(1);
         }
-        for await (const data of new Readable().wrap(wfReader)) {
+        for await (const data of wfReadable) {
             const end_of_speech = await rec.acceptWaveformAsync(data);
             if (end_of_speech) {
                   console.log(rec.result());
@@ -26,10 +28,11 @@ async.filter(files, function(filePath) {
         }
         console.log(rec.finalResult(rec));
         rec.free();
+        // Signal we are done without errors
+        callback(null, true);
     });
     wfStream.pipe(wfReader);
-},
-function(err, results) {
-    console.log("Done!");
+}, function(err, results) {
     model.free();
+    console.log("Done!!!!!");
 });
