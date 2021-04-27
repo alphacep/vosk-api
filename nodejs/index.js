@@ -221,7 +221,7 @@ class Recognizer {
          * @type {unknown}
          */
         this.handle = hasOwnProperty(param, 'speakerModel')
-            ? libvosk.vosk_recognizer_new_spk(model.handle, param.speakerModel, sampleRate)
+            ? libvosk.vosk_recognizer_new_spk(model.handle, param.speakerModel.handle, sampleRate)
             : hasOwnProperty(param, 'grammar')
                 ? libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(param.grammar))
                 : libvosk.vosk_recognizer_new(model.handle, sampleRate);
