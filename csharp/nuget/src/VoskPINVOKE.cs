@@ -52,6 +52,12 @@ class VoskPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_set_log_level")]
   public static extern void SetLogLevel(int jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_gpu_init")]
+  public static extern void GpuInit();
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_gpu_thread_init")]
+  public static extern void GpuThreadInit();
 }
 
 }
