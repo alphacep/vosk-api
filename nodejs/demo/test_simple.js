@@ -4,8 +4,15 @@ const fs = require("fs");
 const { Readable } = require("stream");
 const wav = require("wav");
 
+MODEL_PATH = "model"
+
+if (!(fs.existsSync(MODEL_PATH) && fs.lstatSync(MODEL_PATH).isDirectory())){
+    console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
+    process.exit()
+}
+
 vosk.setLogLevel(0);
-const model = new vosk.Model("model");
+const model = new vosk.Model(MODEL_PATH);
 
 const wfStream = fs.createReadStream("test.wav", {'highWaterMark': 4096});
 const wfReader = new wav.Reader();

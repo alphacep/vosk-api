@@ -4,8 +4,21 @@ const fs = require("fs");
 const { Readable } = require("stream");
 const wav = require("wav");
 
-const model = new vosk.Model('model');
-const speakerModel = new vosk.SpeakerModel('model-spk');
+MODEL_PATH = "model"
+SPEAKER_MODEL_PATH = "model-spk"
+
+if (!(fs.existsSync(MODEL_PATH) && fs.lstatSync(MODEL_PATH).isDirectory())){
+    console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
+    process.exit()
+}
+
+if (!(fs.existsSync(SPEAKER_MODEL_PATH) && fs.lstatSync(SPEAKER_MODEL_PATH).isDirectory())){
+    console.log("Please download the speaker model from https://alphacephei.com/vosk/models and unpack as " + SPEAKER_MODEL_PATH + " in the current folder.")
+    process.exit()
+}
+
+const model = new vosk.Model(MODEL_PATH);
+const speakerModel = new vosk.SpeakerModel(SPEAKER_MODEL_PATH);
 
 const wfStream = fs.createReadStream('test.wav', { highWaterMark: 4096 });
 const wfReader = new wav.Reader();
