@@ -12,11 +12,11 @@ const wfReader = new wav.Reader();
 const wfReadable = new Readable().wrap(wfReader);
 
 wfReader.on('format', async ({ audioFormat, sampleRate, channels }) => {
-    const rec = new vosk.Recognizer({model: model, sampleRate: sampleRate});
     if (audioFormat != 1 || channels != 1) {
         console.error("Audio file must be WAV format mono PCM.");
         process.exit(1);
     }
+    const rec = new vosk.Recognizer({model: model, sampleRate: sampleRate});
     for await (const data of wfReadable) {
         const end_of_speech = rec.acceptWaveform(data);
         if (end_of_speech) {
