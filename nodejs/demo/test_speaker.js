@@ -8,12 +8,12 @@ MODEL_PATH = "model"
 SPEAKER_MODEL_PATH = "model-spk"
 FILE_NAME = "test.wav"
 
-if (!(fs.existsSync(MODEL_PATH) && fs.lstatSync(MODEL_PATH).isDirectory())){
+if (!fs.existsSync(MODEL_PATH)) {
     console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
     process.exit()
 }
 
-if (!(fs.existsSync(SPEAKER_MODEL_PATH) && fs.lstatSync(SPEAKER_MODEL_PATH).isDirectory())){
+if (!fs.existsSync(SPEAKER_MODEL_PATH)) {
     console.log("Please download the speaker model from https://alphacephei.com/vosk/models and unpack as " + SPEAKER_MODEL_PATH + " in the current folder.")
     process.exit()
 }

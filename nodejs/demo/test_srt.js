@@ -9,7 +9,7 @@ FILE_NAME = "test.wav"
 SAMPLE_RATE = 16000 
 BUFFER_SIZE = 4000
 
-if (!(fs.existsSync(MODEL_PATH) && fs.lstatSync(MODEL_PATH).isDirectory())){
+if (!fs.existsSync(MODEL_PATH)) {
     console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
     process.exit()
 }
@@ -41,7 +41,7 @@ ffmpeg_run.on('exit', code => {
         if (!element.hasOwnProperty('result'))
             return;
         const words = element.result;
-        if (words.length == 1){
+        if (words.length == 1) {
             subs.push({
                 type: 'cue',
                 data: {
@@ -56,7 +56,7 @@ ffmpeg_run.on('exit', code => {
         var text = words[0].word + " ";
         for (let i = 1; i < words.length; i++) {
             text += words[i].word + " ";
-            if (i % WORDS_PER_LINE == 0){
+            if (i % WORDS_PER_LINE == 0) {
                 subs.push({
                     type: 'cue',
                     data: {

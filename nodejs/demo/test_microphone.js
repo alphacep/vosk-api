@@ -6,7 +6,7 @@ var mic = require('mic');
 MODEL_PATH = "model"
 SAMPLE_RATE = 16000
 
-if (!(fs.existsSync(MODEL_PATH) && fs.lstatSync(MODEL_PATH).isDirectory())){
+if (!fs.existsSync(MODEL_PATH)) {
     console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
     process.exit()
 }
