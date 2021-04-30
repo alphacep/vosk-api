@@ -5,9 +5,16 @@ const fs = require("fs");
 const { Readable } = require("stream");
 const wav = require("wav");
 
+MODEL_PATH = "model"
+
+if (!(fs.existsSync(MODEL_PATH) && fs.lstatSync(MODEL_PATH).isDirectory())){
+    console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
+    process.exit()
+}
+
 // Process file 4 times in parallel with a single model
 files = ["test.wav", "test.wav", "test.wav", "test.wav"]
-const model = new vosk.Model("model");
+const model = new vosk.Model(MODEL_PATH);
 
 async.filter(files, function(filePath, callback) {
     const wfStream = fs.createReadStream("test.wav", {'highWaterMark': 4096});
