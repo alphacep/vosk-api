@@ -274,34 +274,29 @@ class Recognizer {
      *
      * @param {number} nBestMatches the amount of best matches retured back in result
      * @returns the result in JSON format which contains decoded line, decoded
-     *          words, times in seconds and confidences. You can parse this result
-     *          with any json parser. An optional bBestMatches arg allows managing
-     *          the depth of the best matches array
+     *          words and times in seconds. You can parse this result with any
+     *          json parser. An optional bBestMatches arg allows managing the 
+     *          depth of the best matches array
      * <pre>
      *  {
      *    "result" : [{
      *      "matches" : [{
-     *          "conf" : 1.000000,
      *          "end" : 1.110000,
      *          "start" : 0.870000,
      *          "word" : "what"
      *      }, {
-     *          "conf" : 1.000000,
      *          "end" : 1.530000,
      *          "start" : 1.110000,
      *          "word" : "zero"
      *      }, {
-     *          "conf" : 1.000000,
      *          "end" : 1.950000,
      *          "start" : 1.530000,
      *          "word" : "zero"
      *      }, {
-     *          "conf" : 1.000000,
      *          "end" : 2.340000,
      *          "start" : 1.950000,
      *          "word" : "zero"
      *      }, {
-     *          "conf" : 1.000000,
      *          "end" : 2.610000,
      *          "start" : 2.340000,
      *          "word" : "one"

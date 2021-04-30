@@ -445,10 +445,6 @@ const char* KaldiRecognizer::GetResult(int nBestMatches)
                 continue;
             }
 
-            // We still require it for getting words' confidence.
-            MinimumBayesRisk mbr(nbest_clat);
-            const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
-
             json::JSON matches;
             stringstream text;
 
@@ -464,7 +460,6 @@ const char* KaldiRecognizer::GetResult(int nBestMatches)
                 word["word"] = foundWord;
                 word["start"] = start;
                 word["end"] = start + samples_round_start_ / sample_frequency_ + (frame_offset_ + lengths[j]) * 0.03;
-                word["conf"] = conf[j];
                 matches["matches"].append(word);
 
                 if (j) {
