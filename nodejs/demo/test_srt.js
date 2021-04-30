@@ -41,9 +41,20 @@ ffmpeg_run.on('exit', code => {
         if (!element.hasOwnProperty('result'))
             return;
         const words = element.result;
-        var text = "";
+        if (words.length == 1){
+            subs.push({
+                type: 'cue',
+                data: {
+                start: words[0].start,
+                end: words[0].end,
+                text: words[0].word
+                }
+            });
+            return;
+        }
         var start_index = 0;
-        for (let i = 0; i < words.length; i++) {
+        var text = words[0].word + " ";
+        for (let i = 1; i < words.length; i++) {
             text += words[i].word + " ";
             if (i % WORDS_PER_LINE == 0){
                 subs.push({
