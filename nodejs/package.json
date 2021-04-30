@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "ffi-napi": "^4.0.3",
+    "mic": "^2.1.2",
     "ref-napi": ">=2.0.0",
     "wav": "^1.0.2",
     "async": "^3.2.0"
