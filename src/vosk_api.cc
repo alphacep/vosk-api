@@ -80,9 +80,9 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
     return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
 }
 
-const char *vosk_recognizer_result(VoskRecognizer *recognizer)
+const char *vosk_recognizer_result(VoskRecognizer *recognizer, int nBestMatches)
 {
-    return ((KaldiRecognizer *)recognizer)->Result();
+    return ((KaldiRecognizer *)recognizer)->Result(nBestMatches);
 }
 
 const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer)
@@ -90,9 +90,9 @@ const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer)
     return ((KaldiRecognizer *)recognizer)->PartialResult();
 }
 
-const char *vosk_recognizer_final_result(VoskRecognizer *recognizer)
+const char *vosk_recognizer_final_result(VoskRecognizer *recognizer, int nBestMatches)
 {
-    return ((KaldiRecognizer *)recognizer)->FinalResult();
+    return ((KaldiRecognizer *)recognizer)->FinalResult(nBestMatches);
 }
 
 void vosk_recognizer_free(VoskRecognizer *recognizer)

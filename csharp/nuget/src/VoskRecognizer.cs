@@ -2,6 +2,7 @@ namespace Vosk {
 
 public class VoskRecognizer : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef handle;
+  private const int DEFAULT_N_BEST_MATCHES_DEPTH = 1;
 
   internal VoskRecognizer(global::System.IntPtr cPtr) {
     handle = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
@@ -51,7 +52,11 @@ public class VoskRecognizer : global::System.IDisposable {
   }
 
   public string Result() {
-    return global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(VoskPINVOKE.VoskRecognizer_Result(handle));
+    return Result(DEFAULT_N_BEST_MATCHES_DEPTH);
+  }
+
+  public string Result(int nBestMatches) {
+    return global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(VoskPINVOKE.VoskRecognizer_Result(handle, nBestMatches));
   }
 
   public string PartialResult() {
@@ -59,7 +64,11 @@ public class VoskRecognizer : global::System.IDisposable {
   }
 
   public string FinalResult() {
-    return global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(VoskPINVOKE.VoskRecognizer_FinalResult(handle));
+    return FinalResult(DEFAULT_N_BEST_MATCHES_DEPTH);
+  }
+
+  public string FinalResult(int nBestMatches) {
+    return global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(VoskPINVOKE.VoskRecognizer_FinalResult(handle, nBestMatches));
   }
 
 }

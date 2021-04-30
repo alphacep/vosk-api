@@ -383,7 +383,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     return true;
 }
 
-const char* KaldiRecognizer::GetResult()
+const char* KaldiRecognizer::GetResult(int nBestMatches)
 {
     if (decoder_->NumFramesDecoded() == 0) {
         return StoreReturn("{\"text\": \"\"}");
@@ -423,45 +423,72 @@ const char* KaldiRecognizer::GetResult()
         aligned_lat = clat;
     }
 
-    MinimumBayesRisk mbr(aligned_lat);
-    const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
-    const vector<int32> &words = mbr.GetOneBest();
-    const vector<pair<BaseFloat, BaseFloat> > &times =
-          mbr.GetOneBestTimes();
-
-    int size = words.size();
-
-    json::JSON obj;
-    stringstream text;
-
-    // Create JSON object
-    for (int i = 0; i < size; i++) {
-        json::JSON word;
-        word["word"] = model_->word_syms_->Find(words[i]);
-        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
-        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
-        word["conf"] = conf[i];
-        obj["result"].append(word);
-
-        if (i) {
-            text << " ";
-        }
-        text << model_->word_syms_->Find(words[i]);
+    json::JSON result;
+    std::vector<Lattice> nbest_lats;
+    {
+        Lattice nbest_lat;
+        Lattice aligned_buffer;
+        ConvertLattice(aligned_lat, &aligned_buffer);
+        fst::ShortestPath(aligned_buffer, &nbest_lat, nBestMatches);
+        fst::ConvertNbestToVector(nbest_lat, &nbest_lats);
     }
-    obj["text"] = text.str();
+
+    if (nbest_lats.empty()) {
+        return StoreReturn("{\"text\": \"\"}");
+    } else {
+        for (int32 i = 0; i < static_cast<int32>(nbest_lats.size()); i++) {
+            CompactLattice nbest_clat;
+            ConvertLattice(nbest_lats[i], &nbest_clat);
+
+            std::vector<int32> words, times, lengths;
+            if (!CompactLatticeToWordAlignment(nbest_clat, &words, &times, &lengths)) {
+                continue;
+            }
+
+            // We still require it for getting words' confidence.
+            MinimumBayesRisk mbr(nbest_clat);
+            const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
+
+            json::JSON matches;
+            stringstream text;
+
+            for (int j = 0; j < words.size(); j++) {
+                // Don't output <eps> links, which correspond to silence
+                if (words[j] == 0) {
+                    continue;
+                }
+
+                json::JSON word;
+                auto foundWord = model_->word_syms_->Find(words[j]);
+                auto start = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[j]) * 0.03;
+                word["word"] = foundWord;
+                word["start"] = start;
+                word["end"] = start + samples_round_start_ / sample_frequency_ + (frame_offset_ + lengths[j]) * 0.03;
+                word["conf"] = conf[j];
+                matches["matches"].append(word);
+
+                if (j) {
+                    text << " ";
+                }
+                text << foundWord;
+            }
+            matches["text"] = text.str();
+            result["result"].append(matches);
+        }
+    }
 
     if (spk_model_) {
         Vector<BaseFloat> xvector;
         int num_spk_frames;
         if (GetSpkVector(xvector, &num_spk_frames)) {
             for (int i = 0; i < xvector.Dim(); i++) {
-                obj["spk"].append(xvector(i));
+                result["spk"].append(xvector(i));
             }
-            obj["spk_frames"] = num_spk_frames;
+            result["spk_frames"] = num_spk_frames;
         }
     }
 
-    return StoreReturn(obj.dump());
+    return StoreReturn(result.dump());
 }
 
 
@@ -496,17 +523,17 @@ const char* KaldiRecognizer::PartialResult()
     return StoreReturn(res.dump());
 }
 
-const char* KaldiRecognizer::Result()
+const char* KaldiRecognizer::Result(int nBestMatches)
 {
     if (state_ != RECOGNIZER_RUNNING) {
         return StoreReturn("{\"text\": \"\"}");
     }
     decoder_->FinalizeDecoding();
     state_ = RECOGNIZER_ENDPOINT;
-    return GetResult();
+    return GetResult(nBestMatches);
 }
 
-const char* KaldiRecognizer::FinalResult()
+const char* KaldiRecognizer::FinalResult(int nBestMatches)
 {
     if (state_ != RECOGNIZER_RUNNING) {
         return StoreReturn("{\"text\": \"\"}");
@@ -517,7 +544,7 @@ const char* KaldiRecognizer::FinalResult()
     decoder_->AdvanceDecoding();
     decoder_->FinalizeDecoding();
     state_ = RECOGNIZER_FINALIZED;
-    GetResult();
+    GetResult(nBestMatches);
 
     // Free some memory while we are finalized, next
     // iteration will reinitialize them anyway

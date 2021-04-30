@@ -87,8 +87,8 @@ const libvosk = ffi.Library(soname, {
     'vosk_recognizer_new_grm': [vosk_recognizer_ptr, [vosk_model_ptr, 'float', 'string']],
     'vosk_recognizer_free': ['void', [vosk_recognizer_ptr]],
     'vosk_recognizer_accept_waveform': ['bool', [vosk_recognizer_ptr, 'pointer', 'int']],
-    'vosk_recognizer_result': ['string', [vosk_recognizer_ptr]],
-    'vosk_recognizer_final_result': ['string', [vosk_recognizer_ptr]],
+    'vosk_recognizer_result': ['string', [vosk_recognizer_ptr, 'int']],
+    'vosk_recognizer_final_result': ['string', [vosk_recognizer_ptr, 'int']],
     'vosk_recognizer_partial_result': ['string', [vosk_recognizer_ptr]],
 });
 
@@ -272,43 +272,47 @@ class Recognizer {
 
     /** Returns speech recognition result in a string
      *
+     * @param {number} nBestMatches the amount of best matches retured back in result
      * @returns the result in JSON format which contains decoded line, decoded
      *          words, times in seconds and confidences. You can parse this result
-     *          with any json parser
+     *          with any json parser. An optional bBestMatches arg allows managing
+     *          the depth of the best matches array
      * <pre>
-     * {
-     *   "result" : [{
-     *       "conf" : 1.000000,
-     *       "end" : 1.110000,
-     *       "start" : 0.870000,
-     *       "word" : "what"
-     *     }, {
-     *       "conf" : 1.000000,
-     *       "end" : 1.530000,
-     *       "start" : 1.110000,
-     *       "word" : "zero"
-     *     }, {
-     *       "conf" : 1.000000,
-     *       "end" : 1.950000,
-     *       "start" : 1.530000,
-     *       "word" : "zero"
-     *     }, {
-     *       "conf" : 1.000000,
-     *       "end" : 2.340000,
-     *       "start" : 1.950000,
-     *       "word" : "zero"
-     *     }, {
-     *       "conf" : 1.000000,
-     *      "end" : 2.610000,
-     *       "start" : 2.340000,
-     *       "word" : "one"
-     *     }],
-     *   "text" : "what zero zero zero one"
+     *  {
+     *    "result" : [{
+     *      "matches" : [{
+     *          "conf" : 1.000000,
+     *          "end" : 1.110000,
+     *          "start" : 0.870000,
+     *          "word" : "what"
+     *      }, {
+     *          "conf" : 1.000000,
+     *          "end" : 1.530000,
+     *          "start" : 1.110000,
+     *          "word" : "zero"
+     *      }, {
+     *          "conf" : 1.000000,
+     *          "end" : 1.950000,
+     *          "start" : 1.530000,
+     *          "word" : "zero"
+     *      }, {
+     *          "conf" : 1.000000,
+     *          "end" : 2.340000,
+     *          "start" : 1.950000,
+     *          "word" : "zero"
+     *      }, {
+     *          "conf" : 1.000000,
+     *          "end" : 2.610000,
+     *          "start" : 2.340000,
+     *          "word" : "one"
+     *      }],
+     *      "text" : "what zero zero zero one"
+     *    }]
      *  }
      * </pre>
      */
-    resultString() {
-        return libvosk.vosk_recognizer_result(this.handle);
+    resultString(nBestMatches = 1) {
+        return libvosk.vosk_recognizer_result(this.handle, nBestMatches);
     };
 
     /**
@@ -316,7 +320,7 @@ class Recognizer {
      * @returns {Result<T>} The results
      */
     result() {
-        return JSON.parse(libvosk.vosk_recognizer_result(this.handle));
+        return JSON.parse(this.resultString());
     };
 
     /**
@@ -334,10 +338,11 @@ class Recognizer {
      * You usually call it in the end of the stream to get final bits of audio. It
      * flushes the feature pipeline, so all remaining audio chunks got processed.
      *
+     * @param {number} nBestMatches the amount of best matches retured back in result
      * @returns {Result<T>} speech result.
      */
-    finalResult() {
-        return JSON.parse(libvosk.vosk_recognizer_final_result(this.handle));
+    finalResult(nBestMatches = 1) {
+        return JSON.parse(libvosk.vosk_recognizer_final_result(this.handle, nBestMatches));
     };
 }
 

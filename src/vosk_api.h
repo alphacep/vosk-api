@@ -136,43 +136,47 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
 
 /** Returns speech recognition result
  *
+ * @param nBestMatches - the amount of best matches retured back in result
  * @returns the result in JSON format which contains decoded line, decoded
  *          words, times in seconds and confidences. You can parse this result
- *          with any json parser
+ *          with any json parser. An optional bBestMatches arg allows managing
+ *          the depth of the best matches array
  *
  * <pre>
  * {
  *   "result" : [{
- *       "conf" : 1.000000,
- *       "end" : 1.110000,
- *       "start" : 0.870000,
- *       "word" : "what"
- *     }, {
- *       "conf" : 1.000000,
- *       "end" : 1.530000,
- *       "start" : 1.110000,
- *       "word" : "zero"
- *     }, {
- *       "conf" : 1.000000,
- *       "end" : 1.950000,
- *       "start" : 1.530000,
- *       "word" : "zero"
- *     }, {
- *       "conf" : 1.000000,
- *       "end" : 2.340000,
- *       "start" : 1.950000,
- *       "word" : "zero"
- *     }, {
- *       "conf" : 1.000000,
- *      "end" : 2.610000,
- *       "start" : 2.340000,
- *       "word" : "one"
- *     }],
- *   "text" : "what zero zero zero one"
+ *      "matches" : [{
+ *        "conf" : 1.000000,
+ *        "end" : 1.110000,
+ *        "start" : 0.870000,
+ *        "word" : "what"
+ *      }, {
+ *        "conf" : 1.000000,
+ *        "end" : 1.530000,
+ *        "start" : 1.110000,
+ *        "word" : "zero"
+ *      }, {
+ *        "conf" : 1.000000,
+ *        "end" : 1.950000,
+ *        "start" : 1.530000,
+ *        "word" : "zero"
+ *      }, {
+ *        "conf" : 1.000000,
+ *        "end" : 2.340000,
+ *        "start" : 1.950000,
+ *        "word" : "zero"
+ *      }, {
+ *        "conf" : 1.000000,
+ *        "end" : 2.610000,
+ *        "start" : 2.340000,
+ *        "word" : "one"
+ *      }],
+ *      "text" : "what zero zero zero one",
+ *    }]
  *  }
  * </pre>
  */
-const char *vosk_recognizer_result(VoskRecognizer *recognizer);
+const char *vosk_recognizer_result(VoskRecognizer *recognizer, int nBestMatches = 1);
 
 
 /** Returns partial speech recognition
@@ -195,7 +199,7 @@ const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer);
  *
  *  @returns speech result in JSON format.
  */
-const char *vosk_recognizer_final_result(VoskRecognizer *recognizer);
+const char *vosk_recognizer_final_result(VoskRecognizer *recognizer, int nBestMatches = 1);
 
 
 /** Releases recognizer object

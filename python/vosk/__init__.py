@@ -57,14 +57,14 @@ class KaldiRecognizer(object):
     def AcceptWaveform(self, data):
         return _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
 
-    def Result(self):
-        return _ffi.string(_c.vosk_recognizer_result(self._handle)).decode('utf-8')
+    def Result(self, n_best_matches=1):
+        return _ffi.string(_c.vosk_recognizer_result(self._handle, n_best_matches)).decode('utf-8')
 
     def PartialResult(self):
         return _ffi.string(_c.vosk_recognizer_partial_result(self._handle)).decode('utf-8')
 
-    def FinalResult(self):
-        return _ffi.string(_c.vosk_recognizer_final_result(self._handle)).decode('utf-8')
+    def FinalResult(self, n_best_matches=1):
+        return _ffi.string(_c.vosk_recognizer_final_result(self._handle, n_best_matches)).decode('utf-8')
 
 
 def SetLogLevel(level):

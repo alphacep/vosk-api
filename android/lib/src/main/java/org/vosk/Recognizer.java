@@ -3,6 +3,8 @@ package org.vosk;
 import com.sun.jna.PointerType;
 
 public class Recognizer extends PointerType implements AutoCloseable {
+    private static final int DEFAULT_N_BEST_MATCHES_DEPTH = 1;
+
     public Recognizer(Model model, float sampleRate) {
         super(LibVosk.vosk_recognizer_new(model, sampleRate));
     }
@@ -28,7 +30,11 @@ public class Recognizer extends PointerType implements AutoCloseable {
     }
 
     public String getResult() {
-        return LibVosk.vosk_recognizer_result(this.getPointer());
+        return getResult(DEFAULT_N_BEST_MATCHES_DEPTH);
+    }
+
+    public String getResult(int nBestMatches) {
+        return LibVosk.vosk_recognizer_result(this.getPointer(), nBestMatches);
     }
 
     public String getPartialResult() {
@@ -36,7 +42,11 @@ public class Recognizer extends PointerType implements AutoCloseable {
     }
 
     public String getFinalResult() {
-        return LibVosk.vosk_recognizer_final_result(this.getPointer());
+        return getFinalResult(DEFAULT_N_BEST_MATCHES_DEPTH);
+    }
+
+    public String getFinalResult(int nBestMatches) {
+        return LibVosk.vosk_recognizer_final_result(this.getPointer(), nBestMatches);
     }
 
     @Override

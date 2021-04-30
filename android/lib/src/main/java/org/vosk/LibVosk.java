@@ -31,9 +31,9 @@ public class LibVosk {
 
     public static native boolean vosk_recognizer_accept_waveform_f(Pointer recognizer, float[] data, int len);
 
-    public static native String vosk_recognizer_result(Pointer recognizer);
+    public static native String vosk_recognizer_result(Pointer recognizer, int nBestMatches);
 
-    public static native String vosk_recognizer_final_result(Pointer recognizer);
+    public static native String vosk_recognizer_final_result(Pointer recognizer, int nBestMatches);
 
     public static native String vosk_recognizer_partial_result(Pointer recognizer);
 

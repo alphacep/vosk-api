@@ -42,13 +42,13 @@ class VoskPINVOKE {
   public static extern bool VoskRecognizer_AcceptWaveformFloat(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]float[] jarg2, int jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_result")]
-  public static extern global::System.IntPtr VoskRecognizer_Result(global::System.Runtime.InteropServices.HandleRef jarg1);
+  public static extern global::System.IntPtr VoskRecognizer_Result(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_partial_result")]
   public static extern global::System.IntPtr VoskRecognizer_PartialResult(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_final_result")]
-  public static extern global::System.IntPtr VoskRecognizer_FinalResult(global::System.Runtime.InteropServices.HandleRef jarg1);
+  public static extern global::System.IntPtr VoskRecognizer_FinalResult(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_set_log_level")]
   public static extern void SetLogLevel(int jarg1);
