@@ -25,9 +25,9 @@ const ffmpeg_run = spawn('ffmpeg', ['-loglevel', 'quiet', '-i', FILE_NAME,
                          '-f', 's16le', '-bufsize', String(BUFFER_SIZE) , '-']);
 
 ffmpeg_run.stdout.on('data', (stdout) => {
-        if (rec.acceptWaveform(stdout))
-            console.log(rec.result());
-        else
-            console.log(rec.partialResult());
+    if (rec.acceptWaveform(stdout))
+        console.log(rec.result());
+    else
+        console.log(rec.partialResult());
     console.log(rec.finalResult());
 });

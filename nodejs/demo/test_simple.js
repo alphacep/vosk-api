@@ -18,7 +18,6 @@ if (process.argv.length > 2)
 vosk.setLogLevel(0);
 const model = new vosk.Model(MODEL_PATH);
 
-const wfStream = fs.createReadStream(FILE_NAME, {'highWaterMark': 4096});
 const wfReader = new wav.Reader();
 const wfReadable = new Readable().wrap(wfReader);
 
@@ -37,6 +36,8 @@ wfReader.on('format', async ({ audioFormat, sampleRate, channels }) => {
     console.log(rec.finalResult(rec));
     rec.free();
 });
-wfStream.pipe(wfReader).on('finish', function (err) {
-    model.free();
+
+fs.createReadStream(FILE_NAME, {'highWaterMark': 4096}).pipe(wfReader).on('finish', 
+    function (err) {
+        model.free();
 });

@@ -1,7 +1,7 @@
 var vosk = require('..')
 
 const fs = require("fs");
-var mic = require('mic');
+var mic = require("mic");
 
 MODEL_PATH = "model"
 SAMPLE_RATE = 16000
@@ -20,8 +20,8 @@ var micInstance = mic({
     channels: '1',
     debug: false
 });
-var micInputStream = micInstance.getAudioStream();
 
+var micInputStream = micInstance.getAudioStream();
 micInstance.start();
 
 micInputStream.on('data', data => {
@@ -29,7 +29,7 @@ micInputStream.on('data', data => {
         console.log(rec.result());
     else
         console.log(rec.partialResult());
-    });
+});
 
 process.on('SIGINT', function() {
     console.log(rec.finalResult());

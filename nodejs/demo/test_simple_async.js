@@ -13,11 +13,10 @@ if (!fs.existsSync(MODEL_PATH)) {
 }
 
 // Process file 4 times in parallel with a single model
-files = ["test.wav", "test.wav", "test.wav", "test.wav"]
-const model = new vosk.Model(MODEL_PATH);
+files = Array(10).fill("test.wav")
+const model = new vosk.Model(MODEL_PATH)
 
 async.filter(files, function(filePath, callback) {
-    const wfStream = fs.createReadStream("test.wav", {'highWaterMark': 4096});
     const wfReader = new wav.Reader();
     const wfReadable = new Readable().wrap(wfReader);
 
@@ -38,7 +37,9 @@ async.filter(files, function(filePath, callback) {
         // Signal we are done without errors
         callback(null, true);
     });
-    wfStream.pipe(wfReader);
+
+    fs.createReadStream(filePath, {'highWaterMark': 4096}).pipe(wfReader);
+
 }, function(err, results) {
     model.free();
     console.log("Done!!!!!");
