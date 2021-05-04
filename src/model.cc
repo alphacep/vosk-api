@@ -157,6 +157,7 @@ void Model::ConfigureV1()
     disambig_rxfilename_ = model_path_str_ + "/disambig_tid.int";
     word_syms_rxfilename_ = model_path_str_ + "/words.txt";
     winfo_rxfilename_ = model_path_str_ + "/word_boundary.int";
+    phone_syms_rxfilename_ = model_path_str_ + "/phones.txt";
     carpa_rxfilename_ = model_path_str_ + "/rescore/G.carpa";
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
@@ -173,7 +174,6 @@ void Model::ConfigureV2()
     decodable_opts_.Register(&po);
     po.ReadConfigFile(model_path_str_ + "/conf/model.conf");
 
-
     nnet3_rxfilename_ = model_path_str_ + "/am/final.mdl";
     hclg_fst_rxfilename_ = model_path_str_ + "/graph/HCLG.fst";
     hcl_fst_rxfilename_ = model_path_str_ + "/graph/HCLr.fst";
@@ -181,6 +181,7 @@ void Model::ConfigureV2()
     disambig_rxfilename_ = model_path_str_ + "/graph/disambig_tid.int";
     word_syms_rxfilename_ = model_path_str_ + "/graph/words.txt";
     winfo_rxfilename_ = model_path_str_ + "/graph/phones/word_boundary.int";
+    phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
     carpa_rxfilename_ = model_path_str_ + "/rescore/G.carpa";
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
@@ -286,6 +287,16 @@ void Model::ReadDataFiles()
         winfo_ = NULL;
     }
 
+    phone_syms_ = NULL;
+    phone_syms_loaded_ = false;
+    if (stat(phone_syms_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading phones from " << phone_syms_rxfilename_;
+        if (!(phone_syms_ = fst::SymbolTable::ReadText(phone_syms_rxfilename_)))
+            KALDI_ERR << "Could not read phone symbol table from file "
+                      << phone_syms_rxfilename_;
+        phone_syms_loaded_ = word_syms_;
+    }
+
     std_lm_fst_ = NULL;
     if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
@@ -327,6 +338,8 @@ Model::~Model() {
     if (word_syms_loaded_)
         delete word_syms_;
     delete winfo_;
+    if (phone_syms_loaded_)
+        delete phone_syms_;
     delete hclg_fst_;
     delete hcl_fst_;
     delete g_fst_;
