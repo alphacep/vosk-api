@@ -17,6 +17,7 @@
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
 #include "language_model.h"
+#include "lat/lattice-functions.h"
 
 using namespace fst;
 using namespace kaldi::nnet3;
@@ -422,46 +423,87 @@ const char* KaldiRecognizer::GetResult()
     } else {
         aligned_lat = clat;
     }
+    CompactLattice clat_best_path;
+    CompactLatticeShortestPath(aligned_lat, &clat_best_path); 
+    Lattice best_path;
+    ConvertLattice(clat_best_path, &best_path);
+    if (best_path.Start() == fst::kNoStateId) {
+        return StoreReturn("{\"text\": \"\"}");
+    } else {
+        std::vector<int32> alignment;
+        std::vector<int32> words;
+        LatticeWeight weight;
+        GetLinearSymbolSequence(best_path, &alignment, &words, &weight);
+        MinimumBayesRiskOptions mbr_opts;
+        mbr_opts.decode_mbr = false; // we just want confidences
+        mbr_opts.print_silence = false;  // we'll take of this later
+        MinimumBayesRisk mbr(aligned_lat, words, mbr_opts);
+        const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
+        const vector<pair<BaseFloat, BaseFloat> > &times =
+              mbr.GetOneBestTimes();
 
-    MinimumBayesRisk mbr(aligned_lat);
-    const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
-    const vector<int32> &words = mbr.GetOneBest();
-    const vector<pair<BaseFloat, BaseFloat> > &times =
-          mbr.GetOneBestTimes();
+        int size = words.size();
 
-    int size = words.size();
-
-    json::JSON obj;
-    stringstream text;
-
-    // Create JSON object
-    for (int i = 0; i < size; i++) {
-        json::JSON word;
-        word["word"] = model_->word_syms_->Find(words[i]);
-        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
-        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
-        word["conf"] = conf[i];
-        obj["result"].append(word);
-
-        if (i) {
-            text << " ";
-        }
-        text << model_->word_syms_->Find(words[i]);
-    }
-    obj["text"] = text.str();
-
-    if (spk_model_) {
-        Vector<BaseFloat> xvector;
-        int num_spk_frames;
-        if (GetSpkVector(xvector, &num_spk_frames)) {
-            for (int i = 0; i < xvector.Dim(); i++) {
-                obj["spk"].append(xvector(i));
+        std::vector<int32> words2, times2, lengths;
+        std::vector<std::vector<int32> > prons;
+        std::vector<std::vector<int32> > phone_lengths;
+        if (model_->phone_syms_loaded_) {
+            if (!CompactLatticeToWordProns(*model_->trans_model_, clat_best_path, &words2, &times2, &lengths,
+                                         &prons, &phone_lengths)) {
+                KALDI_WARN << "Failed to convert best path to phone sequence";
+                return StoreReturn("{\"text\": \"\"}");
             }
-            obj["spk_frames"] = num_spk_frames;
         }
-    }
+        json::JSON obj;
+        stringstream text;
 
-    return StoreReturn(obj.dump());
+        // Create JSON object
+        int k = 0;
+        for (int i = 0; i < size; i++) {
+            json::JSON word;
+            word["word"] = model_->word_syms_->Find(words[i]);
+            word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
+            word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
+            word["conf"] = conf[i];
+            if (model_->phone_syms_loaded_) {
+                // skip epsilon words that MBR deletes
+                while (words2[k] == 0) {
+                   k++;
+                }
+              
+                stringstream phones_str;
+                for (int j = 0; j < prons[k].size(); j++) {
+                    if (j) {
+                        phones_str << " ";
+                    }
+                    phones_str << model_->phone_syms_->Find(prons[k][j]);
+                }
+                word["phones"] = phones_str.str();
+            }
+
+            obj["result"].append(word);
+
+            if (i) {
+                text << " ";
+            }
+            text << model_->word_syms_->Find(words[i]);
+            k++;
+        }
+        obj["text"] = text.str();
+
+        if (spk_model_) {
+            Vector<BaseFloat> xvector;
+            int num_spk_frames;
+            if (GetSpkVector(xvector, &num_spk_frames)) {
+                for (int i = 0; i < xvector.Dim(); i++) {
+                    obj["spk"].append(xvector(i));
+                }
+                obj["spk_frames"] = num_spk_frames;
+            }
+        }
+
+        return StoreReturn(obj.dump());
+    }
 }
 
 

@@ -60,6 +60,7 @@ protected:
     string disambig_rxfilename_;
     string word_syms_rxfilename_;
     string winfo_rxfilename_;
+    string phone_syms_rxfilename_;
     string carpa_rxfilename_;
     string std_fst_rxfilename_;
     string final_ie_rxfilename_;
@@ -79,6 +80,8 @@ protected:
     bool word_syms_loaded_;
     kaldi::WordBoundaryInfo *winfo_;
     vector<int32> disambig_;
+    const fst::SymbolTable *phone_syms_;
+    bool phone_syms_loaded_;
 
     fst::Fst<fst::StdArc> *hclg_fst_;
     fst::Fst<fst::StdArc> *hcl_fst_;
