@@ -66,6 +66,7 @@ protected:
     string mfcc_conf_rxfilename_;
     string global_cmvn_stats_rxfilename_;
     string pitch_conf_rxfilename_;
+    string phone_syms_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
@@ -79,6 +80,8 @@ protected:
     bool word_syms_loaded_;
     kaldi::WordBoundaryInfo *winfo_;
     vector<int32> disambig_;
+    const fst::SymbolTable *phone_symbol_table_;
+    bool phone_syms_loaded_;
 
     fst::Fst<fst::StdArc> *hclg_fst_;
     fst::Fst<fst::StdArc> *hcl_fst_;

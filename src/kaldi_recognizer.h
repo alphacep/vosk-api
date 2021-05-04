@@ -51,7 +51,7 @@ class KaldiRecognizer {
         const char* Result();
         const char* FinalResult();
         const char* PartialResult();
-
+        
     private:
         void InitState();
         void InitRescoring();
@@ -60,7 +60,7 @@ class KaldiRecognizer {
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
         bool GetSpkVector(Vector<BaseFloat> &out_xvector, int *frames);
         const char *GetResult();
-        const char *StoreReturn(const string &res);
+        const char *StoreReturn(const string &res);     
 
         Model *model_;
         SingleUtteranceNnet3Decoder *decoder_;

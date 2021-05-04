@@ -163,6 +163,7 @@ void Model::ConfigureV1()
     mfcc_conf_rxfilename_ = model_path_str_ + "/mfcc.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/pitch.conf";
+    phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
 }
 
 void Model::ConfigureV2()
@@ -187,6 +188,7 @@ void Model::ConfigureV2()
     mfcc_conf_rxfilename_ = model_path_str_ + "/conf/mfcc.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/am/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/conf/pitch.conf";
+    phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
 }
 
 void Model::ReadDataFiles()
@@ -270,7 +272,7 @@ void Model::ReadDataFiles()
         word_syms_ = g_fst_->OutputSymbols();
     }
     if (!word_syms_) {
-        KALDI_LOG << "Loading words from " << word_syms_rxfilename_;
+        KALDI_LOG << "Loading words from xxxx" << word_syms_rxfilename_;
         if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_)))
             KALDI_ERR << "Could not read symbol table from file "
                       << word_syms_rxfilename_;
@@ -284,6 +286,17 @@ void Model::ReadDataFiles()
         winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
     } else {
         winfo_ = NULL;
+    }
+
+
+    phone_symbol_table_ = NULL;
+    phone_syms_loaded_ = false;
+    //Providing phones.txt symbol table is optional and currently not required by Vosk
+    //If you provide it by default the phone information will be computed
+    if (stat(phone_syms_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading phonemes from " << phone_syms_rxfilename_;
+        phone_symbol_table_  = fst::SymbolTable::ReadText(phone_syms_rxfilename_);
+        phone_syms_loaded_ = true;
     }
 
     std_lm_fst_ = NULL;
