@@ -292,7 +292,7 @@ void Model::ReadDataFiles()
         word_syms_ = g_fst_->OutputSymbols();
     }
     if (!word_syms_) {
-        KALDI_LOG << "Loading words from xxxx" << word_syms_rxfilename_;
+        KALDI_LOG << "Loading words from " << word_syms_rxfilename_;
         if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_)))
             KALDI_ERR << "Could not read symbol table from file "
                       << word_syms_rxfilename_;
