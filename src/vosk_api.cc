@@ -96,6 +96,11 @@ void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_al
     ((KaldiRecognizer *)recognizer)->SetMaxAlternatives(max_alternatives);
 }
 
+void vosk_recognizer_set_result_options(VoskRecognizer *recognizer, const char *result_opts)
+{
+    ((KaldiRecognizer *)recognizer)->SetResultOptions(result_opts);
+}
+
 void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words)
 {
     ((KaldiRecognizer *)recognizer)->SetWords((bool)words);

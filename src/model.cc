@@ -175,6 +175,7 @@ void Model::ConfigureV1()
     rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
     rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
     rnnlm_lm_rxfilename_ = model_path_str_ + "/rnnlm/final.raw";
+    phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
 }
 
 void Model::ConfigureV2()
@@ -204,6 +205,7 @@ void Model::ConfigureV2()
     rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
     rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
     rnnlm_lm_rxfilename_ = model_path_str_ + "/rnnlm/final.raw";
+    phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
 }
 
 void Model::ReadDataFiles()
@@ -290,7 +292,7 @@ void Model::ReadDataFiles()
         word_syms_ = g_fst_->OutputSymbols();
     }
     if (!word_syms_) {
-        KALDI_LOG << "Loading words from " << word_syms_rxfilename_;
+        KALDI_LOG << "Loading words from xxxx" << word_syms_rxfilename_;
         if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_)))
             KALDI_ERR << "Could not read symbol table from file "
                       << word_syms_rxfilename_;
@@ -302,6 +304,16 @@ void Model::ReadDataFiles()
         KALDI_LOG << "Loading winfo " << winfo_rxfilename_;
         kaldi::WordBoundaryInfoNewOpts opts;
         winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
+    }
+
+    phone_symbol_table_ = NULL;
+    phone_syms_loaded_ = false;
+    //Providing phones.txt symbol table is optional and currently not required by Vosk
+    //If you provide it by default the phone information will be computed
+    if (stat(phone_syms_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading phonemes from " << phone_syms_rxfilename_;
+        phone_symbol_table_  = fst::SymbolTable::ReadText(phone_syms_rxfilename_);
+        phone_syms_loaded_ = true;
     }
 
     if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {

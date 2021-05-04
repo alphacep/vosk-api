@@ -47,6 +47,7 @@ class KaldiRecognizer {
         KaldiRecognizer(Model *model, float sample_frequency, char const *grammar);
         ~KaldiRecognizer();
         void SetMaxAlternatives(int max_alternatives);
+        void SetResultOptions(const char *result_opts);
         void SetSpkModel(SpkModel *spk_model);
         void SetWords(bool words);
         bool AcceptWaveform(const char *data, int len);
@@ -56,7 +57,7 @@ class KaldiRecognizer {
         const char* FinalResult();
         const char* PartialResult();
         void Reset();
-
+        
     private:
         void InitState();
         void InitRescoring();
@@ -93,6 +94,7 @@ class KaldiRecognizer {
 
         // Other
         int max_alternatives_ = 0; // Disable alternatives by default
+        const char *result_opts_ = "words"; // By default enable only word-level results
         bool words_ = false;
 
         float sample_frequency_;
