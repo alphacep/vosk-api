@@ -61,4 +61,4 @@ RUN cd /opt/kaldi \
         --host=i686-w64-mingw32 --openblas-clapack-root=/opt/kaldi/local \
         --fst-root=/opt/kaldi/local --fst-version=1.8.0 \
     && make depend -j \
-    && make -j $(nproc) online2 lm
+    && make -j $(nproc) online2 lm rnnlm

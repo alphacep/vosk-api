@@ -30,6 +30,7 @@
 #include "util/parse-options.h"
 #include "nnet3/nnet-utils.h"
 #include "rnnlm/rnnlm-utils.h"
+#include "rnnlm/rnnlm-lattice-rescoring.h"
 
 using namespace kaldi;
 using namespace std;
@@ -67,25 +68,36 @@ protected:
     string global_cmvn_stats_rxfilename_;
     string pitch_conf_rxfilename_;
 
+    string rnnlm_word_feats_rxfilename_;
+    string rnnlm_feat_embedding_rxfilename_;
+    string rnnlm_config_rxfilename_;
+    string rnnlm_lm_fst_rxfilename_;
+    string rnnlm_lm_rxfilename_;
+
     kaldi::OnlineEndpointConfig endpoint_config_;
     kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
     kaldi::nnet3::NnetSimpleLoopedComputationOptions decodable_opts_;
     kaldi::OnlineNnet2FeaturePipelineInfo feature_info_;
 
-    kaldi::nnet3::DecodableNnetSimpleLoopedInfo *decodable_info_;
-    kaldi::TransitionModel *trans_model_;
-    kaldi::nnet3::AmNnetSimple *nnet_;
-    const fst::SymbolTable *word_syms_;
-    bool word_syms_loaded_;
-    kaldi::WordBoundaryInfo *winfo_;
+    kaldi::nnet3::DecodableNnetSimpleLoopedInfo *decodable_info_ = nullptr;
+    kaldi::TransitionModel *trans_model_ = nullptr;
+    kaldi::nnet3::AmNnetSimple *nnet_ = nullptr;
+    const fst::SymbolTable *word_syms_ = nullptr;
+    bool word_syms_loaded_ = false;
+    kaldi::WordBoundaryInfo *winfo_ = nullptr;
     vector<int32> disambig_;
 
-    fst::Fst<fst::StdArc> *hclg_fst_;
-    fst::Fst<fst::StdArc> *hcl_fst_;
-    fst::Fst<fst::StdArc> *g_fst_;
+    fst::Fst<fst::StdArc> *hclg_fst_ = nullptr;
+    fst::Fst<fst::StdArc> *hcl_fst_ = nullptr;
+    fst::Fst<fst::StdArc> *g_fst_ = nullptr;
 
-    fst::VectorFst<fst::StdArc> *std_lm_fst_;
+    fst::VectorFst<fst::StdArc> *std_lm_fst_ = nullptr;
     kaldi::ConstArpaLm const_arpa_;
+
+    kaldi::rnnlm::RnnlmComputeStateComputationOptions rnnlm_compute_opts;
+    CuMatrix<BaseFloat> word_embedding_mat;
+    fst::VectorFst<fst::StdArc> *rnnlm_lm_fst_ = NULL;
+    kaldi::nnet3::Nnet rnnlm;
 
     int ref_cnt_;
 };

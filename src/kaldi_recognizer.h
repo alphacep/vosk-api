@@ -23,6 +23,7 @@
 #include "feat/feature-mfcc.h"
 #include "lat/kaldi-lattice.h"
 #include "lat/word-align-lattice.h"
+#include "lat/compose-lattice-pruned.h"
 #include "nnet3/am-nnet-simple.h"
 #include "nnet3/nnet-am-decodable-simple.h"
 #include "nnet3/nnet-utils.h"
@@ -62,17 +63,26 @@ class KaldiRecognizer {
         const char *GetResult();
         const char *StoreReturn(const string &res);
 
-        Model *model_;
-        SingleUtteranceNnet3Decoder *decoder_;
-        fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
-        fst::StdVectorFst *g_fst_; // dynamically constructed grammar
-        OnlineNnet2FeaturePipeline *feature_pipeline_;
-        OnlineSilenceWeighting *silence_weighting_;
+        Model *model_ = nullptr;
+        SingleUtteranceNnet3Decoder *decoder_ = nullptr;
+        fst::LookaheadFst<fst::StdArc, int32> *decode_fst_ = nullptr;
+        fst::StdVectorFst *g_fst_ = nullptr; // dynamically constructed grammar
+        OnlineNnet2FeaturePipeline *feature_pipeline_ = nullptr;
+        OnlineSilenceWeighting *silence_weighting_ = nullptr;
 
-        SpkModel *spk_model_;
-        OnlineBaseFeature *spk_feature_;
+        // Speaker identification
+        SpkModel *spk_model_ = nullptr;
+        OnlineBaseFeature *spk_feature_ = nullptr;
 
-        fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_;
+        // Rescoring
+        fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_ = nullptr;
+
+        // RNNLM rescoring
+        kaldi::rnnlm::RnnlmComputeStateInfo *info = nullptr;
+        fst::ScaleDeterministicOnDemandFst *lm_to_subtract_det_scale = nullptr;
+        fst::BackoffDeterministicOnDemandFst<fst::StdArc> *lm_to_subtract_det_backoff = nullptr;
+        kaldi::rnnlm::KaldiRnnlmDeterministicFst* lm_to_add_orig = nullptr;
+        fst::DeterministicOnDemandFst<fst::StdArc> *lm_to_add = nullptr;
 
         float sample_frequency_;
         int32 frame_offset_;

@@ -42,5 +42,5 @@ RUN cd /opt \
     && sed -i "s:-mfloat-abi=hard -mfpu=neon:${ARM_HARDWARE_OPTS}:g" makefiles/linux_openblas_arm.mk \
     && sed -i "s: -O1 : -O3 :g" makefiles/linux_openblas_arm.mk \
     && ./configure --mathlib=OPENBLAS_CLAPACK --shared --use-cuda=no \
-    && make -j 10 online2 lm \
+    && make -j 10 online2 lm rnnlm \
     && find /opt/kaldi -name "*.o" -exec rm {} \;
