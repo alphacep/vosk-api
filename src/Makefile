@@ -30,6 +30,7 @@ LIBS= \
 	$(KALDI_ROOT)/src/feat/kaldi-feat.a \
 	$(KALDI_ROOT)/src/lat/kaldi-lat.a \
 	$(KALDI_ROOT)/src/lm/kaldi-lm.a \
+	$(KALDI_ROOT)/src/rnnlm/kaldi-rnnlm.a \
 	$(KALDI_ROOT)/src/hmm/kaldi-hmm.a \
 	$(KALDI_ROOT)/src/transform/kaldi-transform.a \
 	$(KALDI_ROOT)/src/cudamatrix/kaldi-cudamatrix.a \
