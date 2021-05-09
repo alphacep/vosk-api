@@ -69,6 +69,11 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
 let soname;
 if (os.platform() == 'win32') {
+    // Update path to load dependent dlls
+    let currentPath = process.env.Path;
+    let dllDirectory = path.resolve(path.join(__dirname, "lib", "win-x86_64"));
+    process.env.Path = currentPath + ":" + dllDirectory;
+
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
 } else if (os.platform() == 'darwin') {
     soname = path.join(__dirname, "lib", "osx-x86_64", "libvosk.dylib")
