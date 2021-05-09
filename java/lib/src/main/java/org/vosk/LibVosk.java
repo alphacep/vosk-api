@@ -7,7 +7,12 @@ import com.sun.jna.Pointer;
 public class LibVosk {
 
     static {
-
+        // We have to load dependencies
+        if (Platform.isWindows()) {
+            Native.loadLibrary("libgcc_s_seh-1", LibVosk.class);
+            Native.loadLibrary("libstdc++-6", LibVosk.class);
+            Native.loadLibrary("libwinpthread-1", LibVosk.class);
+        }
         Native.register(LibVosk.class, Platform.isWindows() ? "libvosk" : "vosk");
     }
 
