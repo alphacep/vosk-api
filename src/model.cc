@@ -164,6 +164,11 @@ void Model::ConfigureV1()
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/pitch.conf";
     phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
+    rnnlm_word_feats_rxfilename_ = model_path_str_ + "/rnnlm/word_feats.txt";
+    rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
+    rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
+    rnnlm_lm_rxfilename_ = model_path_str_ + "/rnnlm/final.raw";
+    rnnlm_lm_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
 }
 
 void Model::ConfigureV2()
@@ -189,6 +194,11 @@ void Model::ConfigureV2()
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/am/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/conf/pitch.conf";
     phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
+    rnnlm_word_feats_rxfilename_ = model_path_str_ + "/rnnlm/word_feats.txt";
+    rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
+    rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
+    rnnlm_lm_rxfilename_ = model_path_str_ + "/rnnlm/final.raw";
+    rnnlm_lm_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
 }
 
 void Model::ReadDataFiles()
@@ -254,18 +264,13 @@ void Model::ReadDataFiles()
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading HCLG from " << hclg_fst_rxfilename_;
         hclg_fst_ = fst::ReadFstKaldiGeneric(hclg_fst_rxfilename_);
-        hcl_fst_ = NULL;
-        g_fst_ = NULL;
     } else {
         KALDI_LOG << "Loading HCL and G from " << hcl_fst_rxfilename_ << " " << g_fst_rxfilename_;
-        hclg_fst_ = NULL;
         hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename_);
         g_fst_ = fst::StdFst::Read(g_fst_rxfilename_);
         ReadIntegerVectorSimple(disambig_rxfilename_, &disambig_);
     }
 
-    word_syms_ = NULL;
-    word_syms_loaded_ = false;
     if (hclg_fst_ && hclg_fst_->OutputSymbols()) {
         word_syms_ = hclg_fst_->OutputSymbols();
     } else if (g_fst_ && g_fst_->OutputSymbols()) {
@@ -280,14 +285,12 @@ void Model::ReadDataFiles()
     }
     KALDI_ASSERT(word_syms_);
 
+
     if (stat(winfo_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading winfo " << winfo_rxfilename_;
         kaldi::WordBoundaryInfoNewOpts opts;
         winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
-    } else {
-        winfo_ = NULL;
     }
-
 
     phone_symbol_table_ = NULL;
     phone_syms_loaded_ = false;
@@ -299,11 +302,34 @@ void Model::ReadDataFiles()
         phone_syms_loaded_ = true;
     }
 
-    std_lm_fst_ = NULL;
-    if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
+    // RNNLM Rescoring
+    if (stat(rnnlm_lm_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading RNNLM model from " << rnnlm_lm_rxfilename_;
+
+        ReadKaldiObject(rnnlm_lm_rxfilename_, &rnnlm);
+        rnnlm_lm_fst_ = fst::ReadAndPrepareLmFst(rnnlm_lm_fst_rxfilename_);
+        Matrix<BaseFloat> feature_embedding_mat;
+        ReadKaldiObject(rnnlm_feat_embedding_rxfilename_, &feature_embedding_mat);
+        SparseMatrix<BaseFloat> word_feature_mat;
+        {
+           Input input(rnnlm_word_feats_rxfilename_);
+           int32 feature_dim = feature_embedding_mat.NumRows();
+           rnnlm::ReadSparseWordFeatures(input.Stream(), feature_dim,
+                             &word_feature_mat);
+        }
+        Matrix<BaseFloat> wm(word_feature_mat.NumRows(), feature_embedding_mat.NumCols());
+        wm.AddSmatMat(1.0, word_feature_mat, kNoTrans,
+                      feature_embedding_mat, 0.0);
+        word_embedding_mat.Resize(wm.NumRows(), wm.NumCols(), kUndefined);
+        word_embedding_mat.CopyFromMat(wm);
+
+        ReadConfigFromFile(rnnlm_config_rxfilename_, &rnnlm_compute_opts);
+
+    } else if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
+
         KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
         std_lm_fst_ = fst::ReadFstKaldi(std_fst_rxfilename_);
-        fst::Project(std_lm_fst_, fst::PROJECT_OUTPUT);
+        fst::Project(std_lm_fst_, fst::ProjectType::OUTPUT);
         if (std_lm_fst_->Properties(fst::kILabelSorted, true) == 0) {
             fst::ILabelCompare<fst::StdArc> ilabel_comp;
             fst::ArcSort(std_lm_fst_, ilabel_comp);

@@ -5,6 +5,13 @@ public class Vosk {
     VoskPINVOKE.SetLogLevel(level);
   }
 
+  public static void GpuInit() {
+    VoskPINVOKE.GpuInit();
+  }
+
+  public static void GpuThreadInit() {
+    VoskPINVOKE.GpuThreadInit();
+  }
 }
 
 }
