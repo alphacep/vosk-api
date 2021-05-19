@@ -235,6 +235,11 @@ void KaldiRecognizer::UpdateSilenceWeights()
     }
 }
 
+void KaldiRecognizer::SetMaxAlternatives(int max_alternatives)
+{
+    max_alternatives_ = max_alternatives;
+}
+
 bool KaldiRecognizer::AcceptWaveform(const char *data, int len)
 {
     Vector<BaseFloat> wave;
@@ -386,10 +391,94 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     return true;
 }
 
+
+const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
+{
+    MinimumBayesRisk mbr(clat);
+    const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
+    const vector<int32> &words = mbr.GetOneBest();
+    const vector<pair<BaseFloat, BaseFloat> > &times =
+          mbr.GetOneBestTimes();
+
+    int size = words.size();
+
+    json::JSON obj;
+    stringstream text;
+
+    // Create JSON object
+    for (int i = 0; i < size; i++) {
+        json::JSON word;
+        word["word"] = model_->word_syms_->Find(words[i]);
+        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
+        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
+        word["conf"] = conf[i];
+        obj["result"].append(word);
+
+        if (i) {
+            text << " ";
+        }
+        text << model_->word_syms_->Find(words[i]);
+    }
+    obj["text"] = text.str();
+
+    if (spk_model_) {
+        Vector<BaseFloat> xvector;
+        int num_spk_frames;
+        if (GetSpkVector(xvector, &num_spk_frames)) {
+            for (int i = 0; i < xvector.Dim(); i++) {
+                obj["spk"].append(xvector(i));
+            }
+            obj["spk_frames"] = num_spk_frames;
+        }
+    }
+
+    return StoreReturn(obj.dump());
+}
+
+const char *KaldiRecognizer::NbestResult(CompactLattice &clat)
+{
+    Lattice lat;
+    Lattice nbest_lat;
+    std::vector<Lattice> nbest_lats;
+
+    ConvertLattice (clat, &lat);
+    fst::ShortestPath(lat, &nbest_lat, max_alternatives_);
+    fst::ConvertNbestToVector(nbest_lat, &nbest_lats);
+
+    json::JSON obj;
+    std::stringstream ss;
+    for (int k = 0; k < nbest_lats.size(); k++) {
+
+      Lattice nlat = nbest_lats[k];
+
+      std::vector<int32> alignment;
+      std::vector<int32> words;
+      LatticeWeight weight;
+
+      GetLinearSymbolSequence(nlat, &alignment, &words, &weight);
+      float likelihood = -(weight.Value1() + weight.Value2());
+
+      stringstream text;
+
+      for (int i = 0; i < words.size(); i++) {
+        if (i)
+          text << " ";
+        text << model_->word_syms_->Find(words[i]);
+      }
+
+      json::JSON entry;
+      entry["text"] = text.str();
+      entry["confidence"]= likelihood;
+      obj["alternatives"].append(entry);
+    }
+
+    return StoreReturn(obj.dump());
+}
+
 const char* KaldiRecognizer::GetResult()
 {
     if (decoder_->NumFramesDecoded() == 0) {
-        return StoreReturn("{\"text\": \"\"}");
+        return StoreEmptyReturn();
     }
 
     kaldi::CompactLattice clat;
@@ -440,52 +529,19 @@ const char* KaldiRecognizer::GetResult()
         aligned_lat = clat;
     }
 
-    MinimumBayesRisk mbr(aligned_lat);
-    const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
-    const vector<int32> &words = mbr.GetOneBest();
-    const vector<pair<BaseFloat, BaseFloat> > &times =
-          mbr.GetOneBestTimes();
-
-    int size = words.size();
-
-    json::JSON obj;
-    stringstream text;
-
-    // Create JSON object
-    for (int i = 0; i < size; i++) {
-        json::JSON word;
-        word["word"] = model_->word_syms_->Find(words[i]);
-        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
-        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
-        word["conf"] = conf[i];
-        obj["result"].append(word);
-
-        if (i) {
-            text << " ";
-        }
-        text << model_->word_syms_->Find(words[i]);
-    }
-    obj["text"] = text.str();
-
-    if (spk_model_) {
-        Vector<BaseFloat> xvector;
-        int num_spk_frames;
-        if (GetSpkVector(xvector, &num_spk_frames)) {
-            for (int i = 0; i < xvector.Dim(); i++) {
-                obj["spk"].append(xvector(i));
-            }
-            obj["spk_frames"] = num_spk_frames;
-        }
+    if (max_alternatives_ == 0) {
+        return MbrResult(aligned_lat);
+    } else {
+        return NbestResult(aligned_lat);
     }
 
-    return StoreReturn(obj.dump());
 }
 
 
 const char* KaldiRecognizer::PartialResult()
 {
     if (state_ != RECOGNIZER_RUNNING) {
-        return StoreReturn("{\"text\": \"\"}");
+        return StoreEmptyReturn();
     }
 
     json::JSON res;
@@ -516,7 +572,7 @@ const char* KaldiRecognizer::PartialResult()
 const char* KaldiRecognizer::Result()
 {
     if (state_ != RECOGNIZER_RUNNING) {
-        return StoreReturn("{\"text\": \"\"}");
+        return StoreEmptyReturn();
     }
     decoder_->FinalizeDecoding();
     state_ = RECOGNIZER_ENDPOINT;
@@ -526,7 +582,7 @@ const char* KaldiRecognizer::Result()
 const char* KaldiRecognizer::FinalResult()
 {
     if (state_ != RECOGNIZER_RUNNING) {
-        return StoreReturn("{\"text\": \"\"}");
+        return StoreEmptyReturn();
     }
 
     feature_pipeline_->InputFinished();
@@ -549,6 +605,15 @@ const char* KaldiRecognizer::FinalResult()
     spk_feature_ = nullptr;
 
     return last_result_.c_str();
+}
+
+const char *KaldiRecognizer::StoreEmptyReturn()
+{
+    if (!max_alternatives_) {
+        return StoreReturn("{\"text\": \"\"}");
+    } else {
+        return StoreReturn("{\"alternatives\" : [{\"text\": \"\", \"confidence\" : 1.0}] }");
+    }
 }
 
 // Store result in recognizer and return as const string

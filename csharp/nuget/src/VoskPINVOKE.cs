@@ -32,6 +32,9 @@ class VoskPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_free")]
   public static extern void delete_VoskRecognizer(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_max_alternatives")]
+  public static extern void VoskRecognizer_SetMaxAlternatives(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_accept_waveform")]
   public static extern bool VoskRecognizer_AcceptWaveform(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg2, int jarg3);
 

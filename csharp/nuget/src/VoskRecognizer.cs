@@ -38,6 +38,10 @@ public class VoskRecognizer : global::System.IDisposable {
   public VoskRecognizer(Model model, float sample_rate, string grammar) : this(VoskPINVOKE.new_VoskRecognizerGrm(Model.getCPtr(model), sample_rate, grammar)) {
   }
 
+  public void SetMaxAlternatives(int max_alternatives) {
+    VoskPINVOKE.VoskRecognizer_SetMaxAlternatives(handle, max_alternatives);
+  }
+
   public bool AcceptWaveform(byte[] data, int len) {
     return VoskPINVOKE.VoskRecognizer_AcceptWaveform(handle, data, len);
   }
