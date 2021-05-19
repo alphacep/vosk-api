@@ -46,6 +46,7 @@ class KaldiRecognizer {
         KaldiRecognizer(Model *model, SpkModel *spk_model, float sample_frequency);
         KaldiRecognizer(Model *model, float sample_frequency, char const *grammar);
         ~KaldiRecognizer();
+        void SetMaxAlternatives(int max_alternatives);
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);
@@ -61,7 +62,10 @@ class KaldiRecognizer {
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
         bool GetSpkVector(Vector<BaseFloat> &out_xvector, int *frames);
         const char *GetResult();
+        const char *StoreEmptyReturn();
         const char *StoreReturn(const string &res);
+        const char *MbrResult(CompactLattice &clat);
+        const char *NbestResult(CompactLattice &clat);
 
         Model *model_ = nullptr;
         SingleUtteranceNnet3Decoder *decoder_ = nullptr;
@@ -83,6 +87,8 @@ class KaldiRecognizer {
         fst::BackoffDeterministicOnDemandFst<fst::StdArc> *lm_to_subtract_det_backoff = nullptr;
         kaldi::rnnlm::KaldiRnnlmDeterministicFst* lm_to_add_orig = nullptr;
         fst::DeterministicOnDemandFst<fst::StdArc> *lm_to_add = nullptr;
+
+        int max_alternatives_ = 0; // Disable alternatives by default
 
         float sample_frequency_;
         int32 frame_offset_;

@@ -113,6 +113,20 @@ VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, VoskSpkModel *spk_mode
  *  @returns recognizer object */
 VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, const char *grammar);
 
+/** Configures recognizer to output n-best results
+ *
+ * <pre>
+ *   {
+ *      "alternatives": [
+ *          { "text": "one two three four five", "confidence": 0.97 },
+ *          { "text": "one two three for five", "confidence": 0.03 },
+ *      ]
+ *   }
+ * </pre>
+ *
+ * @param max_alternatives - maximum alternatives to return from recognition results
+ */
+void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives);
 
 /** Accept voice data
  *
@@ -171,6 +185,8 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
  *   "text" : "what zero zero zero one"
  *  }
  * </pre>
+ *
+ * If alternatives enabled it returns result with alternatives, see also vosk_recognizer_set_alternatives().
  */
 const char *vosk_recognizer_result(VoskRecognizer *recognizer);
 

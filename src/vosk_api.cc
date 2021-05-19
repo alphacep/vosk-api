@@ -65,6 +65,11 @@ VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, con
     return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, grammar);
 }
 
+void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives)
+{
+    ((KaldiRecognizer *)recognizer)->SetMaxAlternatives(max_alternatives);
+}
+
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
 {
     return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);

@@ -6,8 +6,12 @@
     <RootNamespace>VoskDemo</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <RestoreSources>$(RestoreSources);../nuget</RestoreSources>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Vosk" Version="0.3.21" />
+    <PackageReference Include="Vosk" Version="0.3.27" />
   </ItemGroup>
 
 </Project>
