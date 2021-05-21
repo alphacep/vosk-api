@@ -1,0 +1,15 @@
+{
+  "name": "vosk-demo-srt",
+  "version": "1.0.0",
+  "description": "Vosk NodeJS srt demo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alpha Cephei Inc.",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "vosk": "^0.3.27",
+    "subtitle": "^4.1.0"
+  }
+}
