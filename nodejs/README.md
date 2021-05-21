@@ -3,7 +3,7 @@ This is an FFI-NAPI wrapper for the Vosk library.
 ## Usage
 
 ```sh
-npm install vosk-api
+npm install vosk
 ```
 
 It mostly follows Vosk interface, some methods are not yet fully implemented.
