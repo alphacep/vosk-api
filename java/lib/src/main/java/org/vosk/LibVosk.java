@@ -1,17 +1,21 @@
 package org.vosk;
 
 import com.sun.jna.Native;
+import com.sun.jna.Library;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 
 public class LibVosk {
 
+    public static interface DependentLibrary extends Library {
+    }
+
     static {
         // We have to load dependencies
         if (Platform.isWindows()) {
-            Native.loadLibrary("libgcc_s_seh-1", LibVosk.class);
-            Native.loadLibrary("libstdc++-6", LibVosk.class);
-            Native.loadLibrary("libwinpthread-1", LibVosk.class);
+            Native.loadLibrary("libgcc_s_seh-1", DependentLibrary.class);
+            Native.loadLibrary("libstdc++-6", DependentLibrary.class);
+            Native.loadLibrary("libwinpthread-1", DependentLibrary.class);
         }
         Native.register(LibVosk.class, Platform.isWindows() ? "libvosk" : "vosk");
     }
