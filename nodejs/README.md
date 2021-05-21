@@ -42,7 +42,7 @@ This repository uses `yarn`, therefore:
 
 ```sh
 yarn install
-yarn download:lib # Required wget
+yarn download:lib # Requires wget
 ```
 
 **Note: `yarn download:lib` downloads the prebuild vosk library that is also included in the published version of this library on npm. If you need the latest Vosk-API features that might not be included in these binaries yet, you'll have to build the Vosk-API from source and create the `nodejs/lib` directory yourself.**
