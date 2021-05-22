@@ -17,6 +17,7 @@
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
 #include "language_model.h"
+#include "ivector/plda.h"
 
 using namespace fst;
 using namespace kaldi::nnet3;
