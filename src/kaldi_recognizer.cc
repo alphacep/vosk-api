@@ -20,6 +20,7 @@
 
 using namespace fst;
 using namespace kaldi::nnet3;
+typedef unordered_map<string, Vector<BaseFloat>*, StringHasher> HashType;
 
 KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) {
 
