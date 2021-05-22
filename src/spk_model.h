@@ -18,6 +18,7 @@
 #include "base/kaldi-common.h"
 #include "online2/online-feature-pipeline.h"
 #include "nnet3/nnet-utils.h"
+#include "ivector/plda.h"
 
 using namespace kaldi;
 
@@ -42,6 +43,8 @@ protected:
 
     MfccOptions spkvector_mfcc_opts;
     VadEnergyOptions vad_opts;
+
+    Plda plda;
 
     int ref_cnt_;
 };
