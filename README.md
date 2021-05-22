@@ -1,7 +1,7 @@
 # Vosk
-![code size](https://img.shields.io/github/languages/code-size/alphacep/vosk-api)
-![downloads](https://img.shields.io/github/downloads/alphacep/vosk-api/total)
-![license](https://img.shields.io/github/license/alphacep/vosk-api)
+![code size](https://img.shields.io/github/languages/code-size/alphacep/vosk-api?style=for-the-badge&logo=appveyor)
+![downloads](https://img.shields.io/github/downloads/alphacep/vosk-api/total?style=for-the-badge&logo=appveyor)
+![license](https://img.shields.io/github/license/alphacep/vosk-api?style=for-the-badge&logo=appveyor)
 
 **Vosk** is an offline open source speech recognition toolkit.
 
