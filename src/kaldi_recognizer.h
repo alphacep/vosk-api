@@ -55,6 +55,7 @@ class KaldiRecognizer {
         const char* PartialResult();
 
     private:
+        void PldaScoring();
         void InitState();
         void InitRescoring();
         void CleanUp();

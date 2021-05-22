@@ -622,3 +622,85 @@ const char *KaldiRecognizer::StoreReturn(const string &res)
     last_result_ = res;
     return last_result_.c_str();
 }
+
+void KaldiRecognizer::PldaScoring() {
+
+    int64 num_train_ivectors = 0, num_train_errs = 0, num_test_ivectors = 0;
+    double tot_test_renorm_scale = 0.0, tot_train_renorm_scale = 0.0;
+    HashType test_ivectors;
+    KALDI_LOG << "Reading test iVectors";
+    std::string utt = "default";
+    if (test_ivectors.count(utt) != 0) {
+        KALDI_ERR << "Duplicate test iVector found for utterance " << utt;
+    }
+
+    xvector_result.AddVec(-1.0, lid_model_->mean);
+    const Vector <BaseFloat> &vec(xvector_result);
+    int32 transform_rows = lid_model_->transform.NumRows();
+    int32 transform_cols = lid_model_->transform.NumCols();
+    int32 vec_dim = vec.Dim();
+    Vector <BaseFloat> vec_out(transform_rows);
+    if (transform_cols == vec_dim) {
+        vec_out.AddMatVec(1.0, lid_model_->transform, kNoTrans, vec, 0.0);
+    } else {
+        if (transform_cols != vec_dim + 1) {
+            KALDI_ERR << "Dimension mismatch: input vector has dimension "
+                      << vec.Dim() << " and transform has " << transform_cols
+                      << " columns.";
+        }
+        vec_out.CopyColFromMat(lid_model_->transform, vec_dim);
+        vec_out.AddMatVec(1.0, lid_model_->transform.Range(0, lid_model_->transform.NumRows(),
+                                                           0, vec_dim), kNoTrans, vec, 1.0);
+    }
+
+    int32 num_examples = 1;// this value is always used for test (affects the
+                           // length normalization in the TransformIvector
+                           // function).
+    Plda plda(lid_model_->plda);
+
+    int32 plda_dim = plda.Dim();
+    Vector <BaseFloat> *transformed_ivector = new Vector<BaseFloat>(plda_dim);
+    tot_test_renorm_scale += plda.TransformIvector(lid_model_->plda_config, vec_out,
+                                                   num_examples,
+                                                   transformed_ivector);
+    test_ivectors[utt] = transformed_ivector;
+    bool binary = false;
+
+    double sums = 0.0, sumsq = 0.0;
+    typedef unordered_map<string, Vector < BaseFloat>*, StringHasher > HashType;
+    std::map <std::string, int32> langs = lid_model_->num_utts;
+    for (auto const &x : langs) {
+        std::string key1 = x.first;
+        if (lid_model_->train_ivectors.count(key1) == 0) {
+            KALDI_WARN << "Key " << key1 << " not present in training iVectors.";
+            continue;
+        }
+        if (test_ivectors.count(utt) == 0) {
+            KALDI_WARN << "Key " << utt << " not present in test iVectors.";
+            continue;
+        }
+        const Vector <BaseFloat> *train_ivector = lid_model_->train_ivectors[key1];
+        const Vector <BaseFloat> *test_ivector = test_ivectors[utt];
+
+        Vector<double> train_ivector_dbl(*train_ivector),
+                test_ivector_dbl(*test_ivector);
+
+        int32 num_train_examples;
+        num_train_examples = lid_model_->num_utts[key1];
+
+        BaseFloat score = plda.LogLikelihoodRatio(train_ivector_dbl,
+                                                  num_train_examples,
+                                                  test_ivector_dbl);
+        sums += score;
+        sumsq += score * score;
+
+        scores_.insert(std::pair<std::string, BaseFloat>(key1, score));
+    }
+
+//    for (HashType::iterator iter = lid_model_->train_ivectors.begin();
+//         iter != lid_model_->train_ivectors.end(); ++iter)
+//        delete iter->second;
+    for (HashType::iterator iter = test_ivectors.begin();
+         iter != test_ivectors.end(); ++iter)
+        delete iter->second;
+}
