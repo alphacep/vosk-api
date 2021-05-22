@@ -19,6 +19,7 @@
 #include "online2/online-feature-pipeline.h"
 #include "nnet3/nnet-utils.h"
 #include "ivector/plda.h"
+#include "ivector/voice-activity-detection.h"
 
 using namespace kaldi;
 
