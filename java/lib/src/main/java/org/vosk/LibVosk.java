@@ -4,20 +4,42 @@ import com.sun.jna.Native;
 import com.sun.jna.Library;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class LibVosk {
 
-    public static interface DependentLibrary extends Library {
+    private static void unpackDll(File targetDir, String lib) throws IOException {
+        InputStream source = LibVosk.class.getResourceAsStream("/win32-x86-64/" + lib + ".dll");
+        Files.copy(source, new File(targetDir, lib + ".dll").toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     static {
-        // We have to load dependencies
+
         if (Platform.isWindows()) {
-            Native.loadLibrary("libgcc_s_seh-1", DependentLibrary.class);
-            Native.loadLibrary("libstdc++-6", DependentLibrary.class);
-            Native.loadLibrary("libwinpthread-1", DependentLibrary.class);
+            // We have to unpack dependencies
+            try {
+                // To get a tmp folder we unpack small library and mark it for deletion
+                File tmpFile = Native.extractFromResourcePath("/win32-x86-64/empty");
+                File tmpDir = tmpFile.getParentFile();
+                new File(tmpDir, tmpFile.getName() + ".x").createNewFile();
+
+                // Now unpack dependencies
+                unpackDll(tmpDir, "libwinpthread-1");
+                unpackDll(tmpDir, "libgcc_s_seh-1");
+                unpackDll(tmpDir, "libstdc++-6");
+
+            } catch (IOException e) {
+                // Nothing for now, it will fail on next step
+            } finally {
+                Native.register(LibVosk.class, "libvosk");
+            }
+        } else {
+            Native.register(LibVosk.class, "vosk");
         }
-        Native.register(LibVosk.class, Platform.isWindows() ? "libvosk" : "vosk");
     }
 
     public static native void vosk_set_log_level(int level);
