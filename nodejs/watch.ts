@@ -1,4 +1,4 @@
-import { setLogLevel, Model, SpkModel, Recognizer, Result } from './src/index'
+import { setLogLevel, Model, SpkModel, Recognizer } from './src/index'
 
 import fs from 'fs'
 import { Readable } from 'stream'
