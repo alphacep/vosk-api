@@ -79,6 +79,7 @@ class KaldiRecognizer {
         SpkModel *spk_model_ = nullptr;
         OnlineBaseFeature *spk_feature_ = nullptr;
         Vector <BaseFloat> xvector_result;
+        std::map<std::string, BaseFloat> scores_;
 
         // Rescoring
         fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_ = nullptr;
