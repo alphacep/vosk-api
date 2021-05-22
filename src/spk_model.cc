@@ -18,12 +18,49 @@ SpkModel::SpkModel(const char *speaker_path) {
     std::string speaker_path_str(speaker_path);
 
     ReadConfigFromFile(speaker_path_str + "/mfcc.conf", &spkvector_mfcc_opts);
-    ReadConfigFromFile(speaker_path_str + "/vad.conf", &opts);
+    ReadConfigFromFile(speaker_path_str + "/vad.conf", &vad_opts);
     spkvector_mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
 
-    plda_rxfilename = language_path_str + "/plda_adapt.smooth0.1";
+    plda_rxfilename = speaker_path_str + "/plda_adapt.smooth0.1";
     ReadKaldiObject(plda_rxfilename, &plda);
-    
+    train_ivector_rspecifier = "ark:" + speaker_path_str + "/xvector.final.train.scp";
+    num_utts_rspecifier = "ark:" + speaker_path_str + "/num_utts.ark";
+
+    RandomAccessInt32Reader num_utts_reader(num_utts_rspecifier);
+
+    double tot_test_renorm_scale = 0.0, tot_train_renorm_scale = 0.0;
+    int64 num_train_ivectors = 0, num_train_errs = 0, num_test_ivectors = 0;
+    int32 dim = plda.Dim();
+    SequentialBaseFloatVectorReader train_ivector_reader(train_ivector_rspecifier);
+    for (; !train_ivector_reader.Done(); train_ivector_reader.Next()) {
+        std::string spk = train_ivector_reader.Key();
+        if (train_ivectors.count(spk) != 0) {
+            KALDI_ERR << "Duplicate training iVector found for speaker " << spk;
+        }
+        const Vector<BaseFloat> &ivector = train_ivector_reader.Value();
+        int32 num_examples;
+        if (!num_utts_rspecifier.empty()) {
+            if (!num_utts_reader.HasKey(spk)) {
+                KALDI_WARN << "Number of utterances not given for speaker " << spk;
+                num_train_errs++;
+                continue;
+            }
+            num_examples = num_utts_reader.Value(spk);
+        } else {
+            num_examples = 1;
+        }
+        num_utts.insert(std::pair<std::string, int32>(spk, num_examples));
+
+        Vector<BaseFloat> *transformed_ivector = new Vector<BaseFloat>(dim);
+        tot_train_renorm_scale += plda.TransformIvector(plda_config, ivector,
+                                                        num_examples,
+                                                        transformed_ivector);
+        train_ivectors[spk] = transformed_ivector;
+        num_train_ivectors++;
+    }
+
+    KALDI_LOG << "Read " << num_train_ivectors << " training iVectors, "
+              << "errors on " << num_train_errs;
     ReadKaldiObject(speaker_path_str + "/final.ext.raw", &speaker_nnet);
     SetBatchnormTestMode(true, &speaker_nnet);
     SetDropoutTestMode(true, &speaker_nnet);

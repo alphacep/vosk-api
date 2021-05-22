@@ -22,6 +22,7 @@
 #include "ivector/voice-activity-detection.h"
 
 using namespace kaldi;
+typedef unordered_map<string, Vector<BaseFloat>*, StringHasher> HashType;
 
 class KaldiRecognizer;
 
@@ -37,13 +38,19 @@ protected:
     ~SpkModel() {};
 
     std::string plda_rxfilename;
+    std::string train_ivector_rspecifier;
+    std::string num_utts_rspecifier;
 
     kaldi::nnet3::Nnet speaker_nnet;
     kaldi::Vector<BaseFloat> mean;
     kaldi::Matrix<BaseFloat> transform;
 
+    HashType train_ivectors;
+    std::map<std::string, int32> num_utts;
+
     MfccOptions spkvector_mfcc_opts;
     VadEnergyOptions vad_opts;
+    PldaConfig plda_config;
 
     Plda plda;
 
