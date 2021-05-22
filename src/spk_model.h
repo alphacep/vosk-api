@@ -34,6 +34,8 @@ protected:
     friend class KaldiRecognizer;
     ~SpkModel() {};
 
+    std::string plda_rxfilename;
+
     kaldi::nnet3::Nnet speaker_nnet;
     kaldi::Vector<BaseFloat> mean;
     kaldi::Matrix<BaseFloat> transform;

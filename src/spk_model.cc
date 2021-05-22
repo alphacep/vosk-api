@@ -20,7 +20,8 @@ SpkModel::SpkModel(const char *speaker_path) {
     ReadConfigFromFile(speaker_path_str + "/mfcc.conf", &spkvector_mfcc_opts);
     ReadConfigFromFile(speaker_path_str + "/vad.conf", &opts);
     spkvector_mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
-
+    
+    plda_rxfilename = language_path_str + "/plda_adapt.smooth0.1";
     ReadKaldiObject(speaker_path_str + "/final.ext.raw", &speaker_nnet);
     SetBatchnormTestMode(true, &speaker_nnet);
     SetDropoutTestMode(true, &speaker_nnet);
