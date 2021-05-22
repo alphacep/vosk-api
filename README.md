@@ -1,7 +1,12 @@
 # About
+![code size](https://img.shields.io/github/languages/code-size/alphacep/vosk-api)
+![downloads](https://img.shields.io/github/downloads/alphacep/vosk-api/total)
+![license](https://img.shields.io/github/license/alphacep/vosk-api)
 
-**Vosk** is an offline open source speech recognition toolkit. It enables
-speech recognition models for 18 languages and dialects - English, Indian
+**Vosk** is an offline open source speech recognition toolkit.
+
+# Supported Languages
+English, Indian
 English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish,
 Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino,
 Ukrainian.
