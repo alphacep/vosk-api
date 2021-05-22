@@ -39,6 +39,7 @@ protected:
     kaldi::Matrix<BaseFloat> transform;
 
     MfccOptions spkvector_mfcc_opts;
+    VadEnergyOptions vad_opts;
 
     int ref_cnt_;
 };
