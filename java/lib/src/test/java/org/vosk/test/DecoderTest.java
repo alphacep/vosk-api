@@ -25,8 +25,10 @@ public class DecoderTest {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
         try (Model model = new Model("model");
-                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
-                    Recognizer recognizer = new Recognizer(model, 16000)) {
+            InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
+            Recognizer recognizer = new Recognizer(model, 16000)) {
+
+            recognizer.setMaxAlternatives(10);
 
             int nbytes;
             byte[] b = new byte[4096];
@@ -48,8 +50,8 @@ public class DecoderTest {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
         try (Model model = new Model("model");
-                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
-                    Recognizer recognizer = new Recognizer(model, 16000)) {
+            InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
+            Recognizer recognizer = new Recognizer(model, 16000)) {
 
             int nbytes;
             byte[] b = new byte[4096];
@@ -73,8 +75,8 @@ public class DecoderTest {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
         try (Model model = new Model("model");
-                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
-                    Recognizer recognizer = new Recognizer(model, 16000, "[\"one two three four five six seven eight nine zero oh\"]")) {
+            InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
+            Recognizer recognizer = new Recognizer(model, 16000, "[\"one two three four five six seven eight nine zero oh\"]")) {
 
             int nbytes;
             byte[] b = new byte[4096];

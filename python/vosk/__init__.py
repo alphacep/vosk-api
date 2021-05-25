@@ -54,6 +54,9 @@ class KaldiRecognizer(object):
     def __del__(self):
         _c.vosk_recognizer_free(self._handle)
 
+    def SetMaxAlternatives(self, max_alternatives):
+        _c.vosk_recognizer_set_max_alternatives(self._handle, max_alternatives)
+
     def AcceptWaveform(self, data):
         return _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
 

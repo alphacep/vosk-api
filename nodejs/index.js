@@ -91,6 +91,7 @@ const libvosk = ffi.Library(soname, {
     'vosk_recognizer_new_spk': [vosk_recognizer_ptr, [vosk_model_ptr, vosk_spk_model_ptr, 'float']],
     'vosk_recognizer_new_grm': [vosk_recognizer_ptr, [vosk_model_ptr, 'float', 'string']],
     'vosk_recognizer_free': ['void', [vosk_recognizer_ptr]],
+    'vosk_recognizer_set_max_alternatives': ['void', [vosk_recognizer_ptr, 'int']],
     'vosk_recognizer_accept_waveform': ['bool', [vosk_recognizer_ptr, 'pointer', 'int']],
     'vosk_recognizer_result': ['string', [vosk_recognizer_ptr]],
     'vosk_recognizer_final_result': ['string', [vosk_recognizer_ptr]],
@@ -241,6 +242,23 @@ class Recognizer {
      */
     free() {
         libvosk.vosk_recognizer_free(this.handle);
+    }
+
+    /** Configures recognizer to output n-best results
+     *
+     * <pre>
+     *   {
+     *      "alternatives": [
+     *          { "text": "one two three four five", "confidence": 0.97 },
+     *          { "text": "one two three for five", "confidence": 0.03 },
+     *      ]
+     *   }
+     * </pre>
+     *
+     * @param max_alternatives - maximum alternatives to return from recognition results
+     */
+    setMaxAlternatives(max_alternatives) {
+        return libvosk.vosk_recognizer_set_max_alternatives(this.handle, max_alternatives);
     }
 
     /** 

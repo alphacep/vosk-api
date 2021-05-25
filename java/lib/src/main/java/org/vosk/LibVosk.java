@@ -1,19 +1,45 @@
 package org.vosk;
 
 import com.sun.jna.Native;
+import com.sun.jna.Library;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class LibVosk {
 
+    private static void unpackDll(File targetDir, String lib) throws IOException {
+        InputStream source = LibVosk.class.getResourceAsStream("/win32-x86-64/" + lib + ".dll");
+        Files.copy(source, new File(targetDir, lib + ".dll").toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
     static {
-        // We have to load dependencies
+
         if (Platform.isWindows()) {
-            Native.loadLibrary("libgcc_s_seh-1", LibVosk.class);
-            Native.loadLibrary("libstdc++-6", LibVosk.class);
-            Native.loadLibrary("libwinpthread-1", LibVosk.class);
+            // We have to unpack dependencies
+            try {
+                // To get a tmp folder we unpack small library and mark it for deletion
+                File tmpFile = Native.extractFromResourcePath("/win32-x86-64/empty");
+                File tmpDir = tmpFile.getParentFile();
+                new File(tmpDir, tmpFile.getName() + ".x").createNewFile();
+
+                // Now unpack dependencies
+                unpackDll(tmpDir, "libwinpthread-1");
+                unpackDll(tmpDir, "libgcc_s_seh-1");
+                unpackDll(tmpDir, "libstdc++-6");
+
+            } catch (IOException e) {
+                // Nothing for now, it will fail on next step
+            } finally {
+                Native.register(LibVosk.class, "libvosk");
+            }
+        } else {
+            Native.register(LibVosk.class, "vosk");
         }
-        Native.register(LibVosk.class, Platform.isWindows() ? "libvosk" : "vosk");
     }
 
     public static native void vosk_set_log_level(int level);
@@ -31,6 +57,8 @@ public class LibVosk {
     public static native Pointer vosk_recognizer_new_spk(Pointer model, Pointer spkModel, float sample_rate);
 
     public static native Pointer vosk_recognizer_new_grm(Pointer model, float sample_rate, String grammar);
+
+    public static native void vosk_recognizer_set_max_alternatives(Pointer recognizer, int max_alternatives);
 
     public static native boolean vosk_recognizer_accept_waveform(Pointer recognizer, byte[] data, int len);
 

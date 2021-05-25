@@ -27,6 +27,7 @@ wfReader.on('format', async ({ audioFormat, sampleRate, channels }) => {
         process.exit(1);
     }
     const rec = new vosk.Recognizer({model: model, sampleRate: sampleRate});
+    rec.setMaxAlternatives(10);
     for await (const data of wfReadable) {
         const end_of_speech = rec.acceptWaveform(data);
         if (end_of_speech) {
