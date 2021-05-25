@@ -7,8 +7,8 @@ public class Recognizer extends PointerType implements AutoCloseable {
         super(LibVosk.vosk_recognizer_new(model, sampleRate));
     }
 
-    public Recognizer(Model model, SpeakerModel spkModel, float sampleRate) {
-        super(LibVosk.vosk_recognizer_new_spk(model.getPointer(), spkModel.getPointer(), sampleRate));
+    public Recognizer(Model model, float sampleRate, SpeakerModel spkModel) {
+        super(LibVosk.vosk_recognizer_new_spk(model.getPointer(), sampleRate, spkModel.getPointer()));
     }
 
     public Recognizer(Model model, float sampleRate, String grammar) {
@@ -17,6 +17,10 @@ public class Recognizer extends PointerType implements AutoCloseable {
 
     public void setMaxAlternatives(int maxAlternatives) {
         LibVosk.vosk_recognizer_set_max_alternatives(this.getPointer(), maxAlternatives);
+    }
+
+    public void setSpeakerModel(SpeakerModel spkModel) {
+        LibVosk.vosk_recognizer_set_spk_model(this.getPointer(), spkModel.getPointer());
     }
 
     public boolean acceptWaveForm(byte[] data, int len) {
@@ -41,6 +45,10 @@ public class Recognizer extends PointerType implements AutoCloseable {
 
     public String getFinalResult() {
         return LibVosk.vosk_recognizer_final_result(this.getPointer());
+    }
+
+    public void reset() {
+        LibVosk.vosk_recognizer_reset(this.getPointer());
     }
 
     @Override
