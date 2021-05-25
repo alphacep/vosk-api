@@ -24,7 +24,7 @@ class VoskPINVOKE {
   public static extern global::System.IntPtr new_VoskRecognizer(global::System.Runtime.InteropServices.HandleRef jarg1, float jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_new_spk")]
-  public static extern global::System.IntPtr new_VoskRecognizerSpk(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, float jarg3);
+  public static extern global::System.IntPtr new_VoskRecognizerSpk(global::System.Runtime.InteropServices.HandleRef jarg1, float jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_new_grm")]
   public static extern global::System.IntPtr new_VoskRecognizerGrm(global::System.Runtime.InteropServices.HandleRef jarg1, float jarg2, string jarg3);
@@ -34,6 +34,9 @@ class VoskPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_max_alternatives")]
   public static extern void VoskRecognizer_SetMaxAlternatives(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_spk_model")]
+  public static extern void VoskRecognizer_SetSpkModel(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_accept_waveform")]
   public static extern bool VoskRecognizer_AcceptWaveform(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)]byte[] jarg2, int jarg3);
@@ -52,6 +55,9 @@ class VoskPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_final_result")]
   public static extern global::System.IntPtr VoskRecognizer_FinalResult(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_reset")]
+  public static extern void VoskRecognizer_Reset(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_set_log_level")]
   public static extern void SetLogLevel(int jarg1);
