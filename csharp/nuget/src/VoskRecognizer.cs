@@ -32,7 +32,7 @@ public class VoskRecognizer : System.IDisposable {
   public VoskRecognizer(Model model, float sample_rate) : this(VoskPINVOKE.new_VoskRecognizer(Model.getCPtr(model), sample_rate)) {
   }
 
-  public VoskRecognizer(Model model, SpkModel spk_model, float sample_rate) : this(VoskPINVOKE.new_VoskRecognizerSpk(Model.getCPtr(model), SpkModel.getCPtr(spk_model), sample_rate)) {
+  public VoskRecognizer(Model model, float sample_rate, SpkModel spk_model) : this(VoskPINVOKE.new_VoskRecognizerSpk(Model.getCPtr(model), sample_rate, SpkModel.getCPtr(spk_model))) {
   }
 
   public VoskRecognizer(Model model, float sample_rate, string grammar) : this(VoskPINVOKE.new_VoskRecognizerGrm(Model.getCPtr(model), sample_rate, grammar)) {
@@ -40,6 +40,10 @@ public class VoskRecognizer : System.IDisposable {
 
   public void SetMaxAlternatives(int max_alternatives) {
     VoskPINVOKE.VoskRecognizer_SetMaxAlternatives(handle, max_alternatives);
+  }
+
+  public void SetSpkModel(SpkModel spk_model) {
+    VoskPINVOKE.VoskRecognizer_SetSpkModel(handle, SpkModel.getCPtr(spk_model));
   }
 
   public bool AcceptWaveform(byte[] data, int len) {
@@ -73,6 +77,10 @@ public class VoskRecognizer : System.IDisposable {
 
   public string FinalResult() {
     return PtrToStringUTF8(VoskPINVOKE.VoskRecognizer_FinalResult(handle));
+  }
+
+  public void Reset() {
+    VoskPINVOKE.VoskRecognizer_Reset(handle);
   }
 
 }

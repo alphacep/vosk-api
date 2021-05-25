@@ -44,7 +44,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="vosk",
-    version="0.3.27",
+    version="0.3.28",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="Offline open source speech recognition API based on Kaldi and Vosk",
