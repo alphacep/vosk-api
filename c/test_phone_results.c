@@ -8,7 +8,7 @@ int main() {
 
     VoskModel *model = vosk_model_new("model");
     VoskRecognizer *recognizer = vosk_recognizer_new(model, 16000.0);
-    vosk_recognizer_set_result_opts(recognizer, "phones");
+    vosk_recognizer_set_result_options(recognizer, "phones");
 
     wavin = fopen("test.wav", "rb");
     fseek(wavin, 44, SEEK_SET);

@@ -215,7 +215,7 @@ void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_al
  * </pre>
  * * @param result_opts - result options to determine which recognition results to return
  */
-void vosk_recognizer_set_result_opts(VoskRecognizer *recognizer, const char *result_opts);
+void vosk_recognizer_set_result_options(VoskRecognizer *recognizer, const char *result_opts);
 
 
 /** Accept voice data
