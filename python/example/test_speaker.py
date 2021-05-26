@@ -26,7 +26,9 @@ if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE
 # Large vocabulary free form recognition
 model = Model(model_path)
 spk_model = SpkModel(spk_model_path)
-rec = KaldiRecognizer(model, spk_model, wf.getframerate())
+#rec = KaldiRecognizer(model, wf.getframerate(), spk_model)
+rec = KaldiRecognizer(model, wf.getframerate())
+rec.SetSpkModel(spk_model)
 
 # We compare speakers with cosine distance. We can keep one or several fingerprints for the speaker in a database
 # to distingusih among users.

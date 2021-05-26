@@ -8,7 +8,7 @@ int main() {
 
     VoskModel *model = vosk_model_new("model");
     VoskSpkModel *spk_model = vosk_spk_model_new("spk-model");
-    VoskRecognizer *recognizer = vosk_recognizer_new_spk(model, spk_model, 16000.0);
+    VoskRecognizer *recognizer = vosk_recognizer_new_spk(model, 16000.0, spk_model);
 
     wavin = fopen("test.wav", "rb");
     fseek(wavin, 44, SEEK_SET);
