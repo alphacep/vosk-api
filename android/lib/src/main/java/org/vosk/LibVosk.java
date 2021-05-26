@@ -12,34 +12,8 @@ import java.nio.file.StandardCopyOption;
 
 public class LibVosk {
 
-    private static void unpackDll(File targetDir, String lib) throws IOException {
-        InputStream source = LibVosk.class.getResourceAsStream("/win32-x86-64/" + lib + ".dll");
-        Files.copy(source, new File(targetDir, lib + ".dll").toPath(), StandardCopyOption.REPLACE_EXISTING);
-    }
-
     static {
-
-        if (Platform.isWindows()) {
-            // We have to unpack dependencies
-            try {
-                // To get a tmp folder we unpack small library and mark it for deletion
-                File tmpFile = Native.extractFromResourcePath("/win32-x86-64/empty");
-                File tmpDir = tmpFile.getParentFile();
-                new File(tmpDir, tmpFile.getName() + ".x").createNewFile();
-
-                // Now unpack dependencies
-                unpackDll(tmpDir, "libwinpthread-1");
-                unpackDll(tmpDir, "libgcc_s_seh-1");
-                unpackDll(tmpDir, "libstdc++-6");
-
-            } catch (IOException e) {
-                // Nothing for now, it will fail on next step
-            } finally {
-                Native.register(LibVosk.class, "libvosk");
-            }
-        } else {
-            Native.register(LibVosk.class, "vosk");
-        }
+        Native.register(LibVosk.class, "vosk");
     }
 
     public static native void vosk_set_log_level(int level);

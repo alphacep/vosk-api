@@ -113,10 +113,12 @@ CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cu
     --host=$HOST --openblas-root=${WORKDIR}/local \
     --fst-root=${WORKDIR}/local --fst-version=${OPENFST_VERSION}
 make -j 8 depend
-make -j 8 online2 lm
+cd $WORKDIR/kaldi/src
+make -j 8 online2 lm rnnlm
 
 # Vosk-api
 cd $WORKDIR
+#rm -rf vosk-api
 git clone -b master --single-branch https://github.com/alphacep/vosk-api
 cd vosk-api/src
 make -j 8 KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
