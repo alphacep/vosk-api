@@ -221,6 +221,7 @@ public class SpeechService {
 
                 if (reset) {
                     recognizer.reset();
+                    reset = false;
                 }
 
                 if (nread < 0)
