@@ -74,8 +74,8 @@ interface VoskLibrary {
    *  @returns recognizer object */
   vosk_recognizer_new_spk: (
     model: VoskModel,
-    spkModel: VoskSpkModel,
     sampleRate: number,
+    spkModel: VoskSpkModel,
   ) => VoskRecognizer
 
   /** Creates the recognizer object with the phrase list
@@ -116,6 +116,16 @@ interface VoskLibrary {
   vosk_recognizer_set_max_alternatives: (
     recognizer: VoskRecognizer,
     maxAlternatives: number,
+  ) => void
+
+  /** Adds speaker recognition model to already created recognizer. Helps to initialize
+   * speaker recognition for grammar-based recognizer.
+   *
+   * @param spkModel Speaker recognition model
+   */
+  vosk_recognizer_set_spk_model: (
+    recognizer: VoskRecognizer,
+    spkModel: VoskSpkModel,
   ) => void
 
   /** Accept voice data
@@ -197,6 +207,12 @@ interface VoskLibrary {
    *  Underlying model is also unreferenced and if needed released */
   vosk_recognizer_free: (recognizer: VoskRecognizer) => void
 
+  /**
+   *
+   * Resets current results so the recognition can continue from scratch
+   */
+  vosk_recognizer_reset: (recognizer: VoskRecognizer) => void
+
   /** Set log level for Kaldi messages
    *
    *  @param log_level the level
@@ -230,13 +246,17 @@ const libvosk: VoskLibrary = ffi.Library(soname, {
   vosk_recognizer_new: [vosk_recognizer_ptr, [vosk_model_ptr, 'float']],
   vosk_recognizer_new_spk: [
     vosk_recognizer_ptr,
-    [vosk_model_ptr, vosk_spk_model_ptr, 'float'],
+    [vosk_model_ptr, 'float', vosk_spk_model_ptr],
   ],
   vosk_recognizer_new_grm: [
     vosk_recognizer_ptr,
     [vosk_model_ptr, 'float', 'string'],
   ],
   vosk_recognizer_set_max_alternatives: [vosk_recognizer_ptr, ['void', 'int']],
+  vosk_recognizer_set_spk_model: [
+    'void',
+    [vosk_recognizer_ptr, vosk_spk_model_ptr],
+  ],
   vosk_recognizer_accept_waveform: [
     'bool',
     [vosk_recognizer_ptr, 'pointer', 'int'],
@@ -245,6 +265,7 @@ const libvosk: VoskLibrary = ffi.Library(soname, {
   vosk_recognizer_partial_result: ['string', [vosk_recognizer_ptr]],
   vosk_recognizer_final_result: ['string', [vosk_recognizer_ptr]],
   vosk_recognizer_free: ['void', [vosk_recognizer_ptr]],
+  vosk_recognizer_reset: ['void', [vosk_recognizer_ptr]],
   vosk_set_log_level: ['void', ['int']],
   vosk_gpu_init: ['void', []],
   vosk_gpu_thread_init: ['void', []],

@@ -111,8 +111,8 @@ class Recognizer {
     if (spkModel) {
       this.handle = lib.vosk_recognizer_new_spk(
         model.getHandle(),
-        spkModel.getHandle(),
         sampleRate,
+        spkModel.getHandle(),
       )
       return
     }
@@ -128,6 +128,15 @@ class Recognizer {
    */
   free() {
     lib.vosk_recognizer_free(this.handle)
+  }
+
+  /** Adds speaker recognition model to already created recognizer. Helps to initialize
+   * speaker recognition for grammar-based recognizer.
+   *
+   * @param spkModel Speaker recognition model
+   */
+  setSpkModel(spkModel: SpkModel) {
+    lib.vosk_recognizer_set_spk_model(this.handle, spkModel.getHandle())
   }
 
   /**
@@ -259,6 +268,14 @@ class Recognizer {
    */
   finalResultObj(): Result {
     return JSON.parse(this.finalResult())
+  }
+
+  /**
+   *
+   * Resets current results so the recognition can continue from scratch
+   */
+  reset() {
+    lib.vosk_recognizer_reset(this.handle)
   }
 }
 
