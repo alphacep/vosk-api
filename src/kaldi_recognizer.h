@@ -43,16 +43,18 @@ enum KaldiRecognizerState {
 class KaldiRecognizer {
     public:
         KaldiRecognizer(Model *model, float sample_frequency);
-        KaldiRecognizer(Model *model, SpkModel *spk_model, float sample_frequency);
+        KaldiRecognizer(Model *model, float sample_frequency, SpkModel *spk_model);
         KaldiRecognizer(Model *model, float sample_frequency, char const *grammar);
         ~KaldiRecognizer();
         void SetMaxAlternatives(int max_alternatives);
+        void SetSpkModel(SpkModel *spk_model);
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);
         const char* Result();
         const char* FinalResult();
         const char* PartialResult();
+        void Reset();
 
     private:
         void PldaScoring();

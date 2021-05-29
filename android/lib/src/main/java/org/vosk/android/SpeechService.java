@@ -149,12 +149,22 @@ public class SpeechService {
         }
     }
 
+    /**
+     * Resets recognizer in a thread, starts recognition over again
+     */
+    public void reset() {
+        if (recognizerThread != null) {
+            recognizerThread.reset();
+        }
+    }
+
     private final class RecognizerThread extends Thread {
 
         private int remainingSamples;
         private final int timeoutSamples;
         private final static int NO_TIMEOUT = -1;
         private volatile boolean paused = false;
+        private volatile boolean reset = false;
 
         RecognitionListener listener;
 
@@ -181,6 +191,13 @@ public class SpeechService {
             this.paused = paused;
         }
 
+        /**
+         * Set reset state to signal reset of the recognizer and start over
+         */
+        public void reset() {
+            this.reset = true;
+        }
+
         @Override
         public void run() {
 
@@ -200,6 +217,11 @@ public class SpeechService {
 
                 if (paused) {
                     continue;
+                }
+
+                if (reset) {
+                    recognizer.reset();
+                    reset = false;
                 }
 
                 if (nread < 0)
