@@ -22,7 +22,7 @@
 #include "ivector/voice-activity-detection.h"
 
 using namespace kaldi;
-typedef unordered_map<string, Vector<BaseFloat>*, StringHasher> HashType;
+typedef unordered_map<std::string, Vector<BaseFloat>*, StringHasher> HashType;
 
 class KaldiRecognizer;
 
