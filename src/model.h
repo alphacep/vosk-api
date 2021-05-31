@@ -67,6 +67,7 @@ protected:
     string mfcc_conf_rxfilename_;
     string global_cmvn_stats_rxfilename_;
     string pitch_conf_rxfilename_;
+    string phone_syms_rxfilename_;
 
     string rnnlm_word_feats_rxfilename_;
     string rnnlm_feat_embedding_rxfilename_;
@@ -86,6 +87,8 @@ protected:
     bool word_syms_loaded_ = false;
     kaldi::WordBoundaryInfo *winfo_ = nullptr;
     vector<int32> disambig_;
+    const fst::SymbolTable *phone_symbol_table_;
+    bool phone_syms_loaded_;
 
     fst::Fst<fst::StdArc> *hclg_fst_ = nullptr;
     fst::Fst<fst::StdArc> *hcl_fst_ = nullptr;

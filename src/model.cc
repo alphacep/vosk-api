@@ -163,6 +163,7 @@ void Model::ConfigureV1()
     mfcc_conf_rxfilename_ = model_path_str_ + "/mfcc.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/pitch.conf";
+    phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
     rnnlm_word_feats_rxfilename_ = model_path_str_ + "/rnnlm/word_feats.txt";
     rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
     rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
@@ -192,6 +193,7 @@ void Model::ConfigureV2()
     mfcc_conf_rxfilename_ = model_path_str_ + "/conf/mfcc.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/am/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/conf/pitch.conf";
+    phone_syms_rxfilename_ = model_path_str_ + "/graph/phones.txt";
     rnnlm_word_feats_rxfilename_ = model_path_str_ + "/rnnlm/word_feats.txt";
     rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
     rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
@@ -283,10 +285,21 @@ void Model::ReadDataFiles()
     }
     KALDI_ASSERT(word_syms_);
 
+
     if (stat(winfo_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading winfo " << winfo_rxfilename_;
         kaldi::WordBoundaryInfoNewOpts opts;
         winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
+    }
+
+    phone_symbol_table_ = NULL;
+    phone_syms_loaded_ = false;
+    //Providing phones.txt symbol table is optional and currently not required by Vosk
+    //If you provide it by default the phone information will be computed
+    if (stat(phone_syms_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading phonemes from " << phone_syms_rxfilename_;
+        phone_symbol_table_  = fst::SymbolTable::ReadText(phone_syms_rxfilename_);
+        phone_syms_loaded_ = true;
     }
 
     // RNNLM Rescoring
