@@ -537,9 +537,9 @@ const char* KaldiRecognizer::GetResult()
     fst::ScaleLattice(fst::GraphLatticeScale(0.9), &rlat); // Apply rescoring weight
     CompactLattice aligned_lat;
     if (model_->winfo_) {
-        WordAlignLattice(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
+        WordAlignLattice(rlat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
     } else {
-        aligned_lat = clat;
+        aligned_lat = rlat;
     }
 
     if (max_alternatives_ == 0) {
