@@ -433,7 +433,12 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
         text << model_->word_syms_->Find(words[i]);
     }
     obj["text"] = text.str();
-    obj["confidence"] = confidence/size;
+    if (size > 0) {
+        obj["confidence"] = confidence/size;
+    } else {
+        obj["confidence"] = confidence;
+    }
+    
 
     if (spk_model_) {
         Vector<BaseFloat> xvector;
