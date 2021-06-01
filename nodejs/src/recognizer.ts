@@ -173,6 +173,30 @@ class Recognizer {
   }
 
   /**
+   * Accept voice data
+   *
+   * accept and process new chunk of voice data
+   *
+   * @param data Audio data in PCM 16-bit mono format
+   */
+  acceptWaveformAsync(data: Buffer): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      lib.vosk_recognizer_accept_waveform.async(
+        this.handle,
+        data,
+        data.length,
+        (err, endOfSpeech) => {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve(endOfSpeech)
+        },
+      )
+    })
+  }
+
+  /**
    * speech recognition text which is not yet finalized.
    * result may change as recognizer process more data.
    *

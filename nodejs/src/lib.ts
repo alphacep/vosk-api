@@ -135,11 +135,15 @@ interface VoskLibrary {
    *  @param data - audio data in PCM 16-bit mono format
    *  @param length - length of the audio data
    *  @returns true if silence is occured and you can retrieve a new utterance with result method */
-  vosk_recognizer_accept_waveform: (
-    recognizer: VoskRecognizer,
-    data: Buffer,
-    dataLength: number,
-  ) => boolean
+  vosk_recognizer_accept_waveform: {
+    (recognizer: VoskRecognizer, data: Buffer, dataLength: number): boolean
+    async: (
+      recognizer: VoskRecognizer,
+      data: Buffer,
+      dataLength: number,
+      cb: (err: Error | null, endOfSpeech: boolean) => void,
+    ) => void
+  }
 
   /** Returns speech recognition result
    *

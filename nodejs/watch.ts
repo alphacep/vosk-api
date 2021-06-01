@@ -29,7 +29,7 @@ wfReader.on('format', async ({ audioFormat, /* sampleRate, */ channels }) => {
     process.exit(1)
   }
   for await (const data of new Readable().wrap(wfReader)) {
-    const end_of_speech = rec.acceptWaveform(data)
+    const end_of_speech = await rec.acceptWaveformAsync(data)
     if (end_of_speech) {
       console.log('end_of_speech', rec.resultObj())
     } else {
