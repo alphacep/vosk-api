@@ -412,6 +412,7 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
           mbr.GetOneBestTimes();
 
     int size = words.size();
+    float confidence = 0.0;
 
     json::JSON obj;
     stringstream text;
@@ -423,6 +424,7 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
         word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
         word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
         word["conf"] = conf[i];
+        confidence += conf[i];
         obj["result"].append(word);
 
         if (i) {
@@ -431,6 +433,12 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
         text << model_->word_syms_->Find(words[i]);
     }
     obj["text"] = text.str();
+    if (size > 0) {
+        obj["confidence"] = confidence/size;
+    } else {
+        obj["confidence"] = confidence;
+    }
+    
 
     if (spk_model_) {
         Vector<BaseFloat> xvector;
