@@ -92,6 +92,7 @@ const libvosk = ffi.Library(soname, {
     'vosk_recognizer_new_grm': [vosk_recognizer_ptr, [vosk_model_ptr, 'float', 'string']],
     'vosk_recognizer_free': ['void', [vosk_recognizer_ptr]],
     'vosk_recognizer_set_max_alternatives': ['void', [vosk_recognizer_ptr, 'int']],
+    'vosk_recognizer_set_words': ['void', [vosk_recognizer_ptr, 'bool']],
     'vosk_recognizer_set_spk_model': ['void', [vosk_recognizer_ptr, vosk_spk_model_ptr]],
     'vosk_recognizer_accept_waveform': ['bool', [vosk_recognizer_ptr, 'pointer', 'int']],
     'vosk_recognizer_result': ['string', [vosk_recognizer_ptr]],
@@ -261,6 +262,43 @@ class Recognizer {
      */
     setMaxAlternatives(max_alternatives) {
         libvosk.vosk_recognizer_set_max_alternatives(this.handle, max_alternatives);
+    }
+
+    /** Configures recognizer to output words with times
+     *
+     * <pre>
+     *   "result" : [{
+     *       "conf" : 1.000000,
+     *       "end" : 1.110000,
+     *       "start" : 0.870000,
+     *       "word" : "what"
+     *     }, {
+     *       "conf" : 1.000000,
+     *       "end" : 1.530000,
+     *       "start" : 1.110000,
+     *       "word" : "zero"
+     *     }, {
+     *       "conf" : 1.000000,
+     *       "end" : 1.950000,
+     *       "start" : 1.530000,
+     *       "word" : "zero"
+     *     }, {
+     *       "conf" : 1.000000,
+     *       "end" : 2.340000,
+     *       "start" : 1.950000,
+     *       "word" : "zero"
+     *     }, {
+     *       "conf" : 1.000000,
+     *       "end" : 2.610000,
+     *       "start" : 2.340000,
+     *       "word" : "one"
+     *     }],
+     * </pre>
+     *
+     * @param words - boolean value
+     */
+    setWords(words) {
+        libvosk.vosk_recognizer_set_words(this.handle, words);
     }
 
     /** Adds speaker recognition model to already created recognizer. Helps to initialize

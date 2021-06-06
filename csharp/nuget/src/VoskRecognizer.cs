@@ -42,6 +42,10 @@ public class VoskRecognizer : System.IDisposable {
     VoskPINVOKE.VoskRecognizer_SetMaxAlternatives(handle, max_alternatives);
   }
 
+  public void SetWords(bool words) {
+    VoskPINVOKE.VoskRecognizer_SetWords(handle, words ? 1 : 0);
+  }
+
   public void SetSpkModel(SpkModel spk_model) {
     VoskPINVOKE.VoskRecognizer_SetSpkModel(handle, SpkModel.getCPtr(spk_model));
   }

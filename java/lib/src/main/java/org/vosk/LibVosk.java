@@ -60,6 +60,8 @@ public class LibVosk {
 
     public static native void vosk_recognizer_set_max_alternatives(Pointer recognizer, int max_alternatives);
 
+    public static native void vosk_recognizer_set_words(Pointer recognizer, boolean words);
+
     public static native void vosk_recognizer_set_spk_model(Pointer recognizer, Pointer spk_model);
 
     public static native boolean vosk_recognizer_accept_waveform(Pointer recognizer, byte[] data, int len);

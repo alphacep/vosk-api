@@ -29,6 +29,7 @@ public class DecoderTest {
             Recognizer recognizer = new Recognizer(model, 16000)) {
 
             recognizer.setMaxAlternatives(10);
+            recognizer.setWords(true);
 
             int nbytes;
             byte[] b = new byte[4096];

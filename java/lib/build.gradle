@@ -5,7 +5,7 @@ plugins {
 
 archivesBaseName = 'vosk'
 group = 'com.alphacephei'
-version = '0.3.29'
+version = '0.3.30'
 
 repositories {
     mavenCentral()
@@ -47,7 +47,7 @@ publishing {
     }
     repositories {
         maven {
-            url = "$buildDir/repo"
+            url = "repo"
         }
     }
 }
