@@ -19,6 +19,10 @@ public class Recognizer extends PointerType implements AutoCloseable {
         LibVosk.vosk_recognizer_set_max_alternatives(this.getPointer(), maxAlternatives);
     }
 
+    public void setWords(boolean words) {
+        LibVosk.vosk_recognizer_set_words(this.getPointer(), words);
+    }
+
     public void setSpeakerModel(SpeakerModel spkModel) {
         LibVosk.vosk_recognizer_set_spk_model(this.getPointer(), spkModel.getPointer());
     }

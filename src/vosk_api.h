@@ -138,6 +138,43 @@ void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk
  */
 void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives);
 
+
+/** Enables words with times in the output
+ *
+ * <pre>
+ *   "result" : [{
+ *       "conf" : 1.000000,
+ *       "end" : 1.110000,
+ *       "start" : 0.870000,
+ *       "word" : "what"
+ *     }, {
+ *       "conf" : 1.000000,
+ *       "end" : 1.530000,
+ *       "start" : 1.110000,
+ *       "word" : "zero"
+ *     }, {
+ *       "conf" : 1.000000,
+ *       "end" : 1.950000,
+ *       "start" : 1.530000,
+ *       "word" : "zero"
+ *     }, {
+ *       "conf" : 1.000000,
+ *       "end" : 2.340000,
+ *       "start" : 1.950000,
+ *       "word" : "zero"
+ *     }, {
+ *       "conf" : 1.000000,
+ *       "end" : 2.610000,
+ *       "start" : 2.340000,
+ *       "word" : "one"
+ *     }],
+ * </pre>
+ *
+ * @param words - boolean value
+ */
+void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words);
+
+
 /** Accept voice data
  *
  *  accept and process new chunk of voice data
@@ -165,38 +202,14 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
  *          with any json parser
  *
  * <pre>
- * {
- *   "result" : [{
- *       "conf" : 1.000000,
- *       "end" : 1.110000,
- *       "start" : 0.870000,
- *       "word" : "what"
- *     }, {
- *       "conf" : 1.000000,
- *       "end" : 1.530000,
- *       "start" : 1.110000,
- *       "word" : "zero"
- *     }, {
- *       "conf" : 1.000000,
- *       "end" : 1.950000,
- *       "start" : 1.530000,
- *       "word" : "zero"
- *     }, {
- *       "conf" : 1.000000,
- *       "end" : 2.340000,
- *       "start" : 1.950000,
- *       "word" : "zero"
- *     }, {
- *       "conf" : 1.000000,
- *      "end" : 2.610000,
- *       "start" : 2.340000,
- *       "word" : "one"
- *     }],
- *   "text" : "what zero zero zero one"
+ *  {
+ *    "text" : "what zero zero zero one"
  *  }
  * </pre>
  *
  * If alternatives enabled it returns result with alternatives, see also vosk_recognizer_set_alternatives().
+ *
+ * If word times enabled returns word time, see also vosk_recognizer_set_word_times().
  */
 const char *vosk_recognizer_result(VoskRecognizer *recognizer);
 
@@ -208,7 +221,7 @@ const char *vosk_recognizer_result(VoskRecognizer *recognizer);
  *
  * <pre>
  * {
- *  "partial" : "cyril one eight zero"
+ *    "partial" : "cyril one eight zero"
  * }
  * </pre>
  */

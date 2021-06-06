@@ -240,6 +240,11 @@ void KaldiRecognizer::SetMaxAlternatives(int max_alternatives)
     max_alternatives_ = max_alternatives;
 }
 
+void KaldiRecognizer::SetWords(bool words)
+{
+    words_ = words;
+}
+
 void KaldiRecognizer::SetSpkModel(SpkModel *spk_model)
 {
     if (state_ == RECOGNIZER_RUNNING) {
@@ -419,11 +424,14 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
     // Create JSON object
     for (int i = 0; i < size; i++) {
         json::JSON word;
-        word["word"] = model_->word_syms_->Find(words[i]);
-        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
-        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
-        word["conf"] = conf[i];
-        obj["result"].append(word);
+
+        if (words_) {
+            word["word"] = model_->word_syms_->Find(words[i]);
+            word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
+            word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
+            word["conf"] = conf[i];
+            obj["result"].append(word);
+        }
 
         if (i) {
             text << " ";
@@ -446,6 +454,67 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
     return StoreReturn(obj.dump());
 }
 
+static bool CompactLatticeToWordAlignmentWeight(const CompactLattice &clat,
+                                                std::vector<int32> *words,
+                                                std::vector<int32> *begin_times,
+                                                std::vector<int32> *lengths,
+                                                CompactLattice::Weight *tot_weight_out)
+{
+  typedef CompactLattice::Arc Arc;
+  typedef Arc::Label Label;
+  typedef CompactLattice::StateId StateId;
+  typedef CompactLattice::Weight Weight;
+  using namespace fst;
+
+  words->clear();
+  begin_times->clear();
+  lengths->clear();
+  *tot_weight_out = Weight::Zero();
+
+  StateId state = clat.Start();
+  Weight tot_weight = Weight::One();
+
+  int32 cur_time = 0;
+  if (state == kNoStateId) {
+    KALDI_WARN << "Empty lattice.";
+    return false;
+  }
+  while (1) {
+    Weight final = clat.Final(state);
+    size_t num_arcs = clat.NumArcs(state);
+    if (final != Weight::Zero()) {
+      if (num_arcs != 0) {
+        KALDI_WARN << "Lattice is not linear.";
+        return false;
+      }
+      if (!final.String().empty()) {
+        KALDI_WARN << "Lattice has alignments on final-weight: probably "
+            "was not word-aligned (alignments will be approximate)";
+      }
+      tot_weight = Times(final, tot_weight);
+      *tot_weight_out = tot_weight;
+      return true;
+    } else {
+      if (num_arcs != 1) {
+        KALDI_WARN << "Lattice is not linear: num-arcs = " << num_arcs;
+        return false;
+      }
+      fst::ArcIterator<CompactLattice> aiter(clat, state);
+      const Arc &arc = aiter.Value();
+      Label word_id = arc.ilabel; // Note: ilabel==olabel, since acceptor.
+      // Also note: word_id may be zero; we output it anyway.
+      int32 length = arc.weight.String().size();
+      words->push_back(word_id);
+      begin_times->push_back(cur_time);
+      lengths->push_back(length);
+      tot_weight = Times(arc.weight, tot_weight);
+      cur_time += length;
+      state = arc.nextstate;
+    }
+  }
+}
+
+
 const char *KaldiRecognizer::NbestResult(CompactLattice &clat)
 {
     Lattice lat;
@@ -461,23 +530,35 @@ const char *KaldiRecognizer::NbestResult(CompactLattice &clat)
     for (int k = 0; k < nbest_lats.size(); k++) {
 
       Lattice nlat = nbest_lats[k];
+      CompactLattice nclat;
+      ConvertLattice(nlat, &nclat);
 
-      std::vector<int32> alignment;
       std::vector<int32> words;
-      LatticeWeight weight;
+      std::vector<int32> begin_times;
+      std::vector<int32> lengths;
+      CompactLattice::Weight weight;
 
-      GetLinearSymbolSequence(nlat, &alignment, &words, &weight);
-      float likelihood = -(weight.Value1() + weight.Value2());
+      CompactLatticeToWordAlignmentWeight(nclat, &words, &begin_times, &lengths, &weight);
+      float likelihood = -(weight.Weight().Value1() + weight.Weight().Value2());
 
       stringstream text;
+      json::JSON entry;
 
       for (int i = 0; i < words.size(); i++) {
+        json::JSON word;
+        if (words[i] == 0)
+            continue;
+        if (words_) {
+            word["word"] = model_->word_syms_->Find(words[i]);
+            word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + begin_times[i]) * 0.03;
+            word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + begin_times[i] + lengths[i]) * 0.03;
+            entry["result"].append(word);
+        }
         if (i)
           text << " ";
         text << model_->word_syms_->Find(words[i]);
       }
 
-      json::JSON entry;
       entry["text"] = text.str();
       entry["confidence"]= likelihood;
       obj["alternatives"].append(entry);
