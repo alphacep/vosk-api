@@ -161,6 +161,42 @@ class Recognizer {
   }
 
   /**
+   * Configures recognizer to output words with times
+   *
+   * <pre>
+   *   "result" : [{
+   *       "conf" : 1.000000,
+   *       "end" : 1.110000,
+   *       "start" : 0.870000,
+   *       "word" : "what"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 1.530000,
+   *       "start" : 1.110000,
+   *       "word" : "zero"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 1.950000,
+   *       "start" : 1.530000,
+   *       "word" : "zero"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 2.340000,
+   *       "start" : 1.950000,
+   *       "word" : "zero"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 2.610000,
+   *       "start" : 2.340000,
+   *       "word" : "one"
+   *     }],
+   * </pre>
+   */
+  setWords(words: boolean) {
+    return lib.vosk_recognizer_set_words(this.handle, words)
+  }
+
+  /**
    * Accept voice data
    *
    * accept and process new chunk of voice data

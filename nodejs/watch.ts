@@ -13,6 +13,7 @@ const rec = new Recognizer({
   spkModel,
 })
 // rec.setMaxAlternatives(2)
+rec.setWords(true)
 
 // To narrow down the possible words to appear in the result
 // const rec = new Recognizer(model, 16000.0, [

@@ -118,6 +118,43 @@ interface VoskLibrary {
     maxAlternatives: number,
   ) => void
 
+  /**
+   * Configures recognizer to output words with times
+   *
+   * <pre>
+   *   "result" : [{
+   *       "conf" : 1.000000,
+   *       "end" : 1.110000,
+   *       "start" : 0.870000,
+   *       "word" : "what"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 1.530000,
+   *       "start" : 1.110000,
+   *       "word" : "zero"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 1.950000,
+   *       "start" : 1.530000,
+   *       "word" : "zero"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 2.340000,
+   *       "start" : 1.950000,
+   *       "word" : "zero"
+   *     }, {
+   *       "conf" : 1.000000,
+   *       "end" : 2.610000,
+   *       "start" : 2.340000,
+   *       "word" : "one"
+   *     }],
+   * </pre>
+   */
+  vosk_recognizer_set_words: (
+    recognizer: VoskRecognizer,
+    words: boolean,
+  ) => void
+
   /** Adds speaker recognition model to already created recognizer. Helps to initialize
    * speaker recognition for grammar-based recognizer.
    *
@@ -257,6 +294,7 @@ const libvosk: VoskLibrary = ffi.Library(soname, {
     [vosk_model_ptr, 'float', 'string'],
   ],
   vosk_recognizer_set_max_alternatives: [vosk_recognizer_ptr, ['void', 'int']],
+  vosk_recognizer_set_words: ['void', [vosk_recognizer_ptr, 'bool']],
   vosk_recognizer_set_spk_model: [
     'void',
     [vosk_recognizer_ptr, vosk_spk_model_ptr],
