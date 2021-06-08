@@ -32,7 +32,7 @@ export interface Result {
   /**
    * Details about the words that have been detected
    */
-  result: WordInfo[]
+  result?: WordInfo[]
   /**
    * The complete utterance that have been detected
    */
