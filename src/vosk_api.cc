@@ -105,11 +105,6 @@ const char *vosk_recognizer_final_result(VoskRecognizer *recognizer)
     return ((KaldiRecognizer *)recognizer)->FinalResult();
 }
 
-void vosk_recognizer_plda_scoring(VoskRecognizer *recognizer)
-{
-    return ((KaldiRecognizer *)recognizer)->PldaScoring();
-}
-
 void vosk_recognizer_reset(VoskRecognizer *recognizer)
 {
     ((KaldiRecognizer *)recognizer)->Reset();

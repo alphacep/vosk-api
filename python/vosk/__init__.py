@@ -72,9 +72,6 @@ class KaldiRecognizer(object):
     def FinalResult(self):
         return _ffi.string(_c.vosk_recognizer_final_result(self._handle)).decode('utf-8')
 
-    def PldaScoring(self):
-        return _c.vosk_recognizer_plda_scoring(self._handle)
-
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)
 

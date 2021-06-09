@@ -224,12 +224,6 @@ const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer);
 const char *vosk_recognizer_final_result(VoskRecognizer *recognizer);
 
 
-/** Calculates PLDA Scoring for the recognizer
- *  
-    Calculates Probabilistic Linear Discriminant Analysis Scores for given recognizer */
-void vosk_recognizer_plda_scoring(VoskRecognizer *recognizer);
-
-
 /** Resets the recognizer
  *
  *  Resets current results so the recognition can continue from scratch */

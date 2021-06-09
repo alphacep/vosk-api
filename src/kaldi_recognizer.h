@@ -55,10 +55,10 @@ class KaldiRecognizer {
         const char* FinalResult();
         const char* PartialResult();
         void Reset();
-        void PldaScoring();
 
     private:
         void InitState();
+        void PldaScoring();
         void InitRescoring();
         void CleanUp();
         void UpdateSilenceWeights();
