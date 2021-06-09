@@ -406,6 +406,9 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
                                                   // expectation, if normally
     out_xvector.Scale(1.0 / ratio);
 
+    xvector_result = out_xvector;
+    PldaScoring();
+
     return true;
 }
 
@@ -450,6 +453,23 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
                 obj["spk"].append(xvector(i));
             }
             obj["spk_frames"] = num_spk_frames;
+
+            using pair_type = decltype(scores_)::value_type;
+            auto pr = std::max_element
+            (
+                std::begin(scores_), std::end(scores_), [] (const pair_type & p1, const pair_type & p2) {
+                    return p1.second < p2.second;
+                }
+            );
+            KALDI_LOG << "speaker " << GetLanguage(pr -> first) << " score " << pr -> second;
+
+            for (auto const &x : scores_) {
+                json::JSON res;
+                res["speaker"] = x.first;
+                res["score"] = x.second;
+                obj.append(res);
+            }
+            scores_.clear();
         }
     }
 
