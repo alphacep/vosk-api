@@ -48,6 +48,7 @@ class KaldiRecognizer {
         ~KaldiRecognizer();
         void SetMaxAlternatives(int max_alternatives);
         void SetSpkModel(SpkModel *spk_model);
+        void SetWords(bool words);
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);
@@ -94,6 +95,7 @@ class KaldiRecognizer {
         fst::DeterministicOnDemandFst<fst::StdArc> *lm_to_add = nullptr;
 
         int max_alternatives_ = 0; // Disable alternatives by default
+        bool words_ = false;
 
         float sample_frequency_;
         int32 frame_offset_;

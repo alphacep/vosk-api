@@ -70,6 +70,11 @@ void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_al
     ((KaldiRecognizer *)recognizer)->SetMaxAlternatives(max_alternatives);
 }
 
+void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words)
+{
+    ((KaldiRecognizer *)recognizer)->SetWords((bool)words);
+}
+
 void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model)
 {
     ((KaldiRecognizer *)recognizer)->SetSpkModel((SpkModel *)spk_model);
