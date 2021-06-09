@@ -467,7 +467,7 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
                 json::JSON res;
                 res["speaker"] = x.first;
                 res["score"] = x.second;
-                obj.append(res);
+                obj["scores"].append(res);
             }
             scores_.clear();
         }
