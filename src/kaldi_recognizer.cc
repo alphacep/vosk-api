@@ -461,7 +461,7 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
                     return p1.second < p2.second;
                 }
             );
-            KALDI_LOG << "speaker " << GetLanguage(pr -> first) << " score " << pr -> second;
+            KALDI_LOG << "speaker " << pr -> first << " score " << pr -> second;
 
             for (auto const &x : scores_) {
                 json::JSON res;
