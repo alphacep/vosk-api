@@ -21,7 +21,7 @@ SpkModel::SpkModel(const char *speaker_path) {
     ReadConfigFromFile(speaker_path_str + "/vad.conf", &vad_opts);
     spkvector_mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
 
-    plda_rxfilename = speaker_path_str + "/plda_adapt.smooth0.1";
+    plda_rxfilename = speaker_path_str + "/plda";
     ReadKaldiObject(plda_rxfilename, &plda);
     train_ivector_rspecifier = "ark:" + speaker_path_str + "/xvector.final.train.scp";
     num_utts_rspecifier = "ark:" + speaker_path_str + "/num_utts.ark";
@@ -61,7 +61,7 @@ SpkModel::SpkModel(const char *speaker_path) {
 
     KALDI_LOG << "Read " << num_train_ivectors << " training iVectors, "
               << "errors on " << num_train_errs;
-    ReadKaldiObject(speaker_path_str + "/final.ext.raw", &speaker_nnet);
+    ReadKaldiObject(speaker_path_str + "/final.raw", &speaker_nnet);
     SetBatchnormTestMode(true, &speaker_nnet);
     SetDropoutTestMode(true, &speaker_nnet);
     CollapseModel(nnet3::CollapseModelConfig(), &speaker_nnet);
