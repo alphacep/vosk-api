@@ -20,6 +20,7 @@ if (process.argv.length > 2)
 vosk.setLogLevel(-1);
 const model = new vosk.Model(MODEL_PATH);
 const rec = new vosk.Recognizer({model: model, sampleRate: SAMPLE_RATE});
+rec.setWords(true);
 
 const ffmpeg_run = spawn('ffmpeg', ['-loglevel', 'quiet', '-i', FILE_NAME,
                          '-ar', String(SAMPLE_RATE) , '-ac', '1',
