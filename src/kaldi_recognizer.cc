@@ -397,16 +397,13 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     // Whiten the vector with global mean and transform and normalize mean
     xvector.AddVec(-1.0, spk_model_->mean);
 
-    out_xvector.Resize(spk_model_->transform.NumRows(), kSetZero);
-    out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
-
     BaseFloat norm = out_xvector.Norm(2.0);
     BaseFloat ratio = norm / sqrt(out_xvector.Dim()); // how much larger it is
                                                   // than it would be, in
                                                   // expectation, if normally
     out_xvector.Scale(1.0 / ratio);
 
-    xvector_result = out_xvector;
+    xvector_result = xvector;
     PldaScoring();
 
     return true;
