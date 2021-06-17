@@ -395,7 +395,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 
     // Whiten the vector with global mean and transform and normalize mean
-    xvector.AddVec(-1.0, spk_model_->mean);
+    // xvector.AddVec(-1.0, spk_model_->mean);
 
     BaseFloat norm = out_xvector.Norm(2.0);
     BaseFloat ratio = norm / sqrt(out_xvector.Dim()); // how much larger it is
