@@ -394,11 +394,19 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     Vector<BaseFloat> xvector;
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 
+    cout << "xvector.Dim():" << xvector.Dim() << endl;
+    cout << "spk_model_.mean.Dim():" << spk_model_->mean.Dim() << endl;
+
+    out_xvector.Resize(spk_model_->transform.NumRows(), kSetZero);
+    out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
+
     BaseFloat norm = out_xvector.Norm(2.0);
     BaseFloat ratio = norm / sqrt(out_xvector.Dim()); // how much larger it is
                                                   // than it would be, in
                                                   // expectation, if normally
     out_xvector.Scale(1.0 / ratio);
+
+    cout << "out_xvector.Dim():" << out_xvector.Dim() << endl;
 
     xvector_result = xvector;
     PldaScoring();
@@ -749,7 +757,7 @@ void KaldiRecognizer::PldaScoring() {
         KALDI_ERR << "Duplicate test iVector found for utterance " << utt;
     }
 
-    //xvector_result.AddVec(-1.0, spk_model_->mean);
+    xvector_result.AddVec(-1.0, spk_model_->mean);
     const Vector <BaseFloat> &vec(xvector_result);
     int32 transform_rows = spk_model_->transform.NumRows();
     int32 transform_cols = spk_model_->transform.NumCols();
