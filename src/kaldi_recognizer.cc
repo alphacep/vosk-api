@@ -394,9 +394,6 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     Vector<BaseFloat> xvector;
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 
-    cout << "xvector.Dim():" << xvector.Dim() << endl;
-    cout << "spk_model_.mean.Dim():" << spk_model_->mean.Dim() << endl;
-
     out_xvector.Resize(spk_model_->transform.NumRows(), kSetZero);
     out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
 
@@ -406,9 +403,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
                                                   // expectation, if normally
     out_xvector.Scale(1.0 / ratio);
 
-    cout << "out_xvector.Dim():" << out_xvector.Dim() << endl;
-
-    xvector_result = xvector;
+    xvector_result = out_xvector;
     PldaScoring();
 
     return true;
@@ -455,6 +450,8 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
                 obj["spk"].append(xvector(i));
             }
             obj["spk_frames"] = num_spk_frames;
+
+            cout << scores_;
 
             using pair_type = decltype(scores_)::value_type;
             auto pr = std::max_element
