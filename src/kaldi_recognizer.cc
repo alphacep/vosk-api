@@ -403,7 +403,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
                                                   // expectation, if normally
     out_xvector.Scale(1.0 / ratio);
 
-    xvector_result = out_xvector;
+    xvector_result = xvector;
     PldaScoring();
 
     return true;
