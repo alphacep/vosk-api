@@ -451,8 +451,6 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
             }
             obj["spk_frames"] = num_spk_frames;
 
-            cout << scores_;
-
             using pair_type = decltype(scores_)::value_type;
             auto pr = std::max_element
             (
