@@ -108,14 +108,21 @@ Model::Model(const char *model_path) : model_path_str_(model_path) {
     SetLogHandler(KaldiLogHandler);
 
     struct stat buffer;
-    string am_path = model_path_str_ + "/am/final.mdl";
-    if (stat(am_path.c_str(), &buffer) == 0) {
-         ConfigureV2();
+    string am_v2_path = model_path_str_ + "/am/final.mdl";
+    string mfcc_v2_path = model_path_str_ + "/conf/mfcc.conf";
+    string am_v1_path = model_path_str_ + "/final.mdl";
+    string mfcc_v1_path = model_path_str_ + "/mfcc.conf";
+    if (stat(am_v2_path.c_str(), &buffer) == 0 && stat(mfcc_v2_path.c_str(), &buffer) == 0) {
+        ConfigureV2();
+        ReadDataFiles();
+    } else if (stat(am_v1_path.c_str(), &buffer) == 0 && stat(mfcc_v1_path.c_str(), &buffer) == 0) {
+        ConfigureV1();
+        ReadDataFiles();
     } else {
-         ConfigureV1();
+        KALDI_ERR << "Folder '" << model_path_str_ << "' does not contain model files. " <<
+                     "Make sure you specified the model path properly in Model constructor. " <<
+                     "If you are not sure about relative path, use absolute path specification.";
     }
-
-    ReadDataFiles();
 
     ref_cnt_ = 1;
 }
