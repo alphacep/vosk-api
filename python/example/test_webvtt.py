@@ -56,11 +56,16 @@ def transcribe():
 
         caption = Caption(start, end, textwrap.fill(content))
         vtt.captions.append(caption)
-    return vtt.content
+
+    # save or return webvtt
+    if len(sys.argv) > 2:
+        vtt.save(sys.argv[2])
+    else:
+        print(vtt.content)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print(f'Usage: {sys.argv[0]} audiofile')
+    if not (1 < len(sys.argv) < 4):
+        print(f'Usage: {sys.argv[0]} audiofile [output file]')
         exit(1)
-    print(transcribe())
+    transcribe()
