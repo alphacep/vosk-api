@@ -408,9 +408,16 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
 }
 
 
-const char *KaldiRecognizer::MbrResult(CompactLattice &clat)
+const char *KaldiRecognizer::MbrResult(CompactLattice &rlat)
 {
-    MinimumBayesRisk mbr(clat);
+    CompactLattice aligned_lat;
+    if (model_->winfo_) {
+        WordAlignLattice(rlat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
+    } else {
+        aligned_lat = rlat;
+    }
+
+    MinimumBayesRisk mbr(aligned_lat);
     const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
     const vector<int32> &words = mbr.GetOneBest();
     const vector<pair<BaseFloat, BaseFloat> > &times =
@@ -530,15 +537,23 @@ const char *KaldiRecognizer::NbestResult(CompactLattice &clat)
     for (int k = 0; k < nbest_lats.size(); k++) {
 
       Lattice nlat = nbest_lats[k];
+      RmEpsilon(&nlat);
       CompactLattice nclat;
+      CompactLattice aligned_nclat;
       ConvertLattice(nlat, &nclat);
+
+      if (model_->winfo_) {
+          WordAlignLattice(nclat, *model_->trans_model_, *model_->winfo_, 0, &aligned_nclat);
+      } else {
+          aligned_nclat = nclat;
+      }
 
       std::vector<int32> words;
       std::vector<int32> begin_times;
       std::vector<int32> lengths;
       CompactLattice::Weight weight;
 
-      CompactLatticeToWordAlignmentWeight(nclat, &words, &begin_times, &lengths, &weight);
+      CompactLatticeToWordAlignmentWeight(aligned_nclat, &words, &begin_times, &lengths, &weight);
       float likelihood = -(weight.Weight().Value1() + weight.Weight().Value2());
 
       stringstream text;
@@ -614,17 +629,11 @@ const char* KaldiRecognizer::GetResult()
     }
 
     fst::ScaleLattice(fst::GraphLatticeScale(0.9), &rlat); // Apply rescoring weight
-    CompactLattice aligned_lat;
-    if (model_->winfo_) {
-        WordAlignLattice(rlat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
-    } else {
-        aligned_lat = rlat;
-    }
 
     if (max_alternatives_ == 0) {
-        return MbrResult(aligned_lat);
+        return MbrResult(rlat);
     } else {
-        return NbestResult(aligned_lat);
+        return NbestResult(rlat);
     }
 
 }
