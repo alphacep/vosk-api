@@ -18,6 +18,7 @@ if not os.path.exists('model'):
 sample_rate = 16000
 model = Model('model')
 rec = KaldiRecognizer(model, sample_rate)
+rec.SetWords(True)
 
 WORDS_PER_LINE = 7
 
