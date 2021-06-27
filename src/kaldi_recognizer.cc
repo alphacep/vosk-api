@@ -710,7 +710,9 @@ const char* KaldiRecognizer::FinalResult()
 
 void KaldiRecognizer::Reset()
 {
-    decoder_->FinalizeDecoding();
+    if (state_ == RECOGNIZER_RUNNING) {
+        decoder_->FinalizeDecoding();
+    }
     StoreEmptyReturn();
     state_ = RECOGNIZER_ENDPOINT;
 }
