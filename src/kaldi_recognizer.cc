@@ -403,9 +403,6 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
                                                   // expectation, if normally
     out_xvector.Scale(1.0 / ratio);
 
-    xvector_result = xvector;
-    PldaScoring();
-
     return true;
 }
 
@@ -453,6 +450,8 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &rlat)
         Vector<BaseFloat> xvector;
         int num_spk_frames;
         if (GetSpkVector(xvector, &num_spk_frames)) {
+            xvector_result = xvector;
+            PldaScoring();
             for (int i = 0; i < xvector.Dim(); i++) {
                 obj["spk"].append(xvector(i));
             }
