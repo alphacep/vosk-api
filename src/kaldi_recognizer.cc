@@ -827,7 +827,7 @@ void KaldiRecognizer::PldaScoring() {
         {
             std::cout << test_ivector_dbl(i) << ' ';
             norm_test += test_ivector_dbl(i) * test_ivector_dbl(i);
-            norm_dot += test_ivector_dbl(i) * train_ivector_dbl(i)
+            norm_dot += test_ivector_dbl(i) * train_ivector_dbl(i);
         }
         KALDI_LOG << "COS(" << key1 << ", test) = " << norm_dot / (norm_test * norm_train);
 
