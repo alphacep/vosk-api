@@ -814,13 +814,12 @@ void KaldiRecognizer::PldaScoring() {
         Vector<double> train_ivector_dbl(*train_ivector),
                 test_ivector_dbl(*test_ivector);
         //  LOG: VECTORS
-        std::cout << "TRAIN_VECTOR:\n[";
+        KALDI_LOG << "TRAIN_VECTOR:\n[";
         for (auto i = train_ivector_dbl.begin(); i != train_ivector_dbl.begin(); ++i)
-            std::cout << *i << ' ';
-        std::cout << "]\nTEST_VECTOR:\n[";
+            KALDI_LOG <<  << *i << ' ';
+        KALDI_LOG << "]\nTEST_VECTOR:\n[";
         for (auto i = test_ivector_dbl.begin(); i != test_ivector_dbl.begin(); ++i)
-            std::cout << *i << ' ';
-        std::cout << "]\n";
+            KALDI_LOG <<  << *i << ' ';
 
         int32 num_train_examples;
         num_train_examples = spk_model_->num_utts[key1];
