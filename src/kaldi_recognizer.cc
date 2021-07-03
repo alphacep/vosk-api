@@ -797,8 +797,8 @@ void KaldiRecognizer::PldaScoring() {
 
     double sums = 0.0, sumsq = 0.0;
     typedef unordered_map<string, Vector < BaseFloat>*, StringHasher > HashType;
-    std::map <std::string, int32> langs = spk_model_->num_utts;
-    for (auto const &x : langs) {
+    std::map <std::string, int32> speakers = spk_model_->num_utts;
+    for (auto const &x : speakers) {
         std::string key1 = x.first;
         if (spk_model_->train_ivectors.count(key1) == 0) {
             KALDI_WARN << "Key " << key1 << " not present in training iVectors.";
@@ -813,6 +813,14 @@ void KaldiRecognizer::PldaScoring() {
 
         Vector<double> train_ivector_dbl(*train_ivector),
                 test_ivector_dbl(*test_ivector);
+        //  LOG: VECTORS
+        std::cout << "TRAIN_VECTOR:\n[";
+        for (auto i = train_ivector_dbl.begin(); i != train_ivector_dbl.begin(); ++i)
+            std::cout << *i << ' ';
+        std::cout << "]\nTEST_VECTOR:\n[";
+        for (auto i = test_ivector_dbl.begin(); i != test_ivector_dbl.begin(); ++i)
+            std::cout << *i << ' ';
+        std::cout << "]\n";
 
         int32 num_train_examples;
         num_train_examples = spk_model_->num_utts[key1];
