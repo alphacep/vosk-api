@@ -18,6 +18,7 @@
 #include "base/kaldi-common.h"
 #include "online2/online-feature-pipeline.h"
 #include "nnet3/nnet-utils.h"
+#include <atomic>
 
 using namespace kaldi;
 
@@ -40,7 +41,7 @@ protected:
 
     MfccOptions spkvector_mfcc_opts;
 
-    int ref_cnt_;
+    std::atomic<int> ref_cnt_;
 };
 
 #endif /* VOSK_SPK_MODEL_H */

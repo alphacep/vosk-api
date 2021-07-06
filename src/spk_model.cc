@@ -31,15 +31,15 @@ SpkModel::SpkModel(const char *speaker_path) {
     ref_cnt_ = 1;
 }
 
-void SpkModel::Ref() 
+void SpkModel::Ref()
 {
-    ref_cnt_++;
+    std::atomic_fetch_add_explicit(&ref_cnt_, 1, std::memory_order_relaxed);
 }
 
-void SpkModel::Unref() 
+void SpkModel::Unref()
 {
-    ref_cnt_--;
-    if (ref_cnt_ == 0) {
-        delete this;
+    if (std::atomic_fetch_sub_explicit(&ref_cnt_, 1, std::memory_order_release) == 0) {
+         std::atomic_thread_fence(std::memory_order_acquire);
+         delete this;
     }
 }
