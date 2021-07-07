@@ -23,7 +23,7 @@ SpkModel::SpkModel(const char *speaker_path) {
 
     plda_rxfilename = speaker_path_str + "/plda";
     ReadKaldiObject(plda_rxfilename, &plda);
-    train_ivector_rspecifier = "ark:" + speaker_path_str + "/xvectors.ark";
+    train_ivector_rspecifier = "scp:" + speaker_path_str + "/xvector.scp";
     num_utts_rspecifier = "ark:" + speaker_path_str + "/num_utts.ark";
 
     RandomAccessInt32Reader num_utts_reader(num_utts_rspecifier);
