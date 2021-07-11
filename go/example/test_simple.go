@@ -3,7 +3,7 @@ package main
 import (
     "flag"
     "os"
-    ".."
+    "github.com/alphacep/vosk-api/go"
 )
 
 func main() {
