@@ -455,9 +455,11 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &rlat)
         Vector<BaseFloat> xvector;
         int num_spk_frames;
         if (GetSpkVector(xvector, &num_spk_frames)) {
+            /* --- Was in vosk-api, commented for test ----
             for (int i = 0; i < xvector.Dim(); i++) {
                 obj["spk"].append(xvector(i));
             }
+            */
             obj["spk_frames"] = num_spk_frames;
 
             using pair_type = decltype(scores_)::value_type;
