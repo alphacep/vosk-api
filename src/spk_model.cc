@@ -21,9 +21,9 @@ SpkModel::SpkModel(const char *speaker_path) {
     ReadConfigFromFile(speaker_path_str + "/vad.conf", &vad_opts);
     spkvector_mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
 
-    plda_rxfilename = speaker_path_str + "/plda";
+    plda_rxfilename = speaker_path_str + "/plda_adapt.smooth0.1";
     ReadKaldiObject(plda_rxfilename, &plda);
-    train_ivector_rspecifier = "scp:" + speaker_path_str + "/xvector.scp";
+    train_ivector_rspecifier = "ark:" + speaker_path_str + "/spk_xvectors.ark";
     num_utts_rspecifier = "ark:" + speaker_path_str + "/num_utts.ark";
 
     RandomAccessInt32Reader num_utts_reader(num_utts_rspecifier);
