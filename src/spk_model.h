@@ -20,6 +20,7 @@
 #include "nnet3/nnet-utils.h"
 #include "ivector/plda.h"
 #include "ivector/voice-activity-detection.h"
+#include <atomic>
 
 using namespace kaldi;
 typedef unordered_map<std::string, Vector<BaseFloat>*, StringHasher> HashType;
@@ -54,7 +55,7 @@ protected:
 
     Plda plda;
 
-    int ref_cnt_;
+    std::atomic<int> ref_cnt_;
 };
 
 #endif /* VOSK_SPK_MODEL_H */
