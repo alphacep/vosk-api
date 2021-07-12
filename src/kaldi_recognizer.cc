@@ -395,7 +395,9 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 
     out_xvector.Resize(spk_model_->transform.NumRows(), kSetZero);
-    out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
+    /*   ------------ Was in vosk-api, commented for test -----------------------
+        out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
+    */
 
     BaseFloat norm = out_xvector.Norm(2.0);
     BaseFloat ratio = norm / sqrt(out_xvector.Dim()); // how much larger it is
