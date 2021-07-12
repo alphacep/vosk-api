@@ -784,7 +784,7 @@ void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
                                                    num_examples,
                                                    transformed_ivector);
     test_ivectors[utt] = transformed_ivector;
-    out_xvector = transformed_ivector;
+    out_xvector = *transformed_ivector;
     bool binary = false;
 
     double sums = 0.0, sumsq = 0.0;
