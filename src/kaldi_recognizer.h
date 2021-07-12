@@ -59,7 +59,7 @@ class KaldiRecognizer {
 
     private:
         void InitState();
-        void PldaScoring();
+        void PldaScoring(Vector<BaseFloat> &out_xvector);
         void InitRescoring();
         void CleanUp();
         void UpdateSilenceWeights();

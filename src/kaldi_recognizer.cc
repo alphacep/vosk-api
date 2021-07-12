@@ -394,19 +394,8 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     Vector<BaseFloat> xvector;
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 
-    out_xvector.Resize(spk_model_->transform.NumRows(), kSetZero);
-    /*   ------------ Was in vosk-api, commented for test -----------------------
-        out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
-    */
-
-    BaseFloat norm = out_xvector.Norm(2.0);
-    BaseFloat ratio = norm / sqrt(out_xvector.Dim()); // how much larger it is
-                                                  // than it would be, in
-                                                  // expectation, if normally
-    out_xvector.Scale(1.0 / ratio);
-
     xvector_result = xvector;
-    PldaScoring();
+    PldaScoring(out_xvector);
 
     return true;
 }
@@ -455,11 +444,9 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &rlat)
         Vector<BaseFloat> xvector;
         int num_spk_frames;
         if (GetSpkVector(xvector, &num_spk_frames)) {
-            /* --- Was in vosk-api, commented for test ----
             for (int i = 0; i < xvector.Dim(); i++) {
                 obj["spk"].append(xvector(i));
             }
-            */
             obj["spk_frames"] = num_spk_frames;
 
             using pair_type = decltype(scores_)::value_type;
@@ -756,7 +743,7 @@ const char *KaldiRecognizer::StoreReturn(const string &res)
     return last_result_.c_str();
 }
 
-void KaldiRecognizer::PldaScoring() {
+void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
 
     int64 num_train_ivectors = 0, num_train_errs = 0, num_test_ivectors = 0;
     double tot_test_renorm_scale = 0.0, tot_train_renorm_scale = 0.0;
@@ -797,6 +784,7 @@ void KaldiRecognizer::PldaScoring() {
                                                    num_examples,
                                                    transformed_ivector);
     test_ivectors[utt] = transformed_ivector;
+    out_xvector = transformed_ivector;
     bool binary = false;
 
     double sums = 0.0, sumsq = 0.0;
