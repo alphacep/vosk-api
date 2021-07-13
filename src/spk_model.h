@@ -50,7 +50,6 @@ protected:
     std::map<std::string, int32> num_utts;
 
     MfccOptions spkvector_mfcc_opts;
-    VadEnergyOptions vad_opts;
     PldaConfig plda_config;
 
     Plda plda;
