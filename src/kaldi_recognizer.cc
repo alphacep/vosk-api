@@ -397,7 +397,8 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     //  xvector_result is filled with xvector for PldaScoring process
     xvector_result = xvector;
     //  out_xvector will be filled by PldaScoring method from utterance
-    //      xvector after transformation
+    //      xvector before transformation so that it can be used for new
+    //      users enrollment
     PldaScoring(out_xvector);
 
     return true;
@@ -777,6 +778,8 @@ void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
                                                            0, vec_dim), kNoTrans, vec, 1.0);
     }
 
+    out_xvector = vec_out;
+
     int32 num_examples = 1;// this value is always used for test (affects the
                            // length normalization in the TransformIvector
                            // function).
@@ -788,7 +791,6 @@ void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
                                                    num_examples,
                                                    transformed_ivector);
     test_ivectors[utt] = transformed_ivector;
-    out_xvector = *transformed_ivector;
     bool binary = false;
 
     typedef unordered_map<string, Vector < BaseFloat>*, StringHasher > HashType;
