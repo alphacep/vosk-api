@@ -21,9 +21,9 @@ SpkModel::SpkModel(const char *speaker_path) {
     ReadConfigFromFile(speaker_path_str + "/vad.conf", &vad_opts);
     spkvector_mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
 
-    plda_rxfilename = speaker_path_str + "/plda_adapt.smooth0.1";
+    plda_rxfilename = speaker_path_str + "/plda_adapt.smooth0.1"; // smoothed version of PLDA
     ReadKaldiObject(plda_rxfilename, &plda);
-    train_ivector_rspecifier = "ark:" + speaker_path_str + "/spk_xvectors.ark";
+    train_ivector_rspecifier = "ark:" + speaker_path_str + "/spk_xvectors.ark"; // train speaker xvectors file
     num_utts_rspecifier = "ark:" + speaker_path_str + "/num_utts.ark";
 
     RandomAccessInt32Reader num_utts_reader(num_utts_rspecifier);
@@ -32,7 +32,7 @@ SpkModel::SpkModel(const char *speaker_path) {
     int64 num_train_ivectors = 0, num_train_errs = 0, num_test_ivectors = 0;
     int32 dim = plda.Dim();
     SequentialBaseFloatVectorReader train_ivector_reader(train_ivector_rspecifier);
-    for (; !train_ivector_reader.Done(); train_ivector_reader.Next()) {
+    for (; !train_ivector_reader.Done(); train_ivector_reader.Next()) { // reading train xvectors
         std::string spk = train_ivector_reader.Key();
         if (train_ivectors.count(spk) != 0) {
             KALDI_ERR << "Duplicate training iVector found for speaker " << spk;
@@ -51,6 +51,7 @@ SpkModel::SpkModel(const char *speaker_path) {
         }
         num_utts.insert(std::pair<std::string, int32>(spk, num_examples));
 
+        //  Transformed version of xvectors
         Vector<BaseFloat> *transformed_ivector = new Vector<BaseFloat>(dim);
         tot_train_renorm_scale += plda.TransformIvector(plda_config, ivector,
                                                         num_examples,
