@@ -394,7 +394,10 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     Vector<BaseFloat> xvector;
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 
+    //  xvector_result is filled with xvector for PldaScoring process
     xvector_result = xvector;
+    //  out_xvector will be filled by PldaScoring method from utterance
+    //      xvector after transformation
     PldaScoring(out_xvector);
 
     return true;
@@ -760,6 +763,7 @@ void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
     int32 transform_cols = spk_model_->transform.NumCols();
     int32 vec_dim = vec.Dim();
     Vector <BaseFloat> vec_out(transform_rows);
+    //  xvector transformation
     if (transform_cols == vec_dim) {
         vec_out.AddMatVec(1.0, spk_model_->transform, kNoTrans, vec, 0.0);
     } else {
@@ -787,9 +791,9 @@ void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
     out_xvector = *transformed_ivector;
     bool binary = false;
 
-    double sums = 0.0, sumsq = 0.0;
     typedef unordered_map<string, Vector < BaseFloat>*, StringHasher > HashType;
     std::map <std::string, int32> speakers = spk_model_->num_utts;
+    //  applying the PLDA scoring for each speaker
     for (auto const &x : speakers) {
         std::string key1 = x.first;
         if (spk_model_->train_ivectors.count(key1) == 0) {
@@ -804,16 +808,16 @@ void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
         const Vector <BaseFloat> *test_ivector = test_ivectors[utt];
 
         Vector<double> train_ivector_dbl(*train_ivector),
-                test_ivector_dbl(*test_ivector);
+                       test_ivector_dbl(*test_ivector);
 
         int32 num_train_examples;
         num_train_examples = spk_model_->num_utts[key1];
 
+        //  Calculate score from loglikelihood ratio respected to train xvector(s)
+        //      and test xvector
         BaseFloat score = plda.LogLikelihoodRatio(train_ivector_dbl,
                                                   num_train_examples,
                                                   test_ivector_dbl);
-        sums += score;
-        sumsq += score * score;
 
         scores_.insert(std::pair<std::string, BaseFloat>(key1, score));
     }
