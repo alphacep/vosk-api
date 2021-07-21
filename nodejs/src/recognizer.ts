@@ -23,7 +23,7 @@ export interface WordInfo {
 
 export interface PartialResult {
   /**
-   * The partial sentence that have been detected until now
+   * The partial sentence that has been detected until now
    */
   partial: string
 }
@@ -34,7 +34,7 @@ export interface Result {
    */
   result?: WordInfo[]
   /**
-   * The complete utterance that have been detected
+   * The complete utterance that has been detected
    */
   text: string
   /**
