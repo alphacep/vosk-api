@@ -293,7 +293,7 @@ const libvosk: VoskLibrary = ffi.Library(soname, {
     vosk_recognizer_ptr,
     [vosk_model_ptr, 'float', 'string'],
   ],
-  vosk_recognizer_set_max_alternatives: [vosk_recognizer_ptr, ['void', 'int']],
+  vosk_recognizer_set_max_alternatives: ['void', [vosk_recognizer_ptr, 'int']],
   vosk_recognizer_set_words: ['void', [vosk_recognizer_ptr, 'bool']],
   vosk_recognizer_set_spk_model: [
     'void',
