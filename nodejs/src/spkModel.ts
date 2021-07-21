@@ -14,8 +14,15 @@ class SpkModel {
    * @param {string} modelPath the path of the model on the filesystem
    * @see models [models](https://alphacephei.com/vosk/models)
    */
-  constructor(modelPath: string) {
-    this.handle = lib.vosk_spk_model_new(modelPath)
+  constructor(modelPath: string)
+  constructor(handle: VoskSpkModel)
+
+  constructor(modelPathOrHandle: string | VoskSpkModel) {
+    if (typeof modelPathOrHandle !== 'string') {
+      this.handle = modelPathOrHandle
+      return
+    }
+    this.handle = lib.vosk_spk_model_new(modelPathOrHandle)
   }
 
   /**
@@ -33,5 +40,17 @@ class SpkModel {
     return this.handle
   }
 }
+
+export const getSpkModelAsync = (modelPath: string) =>
+  new Promise<SpkModel>((res, rej) => {
+    lib.vosk_spk_model_new.async(modelPath, (err, handle) => {
+      if (err) {
+        rej(err)
+        return
+      }
+      const spkModel = new SpkModel(handle)
+      res(spkModel)
+    })
+  })
 
 export default SpkModel

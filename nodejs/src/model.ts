@@ -13,8 +13,15 @@ class Model {
    * @param modelPath The abstract pathname to the model
    * @see models [models](https://alphacephei.com/vosk/models)
    */
-  constructor(modelPath: string) {
-    this.handle = lib.vosk_model_new(modelPath)
+  constructor(modelPath: string)
+  constructor(handle: VoskModel)
+
+  constructor(modelPathOrHandle: string | VoskModel) {
+    if (typeof modelPathOrHandle !== 'string') {
+      this.handle = modelPathOrHandle
+      return
+    }
+    this.handle = lib.vosk_model_new(modelPathOrHandle)
   }
 
   /**
@@ -32,5 +39,17 @@ class Model {
     return this.handle
   }
 }
+
+export const getModelAsync = (modelPath: string) =>
+  new Promise<Model>((res, rej) => {
+    const cb = (err: Error | null, handle: VoskModel) => {
+      if (err) {
+        rej(err)
+        return
+      }
+      res(new Model(handle))
+    }
+    lib.vosk_model_new.async(modelPath, cb)
+  })
 
 export default Model

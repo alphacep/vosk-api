@@ -28,7 +28,13 @@ interface VoskLibrary {
  *
  * @param model_path: the path of the model on the filesystem
  @ @returns model object */
-  vosk_model_new: (modelPath: string) => VoskModel
+  vosk_model_new: {
+    (modelPath: string): VoskModel
+    async: (
+      modelPath: string,
+      cb: (err: Error | null, model: VoskModel) => void,
+    ) => void
+  }
 
   /** Releases the model memory
    *
@@ -48,7 +54,13 @@ interface VoskLibrary {
    *
    * @param model_path: the path of the model on the filesystem
    * @returns model object */
-  vosk_spk_model_new: (modelPath: string) => VoskSpkModel
+  vosk_spk_model_new: {
+    (modelPath: string): VoskSpkModel
+    async: (
+      modelPath: string,
+      cb: (err: Error | null, model: VoskSpkModel) => void,
+    ) => void
+  }
 
   /** Releases the model memory
    *

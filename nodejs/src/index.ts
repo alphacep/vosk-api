@@ -1,6 +1,6 @@
 import lib from './lib'
-export { default as Model } from './model'
-export { default as SpkModel } from './spkModel'
+export { default as Model, getModelAsync } from './model'
+export { default as SpkModel, getSpkModelAsync } from './spkModel'
 export {
   default as Recognizer,
   WordInfo,
