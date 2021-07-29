@@ -1,11 +1,13 @@
 KALDI_ROOT?=$(HOME)/travis/kaldi
 OPENFST_ROOT?=$(KALDI_ROOT)/tools/openfst
 OPENBLAS_ROOT?=$(KALDI_ROOT)/tools/OpenBLAS/install
+MKL_ROOT?=/opt/intel/mkl
 HAVE_CUDA?=0
 CUDA_ROOT?=/usr/local/cuda
 EXT?=so
 CXX?=g++
-HAVE_OPENBLAS_CLAPACK=1
+HAVE_OPENBLAS_CLAPACK?=1
+HAVE_MKL?=0
 HAVE_ACCELERATE=0
 EXTRA_CFLGAS?=
 EXTRA_LDFLAGS?=
@@ -18,7 +20,7 @@ VOSK_SOURCES= \
 	vosk_api.cc
 
 CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING $(EXTRA_CFLAGS) \
-	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include -I$(OPENBLAS_ROOT)/include
+	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include
 
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \
@@ -48,6 +50,14 @@ LIBS += \
 	$(OPENBLAS_ROOT)/lib/liblapack.a \
 	$(OPENBLAS_ROOT)/lib/libblas.a \
 	$(OPENBLAS_ROOT)/lib/libf2c.a
+
+CFLAGS += -I$(OPENBLAS_ROOT)/include
+endif
+
+ifeq ($(HAVE_MKL), 1)
+    LIBS += -L$(MKL_ROOT)/lib/intel64 -Wl,-rpath=$(MKL_ROOT)/lib/intel64 -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_sequential
+
+    CFLAGS += -I$(MKL_ROOT)/include
 endif
 
 ifeq ($(HAVE_ACCELERATE), 1)
