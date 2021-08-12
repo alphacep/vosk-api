@@ -10,7 +10,7 @@ public class VoskDemo
         VoskRecognizer rec = new VoskRecognizer(model, 16000.0f);
         rec.SetMaxAlternatives(0);
         rec.SetWords(true);
-        using(Stream source = File.OpenRead("test.wav")) {
+        using(Stream source = File.OpenRead("my_mono_wav.wav")) { //Vosk API supports only mono wav (no stereo, no other file formats eg mp4)
             byte[] buffer = new byte[4096];
             int bytesRead;
             while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
@@ -28,7 +28,7 @@ public class VoskDemo
    {
         // Demo float array
         VoskRecognizer rec = new VoskRecognizer(model, 16000.0f);
-        using(Stream source = File.OpenRead("test.wav")) {
+        using(Stream source = File.OpenRead("my_mono_wav.wav")) { //Vosk API supports only mono wav (no stereo, no other file formats eg mp4)
             byte[] buffer = new byte[4096];
             int bytesRead;
             while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
@@ -53,7 +53,7 @@ public class VoskDemo
         VoskRecognizer rec = new VoskRecognizer(model, 16000.0f);
         rec.SetSpkModel(spkModel);
 
-        using(Stream source = File.OpenRead("test.wav")) {
+        using(Stream source = File.OpenRead("my_mono_wav.wav")) { //Vosk API supports only mono wav (no stereo, no other file formats eg mp4)
             byte[] buffer = new byte[4096];
             int bytesRead;
             while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
