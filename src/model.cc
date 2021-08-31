@@ -174,7 +174,6 @@ void Model::ConfigureV1()
     rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
     rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
     rnnlm_lm_rxfilename_ = model_path_str_ + "/rnnlm/final.raw";
-    rnnlm_lm_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
 }
 
 void Model::ConfigureV2()
@@ -203,7 +202,6 @@ void Model::ConfigureV2()
     rnnlm_feat_embedding_rxfilename_ = model_path_str_ + "/rnnlm/feat_embedding.final.mat";
     rnnlm_config_rxfilename_ = model_path_str_ + "/rnnlm/special_symbol_opts.conf";
     rnnlm_lm_rxfilename_ = model_path_str_ + "/rnnlm/final.raw";
-    rnnlm_lm_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
 }
 
 void Model::ReadDataFiles()
@@ -296,12 +294,19 @@ void Model::ReadDataFiles()
         winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
     }
 
+    if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
+
+        KALDI_LOG << "Loading subtract G.fst model from " << std_fst_rxfilename_;
+        graph_lm_fst_ = fst::ReadAndPrepareLmFst(std_fst_rxfilename_);
+        KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
+        ReadKaldiObject(carpa_rxfilename_, &const_arpa_);
+    }
+
     // RNNLM Rescoring
     if (stat(rnnlm_lm_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading RNNLM model from " << rnnlm_lm_rxfilename_;
 
         ReadKaldiObject(rnnlm_lm_rxfilename_, &rnnlm);
-        rnnlm_lm_fst_ = fst::ReadAndPrepareLmFst(rnnlm_lm_fst_rxfilename_);
         Matrix<BaseFloat> feature_embedding_mat;
         ReadKaldiObject(rnnlm_feat_embedding_rxfilename_, &feature_embedding_mat);
         SparseMatrix<BaseFloat> word_feature_mat;
@@ -319,17 +324,9 @@ void Model::ReadDataFiles()
 
         ReadConfigFromFile(rnnlm_config_rxfilename_, &rnnlm_compute_opts);
 
-    } else if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
-
-        KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
-        std_lm_fst_ = fst::ReadFstKaldi(std_fst_rxfilename_);
-        fst::Project(std_lm_fst_, fst::ProjectType::OUTPUT);
-        if (std_lm_fst_->Properties(fst::kILabelSorted, true) == 0) {
-            fst::ILabelCompare<fst::StdArc> ilabel_comp;
-            fst::ArcSort(std_lm_fst_, ilabel_comp);
-        }
-        ReadKaldiObject(carpa_rxfilename_, &const_arpa_);
+        rnnlm_enabled_ = true;
     }
+
 }
 
 void Model::Ref() 
@@ -363,5 +360,5 @@ Model::~Model() {
     delete hclg_fst_;
     delete hcl_fst_;
     delete g_fst_;
-    delete std_lm_fst_;
+    delete graph_lm_fst_;
 }
