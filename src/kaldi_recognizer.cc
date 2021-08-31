@@ -142,13 +142,14 @@ KaldiRecognizer::~KaldiRecognizer() {
     delete g_fst_;
     delete decode_fst_;
     delete spk_feature_;
-    delete lm_fst_;
 
-    delete info;
-    delete lm_to_subtract_det_backoff;
-    delete lm_to_subtract_det_scale;
-    delete lm_to_add_orig;
-    delete lm_to_add;
+    delete rnnlm_info_;
+    delete lm_to_subtract_;
+    delete lm_to_subtract_scale_;
+    delete carpa_to_add_;
+    delete carpa_to_add_scale_;
+    delete rnnlm_to_add_;
+    delete rnnlm_to_add_scale_;
 
     model_->Unref();
     if (spk_model_)
@@ -166,21 +167,18 @@ void KaldiRecognizer::InitState()
 
 void KaldiRecognizer::InitRescoring()
 {
-    if (model_->rnnlm_lm_fst_) {
-        float lm_scale = 0.5;
-        int lm_order = 4;
+    if (model_->graph_lm_fst_) {
+        lm_to_subtract_ = new fst::BackoffDeterministicOnDemandFst<StdArc>(*model_->graph_lm_fst_);
+        lm_to_subtract_scale_ = new fst::ScaleDeterministicOnDemandFst(-1.0, lm_to_subtract_);
+        carpa_to_add_ = new ConstArpaLmDeterministicFst(model_->const_arpa_);
 
-        info = new kaldi::rnnlm::RnnlmComputeStateInfo(model_->rnnlm_compute_opts, model_->rnnlm, model_->word_embedding_mat);
-        lm_to_subtract_det_backoff = new fst::BackoffDeterministicOnDemandFst<fst::StdArc>(*model_->rnnlm_lm_fst_);
-        lm_to_subtract_det_scale = new fst::ScaleDeterministicOnDemandFst(-lm_scale, lm_to_subtract_det_backoff);
-        lm_to_add_orig = new kaldi::rnnlm::KaldiRnnlmDeterministicFst(lm_order, *info);
-        lm_to_add = new fst::ScaleDeterministicOnDemandFst(lm_scale, lm_to_add_orig);
-
-    } else if (model_->std_lm_fst_) {
-        fst::CacheOptions cache_opts(true, 50000);
-        fst::ArcMapFstOptions mapfst_opts(cache_opts);
-        fst::StdToLatticeMapper<kaldi::BaseFloat> mapper;
-        lm_fst_ = new fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> >(*model_->std_lm_fst_, mapper, mapfst_opts);
+        if (model_->rnnlm_enabled_) {
+           int lm_order = 4;
+           rnnlm_info_ = new kaldi::rnnlm::RnnlmComputeStateInfo(model_->rnnlm_compute_opts, model_->rnnlm, model_->word_embedding_mat);
+           rnnlm_to_add_ = new kaldi::rnnlm::KaldiRnnlmDeterministicFst(lm_order, *rnnlm_info_);
+           rnnlm_to_add_scale_ = new fst::ScaleDeterministicOnDemandFst(0.5, rnnlm_to_add_);
+           carpa_to_add_scale_ = new fst::ScaleDeterministicOnDemandFst(-0.5, carpa_to_add_);
+        }
     }
 }
 
@@ -592,38 +590,30 @@ const char* KaldiRecognizer::GetResult()
     kaldi::CompactLattice rlat;
     decoder_->GetLattice(true, &clat);
 
-    if (model_->rnnlm_lm_fst_) {
-        kaldi::ComposeLatticePrunedOptions compose_opts;
-        compose_opts.lattice_compose_beam = 3.0;
-        compose_opts.max_arcs = 3000;
-
+    if (lm_to_subtract_scale_ && carpa_to_add_) {
         TopSortCompactLatticeIfNeeded(&clat);
-        fst::ComposeDeterministicOnDemandFst<fst::StdArc> combined_lms(lm_to_subtract_det_scale, lm_to_add);
-        CompactLattice composed_clat;
-        ComposeCompactLatticePruned(compose_opts, clat,
-                                    &combined_lms, &rlat);
-        lm_to_add_orig->Clear();
-    } else if (model_->std_lm_fst_) {
-        Lattice lat1;
+        CompactLattice tlat;
+        fst::ComposeDeterministicOnDemandFst<StdArc> combined_lm(lm_to_subtract_scale_, carpa_to_add_);
+        ComposeCompactLatticeDeterministic(clat, &combined_lm, &tlat);
 
-        ConvertLattice(clat, &lat1);
-        fst::ScaleLattice(fst::GraphLatticeScale(-1.0), &lat1);
-        fst::ArcSort(&lat1, fst::OLabelCompare<kaldi::LatticeArc>());
-        kaldi::Lattice composed_lat;
-        fst::Compose(lat1, *lm_fst_, &composed_lat);
-        fst::Invert(&composed_lat);
-        kaldi::CompactLattice determinized_lat;
-        DeterminizeLattice(composed_lat, &determinized_lat);
-        fst::ScaleLattice(fst::GraphLatticeScale(-1), &determinized_lat);
-        fst::ArcSort(&determinized_lat, fst::OLabelCompare<kaldi::CompactLatticeArc>());
+        if (rnnlm_to_add_scale_) {
+             ComposeLatticePrunedOptions compose_opts;
+             compose_opts.lattice_compose_beam = 3.0;
+             compose_opts.max_arcs = 3000;
+             TopSortCompactLatticeIfNeeded(&tlat);
+             fst::ComposeDeterministicOnDemandFst<StdArc> combined_rnnlm(carpa_to_add_scale_, rnnlm_to_add_scale_);
+             ComposeCompactLatticePruned(compose_opts, tlat,
+                                         &combined_rnnlm, &rlat);
+             rnnlm_to_add_->Clear();
+        } else {
+             rlat = tlat;
+        }
 
-        kaldi::ConstArpaLmDeterministicFst const_arpa_fst(model_->const_arpa_);
-        kaldi::CompactLattice composed_clat;
-        kaldi::ComposeCompactLatticeDeterministic(determinized_lat, &const_arpa_fst, &composed_clat);
-        kaldi::Lattice composed_lat1;
-        ConvertLattice(composed_clat, &composed_lat1);
-        fst::Invert(&composed_lat1);
-        DeterminizeLattice(composed_lat1, &rlat);
+        kaldi::Lattice slat;
+        ConvertLattice(rlat, &slat);
+        fst::Invert(&slat);
+        DeterminizeLattice(slat, &rlat);
+
     } else {
         rlat = clat;
     }

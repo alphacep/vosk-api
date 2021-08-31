@@ -72,7 +72,6 @@ protected:
     string rnnlm_word_feats_rxfilename_;
     string rnnlm_feat_embedding_rxfilename_;
     string rnnlm_config_rxfilename_;
-    string rnnlm_lm_fst_rxfilename_;
     string rnnlm_lm_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
@@ -92,13 +91,13 @@ protected:
     fst::Fst<fst::StdArc> *hcl_fst_ = nullptr;
     fst::Fst<fst::StdArc> *g_fst_ = nullptr;
 
-    fst::VectorFst<fst::StdArc> *std_lm_fst_ = nullptr;
+    fst::VectorFst<fst::StdArc> *graph_lm_fst_ = nullptr;
     kaldi::ConstArpaLm const_arpa_;
 
     kaldi::rnnlm::RnnlmComputeStateComputationOptions rnnlm_compute_opts;
     CuMatrix<BaseFloat> word_embedding_mat;
-    fst::VectorFst<fst::StdArc> *rnnlm_lm_fst_ = NULL;
     kaldi::nnet3::Nnet rnnlm;
+    bool rnnlm_enabled_ = false;
 
     std::atomic<int> ref_cnt_;
 };
