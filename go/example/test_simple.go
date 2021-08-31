@@ -1,16 +1,20 @@
 package main
 
 import (
-    "flag"
-    "os"
+	"bufio"
+	"flag"
+	"fmt"
+	"io"
+	"log"
+	"os"
 
-    "github.com/alphacep/vosk-api/go"
+	vosk "github.com/alphacep/vosk-api/go"
 )
 
 func main() {
-    var filename string
-    flag.StringVar(&filename, "f", "", "file to transcribe")
-    flag.Parse()
+	var filename string
+	flag.StringVar(&filename, "f", "", "file to transcribe")
+	flag.Parse()
 
 	model, err := vosk.NewModel("model")
 	if err != nil {
@@ -23,17 +27,17 @@ func main() {
 	}
 
 	sampleRate := 16000.0
-    rec, err := vosk.NewRecognizer(model, sampleRate, spkModel)
+	rec, err := vosk.NewRecognizer(model, sampleRate, spkModel)
 	if err != nil {
 		log.Fatal(err)
 	}
 	rec.SetWords(1)
 
-    file, err := os.Open(filename)
-    if err != nil {
-        panic(err)
-    }
-    defer file.Close()
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
 
 	file, err := os.Open(filename)
 	if err != nil {
