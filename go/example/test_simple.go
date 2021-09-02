@@ -21,23 +21,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	spkModel, err := vosk.NewSpkModel("model-spk")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	sampleRate := 16000.0
-	rec, err := vosk.NewRecognizer(model, sampleRate, spkModel)
+	rec, err := vosk.NewRecognizer(model, sampleRate)
 	if err != nil {
 		log.Fatal(err)
 	}
 	rec.SetWords(1)
-
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
 
 	file, err := os.Open(filename)
 	if err != nil {
