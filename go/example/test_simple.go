@@ -1,36 +1,56 @@
 package main
 
 import (
-    "flag"
-    "os"
-    "github.com/alphacep/vosk-api/go"
+	"bufio"
+	"flag"
+	"fmt"
+	"io"
+	"log"
+	"os"
+
+	vosk "github.com/alphacep/vosk-api/go"
 )
 
 func main() {
-    var filename string
-    flag.StringVar(&filename, "f", "", "file to transcribe")
-    flag.Parse()
-    model, err := vosk.NewModel("model")
-    rec, err := vosk.NewRecognizer(model)
+	var filename string
+	flag.StringVar(&filename, "f", "", "file to transcribe")
+	flag.Parse()
 
-    file, err := os.Open(filename)
-    if err != nil {
-        panic(err)
-    }
-    defer file.Close()
+	model, err := vosk.NewModel("model")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    fileinfo, err := file.Stat()
-    if err != nil {
-        panic(err)
-    }
+	sampleRate := 16000.0
+	rec, err := vosk.NewRecognizer(model, sampleRate)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rec.SetWords(1)
 
-    filesize := fileinfo.Size()
-    buffer := make([]byte, filesize)
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
 
-    _, err = file.Read(buffer)
-    if err != nil {
-        panic(err)
-    }
+	reader := bufio.NewReader(file)
+	buf := make([]byte, 4096)
 
-    println(vosk.VoskFinalResult(rec, buffer))
+	for {
+		_, err := reader.Read(buf)
+		if err != nil {
+			if err != io.EOF {
+				log.Fatal(err)
+			}
+
+			break
+		}
+
+		if rec.AcceptWaveform(buf) != 0 {
+			fmt.Println(string(rec.Result()))
+		}
+	}
+
+	fmt.Println(string(rec.FinalResult()))
 }

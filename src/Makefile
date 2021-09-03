@@ -1,13 +1,19 @@
+# Locations of the dependencies
 KALDI_ROOT?=$(HOME)/travis/kaldi
 OPENFST_ROOT?=$(KALDI_ROOT)/tools/openfst
 OPENBLAS_ROOT?=$(KALDI_ROOT)/tools/OpenBLAS/install
-HAVE_CUDA?=0
+MKL_ROOT?=/opt/intel/mkl
 CUDA_ROOT?=/usr/local/cuda
-EXT?=so
-CXX?=g++
-HAVE_OPENBLAS_CLAPACK=1
+# Math libraries
+HAVE_OPENBLAS_CLAPACK?=1
+HAVE_MKL?=0
 HAVE_ACCELERATE=0
-EXTRA_CFLGAS?=
+HAVE_CUDA?=0
+# Compiler
+CXX?=g++
+EXT?=so
+# Extra
+EXTRA_CFLAGS?=
 EXTRA_LDFLAGS?=
 
 VOSK_SOURCES= \
@@ -17,8 +23,8 @@ VOSK_SOURCES= \
 	spk_model.cc \
 	vosk_api.cc
 
-CFLAGS=-g -O2 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING $(EXTRA_CFLAGS) \
-	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include -I$(OPENBLAS_ROOT)/include
+CFLAGS=-g -O3 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING \
+	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include $(EXTRA_CFLAGS) 
 
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \
@@ -43,21 +49,26 @@ LIBS= \
 
 
 ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
-LIBS += \
-	$(OPENBLAS_ROOT)/lib/libopenblas.a \
-	$(OPENBLAS_ROOT)/lib/liblapack.a \
-	$(OPENBLAS_ROOT)/lib/libblas.a \
-	$(OPENBLAS_ROOT)/lib/libf2c.a
+    CFLAGS += -I$(OPENBLAS_ROOT)/include
+    LIBS += \
+        $(OPENBLAS_ROOT)/lib/libopenblas.a \
+        $(OPENBLAS_ROOT)/lib/liblapack.a \
+        $(OPENBLAS_ROOT)/lib/libblas.a \
+        $(OPENBLAS_ROOT)/lib/libf2c.a
+endif
+
+ifeq ($(HAVE_MKL), 1)
+    CFLAGS += -I$(MKL_ROOT)/include
+    LIBS += -L$(MKL_ROOT)/lib/intel64 -Wl,-rpath=$(MKL_ROOT)/lib/intel64 -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_sequential
 endif
 
 ifeq ($(HAVE_ACCELERATE), 1)
-LIBS += \
-	-framework Accelerate
+    LIBS += -framework Accelerate
 endif
 
 ifeq ($(HAVE_CUDA), 1)
-CFLAGS+=-DHAVE_CUDA=1 -I$(CUDA_ROOT)/include
-LIBS+=-L$(CUDA_ROOT)/lib64 -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
+    CFLAGS+=-DHAVE_CUDA=1 -I$(CUDA_ROOT)/include
+    LIBS+=-L$(CUDA_ROOT)/lib64 -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
 endif
 
 all: libvosk.$(EXT)

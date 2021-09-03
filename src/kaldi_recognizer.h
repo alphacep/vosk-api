@@ -85,15 +85,18 @@ class KaldiRecognizer {
         std::map<std::string, BaseFloat> scores_;
 
         // Rescoring
-        fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_ = nullptr;
+        fst::BackoffDeterministicOnDemandFst<fst::StdArc> *lm_to_subtract_ = nullptr;
+        fst::ScaleDeterministicOnDemandFst *lm_to_subtract_scale_ = nullptr;
+        kaldi::ConstArpaLmDeterministicFst *carpa_to_add_ = nullptr;
+        fst::ScaleDeterministicOnDemandFst *carpa_to_add_scale_ = nullptr;
 
         // RNNLM rescoring
-        kaldi::rnnlm::RnnlmComputeStateInfo *info = nullptr;
-        fst::ScaleDeterministicOnDemandFst *lm_to_subtract_det_scale = nullptr;
-        fst::BackoffDeterministicOnDemandFst<fst::StdArc> *lm_to_subtract_det_backoff = nullptr;
-        kaldi::rnnlm::KaldiRnnlmDeterministicFst* lm_to_add_orig = nullptr;
-        fst::DeterministicOnDemandFst<fst::StdArc> *lm_to_add = nullptr;
+        kaldi::rnnlm::KaldiRnnlmDeterministicFst* rnnlm_to_add_ = nullptr;
+        fst::DeterministicOnDemandFst<fst::StdArc> *rnnlm_to_add_scale_ = nullptr;
+        kaldi::rnnlm::RnnlmComputeStateInfo *rnnlm_info_ = nullptr;
 
+
+        // Other
         int max_alternatives_ = 0; // Disable alternatives by default
         bool words_ = false;
 
