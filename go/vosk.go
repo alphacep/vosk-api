@@ -18,6 +18,10 @@ func NewModel(modelPath string) (*VoskModel, error) {
 	return model, nil
 }
 
+func (m *VoskModel) Free() {
+	C.vosk_model_free(m.model)
+}
+
 func freeModel(model *VoskModel) {
 	C.vosk_model_free(model.model)
 }
@@ -48,6 +52,10 @@ func freeSpkModel(model *VoskSpkModel) {
 	C.vosk_spk_model_free(model.spkModel)
 }
 
+func(s *VoskSpkModel) Free() {
+	C.vosk_spk_model_free(s.spkModel)
+}
+
 // VoskRecognizer contains a reference to the C VoskRecognizer
 type VoskRecognizer struct {
 	rec *C.struct_VoskRecognizer
@@ -55,6 +63,10 @@ type VoskRecognizer struct {
 
 func freeRecognizer(recognizer *VoskRecognizer) {
 	C.vosk_recognizer_free(recognizer.rec)
+}
+
+func (r *VoskRecognizer) Free() {
+	C.vosk_recognizer_free(r.rec)
 }
 
 // NewRecognizer creates a new VoskRecognizer instance
@@ -110,7 +122,7 @@ func (r *VoskRecognizer) Result() []byte {
 
 // PartialResult returns a partial speech recognition result.
 func (r *VoskRecognizer) PartialResult() []byte {
-	return []byte(C.GoString(C.vosk_recognizer_result(r.rec)))
+	return []byte(C.GoString(C.vosk_recognizer_partial_result(r.rec)))
 }
 
 // FinalResult returns a speech recognition result. Same as result, but doesn't wait
