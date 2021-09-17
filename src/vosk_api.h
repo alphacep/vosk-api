@@ -79,8 +79,12 @@ void vosk_spk_model_free(VoskSpkModel *model);
 
 /** Creates the recognizer object
  *
- *  The recognizers process the speech and return text using shared model data 
- *  @param sample_rate The sample rate of the audio you going to feed into the recognizer
+ *  The recognizers process the speech and return text using shared model data
+ *  @param model       VoskModel containing static data for recognizer. Model can be
+ *                     shared across recognizers, even running in different threads.
+ *  @param sample_rate The sample rate of the audio you going to feed into the recognizer.
+ *                     Make sure this rate matches the audio content, it is a common
+ *                     issue causing accuracy problems.
  *  @returns recognizer object */
 VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate);
 
@@ -90,7 +94,11 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate);
  *  With the speaker recognition mode the recognizer not just recognize
  *  text but also return speaker vectors one can use for speaker identification
  *
- *  @param sample_rate The sample rate of the audio you going to feed into the recognizer
+ *  @param model       VoskModel containing static data for recognizer. Model can be
+ *                     shared across recognizers, even running in different threads.
+ *  @param sample_rate The sample rate of the audio you going to feed into the recognizer.
+ *                     Make sure this rate matches the audio content, it is a common
+ *                     issue causing accuracy problems.
  *  @param spk_model speaker model for speaker identification
  *  @returns recognizer object */
 VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, float sample_rate, VoskSpkModel *spk_model);
@@ -106,7 +114,11 @@ VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, float sample_rate, Vos
  *  Only recognizers with lookahead models support this type of quick configuration.
  *  Precompiled HCLG graph models are not supported.
  *
- *  @param sample_rate The sample rate of the audio you going to feed into the recognizer
+ *  @param model       VoskModel containing static data for recognizer. Model can be
+ *                     shared across recognizers, even running in different threads.
+ *  @param sample_rate The sample rate of the audio you going to feed into the recognizer.
+ *                     Make sure this rate matches the audio content, it is a common
+ *                     issue causing accuracy problems.
  *  @param grammar The string with the list of phrases to recognize as JSON array of strings,
  *                 for example "["one two three four five", "[unk]"]".
  *

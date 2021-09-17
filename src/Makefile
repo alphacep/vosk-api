@@ -23,6 +23,13 @@ VOSK_SOURCES= \
 	spk_model.cc \
 	vosk_api.cc
 
+VOSK_HEADERS= \
+	kaldi_recognizer.h \
+	language_model.h \
+	model.h \
+	spk_model.h \
+	vosk_api.h
+
 CFLAGS=-g -O3 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING \
 	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include $(EXTRA_CFLAGS) 
 
@@ -76,7 +83,7 @@ all: libvosk.$(EXT)
 libvosk.$(EXT): $(VOSK_SOURCES:.cc=.o)
 	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic $(EXTRA_LDFLAGS)
 
-%.o: %.cc
+%.o: %.cc $(VOSK_HEADERS)
 	$(CXX) $(CFLAGS) -c -o $@ $<
 
 clean:
