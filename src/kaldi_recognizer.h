@@ -82,11 +82,9 @@ class KaldiRecognizer {
         OnlineBaseFeature *spk_feature_ = nullptr;
 
         // Rescoring
-        fst::BackoffDeterministicOnDemandFst<fst::StdArc> *lm_to_subtract_ = nullptr;
-        fst::ScaleDeterministicOnDemandFst *lm_to_subtract_scale_ = nullptr;
+        fst::ArcMapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_to_subtract_ = nullptr;
         kaldi::ConstArpaLmDeterministicFst *carpa_to_add_ = nullptr;
         fst::ScaleDeterministicOnDemandFst *carpa_to_add_scale_ = nullptr;
-
         // RNNLM rescoring
         kaldi::rnnlm::KaldiRnnlmDeterministicFst* rnnlm_to_add_ = nullptr;
         fst::DeterministicOnDemandFst<fst::StdArc> *rnnlm_to_add_scale_ = nullptr;
