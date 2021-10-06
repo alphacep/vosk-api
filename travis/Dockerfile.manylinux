@@ -12,7 +12,7 @@ RUN yum -y update && yum -y install \
     && yum clean all
 
 RUN cd /opt \
-    && git clone -b lookahead-1.8.0 --single-branch https://github.com/alphacep/kaldi \
+    && git clone -b vosk --single-branch https://github.com/alphacep/kaldi \
     && cd /opt/kaldi/tools \
     && git clone -b v0.3.13 --single-branch https://github.com/xianyi/OpenBLAS \
     && git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack \

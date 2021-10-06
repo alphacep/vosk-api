@@ -24,7 +24,7 @@ RUN apt-get update && \
 ARG OPENBLAS_ARCH=ARMV7
 ARG ARM_HARDWARE_OPTS="-mfloat-abi=hard -mfpu=neon"
 RUN cd /opt \
-    && git clone -b lookahead-1.8.0 --single-branch https://github.com/alphacep/kaldi \
+    && git clone -b vosk --single-branch https://github.com/alphacep/kaldi \
     && cd kaldi/tools \
     && git clone -b v0.3.13 --single-branch https://github.com/xianyi/OpenBLAS \
     && git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack \

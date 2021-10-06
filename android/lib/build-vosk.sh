@@ -105,7 +105,7 @@ make install
 
 # Kaldi itself
 cd $WORKDIR
-git clone -b android-mix --single-branch https://github.com/alphacep/kaldi
+git clone -b vosk-android --single-branch https://github.com/alphacep/kaldi
 cd $WORKDIR/kaldi/src
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS_CLAPACK --shared \
