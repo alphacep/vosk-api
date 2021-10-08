@@ -538,11 +538,12 @@ const char *KaldiRecognizer::NbestResult(CompactLattice &clat)
     for (int k = 0; k < nbest_lats.size(); k++) {
 
       Lattice nlat = nbest_lats[k];
-      RmEpsilon(&nlat);
-      CompactLattice nclat;
-      CompactLattice aligned_nclat;
-      ConvertLattice(nlat, &nclat);
 
+      CompactLattice nclat;
+      fst::Invert(&nlat);
+      DeterminizeLattice(nlat, &nclat);
+
+      CompactLattice aligned_nclat;
       if (model_->winfo_) {
           WordAlignLattice(nclat, *model_->trans_model_, *model_->winfo_, 0, &aligned_nclat);
       } else {
