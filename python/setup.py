@@ -65,7 +65,7 @@ setuptools.setup(
     cmdclass=cmdclass,
     python_requires='>=3',
     zip_safe=False, # Since we load so file from the filesystem, we can not run from zip file
-    setup_requires=['cffi>=1.14'],
-    install_requires=['cffi>=1.14'],
+    setup_requires=['cffi>=1.0'],
+    install_requires=['cffi>=1.0'],
     cffi_modules=['vosk_builder.py:ffibuilder'],
 )
