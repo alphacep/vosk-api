@@ -5,7 +5,7 @@ plugins {
 
 archivesBaseName = 'vosk'
 group = 'com.alphacephei'
-version = '0.3.31'
+version = '0.3.32'
 
 repositories {
     mavenCentral()

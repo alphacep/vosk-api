@@ -93,4 +93,10 @@ public class DecoderTest {
         }
         Assert.assertTrue(true);
     }
+
+
+    @Test(expected = IOException.class)
+    public void decoderTestException() throws IOException {
+        Model model = new Model("model_missing");
+    }
 }
