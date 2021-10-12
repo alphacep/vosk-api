@@ -1,10 +1,15 @@
 package org.vosk;
 
 import com.sun.jna.PointerType;
+import java.io.IOException;
 
 public class Recognizer extends PointerType implements AutoCloseable {
-    public Recognizer(Model model, float sampleRate) {
+    public Recognizer(Model model, float sampleRate) throws IOException {
         super(LibVosk.vosk_recognizer_new(model, sampleRate));
+
+        if (getPointer() == null) {
+            throw new IOException("Failed to create a recognizer");
+        }
     }
 
     public Recognizer(Model model, float sampleRate, SpeakerModel spkModel) {

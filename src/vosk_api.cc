@@ -27,11 +27,18 @@ using namespace kaldi;
 
 VoskModel *vosk_model_new(const char *model_path)
 {
-    return (VoskModel *)new Model(model_path);
+    try {
+        return (VoskModel *)new Model(model_path);
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 void vosk_model_free(VoskModel *model)
 {
+    if (model == nullptr) {
+       return;
+    }
     ((Model *)model)->Unref();
 }
 
@@ -42,27 +49,46 @@ int vosk_model_find_word(VoskModel *model, const char *word)
 
 VoskSpkModel *vosk_spk_model_new(const char *model_path)
 {
-    return (VoskSpkModel *)new SpkModel(model_path);
+    try {
+        return (VoskSpkModel *)new SpkModel(model_path);
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 void vosk_spk_model_free(VoskSpkModel *model)
 {
+    if (model == nullptr) {
+       return;
+    }
     ((SpkModel *)model)->Unref();
 }
 
 VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
 {
-    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate);
+    try {
+        return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate);
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, float sample_rate, VoskSpkModel *spk_model)
 {
-    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, (SpkModel *)spk_model);
+    try {
+        return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, (SpkModel *)spk_model);
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, const char *grammar)
 {
-    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, grammar);
+    try {
+        return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, grammar);
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives)
@@ -77,22 +103,37 @@ void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words)
 
 void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model)
 {
+    if (recognizer == nullptr || spk_model == nullptr) {
+       return;
+    }
     ((KaldiRecognizer *)recognizer)->SetSpkModel((SpkModel *)spk_model);
 }
 
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
 {
-    return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
+    try {
+        return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
+    } catch (...) {
+        return -1;
+    }
 }
 
 int vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length)
 {
-    return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
+    try {
+        return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
+    } catch (...) {
+        return -1;
+    }
 }
 
 int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length)
 {
-    return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
+    try {
+        return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
+    } catch (...) {
+        return -1;
+    }
 }
 
 const char *vosk_recognizer_result(VoskRecognizer *recognizer)

@@ -25,6 +25,9 @@ class Model(object):
     def __init__(self, model_path):
         self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
 
+        if self._handle == _ffi.NULL:
+            raise Exception("Failed to create a model")
+
     def __del__(self):
         _c.vosk_model_free(self._handle)
 
@@ -35,6 +38,9 @@ class SpkModel(object):
 
     def __init__(self, model_path):
         self._handle = _c.vosk_spk_model_new(model_path.encode('utf-8'))
+
+        if self._handle == _ffi.NULL:
+            raise Exception("Failed to create a speaker model")
 
     def __del__(self):
         _c.vosk_spk_model_free(self._handle)
@@ -51,6 +57,9 @@ class KaldiRecognizer(object):
         else:
             raise TypeError("Unknown arguments")
 
+        if self._handle == _ffi.NULL:
+            raise Exception("Failed to create a recognizer")
+
     def __del__(self):
         _c.vosk_recognizer_free(self._handle)
 
@@ -64,7 +73,10 @@ class KaldiRecognizer(object):
         _c.vosk_recognizer_set_spk_model(self._handle, spk_model._handle)
 
     def AcceptWaveform(self, data):
-        return _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
+        res = _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
+        if res < 0:
+            raise Exception("Failed to process waveform")
+        return res
 
     def Result(self):
         return _ffi.string(_c.vosk_recognizer_result(self._handle)).decode('utf-8')
