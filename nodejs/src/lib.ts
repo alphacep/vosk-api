@@ -25,14 +25,15 @@ export type VoskRecognizer = typeof vosk_recognizer_ptr
 
 interface VoskLibrary {
   /** Loads model data from the file and returns the model object
- *
- * @param model_path: the path of the model on the filesystem
- @ @returns model object */
+   *
+   * @param model_path: the path of the model on the filesystem
+   * @returns model object or NULL if problem occured
+   */
   vosk_model_new: {
-    (modelPath: string): VoskModel
+    (modelPath: string): VoskModel | null
     async: (
       modelPath: string,
-      cb: (err: Error | null, model: VoskModel) => void,
+      cb: (err: Error | null, model: VoskModel | null) => void,
     ) => void
   }
 
@@ -40,25 +41,28 @@ interface VoskLibrary {
    *
    *  The model object is reference-counted so if some recognizer
    *  depends on this model, model might still stay alive. When
-   *  last recognizer is released, model will be released too. */
+   *  last recognizer is released, model will be released too.
+   */
   vosk_model_free: (model: VoskModel) => void
 
   /** Check if a word can be recognized by the model
    * @param word: the word
    * @returns the word symbol if @param word exists inside the model
    * or -1 otherwise.
-   * Reminding that word symbol 0 is for <epsilon> */
+   * Reminding that word symbol 0 is for <epsilon>
+   */
   vosk_model_find_word: (model: VoskModel, word: string) => number
 
   /** Loads speaker model data from the file and returns the model object
    *
    * @param model_path: the path of the model on the filesystem
-   * @returns model object */
+   * @returns model object or NULL if problem occured
+   */
   vosk_spk_model_new: {
-    (modelPath: string): VoskSpkModel
+    (modelPath: string): VoskSpkModel | null
     async: (
       modelPath: string,
-      cb: (err: Error | null, model: VoskSpkModel) => void,
+      cb: (err: Error | null, model: VoskSpkModel | null) => void,
     ) => void
   }
 
@@ -66,15 +70,20 @@ interface VoskLibrary {
    *
    *  The model object is reference-counted so if some recognizer
    *  depends on this model, model might still stay alive. When
-   *  last recognizer is released, model will be released too. */
+   *  last recognizer is released, model will be released too.
+   */
   vosk_spk_model_free: (model: VoskSpkModel) => void
 
   /** Creates the recognizer object
    *
    *  The recognizers process the speech and return text using shared model data
    *  @param sample_rate The sample rate of the audio you going to feed into the recognizer
-   *  @returns recognizer object */
-  vosk_recognizer_new: (model: VoskModel, sampleRate: number) => VoskRecognizer
+   *  @returns recognizer object or NULL if problem occured
+   */
+  vosk_recognizer_new: (
+    model: VoskModel,
+    sampleRate: number,
+  ) => VoskRecognizer | null
 
   /** Creates the recognizer object with speaker recognition
    *
@@ -83,12 +92,13 @@ interface VoskLibrary {
    *
    *  @param spk_model speaker model for speaker identification
    *  @param sample_rate The sample rate of the audio you going to feed into the recognizer
-   *  @returns recognizer object */
+   *  @returns recognizer object or NULL if problem occured
+   */
   vosk_recognizer_new_spk: (
     model: VoskModel,
     sampleRate: number,
     spkModel: VoskSpkModel,
-  ) => VoskRecognizer
+  ) => VoskRecognizer | null
 
   /** Creates the recognizer object with the phrase list
    *
@@ -104,12 +114,13 @@ interface VoskLibrary {
    *  @param grammar The string with the list of phrases to recognize as JSON array of strings,
    *                 for example "["one two three four five", "[unk]"]".
    *
-   *  @returns recognizer object */
+   *  @returns recognizer object or NULL if problem occured
+   */
   vosk_recognizer_new_grm: (
     model: VoskModel,
     sampleRate: number,
     grammar: string,
-  ) => VoskRecognizer
+  ) => VoskRecognizer | null
 
   /**
    * Configures recognizer to output n-best results
@@ -183,14 +194,17 @@ interface VoskLibrary {
    *
    *  @param data - audio data in PCM 16-bit mono format
    *  @param length - length of the audio data
-   *  @returns true if silence is occured and you can retrieve a new utterance with result method */
+   *  @returns 1 if silence is occured and you can retrieve a new utterance with result method
+   *           0 if decoding continues
+   *           -1 if exception occured
+   */
   vosk_recognizer_accept_waveform: {
-    (recognizer: VoskRecognizer, data: Buffer, dataLength: number): boolean
+    (recognizer: VoskRecognizer, data: Buffer, dataLength: number): number
     async: (
       recognizer: VoskRecognizer,
       data: Buffer,
       dataLength: number,
-      cb: (err: Error | null, endOfSpeech: boolean) => void,
+      cb: (err: Error | null, endOfSpeech: number) => void,
     ) => void
   }
 

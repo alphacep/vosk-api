@@ -94,6 +94,8 @@ class Recognizer {
    * @param options.sampleRate - The samplerate of the incoming audio in hertz
    * @param options.spkModel   - A SpkModel which allows speaker identification
    * @param options.grammar    - A list of words to narrow down the words to be recognized
+   *
+   * @throws If the recognizer could not be created
    */
   constructor({ model, sampleRate, spkModel, grammar }: Options) {
     if (spkModel && grammar) {
@@ -101,22 +103,34 @@ class Recognizer {
     }
 
     if (grammar) {
-      this.handle = lib.vosk_recognizer_new_grm(
+      const handle = lib.vosk_recognizer_new_grm(
         model.getHandle(),
         sampleRate,
         JSON.stringify(grammar),
       )
+      if (!handle) {
+        throw new Error('Failed to create a recognizer')
+      }
+      this.handle = handle
       return
     }
     if (spkModel) {
-      this.handle = lib.vosk_recognizer_new_spk(
+      const handle = lib.vosk_recognizer_new_spk(
         model.getHandle(),
         sampleRate,
         spkModel.getHandle(),
       )
+      if (!handle) {
+        throw new Error('Failed to create a recognizer')
+      }
+      this.handle = handle
       return
     }
-    this.handle = lib.vosk_recognizer_new(model.getHandle(), sampleRate)
+    const handle = lib.vosk_recognizer_new(model.getHandle(), sampleRate)
+    if (!handle) {
+      throw new Error('Failed to create a recognizer')
+    }
+    this.handle = handle
   }
 
   /**
@@ -226,7 +240,11 @@ class Recognizer {
             reject(err)
             return
           }
-          resolve(endOfSpeech)
+          if (endOfSpeech < 0) {
+            reject('Could not process voice data')
+            return
+          }
+          resolve(endOfSpeech === 1)
         },
       )
     })

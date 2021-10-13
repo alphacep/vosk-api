@@ -13,6 +13,8 @@ class SpkModel {
    *
    * @param {string} modelPath the path of the model on the filesystem
    * @see models [models](https://alphacephei.com/vosk/models)
+   *
+   * @throws If the speaker model could not be created
    */
   constructor(modelPath: string)
   constructor(handle: VoskSpkModel)
@@ -22,7 +24,11 @@ class SpkModel {
       this.handle = modelPathOrHandle
       return
     }
-    this.handle = lib.vosk_spk_model_new(modelPathOrHandle)
+    const handle = lib.vosk_spk_model_new(modelPathOrHandle)
+    if (!handle) {
+      throw new Error('Failed to create a speaker model')
+    }
+    this.handle = handle
   }
 
   /**
@@ -46,6 +52,10 @@ export const getSpkModelAsync = (modelPath: string) =>
     lib.vosk_spk_model_new.async(modelPath, (err, handle) => {
       if (err) {
         rej(err)
+        return
+      }
+      if (!handle) {
+        rej('Failed to create a speaker model')
         return
       }
       const spkModel = new SpkModel(handle)

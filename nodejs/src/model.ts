@@ -8,10 +8,13 @@ class Model {
   protected handle: VoskModel
 
   /**
-   * Build a Model to be used with the voice recognition. Each language should have it's own Model
-   * for the speech recognition to work.
+   * Build a Model to be used with the voice recognition.
+   * Each language should have it's own Model for the speech recognition to work.
+   *
    * @param modelPath The abstract pathname to the model
    * @see models [models](https://alphacephei.com/vosk/models)
+   *
+   * @throws If the model could not be created
    */
   constructor(modelPath: string)
   constructor(handle: VoskModel)
@@ -21,7 +24,11 @@ class Model {
       this.handle = modelPathOrHandle
       return
     }
-    this.handle = lib.vosk_model_new(modelPathOrHandle)
+    const handle = lib.vosk_model_new(modelPathOrHandle)
+    if (!handle) {
+      throw new Error('Failed to create a model')
+    }
+    this.handle = handle
   }
 
   /**
@@ -40,11 +47,21 @@ class Model {
   }
 }
 
+/**
+ * Build a Model to be used with the voice recognition on a separate thread.
+ * Each language should have it's own Model for the speech recognition to work.
+ *
+ * @param modelPath The abstract pathname to the model
+ */
 export const getModelAsync = (modelPath: string) =>
   new Promise<Model>((res, rej) => {
-    const cb = (err: Error | null, handle: VoskModel) => {
+    const cb = (err: Error | null, handle: VoskModel | null) => {
       if (err) {
         rej(err)
+        return
+      }
+      if (!handle) {
+        rej('Failed to create a model')
         return
       }
       res(new Model(handle))
