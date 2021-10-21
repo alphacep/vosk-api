@@ -4,7 +4,7 @@ from . import diff_align
 from . import language_model
 from . import metasentence
 from . import multipass
-from .transcriber import MultiThreadedTranscriber
+from .transcriber import Transcriber
 from .transcription import Transcription
 
 class ForcedAligner():
@@ -20,10 +20,10 @@ class ForcedAligner():
         self.ks = transcript
         self.ms = metasentence.MetaSentence(self.ks, self.model)
         self.gen_hclg_filename = language_model.make_bigram_language_model(self.ks, self.model)
-        self.mtt = MultiThreadedTranscriber(self.gen_hclg_filename)
+        self.transcriber = Transcriber(self.gen_hclg_filename)
 
     def transcribe(self, wavfile, progress_cb=None, logging=None):
-        words, duration = self.mtt.transcribe()
+        words, duration = self.transcriber.transcribe(wavfile)
         def unalign(words):
             amount = len([X for X in words if X.not_found_in_audio()])
             length = len(words)
@@ -37,7 +37,7 @@ class ForcedAligner():
             logging.info("%d unaligned words (of %d)", amount, length)
         if amount != 0:
             progress_cb({'status': 'ALIGNING'})
-            words = multipass.realign(words, amount, self.ms, self.mtt)
+            words = multipass.realign(words, amount, self.ms, self.transcriber)
         if logging is not None:
             amount, length = unalign(words)
             logging.info("after 2nd pass: %d unaligned words (of %d)", amount, length)
@@ -145,9 +145,10 @@ class AdjacencyOptimizer():
         return True
 
     def optimize_adjacent(self, i, j):
-        '''Given an out-of-audio sequence at [i,j), looks for an opportunity to
-        swap a sub-sequence with adjacent words at [p, i) or [j, p)'''
-
+        '''
+        Given an out-of-audio sequence at [i,j), looks for an opportunity to
+        swap a sub-sequence with adjacent words at [p, i) or [j, p)
+        '''
         for n in reversed(range(1, (j-i)+1)): # consider larger moves first
             if self.swap_adjacent_if_better(i, j, n, "left"): return True
             if self.swap_adjacent_if_better(i, j, n, "right"): return True

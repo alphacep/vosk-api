@@ -36,7 +36,7 @@ def make_bigram_language_model(text, model):
     # 1.2
     def sentences_segmentation(preprocessed_result):
         nlp = spacy.load('en_core_web_sm')
-        preprocess_result = str([symbol for symbol in nlp(preprocessed_result).sents]) 
+        preprocess_result = str([symbol for symbol in nlp(preprocessed_result).sents])
         return preprocess_result
     # 4.1
     def raw_part(make_sentence, prepared_text):
@@ -44,7 +44,7 @@ def make_bigram_language_model(text, model):
         return prepared_text
 
     make_text = ''
-    preprocess_result = preprocess(text) # 1
+    preprocess_result = preprocess(text.strip()) # 1
     while(len(preprocess_result) > 0):
         current_separator_position = get_sentence_separator(preprocess_result)
         # 2

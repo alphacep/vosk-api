@@ -9,7 +9,8 @@ from . import transcription
 # programming algorithm used in sclite's alignment process:
 # http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/sclite.htm#time-mediated
 def align(alignment, ms):
-    '''Use the diff algorithm to align the raw tokens recognized by Kaldi
+    '''
+    Use the diff algorithm to align the raw tokens recognized by Kaldi
     to the words in the transcript (tokenized by MetaSentence as ms).
 
     The output combines information about the timing and alignment of
@@ -53,17 +54,21 @@ def align(alignment, ms):
     return out
 
 def word_diff(a, b):
-    '''Like difflib.SequenceMatcher but it only compares one word
+    '''
+    Like difflib.SequenceMatcher but it only compares one word
     at a time. Returns an iterator whose elements are like
-    (operation, index in a, index in b)'''
+    (operation, index in a, index in b)
+    '''
     matcher = difflib.SequenceMatcher(a=a, b=b)
     for op, a_idx, _, b_idx, _ in by_word(matcher.get_opcodes()):
         yield (op, a_idx, b_idx)
 
 def by_word(opcodes):
-    '''Take difflib.SequenceMatcher.get_opcodes() output and
+    '''
+    Take difflib.SequenceMatcher.get_opcodes() output and
     return an equivalent opcode sequence that only modifies
-    one word at a time'''
+    one word at a time
+    '''
     for op, s1, e1, s2, e2 in opcodes:
         if op == 'delete':
             for i in range(s1, e1):

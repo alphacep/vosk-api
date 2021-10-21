@@ -2,7 +2,7 @@ import wave
 import sys
 import json
 
-class MultiThreadedTranscriber:
+class Transcriber:
     '''
     Acoustic model
     There are align/realign parts:

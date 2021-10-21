@@ -8,9 +8,8 @@ class Word:
 
     SUCCESS = 'success'
     NOT_FOUND_IN_AUDIO = 'not-found-in-audio'
-    NOT_FOUND_IN_TRANSCRIPT = 'not-found-in-transcript'
 
-    def __init__(self, case=None, startOffset=None, endOffset=None, word=None, alignedWord=None, phones=None, conf=None, start=None, end=None, duration=None):
+    def __init__(self, case=None, startOffset=None, endOffset=None, word=None, alignedWord=None, conf=None, start=None, end=None, duration=None):
         self.case = case
         self.startOffset = startOffset
         self.endOffset = endOffset

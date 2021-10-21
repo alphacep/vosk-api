@@ -1,13 +1,13 @@
 import logging
-import os
+#import os
 import wave
-import sys
+#import sys
 
 from . import metasentence
 from . import language_model
 from . import diff_align
 from . import transcription
-from .transcriber import MultiThreadedTranscriber
+#from .transcriber import MultiThreadedTranscriber
 '''
 The script will rework
 Multipass realign unaligned words.
@@ -51,9 +51,8 @@ def prepare_multipass(alignment):
                 cur_unaligned_words = []
     return to_realign, prev_len, next_len
 
-def realign(alignment, amount, ms, mtt, progress_cb=None):
+def realign(wavfile, alignment, amount, ms, transcriber, model, progress_cb=None):
     to_realign, prev_len, next_len = prepare_multipass(alignment)
-    wf = wave.open(sys.argv[1], "rb")
     realignments = []
 
     def realign(chunk):
@@ -62,7 +61,7 @@ def realign(alignment, amount, ms, mtt, progress_cb=None):
         else:
             start_t = chunk["start"][0].start
         if chunk["end"] is None:
-            end_t = wf.getnframes() / float(wf.getframerate())
+            end_t = wavfile.getnframes() / float(wavfile.getframerate())
         else:
             end_t = chunk["end"][len(chunk["end"])-1].end
         duration = end_t - start_t
@@ -74,13 +73,12 @@ def realign(alignment, amount, ms, mtt, progress_cb=None):
         task_start = chunk["start"][0].startOffset
         task_end = chunk["end"][-1].endOffset
         task_transcript = ms.raw_sentence[task_start:task_end]
-        task_ms = metasentence.MetaSentence(task_transcript)
+        task_ms = metasentence.MetaSentence(task_transcript, model)
         task_ks = task_ms.get_kaldi_sequence()
         seq_length = len(task_ks)
-        task_gen_hclg_filename = language_model.make_bigram_language_model(task_transcript + '.')
-        wf.setpos(int((start_t - 0.4) * wf.getframerate()))
-        mtt_unalign = MultiThreadedTranscriber(task_gen_hclg_filename)
-        ret = mtt_unalign.transcribe(wf, duration)[0][0:seq_length]
+        task_gen_hclg_filename = language_model.make_bigram_language_model(task_transcript + '.', model)
+        wavfile.setpos(int((start_t - 0.4) * wavfile.getframerate()))
+        ret = transcriber.transcribe(wavfile, duration)[0][0:seq_length]
         word_alignment = diff_align.align(ret, task_ms)
 
         for w in word_alignment:
