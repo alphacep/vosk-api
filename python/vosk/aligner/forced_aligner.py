@@ -37,7 +37,7 @@ class ForcedAligner():
             logging.info("%d unaligned words (of %d)", amount, length)
         if amount != 0:
             progress_cb({'status': 'ALIGNING'})
-            words = multipass.realign(words, amount, self.ms, self.transcriber)
+            words = multipass.realign(wavfile, words, amount, self.ms, self.transcriber)
         if logging is not None:
             amount, length = unalign(words)
             logging.info("after 2nd pass: %d unaligned words (of %d)", amount, length)

@@ -1,13 +1,10 @@
 import logging
-#import os
 import wave
-#import sys
 
 from . import metasentence
 from . import language_model
 from . import diff_align
 from . import transcription
-#from .transcriber import MultiThreadedTranscriber
 '''
 The script will rework
 Multipass realign unaligned words.
