@@ -144,7 +144,8 @@ make -j 8 online2 lm rnnlm
 
 # Vosk-api
 cd $WORKDIR
-git clone -b master --single-branch https://github.com/alphacep/vosk-api || echo "Git exited with code $?"
+mkdir -p vosk-api
+cp -fr "$WORKDIR_BASE/../`dirname $0`/../../src" vosk-api/
 cd vosk-api/src
 make -j 8 KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
 
