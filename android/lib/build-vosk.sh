@@ -32,6 +32,28 @@ WORKDIR_BASE=`pwd`/build
 PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin
 OPENFST_VERSION=1.8.0
 
+NDK_SYMLINKS_PATH=$ANDROID_TOOLCHAIN_PATH
+#mkdir -p $NDK_SYMLINKS_PATH/bin
+#PATH=$PATH:$NDK_SYMLINKS_PATH/bin
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/arm-linux-androideabi-as $NDK_SYMLINKS_PATH/bin/armv7a-linux-androideabi21-as
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-as $NDK_SYMLINKS_PATH/bin/aarch64-linux-android21-as
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/i686-linux-android-as $NDK_SYMLINKS_PATH/bin/i686-linux-android21-as
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/x86_64-linux-android-as $NDK_SYMLINKS_PATH/bin/x86_64-linux-android21-as
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/arm-linux-androideabi-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/armv7a-linux-androideabi21-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/aarch64-linux-android-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/aarch64-linux-android21-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/i686-linux-android-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/i686-linux-android21-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/i686-linux-androideabi-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/x86_64-linux-android-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/x86_64-linux-android21-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ar $NDK_SYMLINKS_PATH/bin/x86_64-linux-androideabi-ar
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ranlib $NDK_SYMLINKS_PATH/bin/armv7a-linux-androideabi21-ranlib
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ranlib $NDK_SYMLINKS_PATH/bin/aarch64-linux-android21-ranlib
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ranlib $NDK_SYMLINKS_PATH/bin/i686-linux-android21-ranlib
+ln -sf $ANDROID_TOOLCHAIN_PATH/bin/llvm-ranlib $NDK_SYMLINKS_PATH/bin/x86_64-linux-android21-ranlib
+
 for arch in armeabi-v7a arm64-v8a x86_64 x86; do
 
 WORKDIR=${WORKDIR_BASE}/kaldi_${arch}
@@ -85,7 +107,8 @@ make -C OpenBLAS install PREFIX=$WORKDIR/local
 
 # CLAPACK
 cd $WORKDIR
-git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack || echo "Git exited with code $?"
+# TODO remove if exists the clapack/ folder, since having its old files lying around creates problems
+git clone -b v3.2.1 --single-branch https://github.com/alphacep/clapack || echo "Git exited with code $?"
 mkdir -p clapack/BUILD && cd clapack/BUILD
 cmake -DCMAKE_C_FLAGS="$ARCHFLAGS" -DCMAKE_C_COMPILER_TARGET=$HOST \
     -DCMAKE_C_COMPILER=$CC -DCMAKE_SYSTEM_NAME=Generic -DCMAKE_AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin/$AR \
@@ -121,7 +144,6 @@ make -j 8 online2 lm rnnlm
 
 # Vosk-api
 cd $WORKDIR
-#rm -rf vosk-api
 git clone -b master --single-branch https://github.com/alphacep/vosk-api || echo "Git exited with code $?"
 cd vosk-api/src
 make -j 8 KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
