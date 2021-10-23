@@ -79,13 +79,13 @@ mkdir -p $WORKDIR/local/lib
 
 # openblas first
 cd $WORKDIR
-git clone -b v0.3.13 --single-branch https://github.com/xianyi/OpenBLAS
+git clone -b v0.3.13 --single-branch https://github.com/xianyi/OpenBLAS || echo "Git exited with code $?"
 make -C OpenBLAS TARGET=$BLAS_ARCH ONLY_CBLAS=1 AR=$AR CC=$CC HOSTCC=gcc ARM_SOFTFP_ABI=1 USE_THREAD=0 NUM_THREADS=1 -j4
 make -C OpenBLAS install PREFIX=$WORKDIR/local
 
 # CLAPACK
 cd $WORKDIR
-git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack
+git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack || echo "Git exited with code $?"
 mkdir -p clapack/BUILD && cd clapack/BUILD
 cmake -DCMAKE_C_FLAGS="$ARCHFLAGS" -DCMAKE_C_COMPILER_TARGET=$HOST \
     -DCMAKE_C_COMPILER=$CC -DCMAKE_SYSTEM_NAME=Generic -DCMAKE_AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin/$AR \
@@ -98,7 +98,7 @@ find . -name "*.a" | xargs cp -t $WORKDIR/local/lib
 
 # tools directory --> we'll only compile OpenFST
 cd $WORKDIR
-git clone https://github.com/alphacep/openfst
+git clone https://github.com/alphacep/openfst || echo "Git exited with code $?"
 cd openfst
 autoreconf -i
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --prefix=${WORKDIR}/local \
@@ -109,7 +109,7 @@ make install
 
 # Kaldi itself
 cd $WORKDIR
-git clone -b vosk-android --single-branch https://github.com/alphacep/kaldi
+git clone -b vosk-android --single-branch https://github.com/alphacep/kaldi || echo "Git exited with code $?"
 cd $WORKDIR/kaldi/src
 CXX=clang++ AR=ar CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS_CLAPACK --shared \
@@ -117,13 +117,12 @@ CXX=clang++ AR=ar CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure
     --host=$HOST_KALDI --openblas-root=${WORKDIR}/local \
     --fst-root=${WORKDIR}/local --fst-version=${OPENFST_VERSION}
 make -j 8 depend
-cd $WORKDIR/kaldi/src
 make -j 8 online2 lm rnnlm
 
 # Vosk-api
 cd $WORKDIR
 #rm -rf vosk-api
-git clone -b master --single-branch https://github.com/alphacep/vosk-api
+git clone -b master --single-branch https://github.com/alphacep/vosk-api || echo "Git exited with code $?"
 cd vosk-api/src
 make -j 8 KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
 
