@@ -87,7 +87,7 @@ make -C OpenBLAS install PREFIX=$WORKDIR/local
 cd $WORKDIR
 git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack
 mkdir -p clapack/BUILD && cd clapack/BUILD
-cmake -DCMAKE_C_FLAGS=$ARCHFLAGS -DCMAKE_C_COMPILER_TARGET=$HOST \
+cmake -DCMAKE_C_FLAGS="$ARCHFLAGS" -DCMAKE_C_COMPILER_TARGET=$HOST \
     -DCMAKE_C_COMPILER=$CC -DCMAKE_SYSTEM_NAME=Generic -DCMAKE_AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin/$AR \
     -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
     -DCMAKE_CROSSCOMPILING=True ..
