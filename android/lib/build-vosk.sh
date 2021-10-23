@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -xe # print commands being executed & exit when any command fails
+
 if [ "x$ANDROID_NDK_HOME" == "x" ]; then
     echo "ANDROID_NDK_HOME environment variable is undefined, define it with local.properties or with export"
     exit 1
@@ -23,8 +25,6 @@ if [ ! -d "$ANDROID_NDK_HOME" ]; then
     echo "ANDROID_NDK_HOME ($ANDROID_NDK_HOME) is missing. Make sure you have ndk installed"
     exit 1
 fi
-
-set -x
 
 OS_NAME=`echo $(uname -s) | tr '[:upper:]' '[:lower:]'`
 ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64
