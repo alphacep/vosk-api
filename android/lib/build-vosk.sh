@@ -132,7 +132,7 @@ make install
 
 # Kaldi itself
 cd $WORKDIR
-git clone -b vosk-android --single-branch https://github.com/alphacep/kaldi || echo "Git exited with code $?"
+git clone -b vosk-android --single-branch https://github.com/Stypox/kaldi || echo "Git exited with code $?"
 cd $WORKDIR/kaldi/src
 CXX=clang++ AR=ar CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS_CLAPACK --shared \
