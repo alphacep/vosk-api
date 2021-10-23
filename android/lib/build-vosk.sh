@@ -40,6 +40,7 @@ case $arch in
     armeabi-v7a)
           BLAS_ARCH=ARMV7
           HOST=arm-linux-androideabi
+          HOST_KALDI=armv7a-linux-androideabi21
           AR=arm-linux-androideabi-ar
           CC=armv7a-linux-androideabi21-clang
           CXX=armv7a-linux-androideabi21-clang++
@@ -48,6 +49,7 @@ case $arch in
     arm64-v8a)
           BLAS_ARCH=ARMV8
           HOST=aarch64-linux-android
+          HOST_KALDI="$HOST"21
           AR=aarch64-linux-android-ar
           CC=aarch64-linux-android21-clang
           CXX=aarch64-linux-android21-clang++
@@ -56,6 +58,7 @@ case $arch in
     x86_64)
           BLAS_ARCH=ATOM
           HOST=x86_64-linux-android
+          HOST_KALDI="$HOST"21
           AR=x86_64-linux-android-ar
           CC=x86_64-linux-android21-clang
           CXX=x86_64-linux-android21-clang++
@@ -64,6 +67,7 @@ case $arch in
     x86)
           BLAS_ARCH=ATOM
           HOST=i686-linux-android
+          HOST_KALDI="$HOST"21
           AR=i686-linux-android-ar
           CC=i686-linux-android21-clang
           CXX=i686-linux-android21-clang++
@@ -99,7 +103,7 @@ cd openfst
 autoreconf -i
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --prefix=${WORKDIR}/local \
     --enable-shared --enable-static --with-pic --disable-bin \
-    --enable-lookahead-fsts --enable-ngram-fsts --host=$HOST --build=x86-linux-gnu
+    --enable-lookahead-fsts --enable-ngram-fsts --host=$HOST_KALDI --build=x86-linux-gnu
 make -j 8
 make install
 
@@ -110,7 +114,7 @@ cd $WORKDIR/kaldi/src
 CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS_CLAPACK --shared \
     --android-incdir=${ANDROID_TOOLCHAIN_PATH}/sysroot/usr/include \
-    --host=$HOST --openblas-root=${WORKDIR}/local \
+    --host=$HOST_KALDI --openblas-root=${WORKDIR}/local \
     --fst-root=${WORKDIR}/local --fst-version=${OPENFST_VERSION}
 make -j 8 depend
 cd $WORKDIR/kaldi/src
