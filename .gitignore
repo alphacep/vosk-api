@@ -6,9 +6,6 @@ nohup.out
 
 # Gradle files
 .gradle/
-gradlew
-gradlew.bat
-gradle
 local.properties
 
 # Android
