@@ -26,7 +26,7 @@ dependencies {
     implementation 'net.java.dev.jna:jna:4.4.0@aar'
 }
 
-//preBuild.dependsOn buildVosk
+preBuild.dependsOn buildVosk
 
 publishing {
     publications {
