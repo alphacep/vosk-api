@@ -109,10 +109,10 @@ Model::Model(const char *model_path) : model_path_str_(model_path) {
 
     struct stat buffer;
     string am_v2_path = model_path_str_ + "/am/final.mdl";
-    string mfcc_v2_path = model_path_str_ + "/conf/mfcc.conf";
+    string model_conf_v2_path = model_path_str_ + "/conf/model.conf";
     string am_v1_path = model_path_str_ + "/final.mdl";
     string mfcc_v1_path = model_path_str_ + "/mfcc.conf";
-    if (stat(am_v2_path.c_str(), &buffer) == 0 && stat(mfcc_v2_path.c_str(), &buffer) == 0) {
+    if (stat(am_v2_path.c_str(), &buffer) == 0 && stat(model_conf_v2_path.c_str(), &buffer) == 0) {
         ConfigureV2();
         ReadDataFiles();
     } else if (stat(am_v1_path.c_str(), &buffer) == 0 && stat(mfcc_v1_path.c_str(), &buffer) == 0) {
@@ -168,6 +168,7 @@ void Model::ConfigureV1()
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
     mfcc_conf_rxfilename_ = model_path_str_ + "/mfcc.conf";
+    fbank_conf_rxfilename_ = model_path_str_ + "/fbank.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/pitch.conf";
     rnnlm_word_feats_rxfilename_ = model_path_str_ + "/rnnlm/word_feats.txt";
@@ -196,6 +197,7 @@ void Model::ConfigureV2()
     std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
     final_ie_rxfilename_ = model_path_str_ + "/ivector/final.ie";
     mfcc_conf_rxfilename_ = model_path_str_ + "/conf/mfcc.conf";
+    fbank_conf_rxfilename_ = model_path_str_ + "/conf/fbank.conf";
     global_cmvn_stats_rxfilename_ = model_path_str_ + "/am/global_cmvn.stats";
     pitch_conf_rxfilename_ = model_path_str_ + "/conf/pitch.conf";
     rnnlm_word_feats_rxfilename_ = model_path_str_ + "/rnnlm/word_feats.txt";
@@ -213,9 +215,17 @@ void Model::ReadDataFiles()
          " lattice-beam=" << nnet3_decoding_config_.lattice_beam;
     KALDI_LOG << "Silence phones " << endpoint_config_.silence_phones;
 
-    feature_info_.feature_type = "mfcc";
-    ReadConfigFromFile(mfcc_conf_rxfilename_, &feature_info_.mfcc_opts);
-    feature_info_.mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
+    if (stat(mfcc_conf_rxfilename_.c_str(), &buffer) == 0) {
+        feature_info_.feature_type = "mfcc";
+        ReadConfigFromFile(mfcc_conf_rxfilename_, &feature_info_.mfcc_opts);
+        feature_info_.mfcc_opts.frame_opts.allow_downsample = true; // It is safe to downsample
+    } else if (stat(fbank_conf_rxfilename_.c_str(), &buffer) == 0) {
+        feature_info_.feature_type = "fbank";
+        ReadConfigFromFile(fbank_conf_rxfilename_, &feature_info_.fbank_opts);
+        feature_info_.fbank_opts.frame_opts.allow_downsample = true; // It is safe to downsample
+    } else {
+        KALDI_ERR << "Failed to find feature config file";
+    }
 
     feature_info_.silence_weighting_config.silence_weight = 1e-3;
     feature_info_.silence_weighting_config.silence_phones_str = endpoint_config_.silence_phones;

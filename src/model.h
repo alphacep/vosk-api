@@ -66,6 +66,7 @@ protected:
     string std_fst_rxfilename_;
     string final_ie_rxfilename_;
     string mfcc_conf_rxfilename_;
+    string fbank_conf_rxfilename_;
     string global_cmvn_stats_rxfilename_;
     string pitch_conf_rxfilename_;
 
