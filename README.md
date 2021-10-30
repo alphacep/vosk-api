@@ -1,4 +1,4 @@
-# About
+# Vosk Speech Recognition Toolkit
 
 Vosk is an offline open source speech recognition toolkit. It enables
 speech recognition models for 18 languages and dialects - English, Indian
