@@ -75,7 +75,7 @@ endif
 
 ifeq ($(HAVE_CUDA), 1)
     CFLAGS+=-DHAVE_CUDA=1 -I$(CUDA_ROOT)/include
-    LIBS+=-L$(CUDA_ROOT)/lib64 -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
+    LIBS+=-L$(CUDA_ROOT)/lib64 -lcuda -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
 endif
 
 all: libvosk.$(EXT)
