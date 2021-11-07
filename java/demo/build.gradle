@@ -8,9 +8,6 @@ application {
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://alphacephei.com/maven/'
-    }
 }
 
 dependencies {

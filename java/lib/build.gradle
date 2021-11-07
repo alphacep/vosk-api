@@ -1,14 +1,27 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.vanniktech.maven.publish' version '0.18.0'
+}
+
+repositories {
+    mavenCentral()
 }
 
 archivesBaseName = 'vosk'
 group = 'com.alphacephei'
 version = '0.3.32'
 
-repositories {
-    mavenCentral()
+mavenPublish {
+    group = 'com.alphacephei'
+    version = version
+    sonatypeHost = 's01'
 }
 
 dependencies {
@@ -45,14 +58,14 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            url = "repo"
-        }
-    }
 }
 
 test {
     dependsOn cleanTest
     testLogging.showStandardStreams = true
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
