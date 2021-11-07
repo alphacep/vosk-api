@@ -15,6 +15,7 @@ EXT?=so
 # Extra
 EXTRA_CFLAGS?=
 EXTRA_LDFLAGS?=
+OUTDIR?=.
 
 VOSK_SOURCES= \
 	kaldi_recognizer.cc \
@@ -30,7 +31,7 @@ VOSK_HEADERS= \
 	spk_model.h \
 	vosk_api.h
 
-CFLAGS=-g -O3 -std=c++17 -fPIC -DFST_NO_DYNAMIC_LINKING \
+CFLAGS=-g -O3 -std=c++17 -Wno-deprecated-declarations -fPIC -DFST_NO_DYNAMIC_LINKING \
 	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include $(EXTRA_CFLAGS) 
 
 LIBS= \
@@ -78,12 +79,12 @@ ifeq ($(HAVE_CUDA), 1)
     LIBS+=-L$(CUDA_ROOT)/lib64 -lcuda -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
 endif
 
-all: libvosk.$(EXT)
+all: $(OUTDIR)/libvosk.$(EXT)
 
-libvosk.$(EXT): $(VOSK_SOURCES:.cc=.o)
+$(OUTDIR)/libvosk.$(EXT): $(VOSK_SOURCES:%.cc=$(OUTDIR)/%.o)
 	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic $(EXTRA_LDFLAGS)
 
-%.o: %.cc $(VOSK_HEADERS)
+$(OUTDIR)/%.o: %.cc $(VOSK_HEADERS)
 	$(CXX) $(CFLAGS) -c -o $@ $<
 
 clean:

@@ -29,7 +29,7 @@ set -x
 OS_NAME=`echo $(uname -s) | tr '[:upper:]' '[:lower:]'`
 ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64
 WORKDIR_BASE=`pwd`/build
-PATH=$PATH:$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin
+PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin:$PATH
 OPENFST_VERSION=1.8.0
 
 for arch in armeabi-v7a arm64-v8a x86_64 x86; do
@@ -40,7 +40,8 @@ case $arch in
     armeabi-v7a)
           BLAS_ARCH=ARMV7
           HOST=arm-linux-androideabi
-          AR=arm-linux-androideabi-ar
+          AR=llvm-ar
+          RANLIB=llvm-ranlib
           CC=armv7a-linux-androideabi21-clang
           CXX=armv7a-linux-androideabi21-clang++
           ARCHFLAGS="-mfloat-abi=softfp -mfpu=neon"
@@ -48,7 +49,8 @@ case $arch in
     arm64-v8a)
           BLAS_ARCH=ARMV8
           HOST=aarch64-linux-android
-          AR=aarch64-linux-android-ar
+          AR=llvm-ar
+          RANLIB=llvm-ranlib
           CC=aarch64-linux-android21-clang
           CXX=aarch64-linux-android21-clang++
           ARCHFLAGS=""
@@ -56,7 +58,8 @@ case $arch in
     x86_64)
           BLAS_ARCH=ATOM
           HOST=x86_64-linux-android
-          AR=x86_64-linux-android-ar
+          AR=llvm-ar
+          RANLIB=llvm-ranlib
           CC=x86_64-linux-android21-clang
           CXX=x86_64-linux-android21-clang++
           ARCHFLAGS=""
@@ -64,7 +67,8 @@ case $arch in
     x86)
           BLAS_ARCH=ATOM
           HOST=i686-linux-android
-          AR=i686-linux-android-ar
+          AR=llvm-ar
+          RANLIB=llvm-ranlib
           CC=i686-linux-android21-clang
           CXX=i686-linux-android21-clang++
           ARCHFLAGS=""
@@ -107,7 +111,7 @@ make install
 cd $WORKDIR
 git clone -b vosk-android --single-branch https://github.com/alphacep/kaldi
 cd $WORKDIR/kaldi/src
-CXX=$CXX CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
+CXX=$CXX AR=$AR RANLIB=$RANLIB CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING" ./configure --use-cuda=no \
     --mathlib=OPENBLAS_CLAPACK --shared \
     --android-incdir=${ANDROID_TOOLCHAIN_PATH}/sysroot/usr/include \
     --host=$HOST --openblas-root=${WORKDIR}/local \
@@ -118,12 +122,8 @@ make -j 8 online2 lm rnnlm
 
 # Vosk-api
 cd $WORKDIR
-#rm -rf vosk-api
-git clone -b master --single-branch https://github.com/alphacep/vosk-api
-cd vosk-api/src
-make -j 8 KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
-
-# Copy JNI library to sources
-cp $WORKDIR/vosk-api/src/libvosk.so $WORKDIR/../../src/main/jniLibs/$arch/libvosk.so
+mkdir -p $WORKDIR/vosk
+make -j 8 -C ${WORKDIR_BASE}/../../../src OUTDIR=$WORKDIR/vosk KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
+cp $WORKDIR/vosk/libvosk.so $WORKDIR/../../src/main/jniLibs/$arch/libvosk.so
 
 done
