@@ -19,7 +19,7 @@ android {
 
 task buildVosk(type: Exec) {
     commandLine './build-vosk.sh'
-    environment ANDROID_NDK_HOME: android.getSdkDirectory()
+    environment ANDROID_NDK_HOME: android.getNdkDirectory()
 }
 
 dependencies {
