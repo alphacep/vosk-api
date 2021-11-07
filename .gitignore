@@ -10,6 +10,7 @@ gradlew
 gradlew.bat
 gradle
 local.properties
+gradle.properties
 
 # Android
 android/build
