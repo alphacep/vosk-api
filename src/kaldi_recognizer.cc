@@ -628,7 +628,13 @@ const char* KaldiRecognizer::GetResult()
         rlat = clat;
     }
 
-    fst::ScaleLattice(fst::GraphLatticeScale(0.9), &rlat); // Apply rescoring weight
+    // Pruned composition can return empty lattice. It should be rare
+    if (rlat.Start() != 0) {
+       return StoreEmptyReturn();
+    }
+
+    // Apply rescoring weight
+    fst::ScaleLattice(fst::GraphLatticeScale(0.9), &rlat);
 
     if (max_alternatives_ == 0) {
         return MbrResult(rlat);
