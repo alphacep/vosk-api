@@ -113,26 +113,6 @@ class Transcription:
     def _from_jsondata(cls, data):
         return cls(transcript = data['transcript'], words = [Word(**wd) for wd in data['words']])
 
-    def to_csv(self):
-        '''Return a CSV representation of the aligned transcript. Format:
-        <word> <token> <start seconds> <end seconds>
-        '''
-        if not self.words:
-            return ''
-        buf = io.StringIO()
-        w = csv.writer(buf)
-        for X in self.words:
-            print('1111111111111111111111111')
-            if X.case not in (Word.SUCCESS, Word.NOT_FOUND_IN_AUDIO):
-                continue
-            row = [X.word,
-                X.alignedWord,
-                X.start,
-                X.end
-            ]
-            w.writerow(row)
-        return buf.getvalue()
-
     def stats(self):
         counts = defaultdict(int)
         for word in self.words:
