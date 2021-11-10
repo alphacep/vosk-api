@@ -9,7 +9,7 @@ from vosk import KaldiRecognizer
     4.1 cut current sentence
     5.1 prepare text for KaldiRecognizer pattern
 '''
-def make_bigram_language_model(text, model):
+def recognize(text, model):
     # 3.1 
     def get_sentence(preprocess_result):
         symbols = re.findall(r'([^\.\?\!]{1})', preprocess_result)
