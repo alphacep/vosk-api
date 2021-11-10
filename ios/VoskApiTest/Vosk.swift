@@ -14,7 +14,7 @@ public final class Vosk {
     var recognizer : OpaquePointer!
 
     init(model: VoskModel, sampleRate: Float) {
-        recognizer = vosk_recognizer_new_spk(model.model, model.spkModel, sampleRate)
+        recognizer = vosk_recognizer_new_spk(model.model, sampleRate, model.spkModel)
     }
     
     deinit {
