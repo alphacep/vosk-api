@@ -5,9 +5,9 @@ from .transcription import Transcription
 class FullTranscriber():
 
     def __init__(self):
-        self.transcriber = Transcriber(gen_hclg_filename)
+        self.transcriber = Transcriber(recognizer)
     def transcribe(self, wavfile, progress_cb=None, logging=None):
-        words, duration = self.transcriber.transcribe(wavfile, progress_cb=progress_cb)
+        words = self.transcriber.transcribe(wavfile, progress_cb=progress_cb)
         return self.make_transcription_alignment(words)
 
     @staticmethod
