@@ -1,4 +1,3 @@
-import csv
 import io
 import json
 
@@ -33,7 +32,7 @@ class Word:
     def not_found_in_audio(self):
         return self.case == Word.NOT_FOUND_IN_AUDIO
 
-    def nof_found_in_transcript(self):
+    def not_found_in_transcript(self):
         return self.case == Word.NOT_FOUND_IN_TRANSCRIPT
 
     def as_dict(self, without=None):
