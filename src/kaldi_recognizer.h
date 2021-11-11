@@ -59,6 +59,7 @@ class KaldiRecognizer {
 
     private:
         void InitState();
+        void PldaScoring(Vector<BaseFloat> &out_xvector);
         void InitRescoring();
         void CleanUp();
         void UpdateSilenceWeights();
@@ -80,6 +81,8 @@ class KaldiRecognizer {
         // Speaker identification
         SpkModel *spk_model_ = nullptr;
         OnlineBaseFeature *spk_feature_ = nullptr;
+        Vector <BaseFloat> xvector_result;
+        std::map<std::string, BaseFloat> scores_;
 
         // Rescoring
         fst::ArcMapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_to_subtract_ = nullptr;

@@ -17,9 +17,11 @@
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
 #include "language_model.h"
+#include "ivector/plda.h"
 
 using namespace fst;
 using namespace kaldi::nnet3;
+typedef unordered_map<string, Vector<BaseFloat>*, StringHasher> HashType;
 
 KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) {
 
@@ -393,17 +395,12 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     Vector<BaseFloat> xvector;
     RunNnetComputation(features, spk_model_->speaker_nnet, &compiler, &xvector);
 
-    // Whiten the vector with global mean and transform and normalize mean
-    xvector.AddVec(-1.0, spk_model_->mean);
-
-    out_xvector.Resize(spk_model_->transform.NumRows(), kSetZero);
-    out_xvector.AddMatVec(1.0, spk_model_->transform, kNoTrans, xvector, 0.0);
-
-    BaseFloat norm = out_xvector.Norm(2.0);
-    BaseFloat ratio = norm / sqrt(out_xvector.Dim()); // how much larger it is
-                                                  // than it would be, in
-                                                  // expectation, if normally
-    out_xvector.Scale(1.0 / ratio);
+    //  xvector_result is filled with xvector for PldaScoring process
+    xvector_result = xvector;
+    //  out_xvector will be filled by PldaScoring method from utterance
+    //      xvector before transformation so that it can be used for new
+    //      users enrollment
+    PldaScoring(out_xvector);
 
     return true;
 }
@@ -456,6 +453,23 @@ const char *KaldiRecognizer::MbrResult(CompactLattice &rlat)
                 obj["spk"].append(xvector(i));
             }
             obj["spk_frames"] = num_spk_frames;
+
+            using pair_type = decltype(scores_)::value_type;
+            auto pr = std::max_element
+            (
+                std::begin(scores_), std::end(scores_), [] (const pair_type & p1, const pair_type & p2) {
+                    return p1.second < p2.second;
+                }
+            );
+            KALDI_LOG << "speaker " << pr -> first << " score " << pr -> second;
+
+            for (auto const &x : scores_) {
+                json::JSON res;
+                res["speaker"] = x.first;
+                res["score"] = x.second;
+                obj["scores"].append(res);
+            }
+            scores_.clear();
         }
     }
 
@@ -737,4 +751,89 @@ const char *KaldiRecognizer::StoreReturn(const string &res)
 {
     last_result_ = res;
     return last_result_.c_str();
+}
+
+void KaldiRecognizer::PldaScoring(Vector<BaseFloat> &out_xvector) {
+
+    int64 num_train_ivectors = 0, num_train_errs = 0, num_test_ivectors = 0;
+    double tot_test_renorm_scale = 0.0, tot_train_renorm_scale = 0.0;
+    HashType test_ivectors;
+    KALDI_LOG << "Reading test iVectors";
+    std::string utt = "default";
+    if (test_ivectors.count(utt) != 0) {
+        KALDI_ERR << "Duplicate test iVector found for utterance " << utt;
+    }
+
+    xvector_result.AddVec(-1.0, spk_model_->mean);
+    const Vector <BaseFloat> &vec(xvector_result);
+    int32 transform_rows = spk_model_->transform.NumRows();
+    int32 transform_cols = spk_model_->transform.NumCols();
+    int32 vec_dim = vec.Dim();
+    Vector <BaseFloat> vec_out(transform_rows);
+    //  xvector transformation
+    if (transform_cols == vec_dim) {
+        vec_out.AddMatVec(1.0, spk_model_->transform, kNoTrans, vec, 0.0);
+    } else {
+        if (transform_cols != vec_dim + 1) {
+            KALDI_ERR << "Dimension mismatch: input vector has dimension "
+                      << vec.Dim() << " and transform has " << transform_cols
+                      << " columns.";
+        }
+        vec_out.CopyColFromMat(spk_model_->transform, vec_dim);
+        vec_out.AddMatVec(1.0, spk_model_->transform.Range(0, spk_model_->transform.NumRows(),
+                                                           0, vec_dim), kNoTrans, vec, 1.0);
+    }
+
+    out_xvector = vec_out;
+
+    int32 num_examples = 1;// this value is always used for test (affects the
+                           // length normalization in the TransformIvector
+                           // function).
+    Plda plda(spk_model_->plda);
+
+    int32 plda_dim = plda.Dim();
+    Vector <BaseFloat> *transformed_ivector = new Vector<BaseFloat>(plda_dim);
+    tot_test_renorm_scale += plda.TransformIvector(spk_model_->plda_config, vec_out,
+                                                   num_examples,
+                                                   transformed_ivector);
+    test_ivectors[utt] = transformed_ivector;
+    bool binary = false;
+
+    typedef unordered_map<string, Vector < BaseFloat>*, StringHasher > HashType;
+    std::map <std::string, int32> speakers = spk_model_->num_utts;
+    //  applying the PLDA scoring for each speaker
+    for (auto const &x : speakers) {
+        std::string key1 = x.first;
+        if (spk_model_->train_ivectors.count(key1) == 0) {
+            KALDI_WARN << "Key " << key1 << " not present in training iVectors.";
+            continue;
+        }
+        if (test_ivectors.count(utt) == 0) {
+            KALDI_WARN << "Key " << utt << " not present in test iVectors.";
+            continue;
+        }
+        const Vector <BaseFloat> *train_ivector = spk_model_->train_ivectors[key1];
+        const Vector <BaseFloat> *test_ivector = test_ivectors[utt];
+
+        Vector<double> train_ivector_dbl(*train_ivector),
+                       test_ivector_dbl(*test_ivector);
+
+        int32 num_train_examples;
+        num_train_examples = spk_model_->num_utts[key1];
+
+        //  Calculate score from loglikelihood ratio respected to train xvector(s)
+        //      and test xvector
+        BaseFloat score = plda.LogLikelihoodRatio(train_ivector_dbl,
+                                                  num_train_examples,
+                                                  test_ivector_dbl);
+
+        scores_.insert(std::pair<std::string, BaseFloat>(key1, score));
+    }
+
+//    for (HashType::iterator iter = spk_model_->train_ivectors.begin();
+//         iter != spk_model_->train_ivectors.end(); ++iter)
+//        delete iter->second;
+    for (HashType::iterator iter = test_ivectors.begin();
+         iter != test_ivectors.end(); ++iter)
+        delete iter->second;
 }
