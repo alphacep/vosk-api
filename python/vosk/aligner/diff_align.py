@@ -25,8 +25,6 @@ def align(alignment, ms):
     out = []
     for op, a, b in word_diff(hypothesis, reference):
 
-        try:
-
             display_word = display_seq[b] # index
             start_offset, end_offset = txt_offsets[b]
             
@@ -60,10 +58,6 @@ def align(alignment, ms):
                         endOffset=end_offset,
                         word=display_word,
                         realign=True))
-
-        except IndexError:
-            print('Fatal Error: There are words in your textfile that are not in the dictionary, try to exclude special symbols then run again. ')
-            #exit (1)
 
     return out
 

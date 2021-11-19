@@ -5,9 +5,9 @@ from collections import defaultdict
 
 class Word:
 
-    SUCCESS = 'success'
-    NOT_FOUND_IN_AUDIO = 'not-found-in-audio'
-    NOT_FOUND_IN_TRANSCRIPT = 'not-found-in-transcript'
+    SUCCESS = 1
+    NOT_FOUND_IN_AUDIO = 2
+    NOT_FOUND_IN_TRANSCRIPT = 3
 
     def __init__(self, case=None, startOffset=None, endOffset=None, word=None, alignedWord=None, conf=None, start=None, end=None, duration=None, realign=None):
         self.case = case
