@@ -15,6 +15,7 @@ words, words after], using new recognizer and transcriber for the chunk, putting
 '''
 def prepare_multipass(alignment):
     to_realign = []
+    cur_list = []
     chunks = 0
 
     for i, w in enumerate(alignment):
@@ -22,11 +23,6 @@ def prepare_multipass(alignment):
             for j, wd in enumerate(alignment):
                 if j >= max(0, i-3) and j <= min(len(alignment), i+3):
                     wd.realign = True
-    cur_list = []
-    start_idx = []
-    end_idx = []
-    start_counter = 0
-    end_counter = 0
 
     for j, wd in enumerate(alignment):
         if wd.realign:
@@ -80,7 +76,7 @@ def realign(alignment, ms, model, progress_cb=None):
 
         if words[-1]['word'] != chunk_end_word:
             words = words[0:len(words) - 1]
-        
+
         start_t_chunk = words[0]['start']
         for i in range(len(words)):
             words[i]['start'] = words[i]['start'] - start_t_chunk + start_t
