@@ -23,11 +23,17 @@ def align(alignment, ms):
     display_seq = ms.get_display_sequence()
     txt_offsets = ms.get_text_offsets()
     out = []
+
     for op, a, b in word_diff(hypothesis, reference):
 
-            display_word = display_seq[b] # index
-            start_offset, end_offset = txt_offsets[b]
+            try:
+                display_word = display_seq[b] # index
+            except: IndexError:
+                print('Please compare your txt and wav files, probably you have more words in txtfile than wavfile contain')
+                exit (1)
             
+            start_offset, end_offset = txt_offsets[b]
+
             if op == 'equal':
                 hyp_word = hypothesis[a]
                 hyp_token = alignment[a]

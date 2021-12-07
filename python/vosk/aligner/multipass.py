@@ -40,17 +40,25 @@ def prepare_multipass(alignment):
 
     return to_realign, chunks
 
-def realign(alignment, ms, model, progress_cb=None):
+def realign(alignment, ms, model, wavfile, progress_cb=None):
     to_realign, chunks = prepare_multipass(alignment)
     tasks = []
 
     def realign(chunk):
         realignments = []
-        wavfile = wave.open(sys.argv[1], "rb")
+
+        if chunk[0].start is None:
+            start_t = 0
+        else:
+            start_t = chunk[0].start
+
+        if chunk[-1].end is None:
+            end_t = wavfile.getnframes() / float(wavfile.getframerate())
+        else:
+            end_t = chunk[-1].end
+
         shift_start = 0.5
         shift_end = 2
-        start_t = chunk[0].start
-        end_t = chunk[-1].end
         duration = end_t - start_t
         chunk_start_word = chunk[0].word
         chunk_end_word = chunk[-1].word
@@ -66,6 +74,10 @@ def realign(alignment, ms, model, progress_cb=None):
         # getting chunk's sound part as value 'words'
         chunk_recognizer = recognizer.recognize(chunk_transcript + '.', model)
         start_pos = int(((start_t - shift_start) * wavfile.getframerate()))
+
+        if start_pos < 0:
+            start_pos = 0
+
         wavfile.setpos(start_pos)
         end_pos = int(((2 * duration) + shift_end) * wavfile.getframerate())
         chunk_end = end_pos + start_pos

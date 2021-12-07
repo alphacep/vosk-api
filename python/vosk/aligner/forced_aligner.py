@@ -38,7 +38,7 @@ class ForcedAligner():
 
         if amount != 0:
             progress_cb({'status': 'ALIGNING'})
-            words = multipass.realign(words, self.ms, self.model)
+            words = multipass.realign(words, self.ms, self.model, wavfile)
 
         if amount != 0:
             amount, length = unalign(words)
