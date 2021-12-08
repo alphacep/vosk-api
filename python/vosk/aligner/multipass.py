@@ -75,7 +75,7 @@ def realign(alignment, ms, model, wavfile, progress_cb=None):
         chunk_length = len(chunk_ks)
 
         # getting chunk's sound part as value 'words'
-        chunk_recognizer = recognizer.recognize(chunk_transcript + '.', model)
+        chunk_recognizer = recognizer.recognizer(chunk_transcript + '.', model)
         start_pos = int(((start_t - shift_start) * wavfile.getframerate()))
 
         if start_pos < 0:

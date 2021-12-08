@@ -16,7 +16,7 @@ class ForcedAligner():
         self.model = model
         self.ks = transcript
         self.ms = metasentence.MetaSentence(self.ks, self.model)
-        self.recognizer = recognizer.recognize(self.ks, self.model)
+        self.recognizer = recognizer.recognizer(self.ks, self.model)
 
     def transcribe(self, wavfile, progress_cb=None, logging=None):
         words = transcriber.transcribe(self.recognizer, wavfile)

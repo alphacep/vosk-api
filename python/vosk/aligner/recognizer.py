@@ -9,7 +9,7 @@ from vosk import KaldiRecognizer
     4.1 cut current sentence
     5.1 prepare text for KaldiRecognizer pattern
 '''
-def recognize(text, model):
+def recognizer(text, model):
     # 3.1 
     def get_sentence(preprocess_result):
         symbols = re.findall(r'([^\.\?\!]{1})', preprocess_result)
