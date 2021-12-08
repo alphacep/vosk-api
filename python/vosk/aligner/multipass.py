@@ -17,11 +17,14 @@ def prepare_multipass(alignment):
     to_realign = []
     cur_list = []
     chunks = 0
+    reserve_words = 3
+    NOT_FOUND_IN_AUDIO = 2
+    NOT_FOUND_IN_TRANSCRIPT = 3
 
     for i, w in enumerate(alignment):
-        if w.case == 2 or w.case == 3:
+        if w.case == NOT_FOUND_IN_AUDIO or w.case == NOT_FOUND_IN_TRANSCRIPT:
             for j, wd in enumerate(alignment):
-                if j >= max(0, i-3) and j <= min(len(alignment), i+3):
+                if j >= max(0, i - reserve_words) and j <= min(len(alignment), i + reserve_words):
                     wd.realign = True
 
     for j, wd in enumerate(alignment):
