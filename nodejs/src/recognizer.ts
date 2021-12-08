@@ -4,10 +4,6 @@ import SpkModel from './spkModel'
 
 export interface WordInfo {
   /**
-   * The confidence rate in the detection. 0 For unlikely, and 1 for totally accurate
-   */
-  conf: number
-  /**
    * The start of the timeframe when the word is pronounced in seconds
    */
   start: number
@@ -21,18 +17,21 @@ export interface WordInfo {
   word: string
 }
 
-export interface PartialResult {
+export interface MBRWordInfo extends WordInfo {
   /**
-   * The partial sentence that has been detected until now
+   * The confidence rate in the detection. 0 For unlikely, and 1 for totally accurate
    */
-  partial: string
+  conf: number
 }
 
-export interface Result {
+/**
+ * Minimum Bayes Risk (MBR) decoding result
+ */
+export interface MBRResult {
   /**
    * Details about the words that have been detected
    */
-  result?: WordInfo[]
+  result?: MBRWordInfo[]
   /**
    * The complete utterance that has been detected
    */
@@ -46,6 +45,38 @@ export interface Result {
    */
   spk_frames?: number
 }
+
+/**
+ * N-Best Result
+ */
+export interface NBestResult {
+  alternatives: Array<{
+    /**
+     * Details about the words that have been detected
+     */
+    result?: WordInfo[]
+    /**
+     * The difference between the total costs of the best and second-best paths in the lattice
+     */
+    confidence: number
+    /**
+     * The complete utterance that has been detected for this alternative
+     */
+    text: string
+  }>
+}
+
+export interface PartialResult {
+  /**
+   * The partial sentence that has been detected until now
+   */
+  partial: string
+}
+
+/**
+ * When max_alternatives = 0 => MBRResult, Otherwiese NBestResult
+ */
+export type Result = MBRResult | NBestResult
 
 /**
  * Recognizer options
@@ -154,18 +185,10 @@ class Recognizer {
   }
 
   /**
-   * Configures recognizer to output n-best results
+   * When maxAlternatives > 0, n-best results will be returned.
+   * When maxAlternatives = 0, Minimum Bayes Risk (MBR) decoding results are being returned
    *
-   * <pre>
-   *   {
-   *      "alternatives": [
-   *          { "text": "one two three four five", "confidence": 0.97 },
-   *          { "text": "one two three for five", "confidence": 0.03 },
-   *      ]
-   *   }
-   * </pre>
-   *
-   * @param max_alternatives - maximum alternatives to return from recognition results
+   * @param maxAlternatives - Maximum alternatives to return from recognition results
    */
   setMaxAlternatives(maxAlternatives: number) {
     return lib.vosk_recognizer_set_max_alternatives(
@@ -175,36 +198,7 @@ class Recognizer {
   }
 
   /**
-   * Configures recognizer to output words with times
-   *
-   * <pre>
-   *   "result" : [{
-   *       "conf" : 1.000000,
-   *       "end" : 1.110000,
-   *       "start" : 0.870000,
-   *       "word" : "what"
-   *     }, {
-   *       "conf" : 1.000000,
-   *       "end" : 1.530000,
-   *       "start" : 1.110000,
-   *       "word" : "zero"
-   *     }, {
-   *       "conf" : 1.000000,
-   *       "end" : 1.950000,
-   *       "start" : 1.530000,
-   *       "word" : "zero"
-   *     }, {
-   *       "conf" : 1.000000,
-   *       "end" : 2.340000,
-   *       "start" : 1.950000,
-   *       "word" : "zero"
-   *     }, {
-   *       "conf" : 1.000000,
-   *       "end" : 2.610000,
-   *       "start" : 2.340000,
-   *       "word" : "one"
-   *     }],
-   * </pre>
+   * Enables/Disables word timing infos
    */
   setWords(words: boolean) {
     return lib.vosk_recognizer_set_words(this.handle, words)
@@ -279,38 +273,6 @@ class Recognizer {
    * @returns the result in JSON format which contains decoded line, decoded
    *          words, times in seconds and confidences. You can parse this result
    *          with any json parser
-   *
-   * <pre>
-   * {
-   *   "result" : [{
-   *       "conf" : 1.000000,
-   *       "end" : 1.110000,
-   *       "start" : 0.870000,
-   *       "word" : "what"
-   *     }, {
-   *       "conf" : 1.000000,
-   *       "end" : 1.530000,
-   *       "start" : 1.110000,
-   *       "word" : "zero"
-   *     }, {
-   *       "conf" : 1.000000,
-   *       "end" : 1.950000,
-   *       "start" : 1.530000,
-   *       "word" : "zero"
-   *     }, {
-   *       "conf" : 1.000000,
-   *       "end" : 2.340000,
-   *       "start" : 1.950000,
-   *       "word" : "zero"
-   *     }, {
-   *       "conf" : 1.000000,
-   *      "end" : 2.610000,
-   *       "start" : 2.340000,
-   *       "word" : "one"
-   *     }],
-   *   "text" : "what zero zero zero one"
-   *  }
-   * </pre>
    */
   result() {
     return lib.vosk_recognizer_result(this.handle)
