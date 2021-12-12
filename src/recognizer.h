@@ -33,19 +33,19 @@
 
 using namespace kaldi;
 
-enum KaldiRecognizerState {
+enum RecognizerState {
     RECOGNIZER_INITIALIZED,
     RECOGNIZER_RUNNING,
     RECOGNIZER_ENDPOINT,
     RECOGNIZER_FINALIZED
 };
 
-class KaldiRecognizer {
+class Recognizer {
     public:
-        KaldiRecognizer(Model *model, float sample_frequency);
-        KaldiRecognizer(Model *model, float sample_frequency, SpkModel *spk_model);
-        KaldiRecognizer(Model *model, float sample_frequency, char const *grammar);
-        ~KaldiRecognizer();
+        Recognizer(Model *model, float sample_frequency);
+        Recognizer(Model *model, float sample_frequency, SpkModel *spk_model);
+        Recognizer(Model *model, float sample_frequency, char const *grammar);
+        ~Recognizer();
         void SetMaxAlternatives(int max_alternatives);
         void SetSpkModel(SpkModel *spk_model);
         void SetWords(bool words);
@@ -101,7 +101,7 @@ class KaldiRecognizer {
         int64 samples_processed_;
         int64 samples_round_start_;
 
-        KaldiRecognizerState state_;
+        RecognizerState state_;
         string last_result_;
 };
 

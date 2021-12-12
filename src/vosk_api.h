@@ -39,6 +39,10 @@ typedef struct VoskSpkModel VoskSpkModel;
  *  speaker information and so on */
 typedef struct VoskRecognizer VoskRecognizer;
 
+/**
+ * Batch recognizer object
+ */
+typedef struct VoskBatchRecognizer VoskBatchRecognizer;
 
 /** Loads model data from the file and returns the model object
  *
@@ -284,6 +288,26 @@ void vosk_gpu_init();
  *  Has no effect if HAVE_CUDA flag is not set.
  */
 void vosk_gpu_thread_init();
+
+/** Creates the batch recognizer object
+ *  The recognizers process the speech and return text using shared model data
+ *  @param model       VoskModel containing static data for recognizer. Model can be
+ *                     shared across recognizers, even running in different threads.
+ *  @returns recognizer object or NULL if problem occured */
+VoskBatchRecognizer *vosk_batch_recognizer_new(VoskModel *model, float sample_frequency);
+
+/** Releases batch recognizer object
+ *  Underlying model is also unreferenced and if needed released */
+void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer);
+
+/** Accept batch voice data */
+void vosk_batch_recognizer_accept_waveform(VoskRecognizer *recognizer, int id, const char *data, int length);
+
+/** Closes the stream */
+void vosk_batch_recognizer_finish_stream(VoskRecognizer *recognizer, int id);
+
+/** Return results */
+const char *vosk_batch_recognizer_results(VoskBatchRecognizer *recognizer);
 
 #ifdef __cplusplus
 }

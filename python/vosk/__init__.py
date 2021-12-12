@@ -101,3 +101,23 @@ def GpuInit():
 
 def GpuThreadInit():
     _c.vosk_gpu_thread_init()
+
+class BatchRecognizer(object):
+
+    def __init__(self, *args):
+        self._handle = _c.vosk_batch_recognizer_new(args[0]._handle, args[1])
+
+        if self._handle == _ffi.NULL:
+            raise Exception("Failed to create a recognizer")
+
+    def __del__(self):
+        _c.vosk_batch_recognizer_free(self._handle)
+
+    def AcceptWaveform(self, uid, data):
+        res = _c.vosk_batch_recognizer_accept_waveform(self._handle, uid, data, len(data))
+
+    def Results(self):
+        return _ffi.string(_c.vosk_batch_recognizer_result(self._handle)).decode('utf-8')
+
+    def FinishStream(self, uid):
+        _c.vosk_recognizer_final_result(self._handle, uid)

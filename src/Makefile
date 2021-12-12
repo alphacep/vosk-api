@@ -18,16 +18,18 @@ EXTRA_LDFLAGS?=
 OUTDIR?=.
 
 VOSK_SOURCES= \
-	kaldi_recognizer.cc \
+	recognizer.cc \
 	language_model.cc \
 	model.cc \
 	spk_model.cc \
+	batch_recognizer.cc \
 	vosk_api.cc
 
 VOSK_HEADERS= \
-	kaldi_recognizer.h \
+	recognizer.h \
 	language_model.h \
 	model.h \
+	batch_recognizer.h \
 	spk_model.h \
 	vosk_api.h
 
@@ -76,7 +78,10 @@ endif
 
 ifeq ($(HAVE_CUDA), 1)
     CFLAGS+=-DHAVE_CUDA=1 -I$(CUDA_ROOT)/include
-    LIBS+=-L$(CUDA_ROOT)/lib64 -lcuda -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
+    LIBS+=\
+        $(KALDI_ROOT)/src/cudadecoder/kaldi-cudadecoder.a \
+        $(KALDI_ROOT)/src/cudafeat/kaldi-cudafeat.a \
+        -L$(CUDA_ROOT)/lib64 -lcuda -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
 endif
 
 all: $(OUTDIR)/libvosk.$(EXT)
