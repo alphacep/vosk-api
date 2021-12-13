@@ -117,7 +117,7 @@ class BatchRecognizer(object):
         res = _c.vosk_batch_recognizer_accept_waveform(self._handle, uid, data, len(data))
 
     def Results(self):
-        return _ffi.string(_c.vosk_batch_recognizer_result(self._handle)).decode('utf-8')
+        return _ffi.string(_c.vosk_batch_recognizer_results(self._handle)).decode('utf-8')
 
     def FinishStream(self, uid):
-        _c.vosk_recognizer_final_result(self._handle, uid)
+        _c.vosk_batch_recognizer_finish_stream(self._handle, uid)

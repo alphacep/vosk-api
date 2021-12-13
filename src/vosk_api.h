@@ -301,10 +301,10 @@ VoskBatchRecognizer *vosk_batch_recognizer_new(VoskModel *model, float sample_fr
 void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer);
 
 /** Accept batch voice data */
-void vosk_batch_recognizer_accept_waveform(VoskRecognizer *recognizer, int id, const char *data, int length);
+void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, int id, const char *data, int length);
 
 /** Closes the stream */
-void vosk_batch_recognizer_finish_stream(VoskRecognizer *recognizer, int id);
+void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer, int id);
 
 /** Return results */
 const char *vosk_batch_recognizer_results(VoskBatchRecognizer *recognizer);

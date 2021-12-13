@@ -193,12 +193,12 @@ void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer)
     delete ((BatchRecognizer *)recognizer);
 }
 
-void vosk_batch_recognizer_accept_waveform(VoskRecognizer *recognizer, int id, const char *data, int length)
+void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, int id, const char *data, int length)
 {
     ((BatchRecognizer *)recognizer)->AcceptWaveform(id, data, length);
 }
 
-void vosk_batch_recognizer_finish_stream(VoskRecognizer *recognizer, int id)
+void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer, int id)
 {
     ((BatchRecognizer *)recognizer)->FinishStream(id);
 }

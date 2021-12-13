@@ -25,9 +25,22 @@ BatchRecognizer::BatchRecognizer(Model *model, float sample_frequency) : model_(
     model_->Ref();
 
     BatchedThreadedNnet3CudaOnlinePipelineConfig batched_decoder_config;
+    batched_decoder_config.num_worker_threads = 4;
+    batched_decoder_config.max_batch_size = 100;
+
+    batched_decoder_config.feature_opts.feature_type = "mfcc";
+    batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";
+    batched_decoder_config.feature_opts.ivector_extraction_config = "model/conf/ivector.conf";
+    batched_decoder_config.decoder_opts.max_active = 7000;
+    batched_decoder_config.decoder_opts.default_beam = 13.0;
+    batched_decoder_config.decoder_opts.lattice_beam = 8.0;
+    batched_decoder_config.compute_opts.acoustic_scale = 1.0;
+    batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
+    batched_decoder_config.compute_opts.frames_per_chunk = 312;
 
     cuda_pipeline_ = new BatchedThreadedNnet3CudaOnlinePipeline 
          (batched_decoder_config, *model_->hclg_fst_, *model_->nnet_, *model_->trans_model_);
+    cuda_pipeline_->SetSymbolTable(*model_->word_syms_);
 
     CudaOnlinePipelineDynamicBatcherConfig dynamic_batcher_config;
     dynamic_batcher_ = new CudaOnlinePipelineDynamicBatcher(dynamic_batcher_config,
@@ -60,6 +73,9 @@ void BatchRecognizer::InitRescoring()
 
 void BatchRecognizer::FinishStream(uint64_t id)
 {
+    Vector<BaseFloat> wave;
+    SubVector<BaseFloat> chunk(wave.Data(), 0);
+    dynamic_batcher_->Push(id, false, true, chunk);
     streams_.erase(id);
 }
 
@@ -77,7 +93,7 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
           [&, id](const std::string &str, bool partial,
                        bool endpoint_detected) {
               if (partial) {
-                  KALDI_LOG << "id #" << id << " [partial] : " << str;
+                  KALDI_LOG << "id #" << id << " [partial] : " << str << ":";
               }
 
               if (endpoint_detected) {
