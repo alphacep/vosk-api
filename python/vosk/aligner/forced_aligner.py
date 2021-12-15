@@ -1,5 +1,5 @@
 from . import diff_align
-from . import recognizer
+from . import text_processor
 from . import metasentence
 from . import multipass
 from .transcriber import Transcriber as transcriber
@@ -16,10 +16,10 @@ class ForcedAligner():
         self.model = model
         self.ks = transcript
         self.ms = metasentence.MetaSentence(self.ks, self.model)
-        self.recognizer = recognizer.recognizer(self.ks, self.model)
+        self.text = text_processor.process_text(self.ks, self.model)
 
     def transcribe(self, wavfile, progress_cb=None, logging=None):
-        words = transcriber.transcribe(self.recognizer, wavfile)
+        words = transcriber.transcribe(self.text, wavfile)
 
         def unalign(words):
             NFIA = len([X for X in words if (X.not_found_in_audio())])

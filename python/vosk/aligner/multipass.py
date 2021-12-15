@@ -3,7 +3,7 @@ import wave
 import sys
 
 from . import metasentence
-from . import recognizer
+from . import text_processor
 from . import diff_align
 from . import transcription
 from .transcriber import Transcriber as transcriber
@@ -75,7 +75,7 @@ def realign(alignment, ms, model, wavfile, progress_cb=None):
         chunk_length = len(chunk_ks)
 
         # getting chunk's sound part as value 'words'
-        chunk_recognizer = recognizer.recognizer(chunk_transcript + '.', model)
+        text_chunk = text_processor.process_text(chunk_transcript + '.', model)
         start_pos = int(((start_t - shift_start) * wavfile.getframerate()))
 
         if start_pos < 0:
@@ -84,7 +84,7 @@ def realign(alignment, ms, model, wavfile, progress_cb=None):
         wavfile.setpos(start_pos)
         end_pos = int(((2 * duration) + shift_end) * wavfile.getframerate())
         chunk_end = end_pos + start_pos
-        words = transcriber.transcribe(chunk_recognizer, wavfile, chunk_end)[0:chunk_length + 1]
+        words = transcriber.transcribe(text_chunk, wavfile, chunk_end)[0:chunk_length + 1]
 
         if words[0]['word'] != chunk_start_word:
             words = words[1:len(words)]

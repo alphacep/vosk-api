@@ -37,13 +37,16 @@ def main(audiofile, txtfile, model, output):
         logging.info("starting alignment")
         align = aligner.ForcedAligner(transcript, model)
         result = align.transcribe(wavfile, progress_cb=on_progress, logging=logging)
-    final_result = ((result.to_json(indent=2)).replace(',\n      "realign": false,', ',')) 
+    final_result = ((result.to_json(indent=2)).replace(',\n      "realign": false,', ','))
     fh = open(output, 'w', encoding="utf-8") if output else sys.stdout
     fh.write(final_result)
     if output:
         logging.info("output written to %s" % (output))
     print()
+    return final_result
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    main(args.audiofile, args.txtfile, args.model, args.output)
+    log_level = args.log.upper()
+    logging.getLogger().setLevel(log_level)
+    total = len(main(args.audiofile, args.txtfile, args.model, args.output))
