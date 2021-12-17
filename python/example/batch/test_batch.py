@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-from vosk import Model, BatchRecognizer, GpuInit, GpuThreadInit
 import sys
 import os
 import wave
+from time import sleep
+
+from vosk import Model, BatchRecognizer, GpuInit
 
 GpuInit()
-GpuThreadInit()
 
 rec = BatchRecognizer()
 
@@ -14,6 +15,7 @@ fnames = open("tedlium.list").readlines()
 fds = [open(x.strip(), "rb") for x in fnames]
 ended = set()
 while True:
+
     for i, fd in enumerate(fds):
         if i in ended:
             continue
@@ -21,8 +23,20 @@ while True:
         if len(data) == 0:
             rec.FinishStream(i)
             ended.add(i)
-        else:
-            rec.AcceptWaveform(i, data)
-    rec.Results()
+            continue
+        rec.AcceptWaveform(i, data)
+
+    sleep(0.3)
+    for i, fd in enumerate(fds):
+       res = rec.Result(i)
+       print (i, res)
+
     if len(ended) == len(fds):
         break
+
+sleep(20)
+print ("Done")
+for i, fd in enumerate(fds):
+   res = rec.Result(i)
+   print (i, res)
+rec.Wait()

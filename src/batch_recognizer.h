@@ -45,9 +45,12 @@ class BatchRecognizer {
 
         void FinishStream(uint64_t id);
         void AcceptWaveform(uint64_t id, const char *data, int len);
-        const char* PullResults();
+        const char *FrontResult(uint64_t id);
+        void Pop(uint64_t id);
+        void WaitForCompletion();
 
     private:
+        void PushLattice(uint64_t id, CompactLattice &clat, BaseFloat offset);
 
         kaldi::TransitionModel *trans_model_ = nullptr;
         kaldi::nnet3::AmNnetSimple *nnet_ = nullptr;
@@ -64,6 +67,7 @@ class BatchRecognizer {
 
 
         std::set<int> streams_;
+        std::map<int, std::queue<std::string> > results_;
 
         // Rescoring
         fst::ArcMapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_to_subtract_ = nullptr;

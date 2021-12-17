@@ -305,7 +305,13 @@ void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, int 
 void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer, int id);
 
 /** Return results */
-const char *vosk_batch_recognizer_results(VoskBatchRecognizer *recognizer);
+const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer, int id);
+
+/** Release and free first retrieved result */
+void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer, int id);
+
+/** Wait for the processing */
+void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer);
 
 #ifdef __cplusplus
 }

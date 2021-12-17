@@ -203,7 +203,17 @@ void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer, int id
     ((BatchRecognizer *)recognizer)->FinishStream(id);
 }
 
-const char *vosk_batch_recognizer_results(VoskBatchRecognizer *recognizer)
+const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer, int id)
 {
-    return ((BatchRecognizer *)recognizer)->PullResults();
+    return ((BatchRecognizer *)recognizer)->FrontResult(id);
+}
+
+void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer, int id)
+{
+    return ((BatchRecognizer *)recognizer)->Pop(id);
+}
+
+void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer)
+{
+    ((BatchRecognizer *)recognizer)->WaitForCompletion();
 }

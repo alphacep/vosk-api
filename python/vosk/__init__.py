@@ -116,8 +116,14 @@ class BatchRecognizer(object):
     def AcceptWaveform(self, uid, data):
         res = _c.vosk_batch_recognizer_accept_waveform(self._handle, uid, data, len(data))
 
-    def Results(self):
-        return _ffi.string(_c.vosk_batch_recognizer_results(self._handle)).decode('utf-8')
+    def Result(self, uid):
+        ptr = _c.vosk_batch_recognizer_front_result(self._handle, uid)
+        res = _ffi.string(ptr).decode('utf-8')
+        _c.vosk_batch_recognizer_pop(self._handle, uid)
+        return res
 
     def FinishStream(self, uid):
         _c.vosk_batch_recognizer_finish_stream(self._handle, uid)
+
+    def Wait(self):
+        _c.vosk_batch_recognizer_wait(self._handle)

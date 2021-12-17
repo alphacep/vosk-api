@@ -16,6 +16,7 @@
 
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
+#include "json.h"
 
 #include <sys/stat.h>
 
@@ -37,12 +38,12 @@ BatchRecognizer::BatchRecognizer() {
     batched_decoder_config.feature_opts.feature_type = "mfcc";
     batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";
     batched_decoder_config.feature_opts.ivector_extraction_config = "model/conf/ivector.conf";
-    batched_decoder_config.decoder_opts.max_active = 7000;
-    batched_decoder_config.decoder_opts.default_beam = 13.0;
-    batched_decoder_config.decoder_opts.lattice_beam = 8.0;
+    batched_decoder_config.decoder_opts.max_active = 5000;
+    batched_decoder_config.decoder_opts.default_beam = 10.0;
+    batched_decoder_config.decoder_opts.lattice_beam = 4.0;
     batched_decoder_config.compute_opts.acoustic_scale = 1.0;
     batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
-    batched_decoder_config.compute_opts.frames_per_chunk = 312;
+    batched_decoder_config.compute_opts.frames_per_chunk = 51;
 
     struct stat buffer;
 
@@ -126,6 +127,47 @@ void BatchRecognizer::FinishStream(uint64_t id)
     streams_.erase(id);
 }
 
+
+void BatchRecognizer::PushLattice(uint64_t id, CompactLattice &clat, BaseFloat offset)
+{
+    fst::ScaleLattice(fst::GraphLatticeScale(0.9), &clat);
+
+    CompactLattice aligned_lat;
+    WordAlignLattice(clat, *trans_model_, *winfo_, 0, &aligned_lat);
+
+    MinimumBayesRisk mbr(aligned_lat);
+    const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
+    const vector<int32> &words = mbr.GetOneBest();
+    const vector<pair<BaseFloat, BaseFloat> > &times =
+          mbr.GetOneBestTimes();
+
+    int size = words.size();
+
+    json::JSON obj;
+    stringstream text;
+
+    // Create JSON object
+    for (int i = 0; i < size; i++) {
+        json::JSON word;
+
+        word["word"] = word_syms_->Find(words[i]);
+        word["start"] = times[i].first * 0.03 + offset;
+        word["end"] = times[i].second * 0.03 + offset;
+        word["conf"] = conf[i];
+        obj["result"].append(word);
+
+        if (i) {
+            text << " ";
+        }
+        text << word_syms_->Find(words[i]);
+    }
+    obj["text"] = text.str();
+
+//    KALDI_LOG << "Result " << id << " " << obj.dump();
+
+    results_[id].push(obj.dump());
+}
+
 void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
 {
     bool first = false;
@@ -135,7 +177,8 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
         streams_.insert(id);
 
         // Define the callback for results.
-        cuda_pipeline_->SetBestPathCallback(
+#if 0
+         cuda_pipeline_->SetBestPathCallback(
           id,
           [&, id](const std::string &str, bool partial,
                        bool endpoint_detected) {
@@ -151,11 +194,19 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
                   KALDI_LOG << "id #" << id << " : " << str;
               }
             });
+#endif
         cuda_pipeline_->SetLatticeCallback(
           id,
-          [&, id](CompactLattice &clat) {
-              KALDI_LOG << "Got lattice from the stream " << id;
-          });
+          [&, id](SegmentedLatticeCallbackParams& params) {
+              if (params.results.empty()) {
+                  KALDI_WARN << "Empty result for callback";
+                  return;
+              }
+              CompactLattice *clat = params.results[0].GetLatticeResult();
+              BaseFloat offset = params.results[0].GetTimeOffsetSeconds();
+              PushLattice(id, *clat, offset);
+          },
+          CudaPipelineResult::RESULT_TYPE_LATTICE);
     }
 
     Vector<BaseFloat> wave;
@@ -167,8 +218,24 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
     dynamic_batcher_->Push(id, first, false, chunk);
 }
 
-const char* BatchRecognizer::PullResults()
+const char* BatchRecognizer::FrontResult(uint64_t id)
+{
+    if (results_[id].empty()) {
+        return "";
+    }
+    return results_[id].front().c_str();
+}
+
+void BatchRecognizer::Pop(uint64_t id)
+{
+    if (results_[id].empty()) {
+        return;
+    }
+    results_[id].pop();
+}
+
+void BatchRecognizer::WaitForCompletion()
 {
     dynamic_batcher_->WaitForCompletion();
-    return "";
 }
+
