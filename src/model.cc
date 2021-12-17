@@ -242,7 +242,7 @@ void Model::ReadDataFiles()
         nnet3::CollapseModel(nnet3::CollapseModelConfig(), &(nnet_->GetNnet()));
     }
 
-/*    decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
+    decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
                                                                nnet_);
     if (stat(final_ie_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading i-vector extractor from " << final_ie_rxfilename_;
@@ -261,7 +261,7 @@ void Model::ReadDataFiles()
     } else {
         feature_info_.use_ivectors = false;
     }
-*/
+
     if (stat(global_cmvn_stats_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Reading CMVN stats from " << global_cmvn_stats_rxfilename_;
         feature_info_.use_cmvn = true;

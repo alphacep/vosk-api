@@ -290,11 +290,9 @@ void vosk_gpu_init();
 void vosk_gpu_thread_init();
 
 /** Creates the batch recognizer object
- *  The recognizers process the speech and return text using shared model data
- *  @param model       VoskModel containing static data for recognizer. Model can be
- *                     shared across recognizers, even running in different threads.
+ *
  *  @returns recognizer object or NULL if problem occured */
-VoskBatchRecognizer *vosk_batch_recognizer_new(VoskModel *model, float sample_frequency);
+VoskBatchRecognizer *vosk_batch_recognizer_new();
 
 /** Releases batch recognizer object
  *  Underlying model is also unreferenced and if needed released */

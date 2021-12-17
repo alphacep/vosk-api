@@ -17,16 +17,22 @@
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
 
+#include <sys/stat.h>
+
 using namespace fst;
 using namespace kaldi::nnet3;
 using CorrelationID = CudaOnlinePipelineDynamicBatcher::CorrelationID;
 
-BatchRecognizer::BatchRecognizer(Model *model, float sample_frequency) : model_(model), sample_frequency_(sample_frequency) {
-    model_->Ref();
-
+BatchRecognizer::BatchRecognizer() {
     BatchedThreadedNnet3CudaOnlinePipelineConfig batched_decoder_config;
+
+    kaldi::ParseOptions po("something");
+    batched_decoder_config.Register(&po);
+    po.ReadConfigFile("model/conf/model.conf");
+
     batched_decoder_config.num_worker_threads = 4;
     batched_decoder_config.max_batch_size = 100;
+    batched_decoder_config.reset_on_endpoint = true;
 
     batched_decoder_config.feature_opts.feature_type = "mfcc";
     batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";
@@ -38,37 +44,78 @@ BatchRecognizer::BatchRecognizer(Model *model, float sample_frequency) : model_(
     batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
     batched_decoder_config.compute_opts.frames_per_chunk = 312;
 
+    struct stat buffer;
+
+    string nnet3_rxfilename_ = "model/am/final.mdl";
+    string hclg_fst_rxfilename_ = "model/graph/HCLG.fst";
+    string word_syms_rxfilename_ = "model/graph/words.txt";
+    string winfo_rxfilename_ = "model/graph/phones/word_boundary.int";
+    string std_fst_rxfilename_ = "model/rescore/G.fst";
+    string carpa_rxfilename_ = "model/rescore/G.carpa";
+
+    trans_model_ = new kaldi::TransitionModel();
+    nnet_ = new kaldi::nnet3::AmNnetSimple();
+    {
+        bool binary;
+        kaldi::Input ki(nnet3_rxfilename_, &binary);
+        trans_model_->Read(ki.Stream(), binary);
+        nnet_->Read(ki.Stream(), binary);
+        SetBatchnormTestMode(true, &(nnet_->GetNnet()));
+        SetDropoutTestMode(true, &(nnet_->GetNnet()));
+        nnet3::CollapseModel(nnet3::CollapseModelConfig(), &(nnet_->GetNnet()));
+    }
+
+    if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading HCLG from " << hclg_fst_rxfilename_;
+        hclg_fst_ = fst::ReadFstKaldiGeneric(hclg_fst_rxfilename_);
+    }
+
+    KALDI_LOG << "Loading words from " << word_syms_rxfilename_;
+    if (!(word_syms_ = fst::SymbolTable::ReadText(word_syms_rxfilename_))) {
+        KALDI_ERR << "Could not read symbol table from file "
+                  << word_syms_rxfilename_;
+    }
+    KALDI_ASSERT(word_syms_);
+
+    if (stat(winfo_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading winfo " << winfo_rxfilename_;
+        kaldi::WordBoundaryInfoNewOpts opts;
+        winfo_ = new kaldi::WordBoundaryInfo(opts, winfo_rxfilename_);
+    }
+
+    if (stat(carpa_rxfilename_.c_str(), &buffer) == 0) {
+        KALDI_LOG << "Loading subtract G.fst model from " << std_fst_rxfilename_;
+        graph_lm_fst_ = fst::ReadAndPrepareLmFst(std_fst_rxfilename_);
+        KALDI_LOG << "Loading CARPA model from " << carpa_rxfilename_;
+        ReadKaldiObject(carpa_rxfilename_, &const_arpa_);
+    }
+
+
+
     cuda_pipeline_ = new BatchedThreadedNnet3CudaOnlinePipeline 
-         (batched_decoder_config, *model_->hclg_fst_, *model_->nnet_, *model_->trans_model_);
-    cuda_pipeline_->SetSymbolTable(*model_->word_syms_);
+         (batched_decoder_config, *hclg_fst_, *nnet_, *trans_model_);
+    cuda_pipeline_->SetSymbolTable(*word_syms_);
 
     CudaOnlinePipelineDynamicBatcherConfig dynamic_batcher_config;
     dynamic_batcher_ = new CudaOnlinePipelineDynamicBatcher(dynamic_batcher_config,
                                                             *cuda_pipeline_);
-
-    InitRescoring();
 }
 
 BatchRecognizer::~BatchRecognizer() {
+
+    delete trans_model_;
+    delete nnet_;
+    delete word_syms_;
+    delete winfo_;
+    delete hclg_fst_;
+    delete graph_lm_fst_;
+
     delete lm_to_subtract_;
     delete carpa_to_add_;
     delete carpa_to_add_scale_;
 
     delete cuda_pipeline_;
     delete dynamic_batcher_;
-
-    model_->Unref();
-}
-
-void BatchRecognizer::InitRescoring()
-{
-    if (model_->graph_lm_fst_) {
-        fst::CacheOptions cache_opts(true, -1);
-        fst::ArcMapFstOptions mapfst_opts(cache_opts);
-        fst::StdToLatticeMapper<BaseFloat> mapper;
-        lm_to_subtract_ = new fst::ArcMapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> >(*model_->graph_lm_fst_, mapper, mapfst_opts);
-        carpa_to_add_ = new ConstArpaLmDeterministicFst(model_->const_arpa_);
-    }
 }
 
 void BatchRecognizer::FinishStream(uint64_t id)
@@ -104,13 +151,18 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
                   KALDI_LOG << "id #" << id << " : " << str;
               }
             });
+        cuda_pipeline_->SetLatticeCallback(
+          id,
+          [&, id](CompactLattice &clat) {
+              KALDI_LOG << "Got lattice from the stream " << id;
+          });
     }
 
     Vector<BaseFloat> wave;
     wave.Resize(len / 2, kUndefined);
     for (int i = 0; i < len / 2; i++)
         wave(i) = *(((short *)data) + i);
-    SubVector<BaseFloat> chunk(wave.Data(), 0);
+    SubVector<BaseFloat> chunk(wave.Data(), wave.Dim());
 
     dynamic_batcher_->Push(id, first, false, chunk);
 }
@@ -118,6 +170,5 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
 const char* BatchRecognizer::PullResults()
 {
     dynamic_batcher_->WaitForCompletion();
-    cudaDeviceSynchronize();
     return "";
 }

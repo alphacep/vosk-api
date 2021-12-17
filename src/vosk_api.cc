@@ -183,9 +183,9 @@ void vosk_gpu_thread_init()
 #endif
 }
 
-VoskBatchRecognizer *vosk_batch_recognizer_new(VoskModel *model, float sample_frequency)
+VoskBatchRecognizer *vosk_batch_recognizer_new()
 {
-    return (VoskBatchRecognizer *)(new BatchRecognizer((Model *)model, sample_frequency));
+    return (VoskBatchRecognizer *)(new BatchRecognizer());
 }
 
 void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer)

@@ -105,7 +105,7 @@ def GpuThreadInit():
 class BatchRecognizer(object):
 
     def __init__(self, *args):
-        self._handle = _c.vosk_batch_recognizer_new(args[0]._handle, args[1])
+        self._handle = _c.vosk_batch_recognizer_new()
 
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create a recognizer")

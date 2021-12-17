@@ -40,7 +40,7 @@ using namespace kaldi::cuda_decoder;
 
 class BatchRecognizer {
     public:
-        BatchRecognizer(Model *model, float sample_frequency);
+        BatchRecognizer();
         ~BatchRecognizer();
 
         void FinishStream(uint64_t id);
@@ -48,11 +48,20 @@ class BatchRecognizer {
         const char* PullResults();
 
     private:
-        void InitRescoring();
 
-        Model *model_ = nullptr;
+        kaldi::TransitionModel *trans_model_ = nullptr;
+        kaldi::nnet3::AmNnetSimple *nnet_ = nullptr;
+        const fst::SymbolTable *word_syms_ = nullptr;
+
+        fst::Fst<fst::StdArc> *hclg_fst_ = nullptr;
+        kaldi::WordBoundaryInfo *winfo_ = nullptr;
+
+        fst::VectorFst<fst::StdArc> *graph_lm_fst_ = nullptr;
+        kaldi::ConstArpaLm const_arpa_;
+
         BatchedThreadedNnet3CudaOnlinePipeline *cuda_pipeline_ = nullptr;
         CudaOnlinePipelineDynamicBatcher *dynamic_batcher_ = nullptr;
+
 
         std::set<int> streams_;
 

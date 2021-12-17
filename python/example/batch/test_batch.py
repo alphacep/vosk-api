@@ -8,8 +8,7 @@ import wave
 GpuInit()
 GpuThreadInit()
 
-model = Model("model")
-rec = BatchRecognizer(model, 16000.0)
+rec = BatchRecognizer()
 
 fnames = open("tedlium.list").readlines()
 fds = [open(x.strip(), "rb") for x in fnames]
@@ -18,7 +17,7 @@ while True:
     for i, fd in enumerate(fds):
         if i in ended:
             continue
-        data = fd.read(16000)
+        data = fd.read(8000)
         if len(data) == 0:
             rec.FinishStream(i)
             ended.add(i)
