@@ -43,7 +43,7 @@ BatchRecognizer::BatchRecognizer() {
     batched_decoder_config.decoder_opts.lattice_beam = 6.0;
     batched_decoder_config.compute_opts.acoustic_scale = 1.0;
     batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
-    batched_decoder_config.compute_opts.frames_per_chunk = 51;
+    batched_decoder_config.compute_opts.frames_per_chunk = 180;
 
     struct stat buffer;
 
