@@ -35,14 +35,19 @@ async def recognize(websocket, path):
             continue
 
         rec.AcceptWaveform(uid, message)
-        await asyncio.sleep(len(message) / 16000.0 / 2)
+
+        while rec.GetPendingChunks(uid) > 0:
+            await asyncio.sleep(0.1)
+
         res = rec.Result(uid)
         if len(res) == 0:
             await websocket.send('{ "partial" : "" }')
         else:
             await websocket.send(res)
 
-    rec.Wait()
+    while rec.GetPendingChunks(uid) > 0:
+        await asyncio.sleep(0.1)
+
     res = rec.Result(uid)
     await websocket.send(res)
 

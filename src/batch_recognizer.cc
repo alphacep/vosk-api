@@ -38,9 +38,9 @@ BatchRecognizer::BatchRecognizer() {
     batched_decoder_config.feature_opts.feature_type = "mfcc";
     batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";
     batched_decoder_config.feature_opts.ivector_extraction_config = "model/conf/ivector.conf";
-    batched_decoder_config.decoder_opts.max_active = 5000;
-    batched_decoder_config.decoder_opts.default_beam = 10.0;
-    batched_decoder_config.decoder_opts.lattice_beam = 4.0;
+    batched_decoder_config.decoder_opts.max_active = 7000;
+    batched_decoder_config.decoder_opts.default_beam = 13.0;
+    batched_decoder_config.decoder_opts.lattice_beam = 6.0;
     batched_decoder_config.compute_opts.acoustic_scale = 1.0;
     batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
     batched_decoder_config.compute_opts.frames_per_chunk = 51;
@@ -239,3 +239,7 @@ void BatchRecognizer::WaitForCompletion()
     dynamic_batcher_->WaitForCompletion();
 }
 
+int BatchRecognizer::GetPendingChunks(uint64_t id)
+{
+    return dynamic_batcher_->GetPendingChunks(id);
+}

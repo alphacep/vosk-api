@@ -313,6 +313,9 @@ void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer, int id);
 /** Wait for the processing */
 void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer);
 
+/** Get amount of pending chunks for more intelligent waiting */
+int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer, int id);
+
 #ifdef __cplusplus
 }
 #endif

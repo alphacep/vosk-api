@@ -127,3 +127,6 @@ class BatchRecognizer(object):
 
     def Wait(self):
         _c.vosk_batch_recognizer_wait(self._handle)
+
+    def GetPendingChunks(self, uid):
+        return _c.vosk_batch_recognizer_get_pending_chunks(self._handle, uid)

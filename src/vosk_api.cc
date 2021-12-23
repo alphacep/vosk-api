@@ -210,10 +210,15 @@ const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer, 
 
 void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer, int id)
 {
-    return ((BatchRecognizer *)recognizer)->Pop(id);
+    ((BatchRecognizer *)recognizer)->Pop(id);
 }
 
 void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer)
 {
     ((BatchRecognizer *)recognizer)->WaitForCompletion();
+}
+
+int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer, int id)
+{
+    return ((BatchRecognizer *)recognizer)->GetPendingChunks(id);
 }
