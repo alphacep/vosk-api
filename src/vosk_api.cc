@@ -15,12 +15,12 @@
 #include "vosk_api.h"
 
 #include "recognizer.h"
-#include "batch_recognizer.h"
 #include "model.h"
 #include "spk_model.h"
 
 #if HAVE_CUDA
 #include "cudamatrix/cu-device.h"
+#include "batch_recognizer.h"
 #endif
 
 #include <string.h>
@@ -187,40 +187,62 @@ void vosk_gpu_thread_init()
 
 VoskBatchRecognizer *vosk_batch_recognizer_new()
 {
+#if HAVE_CUDA
     return (VoskBatchRecognizer *)(new BatchRecognizer());
+#else
+    return NULL;
+#endif
 }
 
 void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer)
 {
+#if HAVE_CUDA
     delete ((BatchRecognizer *)recognizer);
+#endif
 }
 
 void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, int id, const char *data, int length)
 {
+#if HAVE_CUDA
     ((BatchRecognizer *)recognizer)->AcceptWaveform(id, data, length);
+#endif
 }
 
 void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer, int id)
 {
+#if HAVE_CUDA
     ((BatchRecognizer *)recognizer)->FinishStream(id);
+#endif
 }
 
 const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer, int id)
 {
+#if HAVE_CUDA
     return ((BatchRecognizer *)recognizer)->FrontResult(id);
+#else
+    return NULL;
+#endif
 }
 
 void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer, int id)
 {
+#if HAVE_CUDA
     ((BatchRecognizer *)recognizer)->Pop(id);
+#endif
 }
 
 void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer)
 {
+#if HAVE_CUDA
     ((BatchRecognizer *)recognizer)->WaitForCompletion();
+#endif
 }
 
 int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer, int id)
 {
+#if HAVE_CUDA
     return ((BatchRecognizer *)recognizer)->GetPendingChunks(id);
+#else
+    return 0;
+#endif
 }
