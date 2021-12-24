@@ -29,7 +29,7 @@ while True:
     for i, fd in enumerate(fds):
         if i in ended:
             continue
-        data = fd.read(8000)
+        data = fd.read(16000)
         if len(data) == 0:
             rec.FinishStream(i)
             ended.add(i)

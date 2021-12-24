@@ -31,9 +31,10 @@ BatchRecognizer::BatchRecognizer() {
     batched_decoder_config.Register(&po);
     po.ReadConfigFile("model/conf/model.conf");
 
-    batched_decoder_config.num_worker_threads = 4;
-    batched_decoder_config.max_batch_size = 100;
+    batched_decoder_config.num_worker_threads = -1;
+    batched_decoder_config.max_batch_size = 200;
     batched_decoder_config.reset_on_endpoint = true;
+    batched_decoder_config.use_gpu_feature_extraction = true;
 
     batched_decoder_config.feature_opts.feature_type = "mfcc";
     batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";

@@ -171,6 +171,8 @@ void vosk_set_log_level(int log_level)
 void vosk_gpu_init()
 {
 #if HAVE_CUDA
+//    kaldi::CuDevice::EnableTensorCores(true);
+//    kaldi::CuDevice::EnableTf32Compute(true);
     kaldi::CuDevice::Instantiate().SelectGpuId("yes");
     kaldi::CuDevice::Instantiate().AllowMultithreading();
 #endif
