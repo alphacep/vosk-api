@@ -9,6 +9,7 @@ import platform
 vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 system = os.environ.get('VOSK_PLATFORM', platform.system())
 architecture = os.environ.get('VOSK_ARCHITECTURE', platform.architecture()[0])
+machine = os.environ.get('VOSK_MACHINE', platform.machine())
 
 # Copy precompmilled libraries
 for lib in glob.glob(os.path.join(vosk_source, "src/lib*.*")):
@@ -31,7 +32,7 @@ else:
             elif system == 'Windows' and architecture == '64bit':
                 oses = 'win_amd64'
             elif system == 'Linux' and architecture == '64bit':
-                oses = 'linux_x86_64'
+                oses = 'linux_' + machine
             elif system == 'Linux':
                 oses = 'linux_' + architecture
             else:
