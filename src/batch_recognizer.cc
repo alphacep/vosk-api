@@ -32,7 +32,8 @@ BatchRecognizer::BatchRecognizer() {
     po.ReadConfigFile("model/conf/model.conf");
 
     batched_decoder_config.num_worker_threads = -1;
-    batched_decoder_config.max_batch_size = 200;
+    batched_decoder_config.max_batch_size = 32;
+    batched_decoder_config.num_channels = 600;
     batched_decoder_config.reset_on_endpoint = true;
     batched_decoder_config.use_gpu_feature_extraction = true;
 
@@ -44,7 +45,7 @@ BatchRecognizer::BatchRecognizer() {
     batched_decoder_config.decoder_opts.lattice_beam = 6.0;
     batched_decoder_config.compute_opts.acoustic_scale = 1.0;
     batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
-    batched_decoder_config.compute_opts.frames_per_chunk = 180;
+    batched_decoder_config.compute_opts.frames_per_chunk = 51;
 
     struct stat buffer;
 
@@ -152,8 +153,8 @@ void BatchRecognizer::PushLattice(uint64_t id, CompactLattice &clat, BaseFloat o
         json::JSON word;
 
         word["word"] = word_syms_->Find(words[i]);
-        word["start"] = times[i].first * 0.03 + offset;
-        word["end"] = times[i].second * 0.03 + offset;
+        word["start"] = round(times[i].first) * 0.03 + offset;
+        word["end"] = round(times[i].second) * 0.03 + offset;
         word["conf"] = conf[i];
         obj["result"].append(word);
 
