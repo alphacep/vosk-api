@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "kaldi_recognizer.h"
+#include "recognizer.h"
 #include "json.h"
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
@@ -21,7 +21,7 @@
 using namespace fst;
 using namespace kaldi::nnet3;
 
-KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) {
+Recognizer::Recognizer(Model *model, float sample_frequency) : model_(model), spk_model_(0), sample_frequency_(sample_frequency) {
 
     model_->Ref();
 
@@ -46,7 +46,7 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency) : model_(
     InitRescoring();
 }
 
-KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char const *grammar) : model_(model), spk_model_(0), sample_frequency_(sample_frequency)
+Recognizer::Recognizer(Model *model, float sample_frequency, char const *grammar) : model_(model), spk_model_(0), sample_frequency_(sample_frequency)
 {
     model_->Ref();
 
@@ -107,7 +107,7 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, char cons
     InitRescoring();
 }
 
-KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, SpkModel *spk_model) : model_(model), spk_model_(spk_model), sample_frequency_(sample_frequency) {
+Recognizer::Recognizer(Model *model, float sample_frequency, SpkModel *spk_model) : model_(model), spk_model_(spk_model), sample_frequency_(sample_frequency) {
 
     model_->Ref();
     spk_model->Ref();
@@ -135,7 +135,7 @@ KaldiRecognizer::KaldiRecognizer(Model *model, float sample_frequency, SpkModel 
     InitRescoring();
 }
 
-KaldiRecognizer::~KaldiRecognizer() {
+Recognizer::~Recognizer() {
     delete decoder_;
     delete feature_pipeline_;
     delete silence_weighting_;
@@ -155,7 +155,7 @@ KaldiRecognizer::~KaldiRecognizer() {
          spk_model_->Unref();
 }
 
-void KaldiRecognizer::InitState()
+void Recognizer::InitState()
 {
     frame_offset_ = 0;
     samples_processed_ = 0;
@@ -164,7 +164,7 @@ void KaldiRecognizer::InitState()
     state_ = RECOGNIZER_INITIALIZED;
 }
 
-void KaldiRecognizer::InitRescoring()
+void Recognizer::InitRescoring()
 {
     if (model_->graph_lm_fst_) {
 
@@ -185,7 +185,7 @@ void KaldiRecognizer::InitRescoring()
     }
 }
 
-void KaldiRecognizer::CleanUp()
+void Recognizer::CleanUp()
 {
     delete silence_weighting_;
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
@@ -223,7 +223,7 @@ void KaldiRecognizer::CleanUp()
     }
 }
 
-void KaldiRecognizer::UpdateSilenceWeights()
+void Recognizer::UpdateSilenceWeights()
 {
     if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0 &&
         feature_pipeline_->IvectorFeature() != nullptr) {
@@ -236,17 +236,17 @@ void KaldiRecognizer::UpdateSilenceWeights()
     }
 }
 
-void KaldiRecognizer::SetMaxAlternatives(int max_alternatives)
+void Recognizer::SetMaxAlternatives(int max_alternatives)
 {
     max_alternatives_ = max_alternatives;
 }
 
-void KaldiRecognizer::SetWords(bool words)
+void Recognizer::SetWords(bool words)
 {
     words_ = words;
 }
 
-void KaldiRecognizer::SetSpkModel(SpkModel *spk_model)
+void Recognizer::SetSpkModel(SpkModel *spk_model)
 {
     if (state_ == RECOGNIZER_RUNNING) {
         KALDI_ERR << "Can't add speaker model to already running recognizer";
@@ -257,7 +257,7 @@ void KaldiRecognizer::SetSpkModel(SpkModel *spk_model)
     spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
 }
 
-bool KaldiRecognizer::AcceptWaveform(const char *data, int len)
+bool Recognizer::AcceptWaveform(const char *data, int len)
 {
     Vector<BaseFloat> wave;
     wave.Resize(len / 2, kUndefined);
@@ -266,7 +266,7 @@ bool KaldiRecognizer::AcceptWaveform(const char *data, int len)
     return AcceptWaveform(wave);
 }
 
-bool KaldiRecognizer::AcceptWaveform(const short *sdata, int len)
+bool Recognizer::AcceptWaveform(const short *sdata, int len)
 {
     Vector<BaseFloat> wave;
     wave.Resize(len, kUndefined);
@@ -275,7 +275,7 @@ bool KaldiRecognizer::AcceptWaveform(const short *sdata, int len)
     return AcceptWaveform(wave);
 }
 
-bool KaldiRecognizer::AcceptWaveform(const float *fdata, int len)
+bool Recognizer::AcceptWaveform(const float *fdata, int len)
 {
     Vector<BaseFloat> wave;
     wave.Resize(len, kUndefined);
@@ -284,7 +284,7 @@ bool KaldiRecognizer::AcceptWaveform(const float *fdata, int len)
     return AcceptWaveform(wave);
 }
 
-bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
+bool Recognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
 {
     // Cleanup if we finalized previous utterance or the whole feature pipeline
     if (!(state_ == RECOGNIZER_RUNNING || state_ == RECOGNIZER_INITIALIZED)) {
@@ -343,7 +343,7 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
 
 #define MIN_SPK_FEATS 50
 
-bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_frames)
+bool Recognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_frames)
 {
     vector<int32> nonsilence_frames;
     if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0) {
@@ -409,7 +409,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
 }
 
 
-const char *KaldiRecognizer::MbrResult(CompactLattice &rlat)
+const char *Recognizer::MbrResult(CompactLattice &rlat)
 {
     CompactLattice aligned_lat;
     if (model_->winfo_) {
@@ -523,7 +523,7 @@ static bool CompactLatticeToWordAlignmentWeight(const CompactLattice &clat,
 }
 
 
-const char *KaldiRecognizer::NbestResult(CompactLattice &clat)
+const char *Recognizer::NbestResult(CompactLattice &clat)
 {
     Lattice lat;
     Lattice nbest_lat;
@@ -584,7 +584,7 @@ const char *KaldiRecognizer::NbestResult(CompactLattice &clat)
     return StoreReturn(obj.dump());
 }
 
-const char* KaldiRecognizer::GetResult()
+const char* Recognizer::GetResult()
 {
     if (decoder_->NumFramesDecoded() == 0) {
         return StoreEmptyReturn();
@@ -645,7 +645,7 @@ const char* KaldiRecognizer::GetResult()
 }
 
 
-const char* KaldiRecognizer::PartialResult()
+const char* Recognizer::PartialResult()
 {
     if (state_ != RECOGNIZER_RUNNING) {
         return StoreEmptyReturn();
@@ -676,7 +676,7 @@ const char* KaldiRecognizer::PartialResult()
     return StoreReturn(res.dump());
 }
 
-const char* KaldiRecognizer::Result()
+const char* Recognizer::Result()
 {
     if (state_ != RECOGNIZER_RUNNING) {
         return StoreEmptyReturn();
@@ -686,7 +686,7 @@ const char* KaldiRecognizer::Result()
     return GetResult();
 }
 
-const char* KaldiRecognizer::FinalResult()
+const char* Recognizer::FinalResult()
 {
     if (state_ != RECOGNIZER_RUNNING) {
         return StoreEmptyReturn();
@@ -714,7 +714,7 @@ const char* KaldiRecognizer::FinalResult()
     return last_result_.c_str();
 }
 
-void KaldiRecognizer::Reset()
+void Recognizer::Reset()
 {
     if (state_ == RECOGNIZER_RUNNING) {
         decoder_->FinalizeDecoding();
@@ -723,7 +723,7 @@ void KaldiRecognizer::Reset()
     state_ = RECOGNIZER_ENDPOINT;
 }
 
-const char *KaldiRecognizer::StoreEmptyReturn()
+const char *Recognizer::StoreEmptyReturn()
 {
     if (!max_alternatives_) {
         return StoreReturn("{\"text\": \"\"}");
@@ -733,7 +733,7 @@ const char *KaldiRecognizer::StoreEmptyReturn()
 }
 
 // Store result in recognizer and return as const string
-const char *KaldiRecognizer::StoreReturn(const string &res)
+const char *Recognizer::StoreReturn(const string &res)
 {
     last_result_ = res;
     return last_result_.c_str();

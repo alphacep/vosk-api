@@ -22,7 +22,7 @@
 
 using namespace kaldi;
 
-class KaldiRecognizer;
+class Recognizer;
 
 class SpkModel {
 
@@ -32,7 +32,7 @@ public:
     void Unref();
 
 protected:
-    friend class KaldiRecognizer;
+    friend class Recognizer;
     ~SpkModel() {};
 
     kaldi::nnet3::Nnet speaker_nnet;

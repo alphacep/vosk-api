@@ -36,7 +36,8 @@
 using namespace kaldi;
 using namespace std;
 
-class KaldiRecognizer;
+class Recognizer;
+class BatchRecognizer;
 
 class Model {
 
@@ -52,7 +53,8 @@ protected:
     void ConfigureV2();
     void ReadDataFiles();
 
-    friend class KaldiRecognizer;
+    friend class Recognizer;
+    friend class BatchRecognizer;
 
     string model_path_str_;
     string nnet3_rxfilename_;
