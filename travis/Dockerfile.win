@@ -55,7 +55,7 @@ RUN cd /opt/kaldi \
     && find . -name *.a -exec cp {} /opt/kaldi/local/lib \;
 
 RUN cd /opt/kaldi \
-    && git clone -b android-mix --single-branch https://github.com/alphacep/kaldi \
+    && git clone -b vosk-android --single-branch https://github.com/alphacep/kaldi \
     && cd kaldi/src \
     && CXX=x86_64-w64-mingw32-g++-posix CXXFLAGS="-O3 -ftree-vectorize -DFST_NO_DYNAMIC_LINKING" ./configure --shared --mingw=yes --use-cuda=no \
         --mathlib=OPENBLAS_CLAPACK \
