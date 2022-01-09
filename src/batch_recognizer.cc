@@ -123,12 +123,13 @@ BatchRecognizer::~BatchRecognizer() {
 
 void BatchRecognizer::FinishStream(uint64_t id)
 {
-    Vector<BaseFloat> wave;
-    SubVector<BaseFloat> chunk(wave.Data(), 0);
-    dynamic_batcher_->Push(id, false, true, chunk);
-    streams_.erase(id);
+    if (streams_.find(id) != streams_.end()) {
+       Vector<BaseFloat> wave;
+       SubVector<BaseFloat> chunk(wave.Data(), 0);
+       dynamic_batcher_->Push(id, false, true, chunk);
+       streams_.erase(id);
+    }
 }
-
 
 void BatchRecognizer::PushLattice(uint64_t id, CompactLattice &clat, BaseFloat offset)
 {
