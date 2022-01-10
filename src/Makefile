@@ -55,6 +55,8 @@ LIBS= \
 	$(OPENFST_ROOT)/lib/libfst.a \
 	$(OPENFST_ROOT)/lib/libfstngram.a
 
+LDFLAGS =
+
 
 ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
     CFLAGS += -I$(OPENBLAS_ROOT)/include
@@ -67,11 +69,11 @@ endif
 
 ifeq ($(HAVE_MKL), 1)
     CFLAGS += -DHAVE_MKL=1 -I$(MKL_ROOT)/include
-    LIBS += -L$(MKL_ROOT)/lib/intel64 -Wl,-rpath=$(MKL_ROOT)/lib/intel64 -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_sequential
+    LDFLAGS += -L$(MKL_ROOT)/lib/intel64 -Wl,-rpath=$(MKL_ROOT)/lib/intel64 -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_sequential
 endif
 
 ifeq ($(HAVE_ACCELERATE), 1)
-    LIBS += -framework Accelerate
+    LDFLAGS += -framework Accelerate
 endif
 
 ifeq ($(HAVE_CUDA), 1)
@@ -83,14 +85,15 @@ ifeq ($(HAVE_CUDA), 1)
     LIBS := \
         $(KALDI_ROOT)/src/cudadecoder/kaldi-cudadecoder.a \
         $(KALDI_ROOT)/src/cudafeat/kaldi-cudafeat.a \
-        $(LIBS) \
-        -L$(CUDA_ROOT)/lib64 -lcuda -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
+        $(LIBS)
+
+    LDFLAGS += -L$(CUDA_ROOT)/lib64 -lcuda -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
 endif
 
 all: $(OUTDIR)/libvosk.$(EXT)
 
-$(OUTDIR)/libvosk.$(EXT): $(VOSK_SOURCES:%.cc=$(OUTDIR)/%.o)
-	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic $(EXTRA_LDFLAGS)
+$(OUTDIR)/libvosk.$(EXT): $(VOSK_SOURCES:%.cc=$(OUTDIR)/%.o) $(LIBS)
+	$(CXX) --shared -s -o $@ $^ $(LDFLAGS) -lm -latomic $(EXTRA_LDFLAGS)
 
 $(OUTDIR)/%.o: %.cc $(VOSK_HEADERS)
 	$(CXX) $(CFLAGS) -c -o $@ $<
