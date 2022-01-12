@@ -31,22 +31,6 @@ BatchRecognizer::BatchRecognizer() {
     batched_decoder_config.Register(&po);
     po.ReadConfigFile("model/conf/model.conf");
 
-    batched_decoder_config.num_worker_threads = -1;
-    batched_decoder_config.max_batch_size = 32;
-    batched_decoder_config.num_channels = 600;
-    batched_decoder_config.reset_on_endpoint = true;
-    batched_decoder_config.use_gpu_feature_extraction = true;
-
-    batched_decoder_config.feature_opts.feature_type = "mfcc";
-    batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";
-    batched_decoder_config.feature_opts.ivector_extraction_config = "model/conf/ivector.conf";
-    batched_decoder_config.decoder_opts.max_active = 7000;
-    batched_decoder_config.decoder_opts.default_beam = 13.0;
-    batched_decoder_config.decoder_opts.lattice_beam = 6.0;
-    batched_decoder_config.compute_opts.acoustic_scale = 1.0;
-    batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
-    batched_decoder_config.compute_opts.frames_per_chunk = 51;
-
     struct stat buffer;
 
     string nnet3_rxfilename_ = "model/am/final.mdl";
@@ -93,7 +77,26 @@ BatchRecognizer::BatchRecognizer() {
         ReadKaldiObject(carpa_rxfilename_, &const_arpa_);
     }
 
+    batched_decoder_config.num_worker_threads = -1;
+    batched_decoder_config.max_batch_size = 32;
+    batched_decoder_config.num_channels = 600;
+    batched_decoder_config.reset_on_endpoint = true;
+    batched_decoder_config.use_gpu_feature_extraction = true;
 
+    batched_decoder_config.feature_opts.feature_type = "mfcc";
+    batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";
+    batched_decoder_config.feature_opts.ivector_extraction_config = "model/conf/ivector.conf";
+    batched_decoder_config.decoder_opts.max_active = 7000;
+    batched_decoder_config.decoder_opts.default_beam = 13.0;
+    batched_decoder_config.decoder_opts.lattice_beam = 6.0;
+    batched_decoder_config.compute_opts.acoustic_scale = 1.0;
+    batched_decoder_config.compute_opts.frame_subsampling_factor = 3;
+
+    int32 nnet_left_context, nnet_right_context;
+    nnet3::ComputeSimpleNnetContext(nnet_->GetNnet(), &nnet_left_context,
+                                    &nnet_right_context);
+
+    batched_decoder_config.compute_opts.frames_per_chunk = std::max(51, (nnet_right_context + 3 - nnet_right_context % 3));
 
     cuda_pipeline_ = new BatchedThreadedNnet3CudaOnlinePipeline 
          (batched_decoder_config, *hclg_fst_, *nnet_, *trans_model_);
@@ -102,6 +105,8 @@ BatchRecognizer::BatchRecognizer() {
     CudaOnlinePipelineDynamicBatcherConfig dynamic_batcher_config;
     dynamic_batcher_ = new CudaOnlinePipelineDynamicBatcher(dynamic_batcher_config,
                                                             *cuda_pipeline_);
+
+    samples_per_chunk_ = batched_decoder_config.compute_opts.frames_per_chunk * 160;
 }
 
 BatchRecognizer::~BatchRecognizer() {
@@ -123,11 +128,16 @@ BatchRecognizer::~BatchRecognizer() {
 
 void BatchRecognizer::FinishStream(uint64_t id)
 {
-    if (streams_.find(id) != streams_.end()) {
-       Vector<BaseFloat> wave;
-       SubVector<BaseFloat> chunk(wave.Data(), 0);
-       dynamic_batcher_->Push(id, false, true, chunk);
+    if (streams_.find(id) != streams_.end()) {;
+       SubVector<BaseFloat> chunk = buffers_[id].Range(0, buffers_[id].Dim());
+
+       bool first = false;
+       if (initialized_.find(id) == initialized_.end())
+           first = true;
+       dynamic_batcher_->Push(id, first, true, chunk);
        streams_.erase(id);
+       buffers_.erase(id);
+       initialized_.erase(id);
     }
 }
 
@@ -173,11 +183,9 @@ void BatchRecognizer::PushLattice(uint64_t id, CompactLattice &clat, BaseFloat o
 
 void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
 {
-    bool first = false;
-
     if (streams_.find(id) == streams_.end()) {
-        first = true;
         streams_.insert(id);
+        buffers_[id] = Vector<BaseFloat>();
 
         // Define the callback for results.
 #if 0
@@ -212,13 +220,35 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
           CudaPipelineResult::RESULT_TYPE_LATTICE);
     }
 
-    Vector<BaseFloat> wave;
-    wave.Resize(len / 2, kUndefined);
+    // Collect data so we process exactly samples_per_chunk_
+    Vector<BaseFloat> &buf = buffers_[id];
+    int32 orig_size = buf.Dim();
+    buf.Resize(buf.Dim() + len / 2, kCopyData);
     for (int i = 0; i < len / 2; i++)
-        wave(i) = *(((short *)data) + i);
-    SubVector<BaseFloat> chunk(wave.Data(), wave.Dim());
+        buf(i + orig_size) = *(((short *)data) + i);
 
-    dynamic_batcher_->Push(id, first, false, chunk);
+    // Pick chunks
+    int32 i = 0;
+    while (i + samples_per_chunk_ <= buf.Dim()) {
+        SubVector<BaseFloat> chunk = buf.Range(i, samples_per_chunk_);
+
+        bool first = false;
+        if (initialized_.find(id) == initialized_.end()) {
+           first = true;
+           initialized_.insert(id);
+        }
+        dynamic_batcher_->Push(id, first, false, chunk);
+        i += samples_per_chunk_;
+    }
+
+    // Keep remaining data
+    if (i > 0) {
+        int32 remaining = buf.Dim() - i;
+        for (int j = 0; j < remaining; j++) {
+            buf(j) = buf(i + j);
+        }
+        buf.Resize(remaining, kCopyData);
+    }
 }
 
 const char* BatchRecognizer::FrontResult(uint64_t id)

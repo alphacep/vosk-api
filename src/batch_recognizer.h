@@ -66,9 +66,13 @@ class BatchRecognizer {
         BatchedThreadedNnet3CudaOnlinePipeline *cuda_pipeline_ = nullptr;
         CudaOnlinePipelineDynamicBatcher *dynamic_batcher_ = nullptr;
 
+        // Input and output queues
+        int32 samples_per_chunk_;
 
         std::set<int> streams_;
+        std::set<int> initialized_;
         std::map<int, std::queue<std::string> > results_;
+        std::map<int, kaldi::Vector<BaseFloat> > buffers_;
 
         // Rescoring
         fst::ArcMapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_to_subtract_ = nullptr;
