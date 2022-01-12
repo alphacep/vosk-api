@@ -51,6 +51,12 @@ class BatchRecognizer {
         int GetPendingChunks(uint64_t id);
 
     private:
+        struct Stream {
+            bool initialized = false;
+            std::queue<std::string> results;
+            kaldi::Vector<BaseFloat> buffer;
+        };
+
         void PushLattice(uint64_t id, CompactLattice &clat, BaseFloat offset);
 
         kaldi::TransitionModel *trans_model_ = nullptr;
@@ -66,13 +72,10 @@ class BatchRecognizer {
         BatchedThreadedNnet3CudaOnlinePipeline *cuda_pipeline_ = nullptr;
         CudaOnlinePipelineDynamicBatcher *dynamic_batcher_ = nullptr;
 
-        // Input and output queues
         int32 samples_per_chunk_;
 
-        std::set<int> streams_;
-        std::set<int> initialized_;
-        std::map<int, std::queue<std::string> > results_;
-        std::map<int, kaldi::Vector<BaseFloat> > buffers_;
+        // Input and output queues
+        std::map<int, Stream> streams_;
 
         // Rescoring
         fst::ArcMapFst<fst::StdArc, LatticeArc, fst::StdToLatticeMapper<BaseFloat> > *lm_to_subtract_ = nullptr;

@@ -106,7 +106,7 @@ BatchRecognizer::BatchRecognizer() {
     dynamic_batcher_ = new CudaOnlinePipelineDynamicBatcher(dynamic_batcher_config,
                                                             *cuda_pipeline_);
 
-    samples_per_chunk_ = batched_decoder_config.compute_opts.frames_per_chunk * 160;
+    samples_per_chunk_ = cuda_pipeline_->GetNSampsPerChunk();
 }
 
 BatchRecognizer::~BatchRecognizer() {
@@ -128,17 +128,14 @@ BatchRecognizer::~BatchRecognizer() {
 
 void BatchRecognizer::FinishStream(uint64_t id)
 {
-    if (streams_.find(id) != streams_.end()) {;
-       SubVector<BaseFloat> chunk = buffers_[id].Range(0, buffers_[id].Dim());
-
-       bool first = false;
-       if (initialized_.find(id) == initialized_.end())
-           first = true;
-       dynamic_batcher_->Push(id, first, true, chunk);
-       streams_.erase(id);
-       buffers_.erase(id);
-       initialized_.erase(id);
+    auto it = streams_.find(id);
+    if (it == streams_.end()) {
+        return;
     }
+
+    SubVector<BaseFloat> chunk = it->second.buffer.Range(0, it->second.buffer.Dim());
+    dynamic_batcher_->Push(id, !(it->second.initialized), true, chunk);
+    streams_.erase(it);
 }
 
 void BatchRecognizer::PushLattice(uint64_t id, CompactLattice &clat, BaseFloat offset)
@@ -178,15 +175,12 @@ void BatchRecognizer::PushLattice(uint64_t id, CompactLattice &clat, BaseFloat o
 
 //    KALDI_LOG << "Result " << id << " " << obj.dump();
 
-    results_[id].push(obj.dump());
+    streams_[id].results.push(obj.dump());
 }
 
 void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
 {
     if (streams_.find(id) == streams_.end()) {
-        streams_.insert(id);
-        buffers_[id] = Vector<BaseFloat>();
-
         // Define the callback for results.
 #if 0
          cuda_pipeline_->SetBestPathCallback(
@@ -219,52 +213,55 @@ void BatchRecognizer::AcceptWaveform(uint64_t id, const char *data, int len)
           },
           CudaPipelineResult::RESULT_TYPE_LATTICE);
     }
-
     // Collect data so we process exactly samples_per_chunk_
-    Vector<BaseFloat> &buf = buffers_[id];
-    int32 orig_size = buf.Dim();
-    buf.Resize(buf.Dim() + len / 2, kCopyData);
+    Vector<BaseFloat> &buffer = streams_[id].buffer;
+    int32 end = buffer.Dim();
+    buffer.Resize(end + len / 2, kCopyData);
     for (int i = 0; i < len / 2; i++)
-        buf(i + orig_size) = *(((short *)data) + i);
+        buffer(i + end) = *(((short *)data) + i);
+    end = buffer.Dim();
 
-    // Pick chunks
+    // Pick chunks and submit them to the batcher
     int32 i = 0;
-    while (i + samples_per_chunk_ <= buf.Dim()) {
-        SubVector<BaseFloat> chunk = buf.Range(i, samples_per_chunk_);
-
-        bool first = false;
-        if (initialized_.find(id) == initialized_.end()) {
-           first = true;
-           initialized_.insert(id);
-        }
-        dynamic_batcher_->Push(id, first, false, chunk);
+    while (i + samples_per_chunk_ <= end) {
+        dynamic_batcher_->Push(id, (!streams_[id].initialized), false,
+                                    buffer.Range(i, samples_per_chunk_));
+        streams_[id].initialized = true;
         i += samples_per_chunk_;
     }
 
     // Keep remaining data
     if (i > 0) {
-        int32 remaining = buf.Dim() - i;
-        for (int j = 0; j < remaining; j++) {
-            buf(j) = buf(i + j);
+        int32 tail = end - i;
+        for (int j = 0; j < tail; j++) {
+            buffer(j) = buffer(i + j);
         }
-        buf.Resize(remaining, kCopyData);
+        buffer.Resize(tail, kCopyData);
     }
 }
 
 const char* BatchRecognizer::FrontResult(uint64_t id)
 {
-    if (results_[id].empty()) {
+    auto it = streams_.find(id);
+    if (it == streams_.end()) {
         return "";
     }
-    return results_[id].front().c_str();
+    if (it->second.results.empty()) {
+        return "";
+    }
+    return it->second.results.front().c_str();
 }
 
 void BatchRecognizer::Pop(uint64_t id)
 {
-    if (results_[id].empty()) {
+    auto it = streams_.find(id);
+    if (it == streams_.end()) {
         return;
     }
-    results_[id].pop();
+    if (it->second.results.empty()) {
+        return;
+    }
+    it->second.results.pop();
 }
 
 void BatchRecognizer::WaitForCompletion()
