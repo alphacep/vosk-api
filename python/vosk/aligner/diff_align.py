@@ -28,7 +28,7 @@ def align(alignment, ms):
 
             try:
                 display_word = display_seq[b] # index
-            except: IndexError:
+            except IndexError:
                 print('Please compare your txt and wav files, probably you have more words in txtfile than wavfile contain')
                 exit (1)
             
