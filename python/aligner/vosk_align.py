@@ -49,4 +49,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     log_level = args.log.upper()
     logging.getLogger().setLevel(log_level)
-    total = len(main(args.audiofile, args.txtfile, args.model, args.output))
