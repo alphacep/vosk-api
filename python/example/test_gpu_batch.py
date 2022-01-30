@@ -14,7 +14,8 @@ GpuInit()
 
 rec = BatchRecognizer()
 
-fnames = open("tedlium.list").readlines()
+# Read list of files from the file
+fnames = open(sys.argv[1]).readlines()
 fds = [open(x.strip(), "rb") for x in fnames]
 uids = [fname.strip().split('/')[-1][:-4] for fname in fnames]
 results = [""] * len(fnames)
