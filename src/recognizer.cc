@@ -797,6 +797,14 @@ const char *Recognizer::StoreEmptyReturn()
 {
     if (!max_alternatives_) {
         return StoreReturn("{\"text\": \"\"}");
+    } else if (nlsml_) {
+        return StoreReturn("<?xml version=\"1.0\"?>\n"
+                           "<result grammar=\"default\">\n"
+                           "<interpretation confidence=\"1.0\">\n"
+                           "<instance/>\n"
+                           "<input><noinput/></input>\n"
+                           "</interpretation>\n"
+                           "</result>\n");
     } else {
         return StoreReturn("{\"alternatives\" : [{\"text\": \"\", \"confidence\" : 1.0}] }");
     }
