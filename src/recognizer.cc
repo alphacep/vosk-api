@@ -565,7 +565,7 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
       stringstream text;
       json::JSON entry;
 
-      for (int i = 0; i < words.size(); i++) {
+      for (int i = 0, first = 1; i < words.size(); i++) {
         json::JSON word;
         if (words[i] == 0)
             continue;
@@ -575,8 +575,12 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
             word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + begin_times[i] + lengths[i]) * 0.03;
             entry["result"].append(word);
         }
-        if (i)
+
+        if (first)
+          first = 0;
+        else
           text << " ";
+
         text << model_->word_syms_->Find(words[i]);
       }
 
@@ -626,12 +630,15 @@ const char *Recognizer::NlsmlResult(CompactLattice &clat)
       float likelihood = -(weight.Weight().Value1() + weight.Weight().Value2());
 
       stringstream text;
-      for (int i = 0; i < words.size(); i++) {
-        json::JSON word;
+      for (int i = 0, first = 1; i < words.size(); i++) {
         if (words[i] == 0)
             continue;
-        if (i)
+
+        if (first)
+          first = 0;
+        else
           text << " ";
+
         text << model_->word_syms_->Find(words[i]);
       }
 
