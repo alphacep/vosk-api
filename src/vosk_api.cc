@@ -103,6 +103,11 @@ void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words)
     ((Recognizer *)recognizer)->SetWords((bool)words);
 }
 
+void vosk_recognizer_set_nlsml(VoskRecognizer *recognizer, int nlsml)
+{
+    ((Recognizer *)recognizer)->SetNLSML((bool)nlsml);
+}
+
 void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model)
 {
     if (recognizer == nullptr || spk_model == nullptr) {

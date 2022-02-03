@@ -49,6 +49,7 @@ class Recognizer {
         void SetMaxAlternatives(int max_alternatives);
         void SetSpkModel(SpkModel *spk_model);
         void SetWords(bool words);
+        void SetNLSML(bool nlsml);
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);
@@ -69,6 +70,7 @@ class Recognizer {
         const char *StoreReturn(const string &res);
         const char *MbrResult(CompactLattice &clat);
         const char *NbestResult(CompactLattice &clat);
+        const char *NlsmlResult(CompactLattice &clat);
 
         Model *model_ = nullptr;
         SingleUtteranceNnet3Decoder *decoder_ = nullptr;
@@ -94,6 +96,7 @@ class Recognizer {
         // Other
         int max_alternatives_ = 0; // Disable alternatives by default
         bool words_ = false;
+        bool nlsml_ = false;
 
         float sample_frequency_;
         int32 frame_offset_;

@@ -246,6 +246,11 @@ void Recognizer::SetWords(bool words)
     words_ = words;
 }
 
+void Recognizer::SetNLSML(bool nlsml)
+{
+    nlsml_ = nlsml;
+}
+
 void Recognizer::SetSpkModel(SpkModel *spk_model)
 {
     if (state_ == RECOGNIZER_RUNNING) {
@@ -534,7 +539,6 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
     fst::ConvertNbestToVector(nbest_lat, &nbest_lats);
 
     json::JSON obj;
-    std::stringstream ss;
     for (int k = 0; k < nbest_lats.size(); k++) {
 
       Lattice nlat = nbest_lats[k];
@@ -582,6 +586,63 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
     }
 
     return StoreReturn(obj.dump());
+}
+
+const char *Recognizer::NlsmlResult(CompactLattice &clat)
+{
+    Lattice lat;
+    Lattice nbest_lat;
+    std::vector<Lattice> nbest_lats;
+
+    ConvertLattice (clat, &lat);
+    fst::ShortestPath(lat, &nbest_lat, max_alternatives_);
+    fst::ConvertNbestToVector(nbest_lat, &nbest_lats);
+
+    std::stringstream ss;
+    ss << "<?xml version=\"1.0\"?>\n";
+    ss << "<result grammar=\"default\">\n";
+
+    for (int k = 0; k < nbest_lats.size(); k++) {
+
+      Lattice nlat = nbest_lats[k];
+
+      CompactLattice nclat;
+      fst::Invert(&nlat);
+      DeterminizeLattice(nlat, &nclat);
+
+      CompactLattice aligned_nclat;
+      if (model_->winfo_) {
+          WordAlignLattice(nclat, *model_->trans_model_, *model_->winfo_, 0, &aligned_nclat);
+      } else {
+          aligned_nclat = nclat;
+      }
+
+      std::vector<int32> words;
+      std::vector<int32> begin_times;
+      std::vector<int32> lengths;
+      CompactLattice::Weight weight;
+
+      CompactLatticeToWordAlignmentWeight(aligned_nclat, &words, &begin_times, &lengths, &weight);
+      float likelihood = -(weight.Weight().Value1() + weight.Weight().Value2());
+
+      stringstream text;
+      for (int i = 0; i < words.size(); i++) {
+        json::JSON word;
+        if (words[i] == 0)
+            continue;
+        if (i)
+          text << " ";
+        text << model_->word_syms_->Find(words[i]);
+      }
+
+      ss << "<interpretation grammar=\"default\" confidence=\"" << likelihood << "\">\n";
+      ss << "<input mode=\"speech\">" << text.str() << "</input>\n";
+      ss << "<instance>" << text.str() << "</instance>\n";
+      ss << "</interpretation>\n";
+    }
+    ss << "</result>\n";
+
+    return StoreReturn(ss.str());
 }
 
 const char* Recognizer::GetResult()
@@ -638,6 +699,8 @@ const char* Recognizer::GetResult()
 
     if (max_alternatives_ == 0) {
         return MbrResult(rlat);
+    } else if (nlsml_) {
+        return NlsmlResult(rlat);
     } else {
         return NbestResult(rlat);
     }

@@ -191,6 +191,12 @@ void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_al
 void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words);
 
 
+/** Set NLSML output
+ * @param nlsml - boolean value
+ */
+void vosk_recognizer_set_nlsml(VoskRecognizer *recognizer, int nlsml);
+
+
 /** Accept voice data
  *
  *  accept and process new chunk of voice data
