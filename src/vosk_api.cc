@@ -246,7 +246,7 @@ void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer)
 int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer, int id)
 {
 #if HAVE_CUDA
-    return ((BatchRecognizer *)recognizer)->GetPendingChunks(id);
+    return ((BatchRecognizer *)recognizer)->GetNumPendingChunks(id);
 #else
     return 0;
 #endif

@@ -48,7 +48,7 @@ class BatchRecognizer {
         const char *FrontResult(uint64_t id);
         void Pop(uint64_t id);
         void WaitForCompletion();
-        int GetPendingChunks(uint64_t id);
+        int GetNumPendingChunks(uint64_t id);
 
     private:
         struct Stream {
