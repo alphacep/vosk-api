@@ -271,7 +271,8 @@ void Model::ReadDataFiles()
     if (stat(pitch_conf_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Using pitch in feature pipeline";
         feature_info_.add_pitch = true;
-        ReadConfigFromFile(pitch_conf_rxfilename_, &feature_info_.pitch_opts);
+        ReadConfigsFromFile(pitch_conf_rxfilename_,
+                            &feature_info_.pitch_opts, &feature_info_.pitch_process_opts);
     }
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {
