@@ -271,5 +271,5 @@ void BatchRecognizer::WaitForCompletion()
 
 int BatchRecognizer::GetNumPendingChunks(uint64_t id)
 {
-    return dynamic_batcher_->GetNumPendingChunks(id);
+    return dynamic_batcher_->GetPendingChunks(id);
 }
