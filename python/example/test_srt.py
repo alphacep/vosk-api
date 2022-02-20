@@ -52,5 +52,6 @@ def transcribe():
                    end=datetime.timedelta(seconds=line[-1]['end']))
            subs.append(s)
     return subs
-
-print (srt.compose(transcribe()))
+subtitle = open('subtitle.srt', 'w', encoding="utf-8")
+print ((srt.compose(transcribe())), file = subtitle)
+subtitle.close()
