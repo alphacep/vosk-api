@@ -17,6 +17,7 @@
 
 #include "base/kaldi-common.h"
 #include "util/common-utils.h"
+#include "feat/resample.h"
 
 #include <queue>
 
@@ -45,6 +46,7 @@ class BatchRecognizer {
         bool callbacks_set_;
         float sample_frequency_;
         std::queue<std::string> results_;
+        LinearResample *resampler_;
         kaldi::Vector<BaseFloat> buffer_;
 };
 

@@ -22,9 +22,15 @@ BatchRecognizer::BatchRecognizer(BatchModel *model, float
                                  sample_frequency) : model_(model), sample_frequency_(sample_frequency),
                                  initialized_(false), callbacks_set_(false) {
     id_ = model->GetID(this);
+
+
+    resampler_ = new LinearResample(
+        sample_frequency, 16000.0f,
+        std::min(sample_frequency / 2, 16000.0f / 2), 6);
 }
 
 BatchRecognizer::~BatchRecognizer() {
+    delete resampler_;
     // Drop the ID
 }
 
@@ -112,15 +118,20 @@ void BatchRecognizer::AcceptWaveform(const char *data, int len)
         callbacks_set_ = true;
     }
 
-    int32 end = buffer_.Dim();
-    buffer_.Resize(end + len / 2, kCopyData);
+    Vector<BaseFloat> input_wave(len / 2);
     for (int i = 0; i < len / 2; i++)
-        buffer_(i + end) = *(((short *)data) + i);
-    end = buffer_.Dim();
+        input_wave(i) = *(((short *)data) + i);
+
+    Vector<BaseFloat> resampled_wave;
+    resampler_->Resample(input_wave, true, &resampled_wave);
+
+    int32 end = buffer_.Dim();
+    buffer_.Resize(end + resampled_wave.Dim(), kCopyData);
+    buffer_.Range(end, resampled_wave.Dim()).CopyFromVec(resampled_wave);
 
     // Pick chunks and submit them to the batcher
     int32 i = 0;
-    while (i + model_->samples_per_chunk_ <= end) {
+    while (i + model_->samples_per_chunk_ <= buffer_.Dim()) {
         model_->dynamic_batcher_->Push(id_, !initialized_, false,
                                        buffer_.Range(i, model_->samples_per_chunk_));
         initialized_ = true;
@@ -129,7 +140,7 @@ void BatchRecognizer::AcceptWaveform(const char *data, int len)
 
     // Keep remaining data
     if (i > 0) {
-        int32 tail = end - i;
+        int32 tail = buffer_.Dim() - i;
         for (int j = 0; j < tail; j++) {
             buffer_(j) = buffer_(i + j);
         }
