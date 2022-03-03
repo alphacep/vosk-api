@@ -323,6 +323,11 @@ void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer);
 /** Accept batch voice data */
 void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, const char *data, int length);
 
+/** Set NLSML output
+ * @param nlsml - boolean value
+ */
+void vosk_batch_recognizer_set_nlsml(VoskBatchRecognizer *recognizer, int nlsml);
+
 /** Closes the stream */
 void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer);
 

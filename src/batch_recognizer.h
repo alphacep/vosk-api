@@ -35,6 +35,7 @@ class BatchRecognizer {
         const char *FrontResult();
         void Pop();
         void FinishStream();
+        void SetNLSML(bool nlsml);
 
     private:
 
@@ -44,6 +45,7 @@ class BatchRecognizer {
         uint64_t id_;
         bool initialized_;
         bool callbacks_set_;
+        bool nlsml_;
         float sample_frequency_;
         std::queue<std::string> results_;
         LinearResample *resampler_;

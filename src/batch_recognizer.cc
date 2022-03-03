@@ -20,7 +20,7 @@
 
 BatchRecognizer::BatchRecognizer(BatchModel *model, float
                                  sample_frequency) : model_(model), sample_frequency_(sample_frequency),
-                                 initialized_(false), callbacks_set_(false) {
+                                 initialized_(false), callbacks_set_(false), nlsml_(false) {
     id_ = model->GetID(this);
 
 
@@ -55,30 +55,62 @@ void BatchRecognizer::PushLattice(CompactLattice &clat, BaseFloat offset)
 
     int size = words.size();
 
-    json::JSON obj;
-    stringstream text;
+    if (nlsml_) {
 
-    // Create JSON object
-    for (int i = 0; i < size; i++) {
-        json::JSON word;
-
-        word["word"] = model_->word_syms_->Find(words[i]);
-        word["start"] = round(times[i].first) * 0.03 + offset;
-        word["end"] = round(times[i].second) * 0.03 + offset;
-        word["conf"] = conf[i];
-        obj["result"].append(word);
-
-        if (i) {
-            text << " ";
+        std::stringstream ss;
+        std::stringstream text;
+        ss << "<?xml version=\"1.0\"?>\n";
+        ss << "<result grammar=\"default\">\n";
+        BaseFloat confidence = 0.0;
+        for (int i = 0; i < size; i++) {
+            if (i) {
+                text << " ";
+            }
+            confidence += conf[i];
+            text << model_->word_syms_->Find(words[i]);
         }
-        text << model_->word_syms_->Find(words[i]);
+        confidence /= size;
+
+        ss << "<interpretation grammar=\"default\" confidence=\"" << confidence << "\">\n";
+        ss << "<input mode=\"speech\">" << text.str() << "</input>\n";
+        ss << "<instance>" << text.str() << "</instance>\n";
+        ss << "</interpretation>\n";
+        ss << "</result>\n";
+
+        results_.push(ss.str());
+
+    } else {
+        json::JSON obj;
+        stringstream text;
+
+        // Create JSON object
+        for (int i = 0; i < size; i++) {
+            json::JSON word;
+
+            word["word"] = model_->word_syms_->Find(words[i]);
+            word["start"] = round(times[i].first) * 0.03 + offset;
+            word["end"] = round(times[i].second) * 0.03 + offset;
+            word["conf"] = conf[i];
+            obj["result"].append(word);
+
+            if (i) {
+                text << " ";
+            }
+            text << model_->word_syms_->Find(words[i]);
+        }
+        obj["text"] = text.str();
+
+//      KALDI_LOG << "Result " << id << " " << obj.dump();
+
+        results_.push(obj.dump());
     }
-    obj["text"] = text.str();
-
-//    KALDI_LOG << "Result " << id << " " << obj.dump();
-
-    results_.push(obj.dump());
 }
+
+void BatchRecognizer::SetNLSML(bool nlsml)
+{
+    nlsml_ = nlsml;
+}
+
 
 void BatchRecognizer::AcceptWaveform(const char *data, int len)
 {

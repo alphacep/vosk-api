@@ -236,6 +236,13 @@ void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, cons
 #endif
 }
 
+void vosk_batch_recognizer_set_nlsml(VoskBatchRecognizer *recognizer, int nlsml)
+{
+#if HAVE_CUDA
+    ((BatchRecognizer *)recognizer)->SetNLSML((bool)nlsml);
+#endif
+}
+
 void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer)
 {
 #if HAVE_CUDA
