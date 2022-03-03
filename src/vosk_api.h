@@ -39,10 +39,17 @@ typedef struct VoskSpkModel VoskSpkModel;
  *  speaker information and so on */
 typedef struct VoskRecognizer VoskRecognizer;
 
+
+/**
+ * Batch model object
+ */
+typedef struct VoskBatchModel VoskBatchModel;
+
 /**
  * Batch recognizer object
  */
 typedef struct VoskBatchRecognizer VoskBatchRecognizer;
+
 
 /** Loads model data from the file and returns the model object
  *
@@ -297,30 +304,36 @@ void vosk_gpu_thread_init();
 
 /** Creates the batch recognizer object
  *
- *  @returns recognizer object or NULL if problem occured */
-VoskBatchRecognizer *vosk_batch_recognizer_new();
+ *  @returns model object or NULL if problem occured */
+VoskBatchModel *vosk_batch_model_new();
 
-/** Releases batch recognizer object
- *  Underlying model is also unreferenced and if needed released */
+/** Releases batch model object */
+void vosk_batch_model_free(VoskBatchModel *model);
+
+/** Wait for the processing */
+void vosk_batch_model_wait(VoskBatchModel *model);
+
+/** Creates batch recognizer object
+ *  @returns recognizer object or NULL if problem occured */
+VoskBatchRecognizer *vosk_batch_recognizer_new(VoskBatchModel *model, float sample_rate);
+ 
+/** Releases batch recognizer object */
 void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer);
 
 /** Accept batch voice data */
-void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, int id, const char *data, int length);
+void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, const char *data, int length);
 
 /** Closes the stream */
-void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer, int id);
+void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer);
 
 /** Return results */
-const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer, int id);
+const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer);
 
 /** Release and free first retrieved result */
-void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer, int id);
-
-/** Wait for the processing */
-void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer);
+void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer);
 
 /** Get amount of pending chunks for more intelligent waiting */
-int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer, int id);
+int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer);
 
 #ifdef __cplusplus
 }

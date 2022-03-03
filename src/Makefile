@@ -77,8 +77,8 @@ ifeq ($(HAVE_ACCELERATE), 1)
 endif
 
 ifeq ($(HAVE_CUDA), 1)
-    VOSK_SOURCES += batch_recognizer.cc
-    VOSK_HEADERS += batch_recognizer.h
+    VOSK_SOURCES += batch_recognizer.cc batch_model.cc
+    VOSK_HEADERS += batch_recognizer.h batch_model.h
 
     CFLAGS+=-DHAVE_CUDA=1 -I$(CUDA_ROOT)/include
 

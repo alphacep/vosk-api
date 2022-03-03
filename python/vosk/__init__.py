@@ -105,10 +105,24 @@ def GpuInit():
 def GpuThreadInit():
     _c.vosk_gpu_thread_init()
 
+class BatchModel(object):
+
+    def __init__(self, *args):
+        self._handle = _c.vosk_batch_model_new()
+
+        if self._handle == _ffi.NULL:
+            raise Exception("Failed to create a model")
+
+    def __del__(self):
+        _c.vosk_batch_model_free(self._handle)
+
+    def Wait(self):
+        _c.vosk_batch_model_wait(self._handle)
+
 class BatchRecognizer(object):
 
     def __init__(self, *args):
-        self._handle = _c.vosk_batch_recognizer_new()
+        self._handle = _c.vosk_batch_recognizer_new(args[0]._handle, args[1])
 
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create a recognizer")
@@ -116,20 +130,17 @@ class BatchRecognizer(object):
     def __del__(self):
         _c.vosk_batch_recognizer_free(self._handle)
 
-    def AcceptWaveform(self, uid, data):
-        res = _c.vosk_batch_recognizer_accept_waveform(self._handle, uid, data, len(data))
+    def AcceptWaveform(self, data):
+        res = _c.vosk_batch_recognizer_accept_waveform(self._handle, data, len(data))
 
-    def Result(self, uid):
-        ptr = _c.vosk_batch_recognizer_front_result(self._handle, uid)
+    def Result(self):
+        ptr = _c.vosk_batch_recognizer_front_result(self._handle)
         res = _ffi.string(ptr).decode('utf-8')
-        _c.vosk_batch_recognizer_pop(self._handle, uid)
+        _c.vosk_batch_recognizer_pop(self._handle)
         return res
 
-    def FinishStream(self, uid):
-        _c.vosk_batch_recognizer_finish_stream(self._handle, uid)
+    def FinishStream(self):
+        _c.vosk_batch_recognizer_finish_stream(self._handle)
 
-    def Wait(self):
-        _c.vosk_batch_recognizer_wait(self._handle)
-
-    def GetPendingChunks(self, uid):
-        return _c.vosk_batch_recognizer_get_pending_chunks(self._handle, uid)
+    def GetPendingChunks(self):
+        return _c.vosk_batch_recognizer_get_pending_chunks(self._handle)
