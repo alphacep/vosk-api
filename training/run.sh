@@ -6,6 +6,7 @@
 stage=0
 . utils/parse_options.sh
 
+# Data preparation
 if [ $stage -le 0 ]; then
   data_url=www.openslr.org/resources/31
   lm_url=www.openslr.org/resources/11
@@ -22,24 +23,21 @@ if [ $stage -le 0 ]; then
   local/data_prep.sh $database/LibriSpeech/dev-clean-2 data/test
 fi
 
+# Dictionary formatting
 if [ $stage -le 1 ]; then
   local/prepare_dict.sh data/local/lm data/local/dict
-
   utils/prepare_lang.sh data/local/dict "<UNK>" data/local/lang data/lang
-
-  utils/format_lm.sh data/lang data/local/lm/lm_tgsmall.arpa.gz data/local/dict/lexicon.txt data/lang_test
-  
-  utils/build_const_arpa_lm.sh data/local/lm/lm_tgmed.arpa.gz \
-    data/lang data/lang_test_rescore
 fi
 
-if [ $stage -le 1 ]; then
-  for part in test train; do
-    steps/make_mfcc.sh --cmd "$train_cmd" --nj 10 data/$part exp/make_mfcc/$part $mfcc
-    steps/compute_cmvn_stats.sh data/$part exp/make_mfcc/$part $mfcc
+# Extract MFCC features
+if [ $stage -le 2 ]; then
+  for task in train; do
+    steps/make_mfcc.sh --cmd "$train_cmd" --nj 10 data/$task exp/make_mfcc/$task $mfcc
+    steps/compute_cmvn_stats.sh data/$task exp/make_mfcc/$task $mfcc
   done
 fi
 
+# Train GMM models
 if [ $stage -le 3 ]; then
   steps/train_mono.sh --nj 10 --cmd "$train_cmd" \
     data/train data/lang exp/mono
@@ -66,15 +64,23 @@ if [ $stage -le 3 ]; then
     data/train data/lang exp/tri3 exp/tri3_ali
 fi
 
+# Train TDNN model
 if [ $stage -le 4 ]; then
   local/chain/run_tdnn.sh
 fi
 
+# Decode
 if [ $stage -le 5 ]; then
 
+  utils/format_lm.sh data/lang data/local/lm/lm_tgsmall.arpa.gz data/local/dict/lexicon.txt data/lang_test
   utils/mkgraph.sh --self-loop-scale 1.0 data/lang_test exp/chain/tdnn exp/chain/tdnn/graph
+  utils/build_const_arpa_lm.sh data/local/lm/lm_tgmed.arpa.gz \
+    data/lang data/lang_test_rescore
 
   for task in test; do
+
+    steps/make_mfcc.sh --cmd "$train_cmd" --nj 10 data/$task exp/make_mfcc/$task $mfcc
+    steps/compute_cmvn_stats.sh data/$task exp/make_mfcc/$task $mfcc
 
     steps/online/nnet2/extract_ivectors_online.sh --nj 10 \
         data/${task} exp/chain/extractor \
@@ -90,4 +96,5 @@ if [ $stage -le 5 ]; then
         data/${task} exp/chain/tdnn/decode_${task} exp/chain/tdnn/decode_${task}_rescore
   done
 
+  bash RESULTS
 fi
