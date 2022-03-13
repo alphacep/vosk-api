@@ -47,15 +47,15 @@ class SpkModel(object):
 
 class KaldiRecognizer(object):
 
-    def __init__(self, *args):
-        if len(args) == 2:
+    def __init__(self, stream, sample_rate, model=None):
+        if model is None:
             self._handle = _c.vosk_recognizer_new(args[0]._handle, args[1])
-        elif len(args) == 3 and type(args[2]) is SpkModel:
-            self._handle = _c.vosk_recognizer_new_spk(args[0]._handle, args[1], args[2]._handle)
-        elif len(args) == 3 and type(args[2]) is str:
+        elif isinstance(model, str):
             self._handle = _c.vosk_recognizer_new_grm(args[0]._handle, args[1], args[2].encode('utf-8'))
+        elif isinstance(model, SpkModel):
+            self._handle = _c.vosk_recognizer_new_spk(args[0]._handle, args[1], args[2]._handle)
         else:
-            raise TypeError("Unknown arguments")
+            raise TypeError("model argument must be either None, str or SpkModel")
 
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create a recognizer")
