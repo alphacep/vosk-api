@@ -10,11 +10,11 @@ import srt
 import datetime
 
 from datetime import datetime as dt
-from vosk import KaldiRecognizer
+from vosk import KaldiRecognizer, Model
 
 
 class Transcriber:
-    
+
     def transcribe(model, process, outputdata, outputtype):
         rec = KaldiRecognizer(model, 16000)
         WORDS_PER_LINE = 7
@@ -54,7 +54,7 @@ class Transcriber:
             for i in range(len(result)):
                 final_result += result[i]['text'] + ' '
         return final_result, tot_samples
-    
+
     def resample_ffmpeg(infile):
         process = subprocess.Popen(
             ['ffmpeg', '-nostdin', '-loglevel', 'quiet', '-i', 
@@ -62,17 +62,17 @@ class Transcriber:
             '-ar', '16000','-ac', '1', '-f', 's16le', '-'], 
             stdout=subprocess.PIPE)
         return process
-    
+
     def get_time():
         start_time = dt.now()
         return start_time
-    
+
     def send_time(start_time):
         script_time = str(dt.now() - start_time)
         seconds = script_time[5:8].strip('0')
         mcseconds = script_time[8:].strip('0')
         return script_time.strip(':0'), seconds.rstrip('.'), mcseconds
-    
+
     def process_dir(model, inputdata, outputdata, outputtype, log):
         files = os.listdir(inputdata)
         arg_list = list()
@@ -85,3 +85,29 @@ class Transcriber:
         for i in range(len(input_list)):
             arg_list.extend([(model, input_list[i], output_list[i], outputtype, log)])
         return arg_list
+
+    def get_list_models():
+        url = 'https://alphacephei.com/vosk/models/model-list.json'
+        response = requests.get(url)
+        for i in range(len(response.json())):
+            print(response.json()[i]['name'])
+        exit(1)
+    
+    def check_model(model_name):
+        path = os.path.expandvars('$HOME/.cache')
+        os.chdir(path)
+        if not os.path.isdir('vosk'):
+            os.mkdir('vosk')
+        os.chdir('vosk')
+        if model_name in os.listdir():
+            pass
+        else:
+            pre_link = 'https://alphacephei.com/vosk/models/'
+            model_zip = model_name + '.zip'
+            model_url = pre_link + model_zip
+            urllib.request.urlretrieve(model_url, model_zip)
+            with zipfile.ZipFile(os.getcwd() + '/' + model_zip, 'r') as model_ref:
+                model_ref.extractall(os.getcwd())
+            os.remove(model_zip)
+        model = Model(model_name)
+        return model
