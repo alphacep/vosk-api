@@ -4,7 +4,6 @@ import sys
 import argparse
 
 from transcriber import Transcriber as transcriber
-from vosk import Model
 from multiprocessing.dummy import Pool
 
 
@@ -17,8 +16,11 @@ parser.add_argument(
         '-list_models', action='store_true', 
         help='list of all models')
 parser.add_argument(
-        '-model_name', default='vosk-model-small-en-us-0.15', type=str,
+        '-model_name',  type=str,
         help='select model current language type')
+parser.add_argument(
+        '-lang',  default='en-us', type=str,
+        help='smallest available model for selected language')
 parser.add_argument(
         'input', type=str,
         help='audiofile')
@@ -52,8 +54,12 @@ def calculate(model, inputdata, outputdata, outputtype, log):
         print(final_result)
     return final_result, tot_samples
 
-def main(model, inputdata, outputdata, outputtype, list_models, model_name, log):
-    model = transcriber.check_model(model_name)
+def main(model, inputdata, outputdata, outputtype, list_models, model_name, lang, log):
+    try:
+        model = transcriber.get_model(lang, model_name)
+    except Exception:
+        logging.info('-lang or -model_name settings are wrong, try again')
+        exit(1)
     if list_models:
         transcriber.get_list_models()
     if os.path.isdir(inputdata) and os.path.isdir(outputdata):
@@ -67,6 +73,6 @@ def main(model, inputdata, outputdata, outputtype, list_models, model_name, log)
 
 if __name__ == '__main__':
     start_time = transcriber.get_time()
-    tot_samples = main(args.model, args.input, args.output, args.outputtype, args.list_models, args.model_name, args.log)[1]
+    tot_samples = main(args.model, args.input, args.output, args.outputtype, args.list_models, args.model_name, args.lang, args.log)[1]
     diff_end_start, sec, mcsec = transcriber.send_time(start_time)
     print(f'''Script info: execution time: {sec} sec, {mcsec} mcsec; xRT: {format(tot_samples / 16000.0 / float(diff_end_start), '.3f')}''')

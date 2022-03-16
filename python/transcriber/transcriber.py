@@ -93,21 +93,39 @@ class Transcriber:
             print(response.json()[i]['name'])
         exit(1)
     
-    def check_model(model_name):
-        path = os.path.expandvars('$HOME/.cache')
-        os.chdir(path)
-        if not os.path.isdir('vosk'):
-            os.mkdir('vosk')
-        os.chdir('vosk')
-        if model_name in os.listdir():
-            pass
-        else:
+
+    def get_model(lang, model_name=None):
+
+        def check_path():
+            path = os.path.expandvars('$HOME/.cache')
+            os.chdir(path)
+            if not os.path.isdir('vosk'):
+                os.mkdir('vosk')
+            os.chdir('vosk')
+
+        def download_model(result_model):
             pre_link = 'https://alphacephei.com/vosk/models/'
-            model_zip = model_name + '.zip'
+            model_zip = result_model + '.zip'
             model_url = pre_link + model_zip
             urllib.request.urlretrieve(model_url, model_zip)
             with zipfile.ZipFile(os.getcwd() + '/' + model_zip, 'r') as model_ref:
                 model_ref.extractall(os.getcwd())
             os.remove(model_zip)
-        model = Model(model_name)
+
+        url = 'https://alphacephei.com/vosk/models/model-list.json'
+        model_list = list()
+        response = requests.get(url)
+        for i in range(len(response.json())):
+            if response.json()[i]['lang'] == lang:
+                if response.json()[i]['type'] == 'small' and response.json()[i]['obsolete'] == 'false':
+                    if model_name == None:
+                        result_model = response.json()[i]['name']
+                    else:
+                        result_model = model_name
+        check_path()
+        if result_model in os.listdir():
+            pass
+        else:
+            download_model(result_model)
+        model = Model(result_model)
         return model
