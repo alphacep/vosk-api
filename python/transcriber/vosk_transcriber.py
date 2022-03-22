@@ -1,10 +1,9 @@
-import os
 import logging
-import sys
 import argparse
 
 from transcriber import Transcriber as transcriber
 from multiprocessing.dummy import Pool
+from pathlib import Path
 
 
 parser = argparse.ArgumentParser(
@@ -55,19 +54,15 @@ def calculate(model, inputdata, outputdata, outputtype, log):
     return final_result, tot_samples
 
 def main(model, inputdata, outputdata, outputtype, list_models, model_name, lang, log):
-    try:
-        model = transcriber.get_model(lang, model_name)
-    except Exception:
-        logging.info('-lang or -model_name settings are wrong, try again')
-        exit(1)
+    model = transcriber.get_model(lang, model_name)
     if list_models:
         transcriber.get_list_models()
-    if os.path.isdir(inputdata) and os.path.isdir(outputdata):
-            arg_list = transcriber.process_dir(model, inputdata, outputdata, outputtype, log)
-            with Pool() as pool:
-                for final_result, tot_samples in pool.starmap(calculate, arg_list):
-                    return final_result, tot_samples
-    elif os.path.isfile(inputdata):
+    if Path(inputdata).is_dir() and Path(outputdata).is_dir():
+        arg_list = transcriber.process_dir(model, inputdata, outputdata, outputtype, log)
+        with Pool() as pool:
+            for final_result, tot_samples in pool.starmap(calculate, arg_list):
+                return final_result, tot_samples
+    elif Path(inputdata).is_file():
         final_result, tot_samples = calculate(model, inputdata, outputdata, outputtype, log)
     return final_result, tot_samples
 

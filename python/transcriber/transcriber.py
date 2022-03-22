@@ -1,8 +1,6 @@
 import json
-import sys
 import subprocess
 import time
-import os
 import requests
 import urllib.request
 import zipfile
@@ -11,6 +9,7 @@ import datetime
 
 from datetime import datetime as dt
 from vosk import KaldiRecognizer, Model
+from pathlib import Path
 
 
 class Transcriber:
@@ -82,35 +81,31 @@ class Transcriber:
         format_o = f".{outputtype}"
         input_list = [input_dir + each for each in files]
         output_list = [output_dir + each.replace(extension_i, format_o) for each in files]
-        for i in range(len(input_list)):
-            arg_list.extend([(model, input_list[i], output_list[i], outputtype, log)])
+        [arg_list.extend([(model, input_list[i], output_list[i], outputtype, log)]) for i in range(len(input_list))]
         return arg_list
 
     def get_list_models():
         url = 'https://alphacephei.com/vosk/models/model-list.json'
         response = requests.get(url)
-        for i in range(len(response.json())):
-            print(response.json()[i]['name'])
+        [print(response.json()[i]['name']) for i in range(len(response.json()))]
         exit(1)
-    
 
     def get_model(lang, model_name=None):
 
-        def check_path():
-            path = os.path.expandvars('$HOME/.cache')
-            os.chdir(path)
-            if not os.path.isdir('vosk'):
-                os.mkdir('vosk')
-            os.chdir('vosk')
+        def check_model_path():
+            model_path = Path.home() / '.cache' / 'vosk'
+            if not Path.is_dir(model_path):
+                Path.mkdir(model_path)
+            return model_path
 
-        def download_model(result_model):
+        def download_model(result_model, model_path):
             pre_link = 'https://alphacephei.com/vosk/models/'
-            model_zip = result_model + '.zip'
-            model_url = pre_link + model_zip
+            model_zip = str(model_path) + '/' + result_model + '.zip'
+            model_url = pre_link + result_model + '.zip'
             urllib.request.urlretrieve(model_url, model_zip)
-            with zipfile.ZipFile(os.getcwd() + '/' + model_zip, 'r') as model_ref:
-                model_ref.extractall(os.getcwd())
-            os.remove(model_zip)
+            with zipfile.ZipFile(model_path / model_zip, 'r') as model_ref:
+                model_ref.extractall(model_path)
+            Path.unlink(model_path / model_zip)
 
         url = 'https://alphacephei.com/vosk/models/model-list.json'
         model_list = list()
@@ -122,10 +117,11 @@ class Transcriber:
                         result_model = response.json()[i]['name']
                     else:
                         result_model = model_name
-        check_path()
-        if result_model in os.listdir():
+        model_path = check_model_path()
+        model_arg = str(model_path) + '/' + result_model
+        if Path(model_arg).exists():
             pass
         else:
-            download_model(result_model)
-        model = Model(result_model)
+            download_model(result_model, model_path)
+        model = Model(model_arg)
         return model
