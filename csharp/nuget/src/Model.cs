@@ -32,7 +32,7 @@ public class Model : global::System.IDisposable {
   public Model(string model_path) : this(VoskPINVOKE.new_Model(model_path)) {
   }
 
-  public int vosk_model_find_word(string word) {
+  public int FindWord(string word) {
     return VoskPINVOKE.Model_vosk_model_find_word(handle, word);
   }
 
