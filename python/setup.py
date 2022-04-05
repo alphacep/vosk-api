@@ -44,7 +44,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="vosk",
-    version="0.3.32",
+    version="0.3.33",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="Offline open source speech recognition API based on Kaldi and Vosk",
@@ -53,6 +53,7 @@ setuptools.setup(
     url="https://github.com/alphacep/vosk-api",
     packages=setuptools.find_packages(),
     package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
+    scripts = ['transcriber/vosk_transcriber.py'],
     include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',

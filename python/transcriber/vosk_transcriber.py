@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 import logging
 import argparse
+
 
 from transcriber import Transcriber as transcriber
 from multiprocessing.dummy import Pool
@@ -15,7 +18,7 @@ parser.add_argument(
         '-list_models', action='store_true', 
         help='list of all models')
 parser.add_argument(
-        '-model_name',  type=str,
+        '-model_name',  default='vosk-model-small-en-us-0.15', type=str,
         help='select model current language type')
 parser.add_argument(
         '-lang',  default='en-us', type=str,
@@ -60,7 +63,7 @@ def main(args):
         transcriber.get_list_models()
     model = transcriber.get_model(args)
     if Path(args.input).is_dir() and Path(args.output).is_dir():
-        file_list = transcriber.process_dir(args)
+        file_list = transcriber.get_file_list(args)
         with Pool() as pool:
             for final_result, tot_samples in pool.map(get_results, file_list):
                 return final_result, tot_samples
@@ -70,7 +73,7 @@ def main(args):
     return final_result, tot_samples
 
 if __name__ == '__main__':
-    start_time = transcriber.get_time()
+    start_time = transcriber.get_start_time()
     tot_samples = main(args)[1]
-    diff_end_start, sec, mcsec = transcriber.send_time(start_time)
+    diff_end_start, sec, mcsec = transcriber.get_end_time(start_time)
     logging.info(f'''Script info: execution time: {sec} sec, {mcsec} mcsec; xRT: {format(tot_samples / 16000.0 / float(diff_end_start), '.3f')}''')

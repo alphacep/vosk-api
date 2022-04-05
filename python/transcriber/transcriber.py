@@ -69,17 +69,17 @@ class Transcriber:
             stdout=subprocess.PIPE)
         return process
 
-    def get_time():
+    def get_start_time():
         start_time = dt.now()
         return start_time
 
-    def send_time(start_time):
+    def get_end_time(start_time):
         script_time = str(dt.now() - start_time)
         seconds = script_time[5:8].strip('0')
         mcseconds = script_time[8:].strip('0')
         return script_time.strip(':0'), seconds.rstrip('.'), mcseconds
 
-    def process_dir(args):
+    def get_file_list(args):
         files = os.listdir(args.input)
         arg_list = list()
         input_dir = args.input + '/'
@@ -97,35 +97,23 @@ class Transcriber:
         exit(1)
 
     def get_model(args):
-
-        def get_model_path():
-            model_path = Path.home() / '.cache' / 'vosk'
-            if not Path.is_dir(model_path):
-                Path.mkdir(model_path)
-            return model_path
-
-        def download_model(result_model, model_path):
-            model_zip = Path(model_path, result_model + '.zip')
+        if args.lang != 'en-us' or args.model_name != 'vosk-model-small-en-us-0.15':
+            response = requests.get(model_list_url)
+            for i in range(len(response.json())):
+                if response.json()[i]['lang'] == args.lang and response.json()[i]['type'] == 'small' and response.json()[i]['obsolete'] == 'false' or response.json()[i]['name'] == args.model_name:
+                    result_model = response.json()[i]['name']
+        else:
+            result_model = args.model_name
+        model_path = Path.home() / '.cache' / 'vosk'
+        if not Path.is_dir(model_path):
+            Path.mkdir(model_path)
+        model_location = Path(model_path, result_model)
+        if not Path(model_location).exists():
+            model_zip = str(model_path) + result_model + '.zip'
             model_url = model_pre_path + result_model + '.zip'
             urllib.request.urlretrieve(model_url, model_zip)
             with zipfile.ZipFile(model_path / model_zip, 'r') as model_ref:
                 model_ref.extractall(model_path)
             Path.unlink(model_path / model_zip)
-
-        model_list = list()
-        response = requests.get(model_list_url)
-        for i in range(len(response.json())):
-            if response.json()[i]['lang'] == args.lang:
-                if response.json()[i]['type'] == 'small' and response.json()[i]['obsolete'] == 'false':
-                    if args.model_name == None:
-                        result_model = response.json()[i]['name']
-                    else:
-                        result_model = args.model_name
-        model_path = Path(get_model_path())
-        model_location = Path(model_path, result_model)
-        if Path(model_location).exists():
-            pass
-        else:
-            download_model(result_model, model_path)
         model = Model(str(model_location))
         return model
