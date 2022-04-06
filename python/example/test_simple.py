@@ -19,6 +19,7 @@ if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE
 model = Model("model")
 rec = KaldiRecognizer(model, wf.getframerate())
 rec.SetWords(True)
+rec.SetPartialWords(True)
 
 while True:
     data = wf.readframes(4000)

@@ -197,6 +197,11 @@ void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_al
  */
 void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words);
 
+/** Like above return words and confidences in partial results
+ *
+ * @param partial_words - boolean value
+ */
+void vosk_recognizer_set_partial_words(VoskRecognizer *recognizer, int partial_words);
 
 /** Set NLSML output
  * @param nlsml - boolean value

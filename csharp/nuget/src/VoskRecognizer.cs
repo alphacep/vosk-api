@@ -46,6 +46,10 @@ public class VoskRecognizer : System.IDisposable {
     VoskPINVOKE.VoskRecognizer_SetWords(handle, words ? 1 : 0);
   }
 
+  public void SetPartialWords(bool partial_words) {
+    VoskPINVOKE.VoskRecognizer_SetPartialWords(handle, partial_words ? 1 : 0);
+  }
+
   public void SetSpkModel(SpkModel spk_model) {
     VoskPINVOKE.VoskRecognizer_SetSpkModel(handle, SpkModel.getCPtr(spk_model));
   }

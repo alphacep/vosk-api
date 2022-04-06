@@ -49,6 +49,7 @@ class Recognizer {
         void SetMaxAlternatives(int max_alternatives);
         void SetSpkModel(SpkModel *spk_model);
         void SetWords(bool words);
+        void SetPartialWords(bool partial_words);
         void SetNLSML(bool nlsml);
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
@@ -73,7 +74,7 @@ class Recognizer {
         const char *NlsmlResult(CompactLattice &clat);
 
         Model *model_ = nullptr;
-        SingleUtteranceNnet3Decoder *decoder_ = nullptr;
+        SingleUtteranceNnet3IncrementalDecoder *decoder_ = nullptr;
         fst::LookaheadFst<fst::StdArc, int32> *decode_fst_ = nullptr;
         fst::StdVectorFst *g_fst_ = nullptr; // dynamically constructed grammar
         OnlineNnet2FeaturePipeline *feature_pipeline_ = nullptr;
@@ -96,6 +97,7 @@ class Recognizer {
         // Other
         int max_alternatives_ = 0; // Disable alternatives by default
         bool words_ = false;
+        bool partial_words_ = false;
         bool nlsml_ = false;
 
         float sample_frequency_;

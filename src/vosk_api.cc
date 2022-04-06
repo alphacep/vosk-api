@@ -103,6 +103,11 @@ void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words)
     ((Recognizer *)recognizer)->SetWords((bool)words);
 }
 
+void vosk_recognizer_set_partial_words(VoskRecognizer *recognizer, int partial_words)
+{
+    ((Recognizer *)recognizer)->SetPartialWords((bool)partial_words);
+}
+
 void vosk_recognizer_set_nlsml(VoskRecognizer *recognizer, int nlsml)
 {
     ((Recognizer *)recognizer)->SetNLSML((bool)nlsml);

@@ -30,6 +30,7 @@ public class DecoderTest {
 
             recognizer.setMaxAlternatives(10);
             recognizer.setWords(true);
+            recognizer.setPartialWords(true);
 
             int nbytes;
             byte[] b = new byte[4096];
