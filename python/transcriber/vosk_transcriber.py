@@ -14,7 +14,7 @@ parser.add_argument(
         '-model', type=str,
         help='model path')
 parser.add_argument(
-        '-models_list', action='store_true', 
+        '-models_list', default=False, action='store_true', 
         help='list of all models')
 parser.add_argument(
         '-model_name',  default='vosk-model-small-en-us-0.15', type=str,
@@ -57,7 +57,7 @@ def get_results(inputdata):
 
 def main(args):
     global model
-    if args.models_list:
+    if args.models_list == True:
         transcriber.models_list()
     if args.input:
         model = transcriber.get_model(args)

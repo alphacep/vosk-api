@@ -83,9 +83,8 @@ class Transcriber:
         arg_list = list()
         output_extension = '.' + args.outputtype
         input_files = os.listdir(args.input)
-        number_of_files = len(input_files)
-        output_files = [input_files[name].replace(Path(input_files[name]).suffix, output_extension) for name in range(number_of_files)]
-        for name in range(number_of_files):
+        output_files = [input_files[name].replace(Path(input_files[name]).suffix, output_extension) for name in input_files]
+        for name in input_files:
             input_file = Path(args.input, input_files[name])
             output_file = Path(args.output, output_files[name])
             arg_pair = (input_file, output_file)
