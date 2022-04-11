@@ -37,9 +37,9 @@ class Transcriber:
             if len(data) == 0:
                 break
             if args.outputtype == 'txt':
-                    result, tot_samples = get_result_and_tot_samples(rec, data, tot_samples, result)
-            elif args.outputtype == 'srt':
-                    result, tot_samples = get_result_and_tot_samples(rec, data, tot_samples, result)
+                result, tot_samples = get_result_and_tot_samples(rec, data, tot_samples, result)
+            else:
+                result, tot_samples = get_result_and_tot_samples(rec, data, tot_samples, result)
         result.append(json.loads(rec.FinalResult()))
         if args.outputtype == 'srt':
             for i, res in enumerate(result):
@@ -62,12 +62,12 @@ class Transcriber:
         return final_result, tot_samples
 
     def resample_ffmpeg(infile):
-        process = subprocess.Popen(
+        stream = subprocess.Popen(
             ['ffmpeg', '-nostdin', '-loglevel', 'quiet', '-i', 
             infile, 
             '-ar', '16000','-ac', '1', '-f', 's16le', '-'], 
             stdout=subprocess.PIPE)
-        return process
+        return stream
 
     def get_start_time():
         start_time = dt.now()
@@ -80,33 +80,39 @@ class Transcriber:
         return script_time.strip(':0'), seconds.rstrip('.'), mcseconds
 
     def get_file_list(args):
-        files = os.listdir(args.input)
         arg_list = list()
-        input_dir = args.input + '/'
-        output_dir = args.output + '/'
-        extension_i = f".{files[0].split('.')[1]}"
-        format_o = f".{args.outputtype}"
-        input_list = [input_dir + each for each in files]
-        output_list = [output_dir + each.replace(extension_i, format_o) for each in files]
-        [arg_list.extend([(input_list[i], output_list[i])]) for i in range(len(input_list))]
+        output_extension = '.' + args.outputtype
+        input_files = os.listdir(args.input)
+        number_of_files = len(input_files)
+        output_files = [input_files[name].replace(Path(input_files[name]).suffix, output_extension) for name in range(number_of_files)]
+        for name in range(number_of_files):
+            input_file = Path(args.input, input_files[name])
+            output_file = Path(args.output, output_files[name])
+            arg_pair = (input_file, output_file)
+            arg_list.append(arg_pair)
         return arg_list
 
-    def get_list_models():
+    def models_list():
         response = requests.get(model_list_url)
         [print(response.json()[i]['name']) for i in range(len(response.json()))]
         exit(1)
 
     def get_model(args):
-        if args.lang != 'en-us' or args.model_name != 'vosk-model-small-en-us-0.15':
-            response = requests.get(model_list_url)
-            for i in range(len(response.json())):
-                if response.json()[i]['lang'] == args.lang and response.json()[i]['type'] == 'small' and response.json()[i]['obsolete'] == 'false' or response.json()[i]['name'] == args.model_name:
-                    result_model = response.json()[i]['name']
-        else:
-            result_model = args.model_name
         model_path = Path.home() / '.cache' / 'vosk'
         if not Path.is_dir(model_path):
             Path.mkdir(model_path)
+        response = requests.get(model_list_url)
+        if args.lang == None:
+            if not Path.is_dir(Path(model_path, args.model_name)):
+                for i in range(len(response.json())):
+                    if response.json()[i]['name'] == args.model_name:
+                        result_model = response.json()[i]['name']           
+            else:
+                result_model = args.model_name
+        else:
+            for i in range(len(response.json())):
+                if response.json()[i]['lang'] == args.lang and response.json()[i]['type'] == 'small' and response.json()[i]['obsolete'] == 'false':
+                    result_model = response.json()[i]['name']
         model_location = Path(model_path, result_model)
         if not Path(model_location).exists():
             model_zip = str(model_path) + result_model + '.zip'
