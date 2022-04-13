@@ -49,11 +49,11 @@ class KaldiRecognizer(object):
 
     def __init__(self, stream, sample_rate, model=None):
         if model is None:
-            self._handle = _c.vosk_recognizer_new(args[0]._handle, args[1])
+            self._handle = _c.vosk_recognizer_new(stream._handle, sample_rate)
         elif isinstance(model, str):
-            self._handle = _c.vosk_recognizer_new_grm(args[0]._handle, args[1], args[2].encode('utf-8'))
+            self._handle = _c.vosk_recognizer_new_grm(stream._handle, sample_rate, model.encode())
         elif isinstance(model, SpkModel):
-            self._handle = _c.vosk_recognizer_new_spk(args[0]._handle, args[1], args[2]._handle)
+            self._handle = _c.vosk_recognizer_new_spk(stream._handle, sample_rate, model)
         else:
             raise TypeError("model argument must be either None, str or SpkModel")
 
