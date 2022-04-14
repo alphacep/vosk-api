@@ -7,6 +7,7 @@ import zipfile
 import srt
 import datetime
 import os
+import re
 
 from datetime import datetime as dt
 from vosk import KaldiRecognizer, Model
@@ -57,8 +58,8 @@ class Transcriber:
         if args.outputtype == 'srt':
             final_result = srt.compose(subs)
         elif args.outputtype == 'txt':
-            for i in range(len(result)):
-                final_result += result[i]['text'] + ' '
+            for part in result:
+                final_result += part['text'] + ' '
         return final_result, tot_samples
 
     def resample_ffmpeg(infile):
@@ -93,7 +94,7 @@ class Transcriber:
 
     def models_list():
         response = requests.get(model_list_url)
-        [print(response.json()[i]['name']) for i in range(len(response.json()))]
+        [print(model['name']) for model in response.json()]
         exit(1)
 
     def get_model(args):
@@ -103,15 +104,21 @@ class Transcriber:
         response = requests.get(model_list_url)
         if args.lang == None:
             if not Path.is_dir(Path(model_path, args.model_name)):
-                for i in range(len(response.json())):
-                    if response.json()[i]['name'] == args.model_name:
-                        result_model = response.json()[i]['name']           
+                for model in response.json():
+                    if model['name'] == args.model_name:
+                        result_model = model['name']           
             else:
                 result_model = args.model_name
         else:
-            for i in range(len(response.json())):
-                if response.json()[i]['lang'] == args.lang and response.json()[i]['type'] == 'small' and response.json()[i]['obsolete'] == 'false':
-                    result_model = response.json()[i]['name']
+            model_file_list = os.listdir(model_path)
+            model_file = [model for model in model_file_list if re.match(f"vosk-model(-small)?-{args.lang}", model)]
+            if model_file == []:
+                response = requests.get(model_list_url)
+                for model in response.json():
+                    if model['lang'] == args.lang and model['type'] == 'small' and model['obsolete'] == 'false':
+                        result_model = model['name']
+            else:
+                result_model = model_file[0]
         model_location = Path(model_path, result_model)
         if not Path(model_location).exists():
             model_zip = str(model_path) + result_model + '.zip'
