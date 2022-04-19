@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 parser = argparse.ArgumentParser(
-        description = 'Ttranscribe audio file and save result in selected format')
+        description = 'Transcribe audio file and save result in selected format')
 parser.add_argument(
         '-model', type=str,
         help='model path')
