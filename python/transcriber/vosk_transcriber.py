@@ -10,15 +10,15 @@ from pathlib import Path
 
 
 parser = argparse.ArgumentParser(
-        description = 'The program transcripts audiofile and displays result in selected format')
+        description = 'Ttranscribe audio file and save result in selected format')
 parser.add_argument(
         '-model', type=str,
         help='model path')
 parser.add_argument(
-        '-models_list', default=False, action='store_true', 
+        '-list_models', default=False, action='store_true', 
         help='list of all available models')
 parser.add_argument(
-        '-languages_list', default=False, action='store_true',
+        '-list_languages', default=False, action='store_true',
         help='list of all available languages')
 parser.add_argument(
         '-model_name',  default='vosk-model-small-en-us-0.15', type=str,
@@ -65,35 +65,38 @@ def main(args):
     transcriber = Transcriber()
     transcriber.check_args(args)
     if args.input:
-        model = transcriber.get_model(args)
+        model = transcriber.get_model(args) 
         if Path(args.input).is_dir() and Path(args.output).is_dir():
             file_list = transcriber.get_file_list(args)
             with Pool() as pool:
                 for final_result, tot_samples in pool.map(get_results, file_list):
                     return final_result, tot_samples
-        elif Path(args.input).is_file():
-            inputdata = (args.input, args.output)
-            final_result, tot_samples = get_results(inputdata)
-        elif not Path(args.input).exists() or not Path(args.output).exists():
-            logging.info('Please set correct input/output paths')
-            exit(1)
+        elif not Path(args.input).is_dir() or not Path(args.output).is_dir():
+            if Path(args.input).is_file():
+                inputdata = (args.input, args.output)
+                final_result, tot_samples = get_results(inputdata)
+            elif not Path(args.input).exists():
+                logging.info('File %s does not exist, please select an existing file' % (args.input))
+                exit(1)
+            elif not Path(args.output).exists():
+                logging.info('Folder %s does not exist, please select an existing folder' % (args.output))
+                exit(1)
         return final_result, tot_samples
     else:
-        logging.info('Please set input argument')
+        logging.info('Please select input argument')
         exit(1)
 
+def get_start_time():
+    start_time = dt.now()
+    return start_time
+
+def get_end_time(start_time):
+    script_time = str(dt.now() - start_time)
+    seconds = script_time[5:8].strip('0')
+    mcseconds = script_time[8:].strip('0')
+    return script_time.strip(':0'), seconds.rstrip('.'), mcseconds
+
 if __name__ == '__main__':
-
-    def get_start_time():
-        start_time = dt.now()
-        return start_time
-
-    def get_end_time(start_time):
-        script_time = str(dt.now() - start_time)
-        seconds = script_time[5:8].strip('0')
-        mcseconds = script_time[8:].strip('0')
-        return script_time.strip(':0'), seconds.rstrip('.'), mcseconds
-
     start_time = get_start_time()
     tot_samples = main(args)[1]
     diff_end_start, sec, mcsec = get_end_time(start_time)

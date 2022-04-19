@@ -20,22 +20,22 @@ MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
 
 class Transcriber:
 
+    def get_result_and_tot_samples(self, rec, stream, tot_samples, result):
+        if rec.AcceptWaveform(stream):
+            tot_samples += len(stream)
+            result.append(json.loads(rec.Result()))
+        return result, tot_samples
+    
     def transcribe(self, model, process, args):
         rec = KaldiRecognizer(model, 16000)
         rec.SetWords(True)
-
-        def get_result_and_tot_samples(rec, data, tot_samples, result):
-            if rec.AcceptWaveform(data):
-                tot_samples += len(data)
-                result.append(json.loads(rec.Result()))
-            return result, tot_samples
         tot_samples = 0
         result = []
         while True:
             stream = process.stdout.read(4000)
             if len(stream) == 0:
                 break
-            result, tot_samples = get_result_and_tot_samples(rec, stream, tot_samples, result)
+            result, tot_samples = self.get_result_and_tot_samples(rec, stream, tot_samples, result)
         result.append(json.loads(rec.FinalResult()))
         final_result = ''
         if args.outputtype == 'srt':
@@ -66,75 +66,68 @@ class Transcriber:
         return stream
 
     def get_file_list(self, args):
-        arg_list = []
-        [arg_list.append((Path(args.input, files), Path(args.output, Path(files).stem).with_suffix('.' + args.outputtype))) for files in os.listdir(args.input)]
+        arg_list = set([(Path(args.input, files), Path(args.output, Path(files).stem).with_suffix('.' + args.outputtype)) for files in os.listdir(args.input)])
         return arg_list
+    
+    def get_list_models(self):
+        response = requests.get(MODEL_LIST_URL)
+        [print(model['name']) for model in response.json()]
+        exit(1)
+
+    def get_list_languages(self):
+        response = requests.get(MODEL_LIST_URL)
+        list_languages = set([language['lang'] for language in response.json()])
+        print(*list_languages, sep='\n')
+        exit(1)
 
     def check_args(self, args):
-    
-        def models_list():
-            response = requests.get(MODEL_LIST_URL)
-            [print(model['name']) for model in response.json()]
-            exit(1)
+        if args.list_models == True:
+            self.get_list_models()
+        elif args.list_languages == True:
+            self.get_list_languages()
 
-        def languages_list():
-            language_list = []
-            response = requests.get(MODEL_LIST_URL)
-            [language_list.append(language['lang']) for language in response.json() if language['lang'] not in language_list]
-            print(*language_list, sep='\n')
-            exit(1)
-
-        if args.models_list == True:
-            models_list()
-        elif args.languages_list == True:
-            languages_list()
-
-    def get_model_name_using_model_name_arg(self, args, models_path):
+    def get_model_by_name(self, args, models_path):
         if not Path.is_dir(Path(models_path, args.model_name)):
             response = requests.get(MODEL_LIST_URL)
-            result_model = [model['name'] for model in response.json() if model['name'] == args.model_name]
-            if result_model == []:
-                logging.info('model name "%s" does not exist, set -models_list to see available models' % (args.model_name))
+            result = [model['name'] for model in response.json() if model['name'] == args.model_name]
+            if result == []:
+                logging.info('model name "%s" does not exist, request -models_list to see available models' % (args.model_name))
                 exit(1)
             else:
-                result_model = result_model[0]
+                result = result[0]
         else:
-            result_model = args.model_name
-        return result_model
+            result = args.model_name
+        return result
 
-    def get_model_name_using_lang_arg(self, args, models_path):
+    def get_model_by_lang(self, args, models_path):
         model_file_list = os.listdir(models_path)
         model_file = [model for model in model_file_list if re.match(f"vosk-model(-small)?-{args.lang}", model)]
         if model_file == []:
             response = requests.get(MODEL_LIST_URL)
-            result_model = [model['name'] for model in response.json() if model['lang'] == args.lang and model['type'] == 'small' and model['obsolete'] == 'false']
-            if result_model == []:
-                logging.info('language "%s" does not exist, set -languages_list to see available languages' % (args.lang))
+            result = [model['name'] for model in response.json() if model['lang'] == args.lang and model['type'] == 'small' and model['obsolete'] == 'false']
+            if result == []:
+                logging.info('language "%s" does not exist, request -languages_list to see available languages' % (args.lang))
                 exit(1)
             else:
-                result_model = result_model[0]
+                result = result[0]
         else:
-            result_model = model_file[0]
-        return result_model
-        
-    def download_model(self, model_location, models_path):
-        if not Path(model_location).exists():
-            model_zip = model_location + '.zip'
-            urllib.request.urlretrieve(MODEL_PRE_PATH + model_location[len(str(Path(model_location).parent))+1:] + '.zip', model_zip)
-            with zipfile.ZipFile(model_zip, 'r') as model_ref:
-                model_ref.extractall(models_path)
-            Path.unlink(Path(model_zip))
-        model = Model(model_location)
-        return model
+            result = model_file[0]
+        return result
 
     def get_model(self, args):    
         models_path = Path.home() / '.cache' / 'vosk'
         if not Path.is_dir(models_path):
             Path.mkdir(models_path)
         if args.lang == None:
-            result_model = self.get_model_name_using_model_name_arg(args, models_path)
+            result = self.get_model_by_name(args, models_path)
         else:
-            result_model = self.get_model_name_using_lang_arg(args, models_path)
-        model_location = str(Path(models_path, result_model))
-        model = self.download_model(model_location, models_path)
+            result = self.get_model_by_lang(args, models_path)
+        model_location = str(Path(models_path, result))
+        if not Path(model_location).exists():
+            model_zip = model_location + '.zip'
+            urllib.request.urlretrieve(MODEL_PRE_PATH + model_location[len(srt(Path(model_location).parent))+1:] + '.zip', model_zip)
+            with zipfile.ZipFile(model_zip, 'r') as model_ref:
+                model_ref.extractall(models_path)
+            Path.unlink(Path(model_zip))
+        model = Model(model_location)
         return model
