@@ -64,16 +64,16 @@ def main(args):
     transcriber = Transcriber()
     transcriber.check_args(args)
     if args.input:
-        model = transcriber.get_model_after_args_are_verified(args)
+        model = transcriber.get_model(args)
         if Path(args.input).is_dir() and Path(args.output).is_dir():
-            file_list = transcriber.get_file_list(args)
+            task_list = transcriber.get_task_list(args)
             with Pool() as pool:
                 for final_result, tot_samples in pool.map(get_results, file_list):
                     return final_result, tot_samples
         else:
             if Path(args.input).is_file():
-                i_o_args = (args.input, args.output)
-                final_result, tot_samples = get_results(i_o_args)
+                task = (args.input, args.output)
+                final_result, tot_samples = get_results(task)
             elif not Path(args.input).exists():
                 logging.info('File %s does not exist, please select an existing file' % (args.input))
                 exit(1)
@@ -82,7 +82,7 @@ def main(args):
                 exit(1)
         return final_result, tot_samples
     else:
-        logging.info('Please select input argument')
+        logging.info('Please specify input file or directory')
         exit(1)
 
 def get_start_time():

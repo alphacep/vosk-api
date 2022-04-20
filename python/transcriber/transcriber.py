@@ -20,23 +20,23 @@ MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
 
 class Transcriber:
 
-    def get_result_and_tot_samples(self, rec, stream, tot_samples, result):
-        if rec.AcceptWaveform(stream):
-            tot_samples += len(stream)
-            result.append(json.loads(rec.Result()))
+    def get_result_and_tot_samples(self, rec, process):
+        tot_samples = 0
+        result = []
+        while True:
+            data = process.stdout.read(4000)
+            if len(data) == 0:
+                break
+            if rec.AcceptWaveform(data):
+                tot_samples += len(data)
+                result.append(json.loads(rec.Result())) 
+        result.append(json.loads(rec.FinalResult()))
         return result, tot_samples
     
     def transcribe(self, model, process, args):
         rec = KaldiRecognizer(model, 16000)
         rec.SetWords(True)
-        tot_samples = 0
-        result = []
-        while True:
-            stream = process.stdout.read(4000)
-            if len(stream) == 0:
-                break
-            result, tot_samples = self.get_result_and_tot_samples(rec, stream, tot_samples, result)
-        result.append(json.loads(rec.FinalResult()))
+        result, tot_samples = self.get_result_and_tot_samples(rec, process)
         final_result = ''
         if args.outputtype == 'srt':
             subs = []
@@ -65,9 +65,9 @@ class Transcriber:
             stdout=subprocess.PIPE)
         return stream
 
-    def get_file_list(self, args):
-        arg_list = set([(Path(args.input, files), Path(args.output, Path(files).stem).with_suffix('.' + args.outputtype)) for files in os.listdir(args.input)])
-        return arg_list
+    def get_task_list(self, args):
+        task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.outputtype)) for fn in os.listdir(args.input)]
+        return task_list
     
     def list_models(self):
         response = requests.get(MODEL_LIST_URL)
@@ -114,7 +114,7 @@ class Transcriber:
             result = model_file[0]
         return result
 
-    def get_model_after_args_are_verified(self, args):    
+    def get_model(self, args):
         models_path = Path.home() / '.cache' / 'vosk'
         if not Path.is_dir(models_path):
             Path.mkdir(models_path)
