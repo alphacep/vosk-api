@@ -53,6 +53,7 @@ setuptools.setup(
     url="https://github.com/alphacep/vosk-api",
     packages=setuptools.find_packages(),
     package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
+    scripts = ['transcriber/vosk_transcriber.py'],
     include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',
