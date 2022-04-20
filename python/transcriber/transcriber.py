@@ -69,12 +69,12 @@ class Transcriber:
         arg_list = set([(Path(args.input, files), Path(args.output, Path(files).stem).with_suffix('.' + args.outputtype)) for files in os.listdir(args.input)])
         return arg_list
     
-    def get_list_models(self):
+    def list_models(self):
         response = requests.get(MODEL_LIST_URL)
         [print(model['name']) for model in response.json()]
         exit(1)
 
-    def get_list_languages(self):
+    def list_languages(self):
         response = requests.get(MODEL_LIST_URL)
         list_languages = set([language['lang'] for language in response.json()])
         print(*list_languages, sep='\n')
@@ -82,16 +82,16 @@ class Transcriber:
 
     def check_args(self, args):
         if args.list_models == True:
-            self.get_list_models()
+            self.list_models()
         elif args.list_languages == True:
-            self.get_list_languages()
+            self.list_languages()
 
     def get_model_by_name(self, args, models_path):
         if not Path.is_dir(Path(models_path, args.model_name)):
             response = requests.get(MODEL_LIST_URL)
             result = [model['name'] for model in response.json() if model['name'] == args.model_name]
             if result == []:
-                logging.info('model name "%s" does not exist, request -models_list to see available models' % (args.model_name))
+                logging.info('model name "%s" does not exist, request -list_models to see available models' % (args.model_name))
                 exit(1)
             else:
                 result = result[0]
@@ -106,7 +106,7 @@ class Transcriber:
             response = requests.get(MODEL_LIST_URL)
             result = [model['name'] for model in response.json() if model['lang'] == args.lang and model['type'] == 'small' and model['obsolete'] == 'false']
             if result == []:
-                logging.info('language "%s" does not exist, request -languages_list to see available languages' % (args.lang))
+                logging.info('language "%s" does not exist, request -list_languages to see available languages' % (args.lang))
                 exit(1)
             else:
                 result = result[0]
@@ -114,7 +114,7 @@ class Transcriber:
             result = model_file[0]
         return result
 
-    def get_model(self, args):    
+    def get_model_after_args_are_verified(self, args):    
         models_path = Path.home() / '.cache' / 'vosk'
         if not Path.is_dir(models_path):
             Path.mkdir(models_path)
@@ -122,12 +122,12 @@ class Transcriber:
             result = self.get_model_by_name(args, models_path)
         else:
             result = self.get_model_by_lang(args, models_path)
-        model_location = str(Path(models_path, result))
-        if not Path(model_location).exists():
+        model_location = Path(models_path, result)
+        if not model_location.exists():
             model_zip = model_location + '.zip'
-            urllib.request.urlretrieve(MODEL_PRE_PATH + model_location[len(srt(Path(model_location).parent))+1:] + '.zip', model_zip)
+            urllib.request.urlretrieve(MODEL_PRE_PATH + model_location[len(str(Path(model_location).parent))+1:] + '.zip', model_zip)
             with zipfile.ZipFile(model_zip, 'r') as model_ref:
                 model_ref.extractall(models_path)
             Path.unlink(Path(model_zip))
-        model = Model(model_location)
+        model = Model(str(model_location))
         return model

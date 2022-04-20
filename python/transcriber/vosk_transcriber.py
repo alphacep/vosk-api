@@ -16,16 +16,16 @@ parser.add_argument(
         help='model path')
 parser.add_argument(
         '-list_models', default=False, action='store_true', 
-        help='list of all available models')
+        help='list available models')
 parser.add_argument(
         '-list_languages', default=False, action='store_true',
-        help='list of all available languages')
+        help='list available languages')
 parser.add_argument(
         '-model_name',  default='vosk-model-small-en-us-0.15', type=str,
-        help='select model current language type')
+        help='select model by name')
 parser.add_argument(
         '-lang', type=str,
-        help='smallest available model for selected language')
+        help='select model by language')
 parser.add_argument(
         '-input', type=str,
         help='audiofile')
@@ -47,7 +47,6 @@ logging.info('checking args')
 def get_results(inputdata):
     logging.info('converting audiofile to 16K sampled wav')
     stream = transcriber.resample_ffmpeg(inputdata[0])
-    logging.info('complete')
     logging.info('starting transcription')
     final_result, tot_samples = transcriber.transcribe(model, stream, args)
     logging.info('complete')
@@ -65,16 +64,16 @@ def main(args):
     transcriber = Transcriber()
     transcriber.check_args(args)
     if args.input:
-        model = transcriber.get_model(args) 
+        model = transcriber.get_model_after_args_are_verified(args)
         if Path(args.input).is_dir() and Path(args.output).is_dir():
             file_list = transcriber.get_file_list(args)
             with Pool() as pool:
                 for final_result, tot_samples in pool.map(get_results, file_list):
                     return final_result, tot_samples
-        elif not Path(args.input).is_dir() or not Path(args.output).is_dir():
+        else:
             if Path(args.input).is_file():
-                inputdata = (args.input, args.output)
-                final_result, tot_samples = get_results(inputdata)
+                i_o_args = (args.input, args.output)
+                final_result, tot_samples = get_results(i_o_args)
             elif not Path(args.input).exists():
                 logging.info('File %s does not exist, please select an existing file' % (args.input))
                 exit(1)
