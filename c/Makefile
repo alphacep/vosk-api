@@ -4,13 +4,13 @@ LDFLAGS=-L../src -lvosk -ldl -lpthread -Wl,-rpath=../src
 all: test_vosk test_vosk_speaker
 
 test_vosk: test_vosk.o
-	g++ $^ -o $@ $(LDFLAGS)
+	$(CXX) $^ -o $@ $(LDFLAGS)
 
 test_vosk_speaker: test_vosk_speaker.o
-	g++ $^ -o $@ $(LDFLAGS)
+	$(CXX) $^ -o $@ $(LDFLAGS)
 
 %.o: %.c
-	g++ $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f *.o *.a test_vosk test_vosk_speaker
