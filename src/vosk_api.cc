@@ -103,6 +103,16 @@ void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words)
     ((Recognizer *)recognizer)->SetWords((bool)words);
 }
 
+void vosk_recognizer_set_partial_words(VoskRecognizer *recognizer, int partial_words)
+{
+    ((Recognizer *)recognizer)->SetPartialWords((bool)partial_words);
+}
+
+void vosk_recognizer_set_nlsml(VoskRecognizer *recognizer, int nlsml)
+{
+    ((Recognizer *)recognizer)->SetNLSML((bool)nlsml);
+}
+
 void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model)
 {
     if (recognizer == nullptr || spk_model == nullptr) {
@@ -185,10 +195,33 @@ void vosk_gpu_thread_init()
 #endif
 }
 
-VoskBatchRecognizer *vosk_batch_recognizer_new()
+VoskBatchModel *vosk_batch_model_new()
 {
 #if HAVE_CUDA
-    return (VoskBatchRecognizer *)(new BatchRecognizer());
+    return (VoskBatchModel *)(new BatchModel());
+#else
+    return NULL;
+#endif
+}
+
+void vosk_batch_model_free(VoskBatchModel *model)
+{
+#if HAVE_CUDA
+    delete ((BatchModel *)model);
+#endif
+}
+
+void vosk_batch_model_wait(VoskBatchModel *model)
+{
+#if HAVE_CUDA
+    ((BatchModel *)model)->WaitForCompletion();
+#endif
+}
+
+VoskBatchRecognizer *vosk_batch_recognizer_new(VoskBatchModel *model, float sample_rate)
+{
+#if HAVE_CUDA
+    return (VoskBatchRecognizer *)(new BatchRecognizer((BatchModel *)model, sample_rate));
 #else
     return NULL;
 #endif
@@ -201,47 +234,48 @@ void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer)
 #endif
 }
 
-void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, int id, const char *data, int length)
+void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, const char *data, int length)
 {
 #if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->AcceptWaveform(id, data, length);
+    ((BatchRecognizer *)recognizer)->AcceptWaveform(data, length);
 #endif
 }
 
-void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer, int id)
+void vosk_batch_recognizer_set_nlsml(VoskBatchRecognizer *recognizer, int nlsml)
 {
 #if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->FinishStream(id);
+    ((BatchRecognizer *)recognizer)->SetNLSML((bool)nlsml);
 #endif
 }
 
-const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer, int id)
+void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer)
 {
 #if HAVE_CUDA
-    return ((BatchRecognizer *)recognizer)->FrontResult(id);
+    ((BatchRecognizer *)recognizer)->FinishStream();
+#endif
+}
+
+const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer)
+{
+#if HAVE_CUDA
+    return ((BatchRecognizer *)recognizer)->FrontResult();
 #else
     return NULL;
 #endif
 }
 
-void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer, int id)
+void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer)
 {
 #if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->Pop(id);
+    ((BatchRecognizer *)recognizer)->Pop();
 #endif
 }
 
-void vosk_batch_recognizer_wait(VoskBatchRecognizer *recognizer)
-{
-#if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->WaitForCompletion();
-#endif
-}
 
-int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer, int id)
+int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer)
 {
 #if HAVE_CUDA
-    return ((BatchRecognizer *)recognizer)->GetPendingChunks(id);
+    return ((BatchRecognizer *)recognizer)->GetNumPendingChunks();
 #else
     return 0;
 #endif

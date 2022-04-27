@@ -36,7 +36,7 @@ Recognizer::Recognizer(Model *model, float sample_frequency) : model_(model), sp
         }
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+    decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -97,7 +97,7 @@ Recognizer::Recognizer(Model *model, float sample_frequency, char const *grammar
         KALDI_WARN << "Runtime graphs are not supported by this model";
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+    decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -123,7 +123,7 @@ Recognizer::Recognizer(Model *model, float sample_frequency, SpkModel *spk_model
         }
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+    decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -208,7 +208,7 @@ void Recognizer::CleanUp()
         delete feature_pipeline_;
 
         feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_->feature_info_);
-        decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+        decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -244,6 +244,16 @@ void Recognizer::SetMaxAlternatives(int max_alternatives)
 void Recognizer::SetWords(bool words)
 {
     words_ = words;
+}
+
+void Recognizer::SetPartialWords(bool partial_words)
+{
+    partial_words_ = partial_words;
+}
+
+void Recognizer::SetNLSML(bool nlsml)
+{
+    nlsml_ = nlsml;
 }
 
 void Recognizer::SetSpkModel(SpkModel *spk_model)
@@ -534,7 +544,6 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
     fst::ConvertNbestToVector(nbest_lat, &nbest_lats);
 
     json::JSON obj;
-    std::stringstream ss;
     for (int k = 0; k < nbest_lats.size(); k++) {
 
       Lattice nlat = nbest_lats[k];
@@ -561,7 +570,7 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
       stringstream text;
       json::JSON entry;
 
-      for (int i = 0; i < words.size(); i++) {
+      for (int i = 0, first = 1; i < words.size(); i++) {
         json::JSON word;
         if (words[i] == 0)
             continue;
@@ -571,8 +580,12 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
             word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + begin_times[i] + lengths[i]) * 0.03;
             entry["result"].append(word);
         }
-        if (i)
+
+        if (first)
+          first = 0;
+        else
           text << " ";
+
         text << model_->word_syms_->Find(words[i]);
       }
 
@@ -584,6 +597,66 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
     return StoreReturn(obj.dump());
 }
 
+const char *Recognizer::NlsmlResult(CompactLattice &clat)
+{
+    Lattice lat;
+    Lattice nbest_lat;
+    std::vector<Lattice> nbest_lats;
+
+    ConvertLattice (clat, &lat);
+    fst::ShortestPath(lat, &nbest_lat, max_alternatives_);
+    fst::ConvertNbestToVector(nbest_lat, &nbest_lats);
+
+    std::stringstream ss;
+    ss << "<?xml version=\"1.0\"?>\n";
+    ss << "<result grammar=\"default\">\n";
+
+    for (int k = 0; k < nbest_lats.size(); k++) {
+
+      Lattice nlat = nbest_lats[k];
+
+      CompactLattice nclat;
+      fst::Invert(&nlat);
+      DeterminizeLattice(nlat, &nclat);
+
+      CompactLattice aligned_nclat;
+      if (model_->winfo_) {
+          WordAlignLattice(nclat, *model_->trans_model_, *model_->winfo_, 0, &aligned_nclat);
+      } else {
+          aligned_nclat = nclat;
+      }
+
+      std::vector<int32> words;
+      std::vector<int32> begin_times;
+      std::vector<int32> lengths;
+      CompactLattice::Weight weight;
+
+      CompactLatticeToWordAlignmentWeight(aligned_nclat, &words, &begin_times, &lengths, &weight);
+      float likelihood = -(weight.Weight().Value1() + weight.Weight().Value2());
+
+      stringstream text;
+      for (int i = 0, first = 1; i < words.size(); i++) {
+        if (words[i] == 0)
+            continue;
+
+        if (first)
+          first = 0;
+        else
+          text << " ";
+
+        text << model_->word_syms_->Find(words[i]);
+      }
+
+      ss << "<interpretation grammar=\"default\" confidence=\"" << likelihood << "\">\n";
+      ss << "<input mode=\"speech\">" << text.str() << "</input>\n";
+      ss << "<instance>" << text.str() << "</instance>\n";
+      ss << "</interpretation>\n";
+    }
+    ss << "</result>\n";
+
+    return StoreReturn(ss.str());
+}
+
 const char* Recognizer::GetResult()
 {
     if (decoder_->NumFramesDecoded() == 0) {
@@ -593,7 +666,7 @@ const char* Recognizer::GetResult()
     // Original from decoder, subtracted graph weight, rescored with carpa, rescored with rnnlm
     CompactLattice clat, slat, tlat, rlat;
 
-    decoder_->GetLattice(true, &clat);
+    clat = decoder_->GetLattice(decoder_->NumFramesDecoded(), true);
 
     if (lm_to_subtract_ && carpa_to_add_) {
         Lattice lat, composed_lat;
@@ -638,6 +711,8 @@ const char* Recognizer::GetResult()
 
     if (max_alternatives_ == 0) {
         return MbrResult(rlat);
+    } else if (nlsml_) {
+        return NlsmlResult(rlat);
     } else {
         return NbestResult(rlat);
     }
@@ -653,25 +728,66 @@ const char* Recognizer::PartialResult()
 
     json::JSON res;
 
-    if (decoder_->NumFramesDecoded() == 0) {
-        res["partial"] = "";
-        return StoreReturn(res.dump());
-    }
+    if (partial_words_) {
 
-    Lattice lat;
-    decoder_->GetBestPath(false, &lat);
-    vector<kaldi::int32> alignment, words;
-    LatticeWeight weight;
-    GetLinearSymbolSequence(lat, &alignment, &words, &weight);
-
-    ostringstream text;
-    for (size_t i = 0; i < words.size(); i++) {
-        if (i) {
-            text << " ";
+        if (decoder_->NumFramesInLattice() == 0) {
+            res["partial"] = "";
+            return StoreReturn(res.dump());
         }
-        text << model_->word_syms_->Find(words[i]);
+
+        CompactLattice clat; 
+        CompactLattice aligned_lat;
+
+        clat = decoder_->GetLattice(decoder_->NumFramesInLattice(), false);
+        WordAlignLatticePartial(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
+
+        MinimumBayesRisk mbr(aligned_lat);
+        const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
+        const vector<int32> &words = mbr.GetOneBest();
+        const vector<pair<BaseFloat, BaseFloat> > &times = mbr.GetOneBestTimes();
+
+        int size = words.size();
+
+        stringstream text;
+
+        // Create JSON object
+        for (int i = 0; i < size; i++) {
+            json::JSON word;
+
+            word["word"] = model_->word_syms_->Find(words[i]);
+            word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
+            word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
+            word["conf"] = conf[i];
+            res["partial_result"].append(word);
+
+            if (i) {
+                text << " ";
+            }
+            text << model_->word_syms_->Find(words[i]);
+        }
+        res["partial"] = text.str();
+
+    } else {
+
+        if (decoder_->NumFramesDecoded() == 0) {
+            res["partial"] = "";
+            return StoreReturn(res.dump());
+        }
+        Lattice lat;
+        decoder_->GetBestPath(false, &lat);
+        vector<kaldi::int32> alignment, words;
+        LatticeWeight weight;
+        GetLinearSymbolSequence(lat, &alignment, &words, &weight);
+
+        ostringstream text;
+        for (size_t i = 0; i < words.size(); i++) {
+            if (i) {
+                text << " ";
+            }
+            text << model_->word_syms_->Find(words[i]);
+        }
+        res["partial"] = text.str();
     }
-    res["partial"] = text.str();
 
     return StoreReturn(res.dump());
 }
@@ -727,6 +843,14 @@ const char *Recognizer::StoreEmptyReturn()
 {
     if (!max_alternatives_) {
         return StoreReturn("{\"text\": \"\"}");
+    } else if (nlsml_) {
+        return StoreReturn("<?xml version=\"1.0\"?>\n"
+                           "<result grammar=\"default\">\n"
+                           "<interpretation confidence=\"1.0\">\n"
+                           "<instance/>\n"
+                           "<input><noinput/></input>\n"
+                           "</interpretation>\n"
+                           "</result>\n");
     } else {
         return StoreReturn("{\"alternatives\" : [{\"text\": \"\", \"confidence\" : 1.0}] }");
     }
