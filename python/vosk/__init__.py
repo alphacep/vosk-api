@@ -1,15 +1,16 @@
 import os
 import sys
-import requests
-import urllib.request
-import zipfile
-import re
 
+from requests import get
+from urllib.request import urlretrieve
+from zipfile import ZipFile
+from re import match
 from pathlib import Path
 from .vosk_cffi import ffi as _ffi
 
 MODEL_PRE_PATH = 'https://alphacephei.com/vosk/models/'
 MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
+MODELS_HOME_DIR = Path.home() / '.cache' / 'vosk'
 
 def open_dll():
     dlldir = os.path.abspath(os.path.dirname(__file__))
@@ -44,9 +45,9 @@ class Model(object):
     def vosk_model_find_word(self, word):
         return _c.vosk_model_find_word(self._handle, word.encode('utf-8'))
     
-    def get_model_by_name(self, model_name, models_path):
-        if not Path(models_path, model_name).is_dir():
-            response = requests.get(MODEL_LIST_URL)
+    def get_model_by_name(self, model_name):
+        if not Path(MODELS_HOME_DIR, model_name).is_dir():
+            response = get(MODEL_LIST_URL)
             result = [model['name'] for model in response.json() if model['name'] == model_name]
             if result == []:
                 raise Exception("model name %s does not exist" % (model_name))
@@ -56,11 +57,11 @@ class Model(object):
             result = model_name
         return result
 
-    def get_model_by_lang(self, lang, models_path):
-        model_file_list = os.listdir(models_path)
+    def get_model_by_lang(self, lang):
+        model_file_list = os.listdir(MODELS_HOME_DIR)
         model_file = [model for model in model_file_list if re.match(f"vosk-model(-small)?-{lang}", model)]
         if model_file == []:
-            response = requests.get(MODEL_LIST_URL)
+            response = get(MODEL_LIST_URL)
             result = [model['name'] for model in response.json() if model['lang'] == lang and model['type'] == 'small' and model['obsolete'] == 'false']
             if result == []:
                 raise Exception("lang %s does not exist" % (lang))
@@ -71,21 +72,18 @@ class Model(object):
         return result
 
     def get_model(self, model_name=None, lang=None):
-        models_path = Path.home() / '.cache' / 'vosk'
-        if not models_path.is_dir():
-            models_path.mkdir()
+        if not MODELS_HOME_DIR.is_dir():
+            MODELS_HOME_DIR.mkdir()
         if lang == None:
-            result = self.get_model_by_name(model_name, models_path)
+            result = self.get_model_by_name(model_name)
         else:
-            result = self.get_model_by_lang(lang, models_path)
-        model_location = Path(models_path, result)
-        if not model_location.exists():
-            model_zip = str(model_location) + '.zip'
-            urllib.request.urlretrieve(MODEL_PRE_PATH + str(model_location.name) + '.zip', model_zip)
-            with zipfile.ZipFile(model_zip, 'r') as model_ref:
-                model_ref.extractall(models_path)
-            Path.unlink(Path(model_zip))
-        return str(model_location)
+            result = self.get_model_by_lang(lang)
+        if not Path(MODELS_HOME_DIR, result).exists():
+            urlretrieve((MODEL_PRE_PATH + str(Path(MODELS_HOME_DIR, result).name) + '.zip'), str(Path(MODELS_HOME_DIR, result)) + '.zip')
+            with ZipFile((str(Path(MODELS_HOME_DIR, result))) + '.zip', 'r') as model_ref:
+                model_ref.extractall(MODELS_HOME_DIR)
+            Path.unlink(str(Path(MODELS_HOME_DIR, result)) + '.zip')
+        return str(Path(MODELS_HOME_DIR, result))
 
 class SpkModel(object):
 
