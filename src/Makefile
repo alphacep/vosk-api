@@ -4,6 +4,7 @@ OPENFST_ROOT?=$(KALDI_ROOT)/tools/openfst
 OPENBLAS_ROOT?=$(KALDI_ROOT)/tools/OpenBLAS/install
 MKL_ROOT?=/opt/intel/mkl
 CUDA_ROOT?=/usr/local/cuda
+USE_SHARED?=0
 # Math libraries
 HAVE_OPENBLAS_CLAPACK?=1
 HAVE_MKL?=0
@@ -34,6 +35,7 @@ VOSK_HEADERS= \
 CFLAGS=-g -O3 -std=c++17 -Wno-deprecated-declarations -fPIC -DFST_NO_DYNAMIC_LINKING \
 	-I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include $(EXTRA_CFLAGS) 
 
+ifeq ($(USE_SHARED), 0)
 LIBS= \
 	$(KALDI_ROOT)/src/online2/kaldi-online2.a \
 	$(KALDI_ROOT)/src/decoder/kaldi-decoder.a \
@@ -54,17 +56,41 @@ LIBS= \
 	$(KALDI_ROOT)/src/base/kaldi-base.a \
 	$(OPENFST_ROOT)/lib/libfst.a \
 	$(OPENFST_ROOT)/lib/libfstngram.a
-
+else
+	LDFLAGS+=-lkaldi-online2 \
+			-lkaldi-decoder \
+			-lkaldi-ivector \
+			-lkaldi-gmm \
+			-lkaldi-tree \
+			-lkaldi-feat \
+			-lkaldi-lat \
+			-lkaldi-lm \
+			-lkaldi-rnnlm \
+			-lkaldi-hmm \
+			-lkaldi-nnet3 \
+			-lkaldi-transform \
+			-lkaldi-cudamatrix \
+			-lkaldi-matrix \
+			-lkaldi-fstext \
+			-lkaldi-util \
+			-lkaldi-base \
+			-lfst \
+			-lfstngram
+endif
 LDFLAGS =
 
 
 ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
     CFLAGS += -I$(OPENBLAS_ROOT)/include
+    ifeq ($(USE_SHARED), 0)
     LIBS += \
         $(OPENBLAS_ROOT)/lib/libopenblas.a \
         $(OPENBLAS_ROOT)/lib/liblapack.a \
         $(OPENBLAS_ROOT)/lib/libblas.a \
         $(OPENBLAS_ROOT)/lib/libf2c.a
+    else
+    LDFLAGS += -lopenblas -llapack -lblas -lf2c
+    endif
 endif
 
 ifeq ($(HAVE_MKL), 1)
