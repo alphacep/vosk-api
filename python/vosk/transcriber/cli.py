@@ -4,7 +4,7 @@ import logging
 import argparse
 
 from datetime import datetime as dt
-from transcriber import Transcriber
+from vosk.transcriber.transcriber import Transcriber
 from multiprocessing.dummy import Pool
 from pathlib import Path
 
@@ -95,8 +95,11 @@ def get_end_time(start_time):
     mcseconds = script_time[8:].strip('0')
     return script_time.strip(':0'), seconds.rstrip('.'), mcseconds
 
-if __name__ == '__main__':
+def cli():  # entrypoint used in setup.py
     start_time = get_start_time()
     tot_samples = main(args)[1]
     diff_end_start, sec, mcsec = get_end_time(start_time)
     logging.info(f'''Execution time: {sec} sec, {mcsec} mcsec; xRT: {format(tot_samples / 16000.0 / float(diff_end_start), '.3f')}''')
+
+if __name__ == "__main__":
+    main()

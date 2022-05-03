@@ -15,8 +15,8 @@ from pathlib import Path
 
 
 WORDS_PER_LINE = 7
-MODEL_PRE_PATH = 'https://alphacephei.com/vosk/models/'
-MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
+MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
+MODEL_LIST_URL = MODEL_PRE_URL + 'model-list.json'
 
 class Transcriber:
 
@@ -32,7 +32,7 @@ class Transcriber:
                 result.append(json.loads(rec.Result())) 
         result.append(json.loads(rec.FinalResult()))
         return result, tot_samples
-    
+
     def transcribe(self, model, process, args):
         rec = KaldiRecognizer(model, 16000)
         rec.SetWords(True)
@@ -68,7 +68,7 @@ class Transcriber:
     def get_task_list(self, args):
         task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.outputtype)) for fn in os.listdir(args.input)]
         return task_list
-    
+
     def list_models(self):
         response = requests.get(MODEL_LIST_URL)
         [print(model['name']) for model in response.json()]
@@ -119,13 +119,13 @@ class Transcriber:
         if not Path.is_dir(models_path):
             Path.mkdir(models_path)
         if args.lang == None:
-            result = self.get_model_by_name(args, models_path)
+            model_name = self.get_model_by_name(args, models_path)
         else:
-            result = self.get_model_by_lang(args, models_path)
-        model_location = Path(models_path, result)
+            model_name = self.get_model_by_lang(args, models_path)
+        model_location = models_path / model_name
         if not model_location.exists():
-            model_zip = model_location + '.zip'
-            urllib.request.urlretrieve(MODEL_PRE_PATH + model_location[len(str(Path(model_location).parent))+1:] + '.zip', model_zip)
+            model_zip = str(model_location) + '.zip'
+            urllib.request.urlretrieve(MODEL_PRE_URL + model_name + '.zip', model_zip)
             with zipfile.ZipFile(model_zip, 'r') as model_ref:
                 model_ref.extractall(models_path)
             Path.unlink(Path(model_zip))
