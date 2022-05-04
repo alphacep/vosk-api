@@ -7,22 +7,17 @@ from datetime import datetime as dt
 from vosk.transcriber.transcriber import Transcriber
 from multiprocessing.dummy import Pool
 from pathlib import Path
+from vosk import Model
 
 
 parser = argparse.ArgumentParser(
         description = 'Transcribe audio file and save result in selected format')
-parser.add_argument(
-        '-model', type=str,
-        help='model path')
 parser.add_argument(
         '-list_models', default=False, action='store_true', 
         help='list available models')
 parser.add_argument(
         '-list_languages', default=False, action='store_true',
         help='list available languages')
-parser.add_argument(
-        '-model_name',  default='vosk-model-small-en-us-0.15', type=str,
-        help='select model by name')
 parser.add_argument(
         '-lang', type=str,
         help='select model by language')
@@ -64,7 +59,7 @@ def main(args):
     transcriber = Transcriber()
     transcriber.check_args(args)
     if args.input:
-        model = transcriber.get_model(args)
+        model = Model(lang="en-us")
         if Path(args.input).is_dir() and Path(args.output).is_dir():
             task_list = transcriber.get_task_list(args)
             with Pool() as pool:
@@ -102,4 +97,4 @@ def cli():  # entrypoint used in setup.py
     logging.info(f'''Execution time: {sec} sec, {mcsec} mcsec; xRT: {format(tot_samples / 16000.0 / float(diff_end_start), '.3f')}''')
 
 if __name__ == "__main__":
-    main()
+    main(args)

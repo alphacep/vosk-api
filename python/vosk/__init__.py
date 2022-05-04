@@ -10,7 +10,9 @@ from .vosk_cffi import ffi as _ffi
 
 MODEL_PRE_PATH = 'https://alphacephei.com/vosk/models/'
 MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
-MODELS_HOME_DIR = Path.home() / '.cache' / 'vosk'
+MODELS_HOME_DIR_1 = os.getenv('VOSK_MODEL_PATH')
+MODELS_HOME_DIR_2 = Path('/') / 'usr' / 'share' / 'vosk'
+MODELS_HOME_DIR_3 = Path.home() / '.cache' / 'vosk'
 
 def open_dll():
     dlldir = os.path.abspath(os.path.dirname(__file__))
@@ -46,44 +48,52 @@ class Model(object):
         return _c.vosk_model_find_word(self._handle, word.encode('utf-8'))
     
     def get_model_by_name(self, model_name):
-        if not Path(MODELS_HOME_DIR, model_name).is_dir():
+        if not Path(models_home_dir, model_name).is_dir():
             response = get(MODEL_LIST_URL)
             result = [model['name'] for model in response.json() if model['name'] == model_name]
             if result == []:
                 raise Exception("model name %s does not exist" % (model_name))
             else:
-                result = result[0]
+                return result[0]
         else:
-            result = model_name
-        return result
+            return model_name
 
     def get_model_by_lang(self, lang):
-        model_file_list = os.listdir(MODELS_HOME_DIR)
-        model_file = [model for model in model_file_list if re.match(f"vosk-model(-small)?-{lang}", model)]
+        model_file_list = os.listdir(models_home_dir)
+        model_file = [model for model in model_file_list if match(f"vosk-model(-small)?-{lang}", model)]
         if model_file == []:
             response = get(MODEL_LIST_URL)
             result = [model['name'] for model in response.json() if model['lang'] == lang and model['type'] == 'small' and model['obsolete'] == 'false']
             if result == []:
                 raise Exception("lang %s does not exist" % (lang))
             else:
-                result = result[0]
+                return result[0]
         else:
-            result = model_file[0]
-        return result
+            return model_file[0]
 
     def get_model(self, model_name=None, lang=None):
-        if not MODELS_HOME_DIR.is_dir():
-            MODELS_HOME_DIR.mkdir()
+        global models_home_dir
+        models_home_dir = self.get_model_dir()
+        if not models_home_dir.is_dir():
+            models_home_dir.mkdir()
         if lang == None:
             result = self.get_model_by_name(model_name)
         else:
             result = self.get_model_by_lang(lang)
-        if not Path(MODELS_HOME_DIR, result).exists():
-            urlretrieve((MODEL_PRE_PATH + str(Path(MODELS_HOME_DIR, result).name) + '.zip'), str(Path(MODELS_HOME_DIR, result)) + '.zip')
-            with ZipFile((str(Path(MODELS_HOME_DIR, result))) + '.zip', 'r') as model_ref:
-                model_ref.extractall(MODELS_HOME_DIR)
-            Path.unlink(str(Path(MODELS_HOME_DIR, result)) + '.zip')
-        return str(Path(MODELS_HOME_DIR, result))
+        if not Path(models_home_dir, result).exists():
+            urlretrieve(MODEL_PRE_PATH + result + '.zip', str(Path(models_home_dir, result)) + '.zip')
+            with ZipFile(str(Path(models_home_dir, result)) + '.zip', 'r') as model_ref:
+                model_ref.extractall(models_home_dir)
+            Path.unlink(Path(str(Path(models_home_dir, result)) + '.zip'))
+        return str(Path(models_home_dir, result))
+
+    def get_model_dir(self):
+        if MODELS_HOME_DIR_1 != None and Path(MODELS_HOME_DIR_1).is_dir():
+            return Path(MODELS_HOME_DIR_1)
+        elif MODELS_HOME_DIR_2.is_dir():
+            return MODELS_HOME_DIR_2
+        else:
+            return MODELS_HOME_DIR_3
 
 class SpkModel(object):
 
@@ -112,7 +122,6 @@ class KaldiRecognizer(object):
             raise Exception("Failed to create a recognizer")
 
     def __del__(self):
-
         _c.vosk_recognizer_free(self._handle)
 
     def SetMaxAlternatives(self, max_alternatives):
