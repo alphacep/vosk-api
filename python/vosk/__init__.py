@@ -8,7 +8,6 @@ from re import match
 from pathlib import Path
 from .vosk_cffi import ffi as _ffi
 
-os.environ.setdefault('VOSK_MODEL_PATH', '/home/vadim/projects/test')
 
 MODEL_PRE_PATH = 'https://alphacephei.com/vosk/models/'
 MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
