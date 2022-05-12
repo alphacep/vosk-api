@@ -12,7 +12,7 @@ os.environ.setdefault('VOSK_MODEL_PATH', '/home/vadim/projects/test')
 
 MODEL_PRE_PATH = 'https://alphacephei.com/vosk/models/'
 MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
-LIST_MODEL_HOME_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/') / 'usr' / 'share' / 'vosk', Path.home() / '.cache' / 'vosk']
+MODEL_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/') / 'usr' / 'share' / 'vosk', Path.home() / '.cache' / 'vosk']
 
 def open_dll():
     dlldir = os.path.abspath(os.path.dirname(__file__))
@@ -33,12 +33,10 @@ _c = open_dll()
 
 class Model(object):
     def __init__(self, model_path=None, model_name=None, lang=None):
-        if model_path != None and model_name == None and lang == None:
+        if model_path != None:
             self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
         else:
-            self.model_name = model_name
-            self.lang = lang
-            model_path = self.get_model_path()
+            model_path = self.get_model_path(model_name, lang)
             self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create a model")
@@ -49,59 +47,50 @@ class Model(object):
     def vosk_model_find_word(self, word):
         return _c.vosk_model_find_word(self._handle, word.encode('utf-8'))
 
-    def get_model_path(self):
-        self.select_dir()
-        if self.lang == None:
-            model_path = self.get_model_path_by_name()
-        else:
-            model_path = self.get_model_path_by_lang()
-        if not Path(self.directory, model_path.name).exists():
-            urlretrieve(MODEL_PRE_PATH + str(model_path.name) + '.zip', str(model_path) + '.zip')
-            with ZipFile(str(model_path) + '.zip', 'r') as model_ref:
-                model_ref.extractall(self.directory)
-            Path(str(model_path) + '.zip').unlink()
-        else:
-            pass
-        return str(model_path)
-    
-    def select_dir(self):
-        for directory in LIST_MODEL_HOME_DIRS:
-            if directory == None:
+    def get_model_path(self, model_name, lang):
+        for directory in MODEL_DIRS:
+            if directory == None or not Path(directory).exists() and not directory == MODEL_DIRS[2]:
                 pass
             else:
-                if directory != LIST_MODEL_HOME_DIRS[2] and not Path(directory).exists():
-                    pass
+                if MODEL_DIRS[2] == directory and not MODEL_DIRS[2].exists():
+                    MODEL_DIRS[2].mkdir()
+                model_file_list = os.listdir(directory)
+                if model_name == None:
+                    model_path = Path(directory, self.get_model_by_lang(model_file_list, directory, lang))
                 else:
-                    self.directory = directory
-                    if LIST_MODEL_HOME_DIRS[2] == self.directory and not LIST_MODEL_HOME_DIRS[2].exists():
-                        LIST_MODEL_HOME_DIRS[2].mkdir()
-                    self.model_file_list = os.listdir(self.directory)
-                    break
+                    model_path = Path(directory, self.get_model_by_name(model_file_list, directory, model_name))
+                if not model_path.exists():
+                    urlretrieve(MODEL_PRE_PATH + str(model_path.name) + '.zip', str(model_path) + '.zip')
+                    with ZipFile(str(model_path) + '.zip', 'r') as model_ref:
+                        model_ref.extractall(model_path.parent)
+                    Path(str(model_path) + '.zip').unlink()
+                else:
+                    pass
+                return str(model_path)
 
-    def get_model_path_by_name(self):
-        model_file = [model for model in self.model_file_list if model == self.model_name]
+    def get_model_by_name(self, model_file_list, directory, model_name):
+        model_file = [model for model in model_file_list if model == model_name]
         if model_file == []:
             response = get(MODEL_LIST_URL)
-            result_model = [model['name'] for model in response.json() if model['name'] == self.model_name]
+            result_model = [model['name'] for model in response.json() if model['name'] == model_name]
             if result_model == []:
-                raise Exception("model name %s does not exist" % (self.model_name))
+                raise Exception("model name %s does not exist" % (model_name))
             else:
-                return Path(self.directory, result_model[0])
+                return result_model[0]
         else:
-            return Path(self.directory, model_file[0])
+            return model_file[0]
 
-    def get_model_path_by_lang(self):
-        model_file = [model for model in self.model_file_list if match(f"vosk-model(-small)?-{self.lang}", model)]
+    def get_model_by_lang(self, model_file_list, directory, lang):
+        model_file = [model for model in model_file_list if match(f"vosk-model(-small)?-{lang}", model)]
         if model_file == []:
             response = get(MODEL_LIST_URL)
-            result_model = [model['name'] for model in response.json() if model['lang'] == self.lang and model['type'] == 'small' and model['obsolete'] == 'false']
+            result_model = [model['name'] for model in response.json() if model['lang'] == lang and model['type'] == 'small' and model['obsolete'] == 'false']
             if result_model == []:
-                raise Exception("lang %s does not exist" % (self.lang))
+                raise Exception("lang %s does not exist" % (lang))
             else:
-                return Path(self.directory, result_model[0])
+                return result_model[0]
         else:
-            return Path(self.directory, model_file[0])
-
+            return model_file[0]
 
 class SpkModel(object):
 

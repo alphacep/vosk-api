@@ -22,7 +22,7 @@ parser.add_argument(
         '-list_languages', default=False, action='store_true',
         help='list available languages')
 parser.add_argument(
-        '-model_name', default='vosk-model-small-en-us-0.15', type=str,
+        '-model_name', type=str,
         help='select model by name')
 parser.add_argument(
         '-lang', default='en-us', type=str,
@@ -65,7 +65,7 @@ def main(args):
     transcriber = Transcriber()
     transcriber.check_args(args)
     if args.input:
-        model = Model(lang=args.lang)
+        model = Model(model_path=args.model_path, model_name=args.model_name, lang=args.lang)
         if Path(args.input).is_dir() and Path(args.output).is_dir():
             task_list = transcriber.get_task_list(args)
             with Pool() as pool:
