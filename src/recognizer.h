@@ -74,7 +74,7 @@ class Recognizer {
         const char *NlsmlResult(CompactLattice &clat);
 
         Model *model_ = nullptr;
-        SingleUtteranceNnet3Decoder *decoder_ = nullptr;
+        SingleUtteranceNnet3IncrementalDecoder *decoder_ = nullptr;
         fst::LookaheadFst<fst::StdArc, int32> *decode_fst_ = nullptr;
         fst::StdVectorFst *g_fst_ = nullptr; // dynamically constructed grammar
         OnlineNnet2FeaturePipeline *feature_pipeline_ = nullptr;

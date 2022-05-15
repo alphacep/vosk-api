@@ -36,7 +36,7 @@ Recognizer::Recognizer(Model *model, float sample_frequency) : model_(model), sp
         }
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+    decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -97,7 +97,7 @@ Recognizer::Recognizer(Model *model, float sample_frequency, char const *grammar
         KALDI_WARN << "Runtime graphs are not supported by this model";
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+    decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -123,7 +123,7 @@ Recognizer::Recognizer(Model *model, float sample_frequency, SpkModel *spk_model
         }
     }
 
-    decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+    decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -208,7 +208,7 @@ void Recognizer::CleanUp()
         delete feature_pipeline_;
 
         feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_->feature_info_);
-        decoder_ = new kaldi::SingleUtteranceNnet3Decoder(model_->nnet3_decoding_config_,
+        decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
             *model_->trans_model_,
             *model_->decodable_info_,
             model_->hclg_fst_ ? *model_->hclg_fst_ : *decode_fst_,
@@ -666,7 +666,7 @@ const char* Recognizer::GetResult()
     // Original from decoder, subtracted graph weight, rescored with carpa, rescored with rnnlm
     CompactLattice clat, slat, tlat, rlat;
 
-    decoder_->GetLattice(true, &clat);
+    clat = decoder_->GetLattice(decoder_->NumFramesDecoded(), true);
 
     if (lm_to_subtract_ && carpa_to_add_) {
         Lattice lat, composed_lat;
@@ -728,25 +728,66 @@ const char* Recognizer::PartialResult()
 
     json::JSON res;
 
-    if (decoder_->NumFramesDecoded() == 0) {
-        res["partial"] = "";
-        return StoreReturn(res.dump());
-    }
+    if (partial_words_) {
 
-    Lattice lat;
-    decoder_->GetBestPath(false, &lat);
-    vector<kaldi::int32> alignment, words;
-    LatticeWeight weight;
-    GetLinearSymbolSequence(lat, &alignment, &words, &weight);
-
-    ostringstream text;
-    for (size_t i = 0; i < words.size(); i++) {
-        if (i) {
-            text << " ";
+        if (decoder_->NumFramesInLattice() == 0) {
+            res["partial"] = "";
+            return StoreReturn(res.dump());
         }
-        text << model_->word_syms_->Find(words[i]);
+
+        CompactLattice clat;
+        CompactLattice aligned_lat;
+
+        clat = decoder_->GetLattice(decoder_->NumFramesInLattice(), false);
+        WordAlignLatticePartial(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
+
+        MinimumBayesRisk mbr(aligned_lat);
+        const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
+        const vector<int32> &words = mbr.GetOneBest();
+        const vector<pair<BaseFloat, BaseFloat> > &times = mbr.GetOneBestTimes();
+
+        int size = words.size();
+
+        stringstream text;
+
+        // Create JSON object
+        for (int i = 0; i < size; i++) {
+            json::JSON word;
+
+            word["word"] = model_->word_syms_->Find(words[i]);
+            word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
+            word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
+            word["conf"] = conf[i];
+            res["partial_result"].append(word);
+
+            if (i) {
+                text << " ";
+            }
+            text << model_->word_syms_->Find(words[i]);
+        }
+        res["partial"] = text.str();
+
+    } else {
+
+        if (decoder_->NumFramesDecoded() == 0) {
+            res["partial"] = "";
+            return StoreReturn(res.dump());
+        }
+        Lattice lat;
+        decoder_->GetBestPath(false, &lat);
+        vector<kaldi::int32> alignment, words;
+        LatticeWeight weight;
+        GetLinearSymbolSequence(lat, &alignment, &words, &weight);
+
+        ostringstream text;
+        for (size_t i = 0; i < words.size(); i++) {
+            if (i) {
+                text << " ";
+            }
+            text << model_->word_syms_->Find(words[i]);
+        }
+        res["partial"] = text.str();
     }
-    res["partial"] = text.str();
 
     return StoreReturn(res.dump());
 }
