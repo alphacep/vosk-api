@@ -13,6 +13,8 @@ def open_dll():
         return _ffi.dlopen(os.path.join(dlldir, "libvosk.dll"))
     elif sys.platform == 'linux':
         return _ffi.dlopen(os.path.join(dlldir, "libvosk.so"))
+    elif sys.platform[0:7] == 'freebsd':
+        return _ffi.dlopen(os.path.join(dlldir, "libvosk.so"))
     elif sys.platform == 'darwin':
         return _ffi.dlopen(os.path.join(dlldir, "libvosk.dyld"))
     else:
