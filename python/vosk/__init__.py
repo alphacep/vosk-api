@@ -93,10 +93,7 @@ class Model(object):
             else:
                 return result_model[0]
         else:
-            return model_file[0]
-    
-    def show_progress_bar():
-        
+            return model_file[0] 
     
 class SpkModel(object):
 
