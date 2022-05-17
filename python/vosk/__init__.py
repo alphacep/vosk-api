@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 from requests import get
 from urllib.request import urlretrieve
@@ -7,10 +8,11 @@ from zipfile import ZipFile
 from re import match
 from pathlib import Path
 from .vosk_cffi import ffi as _ffi
+from alive_progress import alive_bar
 
-
-MODEL_PRE_PATH = 'https://alphacephei.com/vosk/models/'
-MODEL_LIST_URL = MODEL_PRE_PATH + 'model-list.json'
+os.environ.setdefault('VOSK_MODEL_PATH','/home/vadim/projects/test')
+MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
+MODEL_LIST_URL = MODEL_PRE_URL + 'model-list.json'
 MODEL_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/') / 'usr' / 'share' / 'vosk', Path.home() / '.cache' / 'vosk']
 
 def open_dll():
@@ -51,15 +53,17 @@ class Model(object):
             if directory == None or not Path(directory).exists() and not directory == MODEL_DIRS[2]:
                 pass
             else:
-                if MODEL_DIRS[2] == directory and not MODEL_DIRS[2].exists():
+                if directory == MODEL_DIRS[2] and not MODEL_DIRS[2].exists():
                     MODEL_DIRS[2].mkdir()
                 model_file_list = os.listdir(directory)
                 if model_name == None:
                     model_path = Path(directory, self.get_model_by_lang(model_file_list, directory, lang))
                 else:
                     model_path = Path(directory, self.get_model_by_name(model_file_list, directory, model_name))
-                if not model_path.exists():
-                    urlretrieve(MODEL_PRE_PATH + str(model_path.name) + '.zip', str(model_path) + '.zip')
+                if not model_path.exists() and not directory == MODEL_DIRS[2]:
+                    continue
+                if not model_path.exists() and MODEL_DIRS[2] == directory:
+                    urlretrieve(MODEL_PRE_URL + str(model_path.name) + '.zip', str(model_path) + '.zip')
                     with ZipFile(str(model_path) + '.zip', 'r') as model_ref:
                         model_ref.extractall(model_path.parent)
                     Path(str(model_path) + '.zip').unlink()
@@ -90,7 +94,10 @@ class Model(object):
                 return result_model[0]
         else:
             return model_file[0]
-
+    
+    def show_progress_bar():
+        
+    
 class SpkModel(object):
 
     def __init__(self, model_path):

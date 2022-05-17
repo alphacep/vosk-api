@@ -13,7 +13,7 @@ from vosk import Model
 parser = argparse.ArgumentParser(
         description = 'Transcribe audio file and save result in selected format')
 parser.add_argument(
-        '-model_path', type=str,
+        '-model', type=str,
         help='model path')
 parser.add_argument(
         '-list_models', default=False, action='store_true', 
@@ -65,7 +65,7 @@ def main(args):
     transcriber = Transcriber()
     transcriber.check_args(args)
     if args.input:
-        model = Model(model_path=args.model_path, model_name=args.model_name, lang=args.lang)
+        model = Model(model_path=args.model, model_name=args.model_name, lang=args.lang)
         if Path(args.input).is_dir() and Path(args.output).is_dir():
             task_list = transcriber.get_task_list(args)
             with Pool() as pool:
