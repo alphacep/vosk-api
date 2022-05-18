@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 
 from requests import get
 from urllib.request import urlretrieve
@@ -8,7 +7,6 @@ from zipfile import ZipFile
 from re import match
 from pathlib import Path
 from .vosk_cffi import ffi as _ffi
-from alive_progress import alive_bar
 
 
 MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
