@@ -10,7 +10,7 @@ from pathlib import Path
 from .vosk_cffi import ffi as _ffi
 from alive_progress import alive_bar
 
-os.environ.setdefault('VOSK_MODEL_PATH','/home/vadim/projects/test')
+
 MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
 MODEL_LIST_URL = MODEL_PRE_URL + 'model-list.json'
 MODEL_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/usr/share/vosk'), Path.home() / '.cache/vosk']
