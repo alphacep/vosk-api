@@ -38,7 +38,6 @@ class Model(object):
             self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
         else:
             model_path = self.get_model_path(model_name, lang)
-            print(model_path)
             self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create a model")
