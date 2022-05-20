@@ -7,11 +7,12 @@ from zipfile import ZipFile
 from re import match
 from pathlib import Path
 from .vosk_cffi import ffi as _ffi
+from tqdm import tqdm
 
 
 MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
 MODEL_LIST_URL = MODEL_PRE_URL + 'model-list.json'
-MODEL_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/usr/share/vosk'), Path.home() / '.cache/vosk']
+MODEL_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/usr/share/vosk'), Path.home() / 'AppData/Local/vosk', Path.home() / '.cache/vosk']
 
 def open_dll():
     dlldir = os.path.abspath(os.path.dirname(__file__))
@@ -47,7 +48,7 @@ class Model(object):
         return _c.vosk_model_find_word(self._handle, word.encode('utf-8'))
 
     def get_model_path(self, model_name, lang):
-        if model_name == None:
+        if model_name is None:
             model_path = self.get_model_by_lang(lang)
         else:
             model_path = self.get_model_by_name(model_name)
@@ -55,7 +56,7 @@ class Model(object):
 
     def get_model_by_name(self, model_name):
         for directory in MODEL_DIRS:
-            if directory == None or not Path(directory).exists():
+            if directory is None or not Path(directory).exists():
                 continue
             model_file_list = os.listdir(directory)
             model_file = [model for model in model_file_list if model == model_name]
@@ -71,7 +72,7 @@ class Model(object):
 
     def get_model_by_lang(self, lang):
         for directory in MODEL_DIRS:
-            if directory == None or not Path(directory).exists():
+            if directory is None or not Path(directory).exists():
                 continue
             model_file_list = os.listdir(directory)
             model_file = [model for model in model_file_list if match(f"vosk-model(-small)?-{lang}", model)]
@@ -86,13 +87,24 @@ class Model(object):
             return Path(directory, result_model[0])
 
     def download_model(self, model_name):
-        if not MODEL_DIRS[2].exists():
-            MODEL_DIRS[2].mkdir()
-        urlretrieve(MODEL_PRE_URL + str(model_name.name) + '.zip', str(model_name) + '.zip')
-        with ZipFile(str(model_name) + '.zip', 'r') as model_ref:
-            model_ref.extractall(model_name.parent)
-        Path(str(model_name) + '.zip').unlink()
-    
+        if not MODEL_DIRS[3].exists():
+            MODEL_DIRS[3].mkdir()
+        with TqdmUpTo(unit='B', unit_scale=True, unit_divisor=1024, miniters=1,
+                desc=(MODEL_PRE_URL + str(model_name.name) + '.zip').split('/')[-1]) as t:
+
+                urlretrieve(MODEL_PRE_URL + str(model_name.name) + '.zip', str(model_name) + '.zip', reporthook=t.update_to, data=None)
+                t.total = t.n
+                with ZipFile(str(model_name) + '.zip', 'r') as model_ref:
+                    model_ref.extractall(model_name.parent)
+                Path(str(model_name) + '.zip').unlink()
+
+class TqdmUpTo(tqdm):
+
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        return self.update(b * bsize - self.n)       
+
 class SpkModel(object):
 
     def __init__(self, model_path):
