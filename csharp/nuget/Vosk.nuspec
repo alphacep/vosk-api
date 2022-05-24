@@ -8,7 +8,8 @@
     <license type="expression">Apache-2.0</license>
     <projectUrl>https://alphacephei.com/vosk/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Vosk is an offline open source speech recognition toolkit. It enables speech recognition models for 16 languages and dialects - English, Indian English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish, Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi.
+    <title>Vosk Speech Recognition Toolkit</title>
+    <description>Vosk is an offline open source speech recognition toolkit. It enables speech recognition models for 20+ languages and dialects - English, Indian English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish, Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino, Ukrainian, Kazakh, Swedish, Japanese, Esperanto, Hindi, Czech. More to come.
 
 Vosk models are small (50 Mb) but provide continuous large vocabulary transcription, zero-latency response with streaming API, reconfigurable vocabulary and speaker identification.
 
@@ -18,7 +19,8 @@ Vosk supplies speech recognition for chatbots, smart home appliances, virtual as
 
 Vosk scales from small devices like Raspberry Pi or Android smartphone to big clusters.</description>
     <releaseNotes>See for details https://github.com/alphacep/vosk-api/releases</releaseNotes>
-    <copyright>Copyright 2020 Alpha Cephei Inc</copyright>
+    <repository type="git" url="https://github.com/alphacep/vosk-api.git" branch="master"/>
+    <copyright>Copyright 2020-2050 Alpha Cephei Inc</copyright>
     <tags>speech recognition voice stt asr speech-to-text ai offline privacy</tags>
     <dependencies>
       <group targetFramework=".NETStandard2.0"/>
