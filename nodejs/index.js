@@ -76,7 +76,7 @@ if (os.platform() == 'win32') {
 
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
 } else if (os.platform() == 'darwin') {
-    soname = path.join(__dirname, "lib", "osx-x86_64", "libvosk.dylib")
+    soname = path.join(__dirname, "lib", "osx-universal", "libvosk.dylib")
 } else {
     soname = path.join(__dirname, "lib", "linux-x86_64", "libvosk.so")
 }
