@@ -30,7 +30,7 @@ while True:
     for i, fd in enumerate(fds):
         if i in ended:
             continue
-        data = fd.read(8000);
+        data = fd.read(8000)
         if len(data) == 0:
             recs[i].FinishStream()
             ended.add(i)
