@@ -25,7 +25,7 @@ else:
         def get_tag(self):
             abi = 'none'
             if system == 'Darwin':
-                oses = 'macosx_10_6_x86_64'
+                oses = 'macosx_10_6_universal'
             elif system == 'Windows' and architecture == '32bit':
                 oses = 'win32'
             elif system == 'Windows' and architecture == '64bit':
