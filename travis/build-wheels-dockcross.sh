@@ -16,6 +16,9 @@ case $CROSS_TRIPLE in
     *aarch64-*)
         export VOSK_ARCHITECTURE=aarch64
         ;;
+    *i686-*)
+        export VOSK_ARCHITECTURE=x86
+        ;;
 esac
 
 # Copy library to output folder
