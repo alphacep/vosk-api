@@ -4,7 +4,7 @@ from vosk import Model, KaldiRecognizer
 import sys
 import json
 
-model = Model("model")
+model = Model(lang="en-us")
 rec = KaldiRecognizer(model, 8000)
 
 res = json.loads(rec.FinalResult())

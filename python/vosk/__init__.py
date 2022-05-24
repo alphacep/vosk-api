@@ -1,7 +1,18 @@
 import os
 import sys
 
+from requests import get
+from urllib.request import urlretrieve
+from zipfile import ZipFile
+from re import match
+from pathlib import Path
 from .vosk_cffi import ffi as _ffi
+from tqdm import tqdm
+
+
+MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
+MODEL_LIST_URL = MODEL_PRE_URL + 'model-list.json'
+MODEL_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/usr/share/vosk'), Path.home() / 'AppData/Local/vosk', Path.home() / '.cache/vosk']
 
 def open_dll():
     dlldir = os.path.abspath(os.path.dirname(__file__))
@@ -21,10 +32,12 @@ def open_dll():
 _c = open_dll()
 
 class Model(object):
-
-    def __init__(self, model_path):
-        self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
-
+    def __init__(self, model_path=None, model_name=None, lang=None):
+        if model_path != None:
+            self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
+        else:
+            model_path = self.get_model_path(model_name, lang)
+            self._handle = _c.vosk_model_new(model_path.encode('utf-8'))
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create a model")
 
@@ -33,6 +46,68 @@ class Model(object):
 
     def vosk_model_find_word(self, word):
         return _c.vosk_model_find_word(self._handle, word.encode('utf-8'))
+
+    def get_model_path(self, model_name, lang):
+        if model_name is None:
+            model_path = self.get_model_by_lang(lang)
+        else:
+            model_path = self.get_model_by_name(model_name)
+        return str(model_path)
+
+    def get_model_by_name(self, model_name):
+        for directory in MODEL_DIRS:
+            if directory is None or not Path(directory).exists():
+                continue
+            model_file_list = os.listdir(directory)
+            model_file = [model for model in model_file_list if model == model_name]
+            if model_file != []:
+                return Path(directory, model_file[0])
+        response = get(MODEL_LIST_URL)
+        result_model = [model['name'] for model in response.json() if model['name'] == model_name]
+        if result_model == []:
+            raise Exception("model name %s does not exist" % (model_name))
+        else:
+            self.download_model(Path(directory, result_model[0]))
+            return Path(directory, result_model[0])
+
+    def get_model_by_lang(self, lang):
+        for directory in MODEL_DIRS:
+            if directory is None or not Path(directory).exists():
+                continue
+            model_file_list = os.listdir(directory)
+            model_file = [model for model in model_file_list if match(f"vosk-model(-small)?-{lang}", model)]
+            if model_file != []:
+                return Path(directory, model_file[0])
+        response = get(MODEL_LIST_URL)
+        result_model = [model['name'] for model in response.json() if model['lang'] == lang and model['type'] == 'small' and model['obsolete'] == 'false']
+        if result_model == []:
+            raise Exception("lang %s does not exist" % (lang))
+        else:
+            self.download_model(Path(directory, result_model[0]))
+            return Path(directory, result_model[0])
+
+    def download_model(self, model_name):
+        if not MODEL_DIRS[3].exists():
+            MODEL_DIRS[3].mkdir()
+        with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1,
+                desc=(MODEL_PRE_URL + str(model_name.name) + '.zip').split('/')[-1]) as t:
+            reporthook = self.my_hook(t)
+            urlretrieve(MODEL_PRE_URL + str(model_name.name) + '.zip', str(model_name) + '.zip', 
+                reporthook=reporthook, data=None)
+            t.total = t.n
+            with ZipFile(str(model_name) + '.zip', 'r') as model_ref:
+                model_ref.extractall(model_name.parent)
+            Path(str(model_name) + '.zip').unlink()
+
+    def my_hook(self, t):
+        last_b = [0]
+        def update_to(b=1, bsize=1, tsize=None):
+            if tsize not in (None, -1):
+                t.total = tsize
+            displayed = t.update((b - last_b[0]) * bsize)
+            last_b[0] = b
+            return displayed
+        return update_to
 
 class SpkModel(object):
 

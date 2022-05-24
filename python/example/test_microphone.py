@@ -38,9 +38,6 @@ parser.add_argument(
     '-f', '--filename', type=str, metavar='FILENAME',
     help='audio file to store recording to')
 parser.add_argument(
-    '-m', '--model', type=str, metavar='MODEL_PATH',
-    help='Path to the model')
-parser.add_argument(
     '-d', '--device', type=int_or_str,
     help='input device (numeric ID or substring)')
 parser.add_argument(
@@ -48,18 +45,12 @@ parser.add_argument(
 args = parser.parse_args(remaining)
 
 try:
-    if args.model is None:
-        args.model = "model"
-    if not os.path.exists(args.model):
-        print ("Please download a model for your language from https://alphacephei.com/vosk/models")
-        print ("and unpack as 'model' in the current folder.")
-        parser.exit(0)
     if args.samplerate is None:
         device_info = sd.query_devices(args.device, 'input')
         # soundfile expects an int, sounddevice provides a float:
         args.samplerate = int(device_info['default_samplerate'])
 
-    model = vosk.Model(args.model)
+    model = vosk.Model(lang="en-us")
 
     if args.filename:
         dump_fn = open(args.filename, "wb")
