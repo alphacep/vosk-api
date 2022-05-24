@@ -1,7 +1,7 @@
 import os
 import sys
 
-from requests import get
+import requests
 from urllib.request import urlretrieve
 from zipfile import ZipFile
 from re import match
@@ -9,7 +9,7 @@ from pathlib import Path
 from .vosk_cffi import ffi as _ffi
 from tqdm import tqdm
 
-
+# Remote location of the models and local folders
 MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
 MODEL_LIST_URL = MODEL_PRE_URL + 'model-list.json'
 MODEL_DIRS = [os.getenv('VOSK_MODEL_PATH'), Path('/usr/share/vosk'), Path.home() / 'AppData/Local/vosk', Path.home() / '.cache/vosk']
@@ -30,6 +30,17 @@ def open_dll():
         raise TypeError("Unsupported platform")
 
 _c = open_dll()
+
+def list_models():
+    response = requests.get(MODEL_LIST_URL)
+    for model in response.json():
+        print(model['name']) 
+
+def list_languages():
+    response = requests.get(MODEL_LIST_URL)
+    languages = set([m['lang'] for m in response.json()])
+    for lang in languages:
+        print (lang)
 
 class Model(object):
     def __init__(self, model_path=None, model_name=None, lang=None):
@@ -62,7 +73,7 @@ class Model(object):
             model_file = [model for model in model_file_list if model == model_name]
             if model_file != []:
                 return Path(directory, model_file[0])
-        response = get(MODEL_LIST_URL)
+        response = requests.get(MODEL_LIST_URL)
         result_model = [model['name'] for model in response.json() if model['name'] == model_name]
         if result_model == []:
             raise Exception("model name %s does not exist" % (model_name))
@@ -78,7 +89,7 @@ class Model(object):
             model_file = [model for model in model_file_list if match(f"vosk-model(-small)?-{lang}", model)]
             if model_file != []:
                 return Path(directory, model_file[0])
-        response = get(MODEL_LIST_URL)
+        response = requests.get(MODEL_LIST_URL)
         result_model = [model['name'] for model in response.json() if model['lang'] == lang and model['type'] == 'small' and model['obsolete'] == 'false']
         if result_model == []:
             raise Exception("lang %s does not exist" % (lang))
@@ -91,7 +102,7 @@ class Model(object):
             MODEL_DIRS[3].mkdir()
         with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1,
                 desc=(MODEL_PRE_URL + str(model_name.name) + '.zip').split('/')[-1]) as t:
-            reporthook = self.my_hook(t)
+            reporthook = self.download_progress_hook(t)
             urlretrieve(MODEL_PRE_URL + str(model_name.name) + '.zip', str(model_name) + '.zip', 
                 reporthook=reporthook, data=None)
             t.total = t.n
@@ -99,7 +110,7 @@ class Model(object):
                 model_ref.extractall(model_name.parent)
             Path(str(model_name) + '.zip').unlink()
 
-    def my_hook(self, t):
+    def download_progress_hook(self, t):
         last_b = [0]
         def update_to(b=1, bsize=1, tsize=None):
             if tsize not in (None, -1):

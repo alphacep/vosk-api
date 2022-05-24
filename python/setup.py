@@ -54,7 +54,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
     entry_points = {
-        'console_scripts': ['vosk-transcriber=vosk.transcriber.cli:cli'],
+        'console_scripts': ['vosk-transcriber=vosk.transcriber.cli:main'],
     },
     include_package_data=True,
     classifiers=[
