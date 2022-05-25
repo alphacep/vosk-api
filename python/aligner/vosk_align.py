@@ -25,30 +25,31 @@ parser.add_argument(
         'model', type=str,
         help='set path to model dir')
 
-def main(audiofile, txtfile, model, output):
-    model = Model(model)
+args=parser.parse_args()
+log_level = args.log.upper()
+logging.getLogger().setLevel(log_level)
+
+def main(args):
+    model = Model(args.model)
 
     def on_progress(p):
         for k,v in p.items():
             logging.debug("%s: %s" % (k, v))
 
-    with open(txtfile, encoding="utf-8") as fh:
+    with open(args.txtfile, encoding="utf-8") as fh:
         transcript = fh.read()
 
-    with wave.open(audiofile) as wavfile:
+    with wave.open(args.audiofile) as wavfile:
         logging.info("starting alignment")
         align = aligner.ForcedAligner(transcript, model)
         result = align.transcribe(wavfile, progress_cb=on_progress, logging=logging)
     final_result = ((result.to_json(indent=2)).replace(',\n      "realign": false,', ','))
-    fh = open(output, 'w', encoding="utf-8") if output else sys.stdout
+    fh = open(args.output, 'w', encoding="utf-8") if args.output else sys.stdout
     fh.write(final_result)
-    if output:
-        logging.info("output written to %s" % (output))
+    if args.output:
+        logging.info("output written to %s" % (args.output))
     print()
     return final_result
 
 if __name__ == "__main__":
-    args = parser.parse_args()
-    log_level = args.log.upper()
-    logging.getLogger().setLevel(log_level)
-    main(args.audiofile, args.txtfile, args.model, args.output)
+    main(args)

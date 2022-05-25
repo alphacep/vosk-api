@@ -26,44 +26,44 @@ def align(alignment, ms):
 
     for op, a, b in word_diff(hypothesis, reference):
 
-            try:
-                display_word = display_seq[b] # index
-            except IndexError:
-                print('Please compare your txt and wav files, probably you have more words in txtfile than wavfile contain')
-                exit (1)
+        try:
+            display_word = display_seq[b] # index
+        except IndexError:
+            print('Please compare your txt and wav files, probably you have more words in txtfile than wavfile contain')
+            exit (1)
             
-            start_offset, end_offset = txt_offsets[b]
+        start_offset, end_offset = txt_offsets[b]
 
-            if op == 'equal':
-                hyp_word = hypothesis[a]
-                hyp_token = alignment[a]
+        if op == 'equal':
+            hyp_word = hypothesis[a]
+            hyp_token = alignment[a]
+            out.append(transcription.Word(
+                case=transcription.Word.SUCCESS,
+                startOffset=start_offset,
+                endOffset=end_offset,
+                word=display_word,
+                alignedWord=hyp_word,
+                realign=False,
+                conf=conf[a],
+                start=start[a],
+                end=end[a],
+                duration=duration[a]))
+            
+        elif op == 'replace': # insert/delete ?
+            if reference[b] == '<unk>':
                 out.append(transcription.Word(
-                    case=transcription.Word.SUCCESS,
+                    case=transcription.Word.NOT_FOUND_IN_TRANSCRIPT,
                     startOffset=start_offset,
                     endOffset=end_offset,
                     word=display_word,
-                    alignedWord=hyp_word,
-                    realign=False,
-                    conf=conf[a],
-                    start=start[a],
-                    end=end[a],
-                    duration=duration[a]))
-            
-            elif op == 'replace': # insert/delete ?
-                if reference[b] == '<unk>':
-                    out.append(transcription.Word(
-                        case=transcription.Word.NOT_FOUND_IN_TRANSCRIPT,
-                        startOffset=start_offset,
-                        endOffset=end_offset,
-                        word=display_word,
-                        realign=False))
-                else:
-                    out.append(transcription.Word(
-                        case=transcription.Word.NOT_FOUND_IN_AUDIO,
-                        startOffset=start_offset,
-                        endOffset=end_offset,
-                        word=display_word,
-                        realign=True))
+                    realign=False))
+            else:
+                out.append(transcription.Word(
+                    case=transcription.Word.NOT_FOUND_IN_AUDIO,
+                    startOffset=start_offset,
+                    endOffset=end_offset,
+                    word=display_word,
+                    realign=True))
 
     return out
 

@@ -89,6 +89,7 @@ class Transcription:
                 'sort_keys':    True,
                 'indent':       4,
                 'separators':   (',', ': '),
+                'ensure_ascii': False,
                 }
         options.update(kwargs)
 
