@@ -22,8 +22,9 @@ case $CROSS_TRIPLE in
 esac
 
 # Copy library to output folder
-mkdir -p /io/wheelhouse/linux-$VOSK_ARCHITECTURE
-cp /opt/vosk-api/src/*.so /io/wheelhouse/linux-$VOSK_ARCHITECTURE
+mkdir -p /io/wheelhouse/vosk-linux-$VOSK_ARCHITECTURE
+cp /opt/vosk-api/src/*.so /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vosk-linux-$VOSK_ARCHITECTURE
 
 # Build wheel
-pip3 wheel /opt/vosk-api/python --no-deps -w /io/wheelhouse
+python3 -m pip install requests tqdm
+python3 -m pip wheel /opt/vosk-api/python --no-deps -w /io/wheelhouse
