@@ -16,7 +16,7 @@ repositories {
 
 archivesBaseName = 'vosk'
 group = 'com.alphacephei'
-version = '0.3.38'
+version = '0.3.40'
 
 mavenPublish {
     group = 'com.alphacephei'

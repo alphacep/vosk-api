@@ -5,7 +5,7 @@ set -e -x
 cd /opt
 git clone https://github.com/alphacep/vosk-api
 cd /opt/vosk-api/src
-KALDI_ROOT=/opt/kaldi make -j $(nproc)
+KALDI_ROOT=/opt/kaldi EXTRA_LDFLAGS="-latomic" make -j $(nproc)
 
 # Decide architecture name
 export VOSK_SOURCE=/opt/vosk-api
