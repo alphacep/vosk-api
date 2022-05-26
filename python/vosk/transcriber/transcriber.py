@@ -8,6 +8,7 @@ import logging
 from pathlib import Path
 from timeit import default_timer as timer
 from vosk import KaldiRecognizer, Model
+from multiprocessing.dummy import Pool
 
 class Transcriber:
 
@@ -76,11 +77,10 @@ class Transcriber:
             print(final_result)
         return final_result, tot_samples
 
-
-    def process_directory(self,args):
+    def process_dir(self,args):
         task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
         with Pool() as pool:
-            pool.map(self.process_entry, file_list)
+            pool.map(self.process_entry, task_list)
 
     def process_file(self, args):
         start_time = timer()

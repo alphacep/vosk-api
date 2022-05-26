@@ -56,22 +56,18 @@ def main():
         exit(1)
 
     if not Path(args.input).exists():
-        logging.info('File %s does not exist, please specify an existing file/directory' % (args.input))
-        exit(1)
-
-    if args.output !='' and not Path(args.output).exists():
-        logging.info('Output %s does not exist, please specify an existing file' % (args.output))
+        logging.info("File/folder '%s' does not exist, please specify an existing file/directory" % (args.input))
         exit(1)
 
     transcriber = Transcriber(args)
 
-    if Path(args.input).is_dir() and Path(args.output).is_dir():
+    if Path(args.input).is_dir():
         transcriber.process_dir(args)
         return
-    elif Path(args.input).is_file() and (args.output=='' or Path(args.output).is_file()):
+    elif Path(args.input).is_file():
         transcriber.process_file(args)
     else:
-        logging.info('Wrong arguments, input and output must be same type')
+        logging.info('Wrong arguments')
         exit(1)
 
 if __name__ == "__main__":
