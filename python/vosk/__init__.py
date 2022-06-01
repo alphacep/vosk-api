@@ -98,8 +98,8 @@ class Model(object):
             return Path(directory, result_model[0])
 
     def download_model(self, model_name):
-        if not MODEL_DIRS[3].exists():
-            MODEL_DIRS[3].mkdir()
+        if not MODEL_DIRS[-1].exists():
+            MODEL_DIRS[-1].mkdir(parent=True)
         with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1,
                 desc=(MODEL_PRE_URL + str(model_name.name) + '.zip').split('/')[-1]) as t:
             reporthook = self.download_progress_hook(t)
