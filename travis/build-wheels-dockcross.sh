@@ -19,6 +19,9 @@ case $CROSS_TRIPLE in
     *i686-*)
         export VOSK_ARCHITECTURE=x86
         ;;
+    *riscv64-*)
+        export VOSK_ARCHITECTURE=riscv64
+        ;;
 esac
 
 # Copy library to output folder

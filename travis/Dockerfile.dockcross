@@ -29,7 +29,7 @@ RUN cd /opt \
     && git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack \
     && echo ${OPENBLAS_ARGS} \
     && make -C OpenBLAS ONLY_CBLAS=1 ${OPENBLAS_ARGS} HOSTCC=gcc USE_LOCKING=1 USE_THREAD=0 all \
-    && make -C OpenBLAS PREFIX=$(pwd)/OpenBLAS/install install \
+    && make -C OpenBLAS ${OPENBLAS_ARGS} HOSTCC=gcc USE_LOCKING=1 USE_THREAD=0 PREFIX=$(pwd)/OpenBLAS/install install \
     && mkdir -p clapack/BUILD && cd clapack/BUILD && cmake .. \
     && make -j 10 -C F2CLIBS \
     && make -j 10 -C BLAS \
