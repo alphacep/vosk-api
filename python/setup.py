@@ -53,7 +53,9 @@ setuptools.setup(
     url="https://github.com/alphacep/vosk-api",
     packages=setuptools.find_packages(),
     package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
-    scripts = ['aligner/vosk_align.py'],
+    entry_points = {
+        'console_scripts': ['vosk-aligner=vosk.aligner.vosk_align:main'],
+    },
     include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',
