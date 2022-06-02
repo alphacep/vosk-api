@@ -25,7 +25,7 @@ else:
         def get_tag(self):
             abi = 'none'
             if system == 'Darwin':
-                oses = 'macosx_10_6_x86_64'
+                oses = 'macosx_10_6_universal2'
             elif system == 'Windows' and architecture == '32bit':
                 oses = 'win32'
             elif system == 'Windows' and architecture == '64bit':
@@ -44,7 +44,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="vosk",
-    version="0.3.32",
+    version="0.3.42",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="Offline open source speech recognition API based on Kaldi and Vosk",
@@ -54,7 +54,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
     entry_points = {
-        'console_scripts': ['vosk-aligner=vosk.aligner.vosk_align:main'],
+        'console_scripts': ['vosk-aligner=vosk.aligner.vosk_align:main', 'vosk-transcriber=vosk.transcriber.cli:main'],
     },
     include_package_data=True,
     classifiers=[
@@ -68,7 +68,7 @@ setuptools.setup(
     cmdclass=cmdclass,
     python_requires='>=3',
     zip_safe=False, # Since we load so file from the filesystem, we can not run from zip file
-    setup_requires=['cffi>=1.0'],
-    install_requires=['cffi>=1.0'],
+    setup_requires=['cffi>=1.0', 'requests', 'tqdm', 'srt'],
+    install_requires=['cffi>=1.0', 'requests', 'tqdm', 'srt'],
     cffi_modules=['vosk_builder.py:ffibuilder'],
 )

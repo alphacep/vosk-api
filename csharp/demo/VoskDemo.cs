@@ -34,7 +34,7 @@ public class VoskDemo
             while((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0) {
                 float[] fbuffer = new float[bytesRead / 2];
                 for (int i = 0, n = 0; i < fbuffer.Length; i++, n+=2) {
-                    fbuffer[i] = (short)(buffer[n] | buffer[n+1] << 8);
+                    fbuffer[i] = BitConverter.ToInt16(buffer, n);
                 }
                 if (rec.AcceptWaveform(fbuffer, fbuffer.Length)) {
                     Console.WriteLine(rec.Result());

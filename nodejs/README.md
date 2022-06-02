@@ -2,18 +2,18 @@ This is an FFI-NAPI wrapper for the Vosk library.
 
 ## Usage
 
-It mostly follows Vosk interface, some methods are not yet fully implemented.
+Bindings mostly follow Vosk interface, some methods are not yet fully implemented.
 
-To use it you need to compile libvosk library, see Python module build
-instructions for details. You can find prebuilt library inside python
-wheel.
+See [demo folder](https://github.com/alphacep/vosk-api/tree/master/nodejs/demo) for
+details.
 
 ## About
 
 Vosk is an offline open source speech recognition toolkit. It enables
-speech recognition models for 17 languages and dialects - English, Indian
+speech recognition for 20+ languages and dialects - English, Indian
 English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish,
-Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino.
+Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino,
+Ukrainian, Kazakh, Swedish, Japanese, Esperanto, Hindi, Czech. More to come.
 
 Vosk models are small (50 Mb) but provide continuous large vocabulary
 transcription, zero-latency response with streaming API, reconfigurable

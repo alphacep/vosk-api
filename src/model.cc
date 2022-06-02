@@ -241,9 +241,9 @@ void Model::ReadDataFiles()
         SetDropoutTestMode(true, &(nnet_->GetNnet()));
         nnet3::CollapseModel(nnet3::CollapseModelConfig(), &(nnet_->GetNnet()));
     }
+
     decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
                                                                nnet_);
-
     if (stat(final_ie_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading i-vector extractor from " << final_ie_rxfilename_;
 
@@ -271,7 +271,8 @@ void Model::ReadDataFiles()
     if (stat(pitch_conf_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Using pitch in feature pipeline";
         feature_info_.add_pitch = true;
-        ReadConfigFromFile(pitch_conf_rxfilename_, &feature_info_.pitch_opts);
+        ReadConfigsFromFile(pitch_conf_rxfilename_,
+                            &feature_info_.pitch_opts, &feature_info_.pitch_process_opts);
     }
 
     if (stat(hclg_fst_rxfilename_.c_str(), &buffer) == 0) {

@@ -1,0 +1,2 @@
+%WER 14.10 [ 2839 / 20138, 214 ins, 487 del, 2138 sub ] exp/chain/tdnn/decode_test/wer_11_0.0
+%WER 12.67 [ 2552 / 20138, 215 ins, 406 del, 1931 sub ] exp/chain/tdnn/decode_test_rescore/wer_11_0.0

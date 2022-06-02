@@ -123,7 +123,13 @@ make -j 8 online2 lm rnnlm
 # Vosk-api
 cd $WORKDIR
 mkdir -p $WORKDIR/vosk
-make -j 8 -C ${WORKDIR_BASE}/../../../src OUTDIR=$WORKDIR/vosk KALDI_ROOT=${WORKDIR}/kaldi OPENFST_ROOT=${WORKDIR}/local OPENBLAS_ROOT=${WORKDIR}/local CXX=$CXX EXTRA_LDFLAGS="-llog -static-libstdc++"
+make -j 8 -C ${WORKDIR_BASE}/../../../src \
+    OUTDIR=$WORKDIR/vosk \
+    KALDI_ROOT=${WORKDIR}/kaldi \
+    OPENFST_ROOT=${WORKDIR}/local \
+    OPENBLAS_ROOT=${WORKDIR}/local \
+    CXX=$CXX \
+    EXTRA_LDFLAGS="-llog -static-libstdc++ -Wl,-soname,libvosk.so"
 cp $WORKDIR/vosk/libvosk.so $WORKDIR/../../src/main/jniLibs/$arch/libvosk.so
 
 done

@@ -7,12 +7,7 @@ import json
 import os
 import numpy as np
 
-model_path = "model"
 spk_model_path = "model-spk"
-
-if not os.path.exists(model_path):
-    print ("Please download the model from https://alphacephei.com/vosk/models and unpack as {} in the current folder.".format(model_path))
-    exit (1)
 
 if not os.path.exists(spk_model_path):
     print ("Please download the speaker model from https://alphacephei.com/vosk/models and unpack as {} in the current folder.".format(spk_model_path))
@@ -24,7 +19,7 @@ if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE
     exit (1)
 
 # Large vocabulary free form recognition
-model = Model(model_path)
+model = Model(lang="en-us")
 spk_model = SpkModel(spk_model_path)
 #rec = KaldiRecognizer(model, wf.getframerate(), spk_model)
 rec = KaldiRecognizer(model, wf.getframerate())

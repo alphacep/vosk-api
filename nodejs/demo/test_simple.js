@@ -29,10 +29,13 @@ wfReader.on('format', async ({ audioFormat, sampleRate, channels }) => {
     const rec = new vosk.Recognizer({model: model, sampleRate: sampleRate});
     rec.setMaxAlternatives(10);
     rec.setWords(true);
+    rec.setPartialWords(true);
     for await (const data of wfReadable) {
         const end_of_speech = rec.acceptWaveform(data);
         if (end_of_speech) {
               console.log(JSON.stringify(rec.result(), null, 4));
+        } else {
+              console.log(JSON.stringify(rec.partialResult(), null, 4));
         }
     }
     console.log(JSON.stringify(rec.finalResult(rec), null, 4));

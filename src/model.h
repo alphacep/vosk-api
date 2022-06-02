@@ -21,7 +21,7 @@
 #include "online2/onlinebin-util.h"
 #include "online2/online-timing.h"
 #include "online2/online-endpoint.h"
-#include "online2/online-nnet3-decoding.h"
+#include "online2/online-nnet3-incremental-decoding.h"
 #include "online2/online-feature-pipeline.h"
 #include "lat/lattice-functions.h"
 #include "lat/sausages.h"
@@ -36,7 +36,7 @@
 using namespace kaldi;
 using namespace std;
 
-class KaldiRecognizer;
+class Recognizer;
 
 class Model {
 
@@ -52,7 +52,7 @@ protected:
     void ConfigureV2();
     void ReadDataFiles();
 
-    friend class KaldiRecognizer;
+    friend class Recognizer;
 
     string model_path_str_;
     string nnet3_rxfilename_;
@@ -76,7 +76,7 @@ protected:
     string rnnlm_lm_rxfilename_;
 
     kaldi::OnlineEndpointConfig endpoint_config_;
-    kaldi::LatticeFasterDecoderConfig nnet3_decoding_config_;
+    kaldi::LatticeIncrementalDecoderConfig nnet3_decoding_config_;
     kaldi::nnet3::NnetSimpleLoopedComputationOptions decodable_opts_;
     kaldi::OnlineNnet2FeaturePipelineInfo feature_info_;
 
