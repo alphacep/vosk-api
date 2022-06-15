@@ -13,6 +13,9 @@ parser.add_argument(
         '--model', '-m', type=str,
         help='model path')
 parser.add_argument(
+        '--vosk-server', '-vs', default=False, type=bool,
+        help='get recognized result using vosk-server')
+parser.add_argument(
         '--list-models', default=False, action='store_true', 
         help='list available models')
 parser.add_argument(
@@ -60,6 +63,8 @@ def main():
         exit(1)
 
     transcriber = Transcriber(args)
+    
+    #results = transcriber.get_web_result(args)
 
     if Path(args.input).is_dir():
         transcriber.process_dir(args)
