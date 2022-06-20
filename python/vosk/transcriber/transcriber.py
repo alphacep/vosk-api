@@ -6,7 +6,6 @@ import os
 import logging
 import asyncio
 import websockets
-import wave
 import shutil
 
 from pathlib import Path
@@ -30,7 +29,7 @@ class Transcriber:
             if rec.AcceptWaveform(data):
                 tot_samples += len(data)
                 result.append(json.loads(rec.Result()))
-                logging.info('processing...')
+                logging.info('Processing...')
         result.append(json.loads(rec.FinalResult()))
         return result, tot_samples
 
@@ -55,26 +54,24 @@ class Transcriber:
                 final_result += part['text'] + ' '
         return final_result
 
-    def get_web_result(self, audiofile_name):
-        async def run_test(uri):
-            async with websockets.connect(uri) as websocket:
-                wf = wave.open(audiofile_name, "rb")
-                await websocket.send('{ "config" : { "sample_rate" : %d } }' % (wf.getframerate()))
-                results = []
-                tot_samples = 0
-                buffer_size = int(wf.getframerate() * 0.2)
-                while True:
-                    data = wf.readframes(buffer_size)
-                    if len(data) == 0:
-                        break
-                    await websocket.send(data)
-                    results.append(json.loads(await websocket.recv()))
-                    logging.info('processing...')
-                await websocket.send('{"eof" : 1}')
-                results.append(json.loads(await websocket.recv()))
-            return results
-        return asyncio.run(run_test('ws://localhost:2700'))
-
+    async def run_test(self, uri, stream):
+        async with websockets.connect(uri) as websocket:
+            await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
+            result = []
+            tot_samples = 0
+            while True:
+                data = stream.stdout.read(4000)
+                if len(data) == 0:
+                    break
+                await websocket.send(data)
+                tot_samples += len(data)
+                results = json.loads(await websocket.recv())
+                if not 'partial' in results:
+                    result.append(results)
+                logging.info('Processing...')
+            await websocket.send('{"eof" : 1}')
+            result.append(json.loads(await websocket.recv()))
+        return result, tot_samples
 
     def resample_ffmpeg(self, infile):
         stream = subprocess.Popen(
@@ -85,7 +82,7 @@ class Transcriber:
         return stream
 
 
-    def process_entry(self, inputdata, vosk_server):
+    def process_entry(self, inputdata):
         logging.info(f'Recognizing {inputdata[0]}')
 
         rec = KaldiRecognizer(self.model, 16000)
@@ -96,12 +93,11 @@ class Transcriber:
         else:
             logging.info('Missing ffmpeg, please install and try again')
             exit(1)
-        
-        if vosk_server == False:
+
+        if self.args.server is None:
             intermediate_result, tot_samples = self.recognize_stream(rec, stream)
         else:
-            tot_samples = 0
-            intermediate_result = self.get_web_result(inputdata[0])
+            intermediate_result, tot_samples = asyncio.run(self.run_test('ws://' + self.args.server, stream))
         
         result = []
         for i, res in enumerate(intermediate_result):
@@ -111,6 +107,7 @@ class Transcriber:
         final_result = self.format_result(result)
 
         if inputdata[1] != '':
+            logging.info(f'Writing processing result to %s' % (inputdata[1]))
             with open(inputdata[1], 'w', encoding='utf-8') as fh:
                 fh.write(final_result)
         else:
@@ -118,14 +115,12 @@ class Transcriber:
         return final_result, tot_samples
 
     def process_dir(self, args):
-        task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
-        with Pool() as pool:
-            pool.map(self.process_entry, task_list)
+            task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
+            with Pool() as pool:
+                pool.map(self.process_entry, task_list)
 
     def process_file(self, args):
-        #print(args)
-        #exit(1)
         start_time = timer()
-        final_result, tot_samples = self.process_entry([args.input, args.output], args.vosk_server)
+        final_result, tot_samples = self.process_entry([args.input, args.output])
         elapsed = timer() - start_time
         logging.info(f'''Execution time: {elapsed:.3f} sec; xRT: {format(tot_samples / 16000.0 / float(elapsed), '.3f')}''')
