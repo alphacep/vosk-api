@@ -115,9 +115,9 @@ class Transcriber:
         return final_result, tot_samples
 
     def process_dir(self, args):
-            task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
-            with Pool() as pool:
-                pool.map(self.process_entry, task_list)
+        task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
+        with Pool() as pool:
+            pool.map(self.process_entry, task_list)
 
     def process_file(self, args):
         start_time = timer()
