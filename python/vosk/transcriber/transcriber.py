@@ -8,6 +8,7 @@ import asyncio
 import websockets
 import shutil
 
+from queue import Queue
 from pathlib import Path
 from timeit import default_timer as timer
 from vosk import KaldiRecognizer, Model
@@ -54,24 +55,31 @@ class Transcriber:
                 final_result += part['text'] + ' '
         return final_result
 
-    async def run_test(self, uri, stream):
-        async with websockets.connect(uri) as websocket:
-            await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
-            result = []
-            tot_samples = 0
-            while True:
-                data = stream.stdout.read(4000)
-                if len(data) == 0:
-                    break
-                await websocket.send(data)
-                tot_samples += len(data)
-                results = json.loads(await websocket.recv())
-                if not 'partial' in results:
-                    result.append(results)
-                logging.info('Processing...')
-            await websocket.send('{"eof" : 1}')
-            result.append(json.loads(await websocket.recv()))
-        return result, tot_samples
+    async def run_test(self):
+        while True:
+            try:
+                input_file, output_file = self.queue.get_nowait()
+            except:
+                break
+            stream = self.resample_ffmpeg(input_file)
+            async with websockets.connect('ws://' + self.args.server) as websocket:
+                await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
+                result = []
+                tot_samples = 0
+                while True:
+                    data = stream.stdout.read(4000)
+                    if len(data) == 0:
+                        break
+                    await websocket.send(data)
+                    tot_samples += len(data)
+                    results = json.loads(await websocket.recv())
+                    if not 'partial' in results:
+                        result.append(results)
+                    logging.info('Processing...')
+                await websocket.send('{"eof" : 1}')
+                result.append(json.loads(await websocket.recv()))
+                with open(output_file, 'w', encoding='utf-8') as fh:
+                    fh.write(self.format_result(result))
 
     def resample_ffmpeg(self, infile):
         stream = subprocess.Popen(
@@ -80,7 +88,6 @@ class Transcriber:
             '-ar', '16000','-ac', '1', '-f', 's16le', '-'], 
             stdout=subprocess.PIPE)
         return stream
-
 
     def process_entry(self, inputdata):
         logging.info(f'Recognizing {inputdata[0]}')
@@ -93,11 +100,6 @@ class Transcriber:
         else:
             logging.info('Missing ffmpeg, please install and try again')
             exit(1)
-
-        if self.args.server is None:
-            intermediate_result, tot_samples = self.recognize_stream(rec, stream)
-        else:
-            intermediate_result, tot_samples = asyncio.run(self.run_test('ws://' + self.args.server, stream))
         
         result = []
         for i, res in enumerate(intermediate_result):
@@ -116,11 +118,22 @@ class Transcriber:
 
     def process_dir(self, args):
         task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
-        with Pool() as pool:
-            pool.map(self.process_entry, task_list)
+        if self.args.server is None:
+            with Pool() as pool:
+                pool.map(self.process_entry, task_list)
+        else:
+            asyncio.run(self.process_dir_async(task_list))
+
+    async def process_dir_async(self, task_list):
+        self.queue = Queue()
+        [self.queue.put(x) for x in task_list]
+        worker_tasks = [asyncio.create_task(self.run_test()) for i in range(10)]
+        await asyncio.gather(*worker_tasks)
+
 
     def process_file(self, args):
         start_time = timer()
         final_result, tot_samples = self.process_entry([args.input, args.output])
         elapsed = timer() - start_time
         logging.info(f'''Execution time: {elapsed:.3f} sec; xRT: {format(tot_samples / 16000.0 / float(elapsed), '.3f')}''')
+
