@@ -14,7 +14,7 @@ parser.add_argument(
         help='model path')
 parser.add_argument(
         '--server', '-s', const='localhost:2700', action='store_const', 
-        help='get recognized result using vosk-server')
+        help='use server for recognition')
 parser.add_argument(
         '--list-models', default=False, action='store_true', 
         help='list available models')

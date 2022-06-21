@@ -14,6 +14,7 @@ from timeit import default_timer as timer
 from vosk import KaldiRecognizer, Model
 from multiprocessing.dummy import Pool
 
+
 class Transcriber:
 
     def __init__(self, args):
@@ -55,7 +56,7 @@ class Transcriber:
                 final_result += part['text'] + ' '
         return final_result
 
-    async def run_test(self):
+    async def process_by_server(self):
         while True:
             try:
                 input_file, output_file = self.queue.get_nowait()
@@ -65,19 +66,18 @@ class Transcriber:
             async with websockets.connect('ws://' + self.args.server) as websocket:
                 await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
                 result = []
-                tot_samples = 0
                 while True:
                     data = stream.stdout.read(4000)
                     if len(data) == 0:
                         break
                     await websocket.send(data)
-                    tot_samples += len(data)
                     results = json.loads(await websocket.recv())
                     if not 'partial' in results:
                         result.append(results)
                     logging.info('Processing...')
                 await websocket.send('{"eof" : 1}')
                 result.append(json.loads(await websocket.recv()))
+                logging.info('File %s processing complete' % (output_file))
                 with open(output_file, 'w', encoding='utf-8') as fh:
                     fh.write(self.format_result(result))
 
@@ -91,30 +91,50 @@ class Transcriber:
 
     def process_entry(self, inputdata):
         logging.info(f'Recognizing {inputdata[0]}')
-
-        rec = KaldiRecognizer(self.model, 16000)
-        rec.SetWords(True)
-        
         if shutil.which("ffmpeg"):
             stream = self.resample_ffmpeg(inputdata[0])
         else:
             logging.info('Missing ffmpeg, please install and try again')
             exit(1)
-        
-        result = []
-        for i, res in enumerate(intermediate_result):
-            if not 'partial' in res.keys():
-                result.append(res)
-
+        if self.args.server is None:
+            rec = KaldiRecognizer(self.model, 16000)
+            rec.SetWords(True)
+            result, tot_samples = self.recognize_stream(rec, stream)
+        else:
+            result, tot_samples = asyncio.run(self.get_server_recognizer(stream))
         final_result = self.format_result(result)
-
         if inputdata[1] != '':
-            logging.info(f'Writing processing result to %s' % (inputdata[1]))
+            logging.info(f'File %s pocessing complete' % (inputdata[1]))
             with open(inputdata[1], 'w', encoding='utf-8') as fh:
                 fh.write(final_result)
         else:
             print(final_result)
-        return final_result, tot_samples
+        return tot_samples
+
+    async def process_dir_async(self, task_list):
+        self.queue = Queue()
+        [self.queue.put(x) for x in task_list]
+        worker_tasks = [asyncio.create_task(self.process_by_server()) for i in range(10)]
+        await asyncio.gather(*worker_tasks)
+
+    async def get_server_recognizer(self, stream):
+        async with websockets.connect('ws://' + self.args.server) as websocket:
+            await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
+            result = []
+            tot_samples = 0
+            while True:
+                data = stream.stdout.read(4000)
+                if len(data) == 0:
+                    break
+                tot_samples += len(data)
+                await websocket.send(data)
+                results = json.loads(await websocket.recv())
+                if not 'partial' in results:
+                    result.append(results)
+                logging.info('Processing...')
+            await websocket.send('{"eof" : 1}')
+            result.append(json.loads(await websocket.recv()))
+        return result, tot_samples
 
     def process_dir(self, args):
         task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
@@ -124,16 +144,8 @@ class Transcriber:
         else:
             asyncio.run(self.process_dir_async(task_list))
 
-    async def process_dir_async(self, task_list):
-        self.queue = Queue()
-        [self.queue.put(x) for x in task_list]
-        worker_tasks = [asyncio.create_task(self.run_test()) for i in range(10)]
-        await asyncio.gather(*worker_tasks)
-
-
     def process_file(self, args):
         start_time = timer()
-        final_result, tot_samples = self.process_entry([args.input, args.output])
+        tot_samples = self.process_entry([args.input, args.output])
         elapsed = timer() - start_time
         logging.info(f'''Execution time: {elapsed:.3f} sec; xRT: {format(tot_samples / 16000.0 / float(elapsed), '.3f')}''')
-
