@@ -65,8 +65,9 @@ class Transcriber:
             async with websockets.connect('ws://' + self.args.server) as websocket:
                 await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
                 result = []
+                reader = asyncio.StreamReader(stream.stdout)
                 while True:
-                    data = stream.stdout.read(4000)
+                    data = await reader.read(4000)
                     if len(data) == 0:
                         break
                     await websocket.send(data)
