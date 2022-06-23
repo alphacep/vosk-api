@@ -6,7 +6,6 @@ import os
 import logging
 import asyncio
 import websockets
-import shutil
 
 from queue import Queue
 from pathlib import Path
@@ -30,8 +29,8 @@ class Transcriber:
                 break
             if rec.AcceptWaveform(data):
                 tot_samples += len(data)
+                print(rec.PartialResult())
                 result.append(json.loads(rec.Result()))
-                logging.info('Processing...')
         result.append(json.loads(rec.FinalResult()))
         return result, tot_samples
 
@@ -56,7 +55,7 @@ class Transcriber:
                 final_result += part['text'] + ' '
         return final_result
 
-    async def process_by_server(self):
+    async def server_process(self):
         while True:
             try:
                 input_file, output_file = self.queue.get_nowait()
@@ -74,7 +73,8 @@ class Transcriber:
                     results = json.loads(await websocket.recv())
                     if not 'partial' in results:
                         result.append(results)
-                    logging.info('Processing...')
+                    else:
+                        print(results)
                 await websocket.send('{"eof" : 1}')
                 result.append(json.loads(await websocket.recv()))
                 logging.info('File %s processing complete' % (output_file))
@@ -91,9 +91,9 @@ class Transcriber:
 
     def process_entry(self, inputdata):
         logging.info(f'Recognizing {inputdata[0]}')
-        if shutil.which("ffmpeg"):
+        try:
             stream = self.resample_ffmpeg(inputdata[0])
-        else:
+        except Exception:
             logging.info('Missing ffmpeg, please install and try again')
             exit(1)
         if self.args.server is None:
@@ -101,7 +101,7 @@ class Transcriber:
             rec.SetWords(True)
             result, tot_samples = self.recognize_stream(rec, stream)
         else:
-            result, tot_samples = asyncio.run(self.get_server_recognizer(stream))
+            result, tot_samples = asyncio.run(self.run_server_recognizer(stream))
         final_result = self.format_result(result)
         if inputdata[1] != '':
             logging.info(f'File %s pocessing complete' % (inputdata[1]))
@@ -114,10 +114,10 @@ class Transcriber:
     async def process_dir_async(self, task_list):
         self.queue = Queue()
         [self.queue.put(x) for x in task_list]
-        worker_tasks = [asyncio.create_task(self.process_by_server()) for i in range(10)]
+        worker_tasks = [asyncio.create_task(self.server_process()) for i in range(self.args.tasks_number)]
         await asyncio.gather(*worker_tasks)
 
-    async def get_server_recognizer(self, stream):
+    async def run_server_recognizer(self, stream):
         async with websockets.connect('ws://' + self.args.server) as websocket:
             await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
             result = []
