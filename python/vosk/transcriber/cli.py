@@ -38,7 +38,7 @@ parser.add_argument(
         help='optional arg output data type')
 parser.add_argument(
         '--tasks_number', '-tn', default=10, type=int,
-        help='concurrent tasks number')
+        help='simultaneous tasks number')
 parser.add_argument(
         '--log-level', default='INFO',
         help='logging level')
