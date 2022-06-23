@@ -131,7 +131,8 @@ class Transcriber:
                 results = json.loads(await websocket.recv())
                 if not 'partial' in results:
                     result.append(results)
-                logging.info('Processing...')
+                else:
+                    print(results)
             await websocket.send('{"eof" : 1}')
             result.append(json.loads(await websocket.recv()))
         return result, tot_samples
