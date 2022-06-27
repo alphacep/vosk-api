@@ -2,6 +2,7 @@
 
 import logging
 import argparse
+import os
 
 from pathlib import Path
 from vosk import list_models, list_languages
@@ -68,10 +69,15 @@ def main():
     transcriber = Transcriber(args)
 
     if Path(args.input).is_dir():
-        transcriber.process_dir(args)
+        task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
+        transcriber.process_dir(args, task_list)
         return
     elif Path(args.input).is_file():
-        transcriber.process_file(args)
+        if args.output == '':
+            task_list = [(Path(args.input), '')]
+        else:
+            task_list = [(Path(args.input), Path(args.output))]
+        transcriber.process_file(args, task_list)
     else:
         logging.info('Wrong arguments')
         exit(1)
