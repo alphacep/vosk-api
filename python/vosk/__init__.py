@@ -86,7 +86,7 @@ class Model(object):
             if directory is None or not Path(directory).exists():
                 continue
             model_file_list = os.listdir(directory)
-            model_file = [model for model in model_file_list if match(f"vosk-model(-small)?-{lang}", model)]
+            model_file = [model for model in model_file_list if match(r'vosk-model(-small)?-' + lang, model)]
             if model_file != []:
                 return Path(directory, model_file[0])
         response = requests.get(MODEL_LIST_URL)
