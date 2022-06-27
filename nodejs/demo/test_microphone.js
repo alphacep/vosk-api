@@ -23,7 +23,6 @@ var micInstance = mic({
 });
 
 var micInputStream = micInstance.getAudioStream();
-micInstance.start();
 
 micInputStream.on('data', data => {
     if (rec.acceptWaveform(data))
@@ -32,9 +31,16 @@ micInputStream.on('data', data => {
         console.log(rec.partialResult());
 });
 
-process.on('SIGINT', function() {
+micInputStream.on('audioProcessExitComplete', function() {
+    console.log("Cleaning up");
     console.log(rec.finalResult());
-    console.log("\nDone");
     rec.free();
     model.free();
 });
+
+process.on('SIGINT', function() {
+    console.log("\nStopping");
+    micInstance.stop();
+});
+
+micInstance.start();
