@@ -14,7 +14,7 @@ parser.add_argument(
         '--model', '-m', type=str,
         help='model path')
 parser.add_argument(
-        '--server', '-s', const='localhost:2700', action='store_const', 
+        '--server', '-s', const='localhost:2700', action='store_const',  
         help='use server for recognition')
 parser.add_argument(
         '--list-models', default=False, action='store_true', 
@@ -38,7 +38,7 @@ parser.add_argument(
         '--output-type', '-t', default='txt', type=str,
         help='optional arg output data type')
 parser.add_argument(
-        '--tasks_number', '-tn', default=10, type=int,
+        '--tasks', '-ts', default=10, type=int,
         help='simultaneous tasks number')
 parser.add_argument(
         '--log-level', default='INFO',
@@ -70,17 +70,18 @@ def main():
 
     if Path(args.input).is_dir():
         task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
-        transcriber.process_dir(args, task_list)
+        transcriber.process_task_list(args, task_list)
         return
     elif Path(args.input).is_file():
         if args.output == '':
             task_list = [(Path(args.input), '')]
         else:
             task_list = [(Path(args.input), Path(args.output))]
-        transcriber.process_file(args, task_list)
-    else:
-        logging.info('Wrong arguments')
-        exit(1)
+        transcriber.process_task_list(args, task_list)
+        return
+    #else:
+        #logging.info('Wrong arguments')
+        #exit(1)
 
 if __name__ == "__main__":
     main()

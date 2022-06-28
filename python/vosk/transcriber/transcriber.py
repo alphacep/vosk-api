@@ -30,7 +30,7 @@ class Transcriber:
                 break
             if rec.AcceptWaveform(data):
                 tot_samples += len(data)
-                print(rec.PartialResult())
+                logging.info(rec.PartialResult())
                 result.append(json.loads(rec.Result()))
         result.append(json.loads(rec.FinalResult()))
         return result, tot_samples
@@ -59,7 +59,7 @@ class Transcriber:
                 final_result += part['text'] + ' '
         return final_result
 
-    async def server_process(self):
+    async def run_server_recognition(self):
         start_time = timer()
         
         while True:
@@ -70,7 +70,7 @@ class Transcriber:
             
             stream = self.resample_ffmpeg(input_file)
             async with websockets.connect('ws://' + self.args.server) as websocket:
-                await websocket.send('{ "config" : { "sample_rate" : %d } }' % 16000)
+                await websocket.send('{ "config" : { "sample_rate" : 16000 } }')
                 tot_samples = 0
                 result = []
 
@@ -92,15 +92,13 @@ class Transcriber:
                 final_result = self.format_result(result)
                 
                 if output_file != '':
-                    logging.info(f'File %s pocessing complete' % (output_file))
+                    logging.info(f'File %s processing complete' % (output_file))
                     with open(output_file, 'w', encoding='utf-8') as fh:
                         fh.write(final_result)
                 else:
                     print(final_result)
                 elapsed = timer() - start_time
                 logging.info(f'''Execution time: {elapsed:.3f} sec; xRT: {format(tot_samples / 16000.0 / float(elapsed), '.3f')}''')
-
-
 
     def resample_ffmpeg(self, infile):
         stream = subprocess.Popen(
@@ -126,7 +124,7 @@ class Transcriber:
         final_result = self.format_result(result)
 
         if inputdata[1] != '':
-            logging.info(f'File %s pocessing complete' % (inputdata[1]))
+            logging.info(f'File %s processing complete' % (inputdata[1]))
             with open(inputdata[1], 'w', encoding='utf-8') as fh:
                 fh.write(final_result)
         else:
@@ -137,18 +135,14 @@ class Transcriber:
     async def process_task_list_server(self, task_list):
         self.queue = Queue()
         [self.queue.put(x) for x in task_list]
-        worker_tasks = [asyncio.create_task(self.server_process()) for i in range(self.args.tasks_number)]
+        worker_tasks = [asyncio.create_task(self.run_server_recognition()) for i in range(self.args.tasks)]
         await asyncio.gather(*worker_tasks)
 
-    def process_dir(self, args, task_list):
-        if self.args.server is None:
+    def process_task_list(self, args, task_list):
+        if self.args.server is None and Path(self.args.input).is_dir():
             with Pool() as pool:
                 pool.map(self.process_task_list_pool, task_list)
-        else:
-            asyncio.run(self.process_task_list_server(task_list))
-
-    def process_file(self, args, task_list):
-        if self.args.server is None:
+        elif self.args.server is None and Path(self.args.input).is_file():
             self.process_task_list_pool([args.input, args.output])
         else:
             asyncio.run(self.process_task_list_server(task_list))
