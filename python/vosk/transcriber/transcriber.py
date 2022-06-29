@@ -99,6 +99,7 @@ class Transcriber:
                     print(final_result)
                 elapsed = timer() - start_time
                 logging.info(f'''Execution time: {elapsed:.3f} sec; xRT: {format(tot_samples / 16000.0 / float(elapsed), '.3f')}''')
+                self.queue.task_done()
 
     def resample_ffmpeg(self, infile):
         stream = subprocess.Popen(
