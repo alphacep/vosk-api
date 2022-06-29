@@ -3,7 +3,6 @@
 import logging
 import argparse
 import os
-import asyncio
 
 from pathlib import Path
 from vosk import list_models, list_languages
