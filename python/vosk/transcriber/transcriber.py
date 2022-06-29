@@ -69,7 +69,7 @@ class Transcriber:
                 break
             
             stream = self.resample_ffmpeg(input_file)
-            async with websockets.connect('ws://' + self.args.server) as websocket:
+            async with websockets.connect(self.args.server) as websocket:
                 await websocket.send('{ "config" : { "sample_rate" : 16000 } }')
                 tot_samples = 0
                 result = []
@@ -139,10 +139,8 @@ class Transcriber:
         await asyncio.gather(*worker_tasks)
 
     def process_task_list(self, args, task_list):
-        if self.args.server is None and Path(self.args.input).is_dir():
+        if self.args.server is None:
             with Pool() as pool:
                 pool.map(self.process_task_list_pool, task_list)
-        elif self.args.server is None and Path(self.args.input).is_file():
-            self.process_task_list_pool([args.input, args.output])
         else:
             asyncio.run(self.process_task_list_server(task_list))

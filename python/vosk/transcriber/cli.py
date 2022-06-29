@@ -3,6 +3,7 @@
 import logging
 import argparse
 import os
+import asyncio
 
 from pathlib import Path
 from vosk import list_models, list_languages
@@ -14,7 +15,7 @@ parser.add_argument(
         '--model', '-m', type=str,
         help='model path')
 parser.add_argument(
-        '--server', '-s', const='localhost:2700', action='store_const',  
+        '--server', '-s', const='ws://localhost:2700', action='store_const',  
         help='use server for recognition')
 parser.add_argument(
         '--list-models', default=False, action='store_true', 
@@ -59,7 +60,7 @@ def main():
         return
 
     if not args.input:
-        logging.info('Please specify input file or directory')
+        logging.info("Please specify input file or directory")
         exit(1)
 
     if not Path(args.input).exists():
@@ -70,18 +71,15 @@ def main():
 
     if Path(args.input).is_dir():
         task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
-        transcriber.process_task_list(args, task_list)
-        return
     elif Path(args.input).is_file():
         if args.output == '':
-            task_list = [(Path(args.input), '')]
+            task_list = [(Path(args.input), args.output)]
         else:
             task_list = [(Path(args.input), Path(args.output))]
-        transcriber.process_task_list(args, task_list)
-        return
-    #else:
-        #logging.info('Wrong arguments')
-        #exit(1)
+    else:
+        logging.info("Wrong arguments")
+        exit(1)
+    transcriber.process_task_list(args, task_list)    
 
 if __name__ == "__main__":
     main()
