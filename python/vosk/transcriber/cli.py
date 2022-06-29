@@ -79,6 +79,7 @@ def main():
     else:
         logging.info("Wrong arguments")
         exit(1)
+    
     transcriber.process_task_list(args, task_list)    
 
 if __name__ == "__main__":
