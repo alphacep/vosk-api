@@ -111,7 +111,7 @@ class Transcriber:
 
     def process_task_list_pool(self, inputdata):
         start_time = timer()
-        logging.info(f'Recognizing {inputdata[0]}')
+        logging.info('Recognizing {}'.format(inputdata[0]))
 
         try:
             stream = self.resample_ffmpeg(inputdata[0])
@@ -131,7 +131,7 @@ class Transcriber:
         else:
             print(final_result)
         elapsed = timer() - start_time
-        logging.info(f'''Execution time: {elapsed:.3f} sec; xRT: {format(tot_samples / 16000.0 / float(elapsed), '.3f')}''')
+        logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, tot_samples / 16000.0 / float(elapsed)))
 
     async def process_task_list_server(self, task_list):
         self.queue = Queue()
