@@ -92,7 +92,7 @@ class Transcriber:
                 final_result = self.format_result(result)
                 
                 if output_file != '':
-                    logging.info(f'File %s processing complete' % (output_file))
+                    logging.info('File {} processing complete'.format(output_file))
                     with open(output_file, 'w', encoding='utf-8') as fh:
                         fh.write(final_result)
                 else:
@@ -125,7 +125,7 @@ class Transcriber:
         final_result = self.format_result(result)
 
         if inputdata[1] != '':
-            logging.info(f'File %s processing complete' % (inputdata[1]))
+            logging.info('File {} processing complete'.format(inputdata[1]))
             with open(inputdata[1], 'w', encoding='utf-8') as fh:
                 fh.write(final_result)
         else:
