@@ -33,7 +33,7 @@ def get_result(args):
             logging.debug("%s: %s" % (k, v))
 
     with open(args.txtfile, encoding="utf-8") as fh:
-        transcript = fh.read()    
+        transcript = fh.read() 
     model = Model(args.model)
     with wave.open(args.audiofile) as wavfile:
         logging.info("starting alignment")
