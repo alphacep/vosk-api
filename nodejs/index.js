@@ -76,7 +76,7 @@ if (os.platform() == 'win32') {
 
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
 } else if (os.platform() == 'darwin') {
-    soname = path.join(__dirname, "lib", "osx-x86_64", "libvosk.dylib")
+    soname = path.join(__dirname, "lib", "osx-universal", "libvosk.dylib")
 } else {
     soname = path.join(__dirname, "lib", "linux-x86_64", "libvosk.so")
 }
@@ -93,6 +93,7 @@ const libvosk = ffi.Library(soname, {
     'vosk_recognizer_free': ['void', [vosk_recognizer_ptr]],
     'vosk_recognizer_set_max_alternatives': ['void', [vosk_recognizer_ptr, 'int']],
     'vosk_recognizer_set_words': ['void', [vosk_recognizer_ptr, 'bool']],
+    'vosk_recognizer_set_partial_words': ['void', [vosk_recognizer_ptr, 'bool']],
     'vosk_recognizer_set_spk_model': ['void', [vosk_recognizer_ptr, vosk_spk_model_ptr]],
     'vosk_recognizer_accept_waveform': ['bool', [vosk_recognizer_ptr, 'pointer', 'int']],
     'vosk_recognizer_result': ['string', [vosk_recognizer_ptr]],
@@ -299,6 +300,11 @@ class Recognizer {
      */
     setWords(words) {
         libvosk.vosk_recognizer_set_words(this.handle, words);
+    }
+
+    /** Same as above, but for partial results*/
+    setPartialWords(partial_words) {
+        libvosk.vosk_recognizer_set_partial_words(this.handle, partial_words);
     }
 
     /** Adds speaker recognition model to already created recognizer. Helps to initialize

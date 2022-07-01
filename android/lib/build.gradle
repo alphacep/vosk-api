@@ -24,7 +24,7 @@ task buildVosk(type: Exec) {
 }
 
 dependencies {
-    implementation 'net.java.dev.jna:jna:4.4.0@aar'
+    api 'net.java.dev.jna:jna:4.4.0@aar'
 }
 
 //preBuild.dependsOn buildVosk
@@ -37,6 +37,18 @@ publishing {
             pom {
                 name = pomName
                 description = pomDescription
+            }
+            //generate pom nodes for dependencies
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+                configurations.implementation.allDependencies.each { dependency ->
+                    if (dependency.name != 'unspecified') {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', dependency.group)
+                        dependencyNode.appendNode('artifactId', dependency.name)
+                        dependencyNode.appendNode('version', dependency.version)
+                    }
+                }
             }
         }
     }

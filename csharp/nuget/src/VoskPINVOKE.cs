@@ -38,6 +38,9 @@ class VoskPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_words")]
   public static extern void VoskRecognizer_SetWords(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_partial_words")]
+  public static extern void VoskRecognizer_SetPartialWords(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_spk_model")]
   public static extern void VoskRecognizer_SetSpkModel(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 

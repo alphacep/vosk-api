@@ -1,6 +1,6 @@
 {
   "name": "vosk-js",
-  "version": "0.3.29",
+  "version": "0.3.42",
   "description": "Node binding for continuous voice recoginition through vosk-api.",
   "repository": {
     "type": "git",
