@@ -418,14 +418,23 @@ bool Recognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_frame
     return true;
 }
 
+// If we can't align, we still need to prepare for MBR
+static void CopyLatticeForMbr(CompactLattice &lat, CompactLattice *lat_out)
+{
+    *lat_out = lat;
+    RmEpsilon(lat_out, true);
+    fst::CreateSuperFinal(lat_out);
+    TopSortCompactLatticeIfNeeded(lat_out);
+}
 
 const char *Recognizer::MbrResult(CompactLattice &rlat)
 {
+
     CompactLattice aligned_lat;
     if (model_->winfo_) {
         WordAlignLattice(rlat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
     } else {
-        aligned_lat = rlat;
+        CopyLatticeForMbr(rlat, &aligned_lat);
     }
 
     MinimumBayesRisk mbr(aligned_lat);
@@ -739,7 +748,11 @@ const char* Recognizer::PartialResult()
         CompactLattice aligned_lat;
 
         clat = decoder_->GetLattice(decoder_->NumFramesInLattice(), false);
-        WordAlignLatticePartial(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
+        if (model_->winfo_) {
+            WordAlignLatticePartial(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
+        } else {
+            CopyLatticeForMbr(clat, &aligned_lat);
+        }
 
         MinimumBayesRisk mbr(aligned_lat);
         const vector<BaseFloat> &conf = mbr.GetOneBestConfidences();
