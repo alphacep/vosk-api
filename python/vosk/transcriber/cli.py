@@ -2,6 +2,7 @@
 
 import logging
 import argparse
+import os
 
 from pathlib import Path
 from vosk import list_models, list_languages
@@ -12,6 +13,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
         '--model', '-m', type=str,
         help='model path')
+parser.add_argument(
+        '--server', '-s', const='ws://localhost:2700', action='store_const',  
+        help='use server for recognition')
 parser.add_argument(
         '--list-models', default=False, action='store_true', 
         help='list available models')
@@ -34,6 +38,9 @@ parser.add_argument(
         '--output-type', '-t', default='txt', type=str,
         help='optional arg output data type')
 parser.add_argument(
+        '--tasks', '-ts', default=10, type=int,
+        help='simultaneous tasks number')
+parser.add_argument(
         '--log-level', default='INFO',
         help='logging level')
 
@@ -52,7 +59,7 @@ def main():
         return
 
     if not args.input:
-        logging.info('Please specify input file or directory')
+        logging.info("Please specify input file or directory")
         exit(1)
 
     if not Path(args.input).exists():
@@ -62,13 +69,17 @@ def main():
     transcriber = Transcriber(args)
 
     if Path(args.input).is_dir():
-        transcriber.process_dir(args)
-        return
+        task_list = [(Path(args.input, fn), Path(args.output, Path(fn).stem).with_suffix('.' + args.output_type)) for fn in os.listdir(args.input)]
     elif Path(args.input).is_file():
-        transcriber.process_file(args)
+        if args.output == '':
+            task_list = [(Path(args.input), args.output)]
+        else:
+            task_list = [(Path(args.input), Path(args.output))]
     else:
-        logging.info('Wrong arguments')
+        logging.info("Wrong arguments")
         exit(1)
+    
+    transcriber.process_task_list(args, task_list)    
 
 if __name__ == "__main__":
     main()
