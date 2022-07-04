@@ -61,7 +61,7 @@ class Transcriber:
 
 
     def process_entry(self, inputdata):
-        logging.info(f'Recognizing {inputdata[0]}')
+        logging.info('Recognizing {}'.format(inputdata[0]))
 
         rec = KaldiRecognizer(self.model, 16000)
         rec.SetWords(True)
@@ -86,4 +86,4 @@ class Transcriber:
         start_time = timer()
         final_result, tot_samples = self.process_entry([args.input, args.output])
         elapsed = timer() - start_time
-        logging.info(f'''Execution time: {elapsed:.3f} sec; xRT: {format(tot_samples / 16000.0 / float(elapsed), '.3f')}''')
+        logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, tot_samples / 16000.0 / float(elapsed)))
