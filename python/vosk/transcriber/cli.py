@@ -39,7 +39,7 @@ parser.add_argument(
         help='optional arg output data type')
 parser.add_argument(
         '--tasks', '-ts', default=10, type=int,
-        help='simultaneous tasks number')
+        help='number of parallel recognition tasks')
 parser.add_argument(
         '--log-level', default='INFO',
         help='logging level')
@@ -78,7 +78,7 @@ def main():
     else:
         logging.info("Wrong arguments")
         exit(1)
-    
+
     transcriber.process_task_list(args, task_list)    
 
 if __name__ == "__main__":

@@ -13,6 +13,8 @@ from timeit import default_timer as timer
 from vosk import KaldiRecognizer, Model
 from multiprocessing.dummy import Pool
 
+CHUNK_SIZE = 4000
+SAMPLE_RATE = 16000.0
 
 class Transcriber:
 
@@ -25,15 +27,49 @@ class Transcriber:
         result = []
 
         while True:
-            data = stream.stdout.read(4000)
+            data = stream.stdout.read(CHUNK_SIZE)
+
             if len(data) == 0:
                 break
+
+            tot_samples += len(data)
             if rec.AcceptWaveform(data):
-                tot_samples += len(data)
-                logging.info(rec.PartialResult())
-                result.append(json.loads(rec.Result()))
-        result.append(json.loads(rec.FinalResult()))
+                jres = json.loads(rec.Result())
+                logging.info(jres)
+                result.append(jres)
+            else:
+                jres = json.loads(rec.PartialResult())
+                logging.info(jres)
+
+        jres = json.loads(rec.FinalResult())
+        logging.info(jres)
+        result.append(jres)
+
         return result, tot_samples
+
+    async def recognize_stream_server(self, proc):
+        async with websockets.connect(self.args.server) as websocket:
+            tot_samples = 0
+            result = []
+
+            await websocket.send('{ "config" : { "sample_rate" : %f } }' % (SAMPLE_RATE))
+            while True:
+                data = await proc.stdout.read(CHUNK_SIZE)
+                tot_samples += len(data)
+                if len(data) == 0:
+                    break
+                await websocket.send(data)
+                jres = json.loads(await websocket.recv())
+                logging.info(jres)
+                if not 'partial' in jres:
+                    result.append(jres)
+            await websocket.send('{"eof" : 1}')
+            jres = json.loads(await websocket.recv())
+            logging.info(jres)
+            result.append(jres)
+
+            return result, tot_samples
+
 
     def format_result(self, result, words_per_line=7):
         final_result = ''
@@ -59,67 +95,52 @@ class Transcriber:
                 final_result += part['text'] + ' '
         return final_result
 
-    async def run_server_recognition(self):
-        start_time = timer()
-        
+    def resample_ffmpeg(self, infile):
+        cmd = "ffmpeg -nostdin -loglevel quiet -i {} -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
+        stream = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        return stream
+
+    async def resample_ffmpeg_async(self, infile):
+        cmd = "ffmpeg -nostdin -loglevel quiet -i {} -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
+        return await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)
+
+    async def server_worker(self):
         while True:
             try:
                 input_file, output_file = self.queue.get_nowait()
             except:
                 break
-            
-            stream = self.resample_ffmpeg(input_file)
-            async with websockets.connect(self.args.server) as websocket:
-                await websocket.send('{ "config" : { "sample_rate" : 16000 } }')
-                tot_samples = 0
-                result = []
 
-                #reader = asyncio.StreamReader(stream.stdout)
-                while True:
-                    data = stream.stdout.read(4000)
-                    #data = await reader.read(4000)
-                    tot_samples += len(data)
-                    if len(data) == 0:
-                        break
-                    await websocket.send(data)
-                    results = json.loads(await websocket.recv())
-                    if not 'partial' in results:
-                        result.append(results)
-                    else:
-                        print(results)
-                await websocket.send('{"eof" : 1}')
-                result.append(json.loads(await websocket.recv()))
-                final_result = self.format_result(result)
-                
-                if output_file != '':
-                    logging.info('File {} processing complete'.format(output_file))
-                    with open(output_file, 'w', encoding='utf-8') as fh:
-                        fh.write(final_result)
-                else:
-                    print(final_result)
-                elapsed = timer() - start_time
-                logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, tot_samples / 16000.0 / float(elapsed)))
-                self.queue.task_done()
+            logging.info('Recognizing {}'.format(input_file))
+            start_time = timer()
+            proc = await self.resample_ffmpeg_async(input_file)
+            result, tot_samples = await self.recognize_stream_server(proc)
 
-    def resample_ffmpeg(self, infile):
-        stream = subprocess.Popen(
-            ['ffmpeg', '-nostdin', '-loglevel', 'quiet', '-i', 
-            infile, 
-            '-ar', '16000','-ac', '1', '-f', 's16le', '-'], 
-            stdout=subprocess.PIPE)
-        return stream
+            final_result = self.format_result(result)
+            if output_file != '':
+                logging.info('File {} processing complete'.format(output_file))
+                with open(output_file, 'w', encoding='utf-8') as fh:
+                    fh.write(final_result)
+            else:
+                print(final_result)
 
-    def process_task_list_pool(self, inputdata):
-        start_time = timer()
+            await proc.wait()
+
+            elapsed = timer() - start_time
+            logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
+            self.queue.task_done()
+
+    def pool_worker(self, inputdata):
         logging.info('Recognizing {}'.format(inputdata[0]))
+        start_time = timer()
 
         try:
             stream = self.resample_ffmpeg(inputdata[0])
         except Exception:
             logging.info('Missing ffmpeg, please install and try again')
-            exit(1)
+            return
 
-        rec = KaldiRecognizer(self.model, 16000)
+        rec = KaldiRecognizer(self.model, SAMPLE_RATE)
         rec.SetWords(True)
         result, tot_samples = self.recognize_stream(rec, stream)
         final_result = self.format_result(result)
@@ -130,18 +151,22 @@ class Transcriber:
                 fh.write(final_result)
         else:
             print(final_result)
+
         elapsed = timer() - start_time
-        logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, tot_samples / 16000.0 / float(elapsed)))
+        logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
 
     async def process_task_list_server(self, task_list):
         self.queue = Queue()
         [self.queue.put(x) for x in task_list]
-        worker_tasks = [asyncio.create_task(self.run_server_recognition()) for i in range(self.args.tasks)]
-        await asyncio.gather(*worker_tasks)
+        workers = [asyncio.create_task(self.server_worker()) for i in range(self.args.tasks)]
+        await asyncio.gather(*workers)
+
+    def process_task_list_pool(self, task_list):
+        with Pool() as pool:
+            pool.map(self.pool_worker, task_list)
 
     def process_task_list(self, args, task_list):
         if self.args.server is None:
-            with Pool() as pool:
-                pool.map(self.process_task_list_pool, task_list)
+            self.process_task_list_pool(task_list)
         else:
             asyncio.run(self.process_task_list_server(task_list))
