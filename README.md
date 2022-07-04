@@ -12,7 +12,7 @@ transcription, zero-latency response with streaming API, reconfigurable
 vocabulary and speaker identification.
 
 Speech recognition bindings implemented for various programming languages
-like Python, Java, Node.JS, C#, C++ and others.
+like Python, Java, Node.JS, C#, C++, Rust, Go and others.
 
 Vosk supplies speech recognition for chatbots, smart home appliances,
 virtual assistants. It can also create subtitles for movies,
