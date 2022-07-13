@@ -40,7 +40,7 @@ def get_result(args):
         align = scripts.ForcedAligner(transcript, model)
         intermediate_result = align.transcribe(wavfile, progress_cb=on_progress, logging=logging)
     result = ((intermediate_result.to_json(indent=2)).replace(',\n      "realign": false,', ','))
-    fh = open(args.audiofile, 'w', encoding="utf-8") if args.output else sys.stdout
+    fh = open(args.output, 'w', encoding="utf-8") if args.output else sys.stdout
     fh.write(result)
     if args.output:
         logging.info("output written to %s" % (args.output))
