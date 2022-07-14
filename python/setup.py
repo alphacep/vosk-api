@@ -32,6 +32,8 @@ else:
                 oses = 'win_amd64'
             elif system == 'Linux' and architecture == '64bit':
                 oses = 'linux_x86_64'
+            elif system == 'Linux' and architecture == 'aarch64':
+                oses = 'manylinux2014_aarch64'
             elif system == 'Linux':
                 oses = 'linux_' + architecture
             else:
