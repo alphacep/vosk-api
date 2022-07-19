@@ -32,6 +32,8 @@ else:
                 oses = 'win_amd64'
             elif system == 'Linux' and architecture == '64bit':
                 oses = 'linux_x86_64'
+            elif system == 'Linux' and architecture == 'aarch64':
+                oses = 'manylinux2014_aarch64'
             elif system == 'Linux':
                 oses = 'linux_' + architecture
             else:
@@ -44,7 +46,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="vosk",
-    version="0.3.42",
+    version="0.3.43",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
     description="Offline open source speech recognition API based on Kaldi and Vosk",

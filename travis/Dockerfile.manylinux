@@ -9,6 +9,7 @@ RUN yum -y update && yum -y install \
     autoconf \
     libtool \
     cmake \
+    libffi-devel \
     && yum clean all
 
 RUN cd /opt \

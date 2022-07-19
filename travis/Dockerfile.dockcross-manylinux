@@ -1,0 +1,39 @@
+ARG DOCKCROSS_IMAGE=dockcross/manylinux2014-aarch64
+FROM ${DOCKCROSS_IMAGE}
+
+LABEL description="A docker image for building portable Python linux binary wheels and Kaldi on other architectures"
+LABEL maintainer="contact@alphacephei.com"
+
+RUN yum -y install \
+    automake \
+    autoconf \
+    libtool \
+    libffi-devel \
+    && yum clean all
+
+ARG OPENBLAS_ARGS=
+RUN cd /opt \
+    && git clone -b vosk --single-branch https://github.com/alphacep/kaldi \
+    && cd kaldi/tools \
+    && git clone -b v0.3.20 --single-branch https://github.com/xianyi/OpenBLAS \
+    && git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack \
+    && echo ${OPENBLAS_ARGS} \
+    && make -C OpenBLAS ONLY_CBLAS=1 ${OPENBLAS_ARGS} HOSTCC=gcc USE_LOCKING=1 USE_THREAD=0 all \
+    && make -C OpenBLAS ${OPENBLAS_ARGS} HOSTCC=gcc USE_LOCKING=1 USE_THREAD=0 PREFIX=$(pwd)/OpenBLAS/install install \
+    && mkdir -p clapack/BUILD && cd clapack/BUILD && cmake .. \
+    && make -j 10 -C F2CLIBS \
+    && make -j 10 -C BLAS \
+    && make -j 10 -C SRC \
+    && find . -name "*.a" | xargs cp -t ../../OpenBLAS/install/lib \
+    && cd /opt/kaldi/tools \
+    && git clone --single-branch https://github.com/alphacep/openfst openfst \
+    && cd openfst \
+    && autoreconf -i \
+    && CFLAGS="-g -O3" ./configure --prefix=/opt/kaldi/tools/openfst --enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin --host=${CROSS_TRIPLE} --build=x86-linux-gnu \
+    && make -j 10 && make install \
+    && cd /opt/kaldi/src \
+    && sed -i "s:TARGET_ARCH=\"\`uname -m\`\":TARGET_ARCH=$(echo $CROSS_TRIPLE|cut -d - -f 1):g" configure \
+    && sed -i "s: -O1 : -O3 :g" makefiles/linux_openblas_arm.mk \
+    && ./configure --mathlib=OPENBLAS_CLAPACK --shared --use-cuda=no \
+    && make -j 10 online2 lm rnnlm \
+    && find /opt/kaldi -name "*.o" -exec rm {} \;
