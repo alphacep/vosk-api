@@ -1,5 +1,8 @@
 import os
 import sys
+import srt
+import datetime
+import json
 
 import requests
 from urllib.request import urlretrieve
@@ -181,7 +184,22 @@ class KaldiRecognizer(object):
 
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)
-
+    
+    def SRTResult(self, results, words_per_line):
+        subs = []
+        for i, res in enumerate(results):
+            jres = json.loads(res)
+            if not 'result' in jres:
+                continue
+            words = jres['result']
+            for j in range(0, len(words), words_per_line):
+                line = words[j : j + words_per_line]
+                s = srt.Subtitle(index=len(subs),
+                        content=" ".join([l['word'] for l in line]),
+                        start=datetime.timedelta(seconds=line[0]['start']),
+                        end=datetime.timedelta(seconds=line[-1]['end']))
+                subs.append(s)
+        return srt.compose(subs)
 
 def SetLogLevel(level):
     return _c.vosk_set_log_level(level)

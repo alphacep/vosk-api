@@ -2,12 +2,7 @@
 
 from vosk import Model, KaldiRecognizer, SetLogLevel
 import sys
-import os
-import wave
 import subprocess
-import srt
-import json
-import datetime
 
 SetLogLevel(-1)
 
@@ -24,29 +19,13 @@ process = subprocess.Popen(['ffmpeg', '-loglevel', 'quiet', '-i',
 
 WORDS_PER_LINE = 7
 
-def transcribe():
-    results = []
-    subs = []
-    while True:
-       data = process.stdout.read(4000)
-       if len(data) == 0:
-           break
-       if rec.AcceptWaveform(data):
-           results.append(rec.Result())
-    results.append(rec.FinalResult())
+results = []
+while True:
+    data = process.stdout.read(4000)
+    if len(data) == 0:
+        break
+    if rec.AcceptWaveform(data):
+        results.append(rec.Result())
+results.append(rec.FinalResult())
 
-    for i, res in enumerate(results):
-       jres = json.loads(res)
-       if not 'result' in jres:
-           continue
-       words = jres['result']
-       for j in range(0, len(words), WORDS_PER_LINE):
-           line = words[j : j + WORDS_PER_LINE] 
-           s = srt.Subtitle(index=len(subs), 
-                   content=" ".join([l['word'] for l in line]),
-                   start=datetime.timedelta(seconds=line[0]['start']), 
-                   end=datetime.timedelta(seconds=line[-1]['end']))
-           subs.append(s)
-    return subs
-
-print (srt.compose(transcribe()))
+print (rec.SRTResult(results, WORDS_PER_LINE))
