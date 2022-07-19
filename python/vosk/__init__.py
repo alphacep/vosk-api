@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 import requests
 from urllib.request import urlretrieve
@@ -181,6 +182,10 @@ class KaldiRecognizer(object):
 
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)
+
+    def TextResult(self):
+        res = json.loads(self.Result())
+        return res['text']
 
 
 def SetLogLevel(level):
