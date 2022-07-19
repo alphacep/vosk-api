@@ -215,9 +215,6 @@ void Model::ReadDataFiles()
          " lattice-beam=" << nnet3_decoding_config_.lattice_beam;
     KALDI_LOG << "Silence phones " << endpoint_config_.silence_phones;
 
-    nnet3_decoding_config_.determinize_max_delay = 20;
-    nnet3_decoding_config_.determinize_min_chunk_size = 10;
-
     if (stat(mfcc_conf_rxfilename_.c_str(), &buffer) == 0) {
         feature_info_.feature_type = "mfcc";
         ReadConfigFromFile(mfcc_conf_rxfilename_, &feature_info_.mfcc_opts);

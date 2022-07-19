@@ -5,18 +5,20 @@ import sys
 import os
 import wave
 
+# You can set log level to -1 to disable debug messages
 SetLogLevel(0)
-
-if not os.path.exists("model"):
-    print ("Please download the model from https://alphacephei.com/vosk/models and unpack as 'model' in the current folder.")
-    exit (1)
 
 wf = wave.open(sys.argv[1], "rb")
 if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE":
     print ("Audio file must be WAV format mono PCM.")
     exit (1)
 
-model = Model("model")
+model = Model(lang="en-us")
+
+# You can also init model by name or with a folder path
+# model = Model(model_name="vosk-model-en-us-0.21")
+# model = Model("models/en")
+
 rec = KaldiRecognizer(model, wf.getframerate())
 rec.SetWords(True)
 rec.SetPartialWords(True)

@@ -1,25 +1,15 @@
-ARG DOCKCROSS_IMAGE=alphacep/dockcross-linux-armv7
+ARG DOCKCROSS_IMAGE=dockcross/manylinux2014-aarch64
 FROM ${DOCKCROSS_IMAGE}
 
 LABEL description="A docker image for building portable Python linux binary wheels and Kaldi on other architectures"
 LABEL maintainer="contact@alphacephei.com"
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        wget \
-        libffi-dev \
-        libpcre3-dev \
-        zlib1g-dev \
-        automake \
-        autoconf \
-        libtool \
-        cmake \
-        python3 \
-        python3-pip \
-        python3-wheel \
-        python3-setuptools \
-        python3-cffi \
-    && rm -rf /var/lib/apt/lists/*
+RUN yum -y install \
+    automake \
+    autoconf \
+    libtool \
+    libffi-devel \
+    && yum clean all
 
 ARG OPENBLAS_ARGS=
 RUN cd /opt \

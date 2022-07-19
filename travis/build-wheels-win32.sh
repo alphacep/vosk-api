@@ -13,8 +13,8 @@ cp /usr/lib/gcc/i686-w64-mingw32/*-posix/libgcc_s_sjlj-1.dll /opt/vosk-api/src
 cp /usr/i686-w64-mingw32/lib/libwinpthread-1.dll /opt/vosk-api/src
 
 # Copy dlls to output folder
-mkdir -p /io/wheelhouse/win32
-cp /opt/vosk-api/src/*.{dll,lib} /io/wheelhouse/win32
+mkdir -p /io/wheelhouse/vosk-win32
+cp /opt/vosk-api/src/*.{dll,lib} /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vosk-win32
 
 # Build wheel and put to the output folder
 export VOSK_SOURCE=/opt/vosk-api

@@ -5,12 +5,7 @@ import sys
 import json
 import os
 
-if not os.path.exists("model"):
-    print ("Please download the model from https://alphacephei.com/vosk/models and unpack as 'model' in the current folder.")
-    exit (1)
-
-
-model = Model("model")
+model = Model(lang="en-us")
 
 # Large vocabulary free form recognition
 rec = KaldiRecognizer(model, 16000)
