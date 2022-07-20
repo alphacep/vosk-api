@@ -6,6 +6,7 @@ import os
 import logging
 import asyncio
 import websockets
+import shlex
 
 from queue import Queue
 from pathlib import Path
@@ -96,12 +97,12 @@ class Transcriber:
         return final_result
 
     def resample_ffmpeg(self, infile):
-        cmd = "ffmpeg -nostdin -loglevel quiet -i {} -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
-        stream = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        cmd = shlex.split("ffmpeg -nostdin -loglevel quiet -i \"{}\" -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE))
+        stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
     async def resample_ffmpeg_async(self, infile):
-        cmd = "ffmpeg -nostdin -loglevel quiet -i {} -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
+        cmd = "ffmpeg -nostdin -loglevel quiet -i \"{}\" -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
         return await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)
 
     async def server_worker(self):
@@ -136,7 +137,7 @@ class Transcriber:
 
         try:
             stream = self.resample_ffmpeg(inputdata[0])
-        except Exception:
+        except :
             logging.info('Missing ffmpeg, please install and try again')
             return
 
