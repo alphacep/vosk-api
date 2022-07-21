@@ -137,8 +137,9 @@ class Transcriber:
 
         try:
             stream = self.resample_ffmpeg(inputdata[0])
-        except :
-            logging.info('Missing ffmpeg, please install and try again')
+            logging.info('FFMPEG ok')
+        except Exception as e:
+            logging.info(e)
             return
 
         rec = KaldiRecognizer(self.model, SAMPLE_RATE)
