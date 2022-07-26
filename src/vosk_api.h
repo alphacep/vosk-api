@@ -243,7 +243,7 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
  *  }
  * </pre>
  *
- * If alternatives enabled it returns result with alternatives, see also vosk_recognizer_set_alternatives().
+ * If alternatives enabled it returns result with alternatives, see also vosk_recognizer_set_max_alternatives().
  *
  * If word times enabled returns word time, see also vosk_recognizer_set_word_times().
  */
