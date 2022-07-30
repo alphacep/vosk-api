@@ -72,7 +72,7 @@ if (os.platform() == 'win32') {
     // Update path to load dependent dlls
     let currentPath = process.env.Path;
     let dllDirectory = path.resolve(path.join(__dirname, "lib", "win-x86_64"));
-    process.env.Path = currentPath + path.delimiter + dllDirectory;
+    process.env.Path = dllDirectory + path.delimiter + currentPath;
 
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
 } else if (os.platform() == 'darwin') {
