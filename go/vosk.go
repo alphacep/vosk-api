@@ -5,6 +5,7 @@ package vosk
 // #include <stdlib.h>
 // #include <vosk_api.h>
 import "C"
+import "unsafe"
 
 // VoskModel contains a reference to the C VoskModel
 type VoskModel struct {
@@ -13,7 +14,9 @@ type VoskModel struct {
 
 // NewModel creates a new VoskModel instance
 func NewModel(modelPath string) (*VoskModel, error) {
-	internal := C.vosk_model_new(C.CString(modelPath))
+	cmodelPath := C.CString(modelPath)
+	defer C.free(unsafe.Pointer(cmodelPath))
+	internal := C.vosk_model_new(cmodelPath)
 	model := &VoskModel{model: internal}
 	return model, nil
 }
@@ -29,10 +32,10 @@ func freeModel(model *VoskModel) {
 // FindWord checks if a word can be recognized by the model.
 // Returns the word symbol if the word exists inside the model or
 // -1 otherwise.
-func (m *VoskModel) FindWord(word []byte) int {
-	cbuf := C.CBytes(word)
-	defer C.free(cbuf)
-	i := C.vosk_model_find_word(m.model, (*C.char)(cbuf))
+func (m *VoskModel) FindWord(word string) int {
+	cstr := C.CString(word)
+	defer C.free(unsafe.Pointer(cstr))
+	i := C.vosk_model_find_word(m.model, cstr)
 	return int(i)
 }
 
@@ -43,7 +46,9 @@ type VoskSpkModel struct {
 
 // NewSpkModel creates a new VoskSpkModel instance
 func NewSpkModel(spkModelPath string) (*VoskSpkModel, error) {
-	internal := C.vosk_spk_model_new(C.CString(spkModelPath))
+	cspkModelPath := C.CString(spkModelPath)
+	defer C.free(unsafe.Pointer(cspkModelPath))
+	internal := C.vosk_spk_model_new(cspkModelPath)
 	spkModel := &VoskSpkModel{spkModel: internal}
 	return spkModel, nil
 }
@@ -84,10 +89,10 @@ func NewRecognizerSpk(model *VoskModel, sampleRate float64, spkModel *VoskSpkMod
 }
 
 // NewRecognizerGrm creates a new VoskRecognizer instance with the phrase list.
-func NewRecognizerGrm(model *VoskModel, sampleRate float64, grammer []byte) (*VoskRecognizer, error) {
-	cbuf := C.CBytes(grammer)
-	defer C.free(cbuf)
-	internal := C.vosk_recognizer_new_grm(model.model, C.float(sampleRate), (*C.char)(cbuf))
+func NewRecognizerGrm(model *VoskModel, sampleRate float64, grammar string) (*VoskRecognizer, error) {
+	cgrammar := C.CString(grammar)
+	defer C.free(unsafe.Pointer(cgrammar))
+	internal := C.vosk_recognizer_new_grm(model.model, C.float(sampleRate), cgrammar)
 	rec := &VoskRecognizer{rec: internal}
 	return rec, nil
 }
@@ -107,6 +112,11 @@ func (r *VoskRecognizer) SetWords(words int) {
 	C.vosk_recognizer_set_words(r.rec, C.int(words))
 }
 
+// SetPartialWords enables words with times in the partial ouput.
+func (r *VoskRecognizer) SetPartialWords(words int) {
+	C.vosk_recognizer_set_partial_words(r.rec, C.int(words))
+}
+
 // AcceptWaveform accepts and processes a new chunk of the voice data.
 func (r *VoskRecognizer) AcceptWaveform(buffer []byte) int {
 	cbuf := C.CBytes(buffer)
@@ -116,19 +126,19 @@ func (r *VoskRecognizer) AcceptWaveform(buffer []byte) int {
 }
 
 // Result returns a speech recognition result.
-func (r *VoskRecognizer) Result() []byte {
-	return []byte(C.GoString(C.vosk_recognizer_result(r.rec)))
+func (r *VoskRecognizer) Result() string {
+	return C.GoString(C.vosk_recognizer_result(r.rec))
 }
 
 // PartialResult returns a partial speech recognition result.
-func (r *VoskRecognizer) PartialResult() []byte {
-	return []byte(C.GoString(C.vosk_recognizer_partial_result(r.rec)))
+func (r *VoskRecognizer) PartialResult() string {
+	return C.GoString(C.vosk_recognizer_partial_result(r.rec))
 }
 
 // FinalResult returns a speech recognition result. Same as result, but doesn't wait
 // for silence.
-func (r *VoskRecognizer) FinalResult() []byte {
-	return []byte(C.GoString(C.vosk_recognizer_final_result(r.rec)))
+func (r *VoskRecognizer) FinalResult() string {
+	return C.GoString(C.vosk_recognizer_final_result(r.rec))
 }
 
 // Reset resets the recognizer.

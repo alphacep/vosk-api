@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"encoding/json"
 
 	vosk "github.com/alphacep/vosk-api/go"
 )
@@ -20,6 +21,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// we can check if word is in the vocabulary
+	// fmt.Println(model.FindWord("air"))
 
 	sampleRate := 16000.0
 	rec, err := vosk.NewRecognizer(model, sampleRate)
@@ -48,9 +52,12 @@ func main() {
 		}
 
 		if rec.AcceptWaveform(buf) != 0 {
-			fmt.Println(string(rec.Result()))
+			fmt.Println(rec.Result())
 		}
 	}
 
-	fmt.Println(string(rec.FinalResult()))
+	// Unmarshal example for final result
+	var jres map[string]interface{}
+	json.Unmarshal([]byte(rec.FinalResult()), &jres)
+	fmt.Println(jres["text"])
 }
