@@ -137,7 +137,9 @@ class Transcriber:
 
         try:
             stream = self.resample_ffmpeg(inputdata[0])
-            logging.info('FFMPEG ok')
+        except FileNotFoundError as e:
+            print(e, 'Missing FFMPEG, please install and try again')
+            return
         except Exception as e:
             logging.info(e)
             return
