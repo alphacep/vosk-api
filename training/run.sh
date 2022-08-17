@@ -3,11 +3,13 @@
 . ./cmd.sh
 . ./path.sh
 
-stage=0
+stage=-1
+stop_stage=100
+
 . utils/parse_options.sh
 
 # Data preparation
-if [ $stage -le 0 ]; then
+if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   data_url=www.openslr.org/resources/31
   lm_url=www.openslr.org/resources/11
   database=corpus
@@ -24,13 +26,13 @@ if [ $stage -le 0 ]; then
 fi
 
 # Dictionary formatting
-if [ $stage -le 1 ]; then
+if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   local/prepare_dict.sh data/local/lm data/local/dict
   utils/prepare_lang.sh data/local/dict "<UNK>" data/local/lang data/lang
 fi
 
 # Extract MFCC features
-if [ $stage -le 2 ]; then
+if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
   for task in train; do
     steps/make_mfcc.sh --cmd "$train_cmd" --nj 10 data/$task exp/make_mfcc/$task $mfcc
     steps/compute_cmvn_stats.sh data/$task exp/make_mfcc/$task $mfcc
@@ -38,7 +40,7 @@ if [ $stage -le 2 ]; then
 fi
 
 # Train GMM models
-if [ $stage -le 3 ]; then
+if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   steps/train_mono.sh --nj 10 --cmd "$train_cmd" \
     data/train data/lang exp/mono
 
@@ -65,12 +67,12 @@ if [ $stage -le 3 ]; then
 fi
 
 # Train TDNN model
-if [ $stage -le 4 ]; then
+if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
   local/chain/run_tdnn.sh
 fi
 
 # Decode
-if [ $stage -le 5 ]; then
+if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
 
   utils/format_lm.sh data/lang data/local/lm/lm_tgsmall.arpa.gz data/local/dict/lexicon.txt data/lang_test
   utils/mkgraph.sh --self-loop-scale 1.0 data/lang_test exp/chain/tdnn exp/chain/tdnn/graph
