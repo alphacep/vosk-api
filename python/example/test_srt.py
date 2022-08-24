@@ -11,21 +11,9 @@ model = Model(lang="en-us")
 rec = KaldiRecognizer(model, sample_rate)
 rec.SetWords(True)
 
-process = subprocess.Popen(['ffmpeg', '-loglevel', 'quiet', '-i',
+stream = subprocess.Popen(['ffmpeg', '-loglevel', 'quiet', '-i',
                             sys.argv[1],
                             '-ar', str(sample_rate) , '-ac', '1', '-f', 's16le', '-'],
-                            stdout=subprocess.PIPE)
+                            stdout=subprocess.PIPE).stdout
 
-
-WORDS_PER_LINE = 7
-
-results = []
-while True:
-    data = process.stdout.read(4000)
-    if len(data) == 0:
-        break
-    if rec.AcceptWaveform(data):
-        results.append(rec.Result())
-results.append(rec.FinalResult())
-
-print (rec.SRTResult(results, WORDS_PER_LINE))
+print(rec.SrtResult(stream))

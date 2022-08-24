@@ -185,7 +185,16 @@ class KaldiRecognizer(object):
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)
     
-    def SRTResult(self, results, words_per_line):
+    def SrtResult(self, stream):
+        words_per_line = 7
+        results = []
+        while True:
+            data = stream.read(4000)
+            if len(data) == 0:
+                break
+            if self.AcceptWaveform(data):
+                results.append(self.Result())
+        results.append(self.FinalResult())
         subs = []
         for i, res in enumerate(results):
             jres = json.loads(res)
@@ -199,6 +208,7 @@ class KaldiRecognizer(object):
                         start=datetime.timedelta(seconds=line[0]['start']),
                         end=datetime.timedelta(seconds=line[-1]['end']))
                 subs.append(s)
+
         return srt.compose(subs)
 
 def SetLogLevel(level):
