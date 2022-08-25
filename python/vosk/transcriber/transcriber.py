@@ -41,11 +41,9 @@ class Transcriber:
             else:
                 jres = json.loads(rec.PartialResult())
                 logging.info(jres)
-
         jres = json.loads(rec.FinalResult())
         logging.info(jres)
         result.append(jres)
-
         return result, tot_samples
 
     async def recognize_stream_server(self, proc):
@@ -93,7 +91,8 @@ class Transcriber:
 
         elif self.args.output_type == 'txt':
             for part in result:
-                final_result += part['text'] + ' '
+                if part["text"] != '':
+                    final_result += part["text"] + '\n'
         return final_result
 
     def resample_ffmpeg(self, infile):
@@ -123,7 +122,7 @@ class Transcriber:
                 with open(output_file, 'w', encoding='utf-8') as fh:
                     fh.write(final_result)
             else:
-                print(final_result)
+                print(*final_result)
 
             await proc.wait()
 
