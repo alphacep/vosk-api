@@ -41,9 +41,11 @@ class Transcriber:
             else:
                 jres = json.loads(rec.PartialResult())
                 logging.info(jres)
+
         jres = json.loads(rec.FinalResult())
         logging.info(jres)
         result.append(jres)
+
         return result, tot_samples
 
     async def recognize_stream_server(self, proc):
