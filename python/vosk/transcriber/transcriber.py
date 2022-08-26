@@ -73,7 +73,7 @@ class Transcriber:
 
 
     def format_result(self, result, words_per_line=7):
-        final_result = ''
+        processed_result = ''
         if self.args.output_type == 'srt':
             subs = []
 
@@ -89,12 +89,13 @@ class Transcriber:
                             start=datetime.timedelta(seconds=line[0]['start']),
                             end=datetime.timedelta(seconds=line[-1]['end']))
                     subs.append(s)
-            final_result = srt.compose(subs)
+            processed_result = srt.compose(subs)
 
         elif self.args.output_type == 'txt':
             for part in result:
-                final_result += part['text'] + ' '
-        return final_result
+                if part["text"] != '':
+                    processed_result += part["text"] + '\n'
+        return processed_result
 
     def resample_ffmpeg(self, infile):
         cmd = shlex.split("ffmpeg -nostdin -loglevel quiet -i \"{}\" -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE))
@@ -117,13 +118,13 @@ class Transcriber:
             proc = await self.resample_ffmpeg_async(input_file)
             result, tot_samples = await self.recognize_stream_server(proc)
 
-            final_result = self.format_result(result)
+            processed_result = self.format_result(result)
             if output_file != '':
                 logging.info('File {} processing complete'.format(output_file))
                 with open(output_file, 'w', encoding='utf-8') as fh:
-                    fh.write(final_result)
+                    fh.write(processed_result)
             else:
-                print(final_result)
+                print(processed_result)
 
             await proc.wait()
 
@@ -147,14 +148,14 @@ class Transcriber:
         rec = KaldiRecognizer(self.model, SAMPLE_RATE)
         rec.SetWords(True)
         result, tot_samples = self.recognize_stream(rec, stream)
-        final_result = self.format_result(result)
+        processed_result = self.format_result(result)
 
         if inputdata[1] != '':
             logging.info('File {} processing complete'.format(inputdata[1]))
             with open(inputdata[1], 'w', encoding='utf-8') as fh:
-                fh.write(final_result)
+                fh.write(processed_result)
         else:
-            print(final_result)
+            print(processed_result)
 
         elapsed = timer() - start_time
         logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
