@@ -94,7 +94,7 @@ class Transcriber:
         elif self.args.output_type == 'txt':
             for part in result:
                 if part["text"] != '':
-                processed_result += part["text"] + '\n'
+                    processed_result += part["text"] + '\n'
         return processed_result
 
     def resample_ffmpeg(self, infile):
