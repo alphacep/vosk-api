@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 
-from vosk import KaldiRecognizer, Model
-import gradio as gr
 import json
+import gradio as gr
+
+from vosk import KaldiRecognizer, Model
 
 model = Model(lang="en-us")
 
 def transcribe(data, state):
     sample_rate, audio_data = data
     audio_data = (audio_data >> 16).astype("int16").tobytes()
-    
+
     if state is None:
         rec = KaldiRecognizer(model, sample_rate)
         result = []
     else:
         rec, result = state
-    
+
     if rec.AcceptWaveform(audio_data):
         text_result = json.loads(rec.Result())["text"]
         if text_result != '':

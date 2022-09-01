@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from vosk import Model, KaldiRecognizer
 import sys
 import json
-import os
+
+from vosk import Model, KaldiRecognizer
 
 model = Model(lang="en-us")
 
@@ -22,7 +22,7 @@ while True:
         break
     if rec.AcceptWaveform(data):
         res = json.loads(rec.Result())
-        print (res['text'])
+        print(res['text'])
 
 res = json.loads(rec.FinalResult())
-print (res['text'])
+print(res['text'])

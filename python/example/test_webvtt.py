@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
-from vosk import Model, KaldiRecognizer, SetLogLevel
-from webvtt import WebVTT, Caption
 import sys
-import os
 import subprocess
 import json
 import textwrap
 
-SetLogLevel(-1)
+from vosk import Model, KaldiRecognizer, SetLogLevel
+from webvtt import WebVTT, Caption
 
-sample_rate = 16000
-model = Model(lang="en-us")
-rec = KaldiRecognizer(model, sample_rate)
-rec.SetWords(True)
-
+SAMPLE_RATE = 16000
 WORDS_PER_LINE = 7
 
+SetLogLevel(-1)
 
-def timeString(seconds):
+model = Model(lang="en-us")
+rec = KaldiRecognizer(model, SAMPLE_RATE)
+rec.SetWords(True)
+
+
+def timestring(seconds):
     minutes = seconds / 60
     seconds = seconds % 60
     hours = int(minutes / 60)
@@ -28,7 +28,7 @@ def timeString(seconds):
 
 def transcribe():
     command = ['ffmpeg', '-nostdin', '-loglevel', 'quiet', '-i', sys.argv[1],
-               '-ar', str(sample_rate), '-ac', '1', '-f', 's16le', '-']
+               '-ar', str(SAMPLE_RATE), '-ac', '1', '-f', 's16le', '-']
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
 
     results = []
@@ -41,13 +41,13 @@ def transcribe():
     results.append(rec.FinalResult())
 
     vtt = WebVTT()
-    for i, res in enumerate(results):
+    for _, res in enumerate(results):
         words = json.loads(res).get('result')
         if not words:
             continue
 
-        start = timeString(words[0]['start'])
-        end = timeString(words[-1]['end'])
+        start = timestring(words[0]['start'])
+        end = timestring(words[-1]['end'])
         content = ' '.join([w['word'] for w in words])
 
         caption = Caption(start, end, textwrap.fill(content))
@@ -61,7 +61,7 @@ def transcribe():
 
 
 if __name__ == '__main__':
-    if not (1 < len(sys.argv) < 4):
-        print('Usage: {} audiofile [output file]'.format(sys.argv[0]))
-        exit(1)
+    if not 1 < len(sys.argv) < 4:
+        print(f'Usage: {sys.argv[0]} audiofile [output file]')
+        sys.exit(1)
     transcribe()
