@@ -2,14 +2,12 @@ import json
 import subprocess
 import srt
 import datetime
-import os
 import logging
 import asyncio
 import websockets
 import shlex
 
 from queue import Queue
-from pathlib import Path
 from timeit import default_timer as timer
 from vosk import KaldiRecognizer, Model
 from multiprocessing.dummy import Pool
@@ -22,6 +20,7 @@ class Transcriber:
     def __init__(self, args):
         self.model = Model(model_path=args.model, model_name=args.model_name, lang=args.lang)
         self.args = args
+        self.queue = Queue()
 
     def recognize_stream(self, rec, stream):
         tot_samples = 0
@@ -40,10 +39,10 @@ class Transcriber:
                 result.append(jres)
             else:
                 jres = json.loads(rec.PartialResult())
-                logging.info(jres)
+                if jres["partial"] != "":
+                    logging.info(jres)
 
         jres = json.loads(rec.FinalResult())
-        logging.info(jres)
         result.append(jres)
 
         return result, tot_samples
@@ -62,7 +61,7 @@ class Transcriber:
                 await websocket.send(data)
                 jres = json.loads(await websocket.recv())
                 logging.info(jres)
-                if not 'partial' in jres:
+                if not "partial" in jres:
                     result.append(jres)
             await websocket.send('{"eof" : 1}')
             jres = json.loads(await websocket.recv())
@@ -73,44 +72,46 @@ class Transcriber:
 
 
     def format_result(self, result, words_per_line=7):
-        processed_result = ''
-        if self.args.output_type == 'srt':
+        processed_result = ""
+        if self.args.output_type == "srt":
             subs = []
 
-            for i, res in enumerate(result):
-                if not 'result' in res:
+            for _, res in enumerate(result):
+                if not "result" in res:
                     continue
-                words = res['result']
+                words = res["result"]
 
                 for j in range(0, len(words), words_per_line):
                     line = words[j : j + words_per_line]
                     s = srt.Subtitle(index=len(subs),
-                            content = ' '.join([l['word'] for l in line]),
-                            start=datetime.timedelta(seconds=line[0]['start']),
-                            end=datetime.timedelta(seconds=line[-1]['end']))
+                            content = " ".join([l["word"] for l in line]),
+                            start=datetime.timedelta(seconds=line[0]["start"]),
+                            end=datetime.timedelta(seconds=line[-1]["end"]))
                     subs.append(s)
             processed_result = srt.compose(subs)
 
-        elif self.args.output_type == 'txt':
+        elif self.args.output_type == "txt":
             for part in result:
-                if part["text"] != '':
-                    processed_result += part["text"] + '\n'
+                if part["text"] != "":
+                    processed_result += part["text"] + "\n"
         return processed_result
 
     def resample_ffmpeg(self, infile):
-        cmd = shlex.split("ffmpeg -nostdin -loglevel quiet -i \"{}\" -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE))
+        cmd = shlex.split('ffmpeg -nostdin -loglevel quiet '
+                '-i \"{}\" -ar {} -ac 1 -f s16le -'.format(str(infile), SAMPLE_RATE))
         stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
     async def resample_ffmpeg_async(self, infile):
-        cmd = "ffmpeg -nostdin -loglevel quiet -i \"{}\" -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
+        cmd = 'ffmpeg -nostdin -loglevel quiet '\
+        '-i \"{}\" -ar {} -ac 1 -f s16le -'.format(str(infile), SAMPLE_RATE)
         return await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)
 
     async def server_worker(self):
         while True:
             try:
                 input_file, output_file = self.queue.get_nowait()
-            except:
+            except Exception:
                 break
 
             logging.info('Recognizing {}'.format(input_file))
@@ -119,9 +120,9 @@ class Transcriber:
             result, tot_samples = await self.recognize_stream_server(proc)
 
             processed_result = self.format_result(result)
-            if output_file != '':
+            if output_file != "":
                 logging.info('File {} processing complete'.format(output_file))
-                with open(output_file, 'w', encoding='utf-8') as fh:
+                with open(output_file, "w", encoding="utf-8") as fh:
                     fh.write(processed_result)
             else:
                 print(processed_result)
@@ -129,7 +130,8 @@ class Transcriber:
             await proc.wait()
 
             elapsed = timer() - start_time
-            logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
+            logging.info('Execution time: {:.3f} sec; '\
+                    'xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
             self.queue.task_done()
 
     def pool_worker(self, inputdata):
@@ -150,19 +152,20 @@ class Transcriber:
         result, tot_samples = self.recognize_stream(rec, stream)
         processed_result = self.format_result(result)
 
-        if inputdata[1] != '':
+        if inputdata[1] != "":
             logging.info('File {} processing complete'.format(inputdata[1]))
-            with open(inputdata[1], 'w', encoding='utf-8') as fh:
+            with open(inputdata[1], "w", encoding="utf-8") as fh:
                 fh.write(processed_result)
         else:
             print(processed_result)
 
         elapsed = timer() - start_time
-        logging.info('Execution time: {:.3f} sec; xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
+        logging.info('Execution time: {:.3f} sec; '\
+                'xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
 
     async def process_task_list_server(self, task_list):
-        self.queue = Queue()
-        [self.queue.put(x) for x in task_list]
+        for x in task_list:
+            self.queue.put(x)
         workers = [asyncio.create_task(self.server_worker()) for i in range(self.args.tasks)]
         await asyncio.gather(*workers)
 
@@ -170,7 +173,7 @@ class Transcriber:
         with Pool() as pool:
             pool.map(self.pool_worker, task_list)
 
-    def process_task_list(self, args, task_list):
+    def process_task_list(self, task_list):
         if self.args.server is None:
             self.process_task_list_pool(task_list)
         else:

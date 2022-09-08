@@ -12,7 +12,7 @@ GpuInit()
 
 model = BatchModel()
 
-with open(sys.argv[1], encoding='uft-8').readlines() as fnames:
+with open(sys.argv[1], encoding="uft-8").readlines() as fnames:
     fds = [open(x.strip(), "rb") for x in fnames]
 uids = [fname.strip().split('/')[-1][:-4] for fname in fnames]
 recs = [BatchRecognizer(model, 16000) for x in fnames]
@@ -42,7 +42,7 @@ while True:
     for i, fd in enumerate(fds):
         res = recs[i].Result()
         if len(res) != 0:
-            results[i] = results[i] + " " + json.loads(res)['text']
+            results[i] = results[i] + " " + json.loads(res)["text"]
 
     if len(ended) == len(fds):
         break
@@ -52,7 +52,7 @@ end_time = timer()
 for i, res in enumerate(results):
     print(uids[i], res.strip())
 
-print("Processed %.3f seconds of audio in %.3f seconds (%.3f xRT)"
+print('Processed %.3f seconds of audio in %.3f seconds (%.3f xRT)'
     % (TOT_SAMPLES / 16000.0 / 2,
     end_time - start_time,
     (TOT_SAMPLES / 16000.0 / 2 / (end_time - start_time))),

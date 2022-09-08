@@ -19,13 +19,13 @@ def transcribe(data, state):
 
     if rec.AcceptWaveform(audio_data):
         text_result = json.loads(rec.Result())["text"]
-        if text_result != '':
+        if text_result != "":
             result.append(text_result)
-        partial_result = ''
+        partial_result = ""
     else:
         partial_result = json.loads(rec.PartialResult())["partial"] + " "
 
-    return '\n'.join(result) + '\n' + partial_result, (rec, result)
+    return "\n".join(result) + "\n" + partial_result, (rec, result)
 
 gr.Interface(
     fn=transcribe,

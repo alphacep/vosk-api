@@ -13,9 +13,9 @@ model = Model(lang="en-us")
 rec = KaldiRecognizer(model, SAMPLE_RATE)
 rec.SetWords(True)
 
-stream = subprocess.Popen(['ffmpeg', '-loglevel', 'quiet', '-i',
+with subprocess.Popen(["ffmpeg", "-loglevel", "quiet", "-i",
                             sys.argv[1],
-                            '-ar', str(SAMPLE_RATE) , '-ac', '1', '-f', 's16le', '-'],
-                            stdout=subprocess.PIPE).stdout
+                            "-ar", str(SAMPLE_RATE) , "-ac", "1", "-f", "s16le", "-"],
+                            stdout=subprocess.PIPE).stdout as stream:
 
-print(rec.SrtResult(stream))
+    print(rec.SrtResult(stream))
