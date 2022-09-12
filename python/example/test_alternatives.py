@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
 import wave
+import sys
 import json
 
 from vosk import Model, KaldiRecognizer, SetLogLevel
