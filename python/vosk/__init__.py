@@ -92,7 +92,7 @@ class Model:
                 continue
             model_file_list = os.listdir(directory)
             model_file = [model for model in model_file_list if
-                    match(r'vosk-model(-small)?-{}'.format(lang), model)]
+                    match(r"vosk-model(-small)?-{}".format(lang), model)]
             if model_file != []:
                 return Path(directory, model_file[0])
         response = requests.get(MODEL_LIST_URL, timeout=10)
