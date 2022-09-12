@@ -7,8 +7,6 @@ import sounddevice as sd
 
 from vosk import Model, KaldiRecognizer
 
-DUMP_FN = None
-
 q = queue.Queue()
 
 def int_or_str(text):
@@ -18,7 +16,7 @@ def int_or_str(text):
     except ValueError:
         return text
 
-def callback(indata, status):
+def callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
@@ -55,30 +53,28 @@ try:
     model = Model(lang="en-us")
 
     if args.filename:
-        with open(args.filename, "wb") as DUMP_FN:
+        dump_fn = open(args.filename, "wb")
+    else:
+        dump_fn = None
 
-            with sd.RawInputStream(samplerate=args.samplerate,
-                    blocksize = 8000,
-                    device=args.device,
-                    dtype="int16",
-                    channels=1,
-                    callback=callback):
-                print("#" * 80)
-                print("Press Ctrl+C to stop the recording")
-                print("#" * 80)
+    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device,
+            dtype="int16", channels=1, callback=callback):
+        print('#' * 80)
+        print('Press Ctrl+C to stop the recording')
+        print('#' * 80)
 
-                rec = KaldiRecognizer(model, args.samplerate)
-                while True:
-                    data = q.get()
-                    if rec.AcceptWaveform(data):
-                        print(rec.Result())
-                    else:
-                        print(rec.PartialResult())
-                    if DUMP_FN is not None:
-                        DUMP_FN.write(data)
+        rec = KaldiRecognizer(model, args.samplerate)
+        while True:
+            data = q.get()
+            if rec.AcceptWaveform(data):
+                print(rec.Result())
+            else:
+                print(rec.PartialResult())
+            if dump_fn is not None:
+                dump_fn.write(data)
 
 except KeyboardInterrupt:
-    print("\nDone")
+    print('\nDone')
     parser.exit(0)
 except Exception as e:
     parser.exit(type(e).__name__ + ": " + str(e))

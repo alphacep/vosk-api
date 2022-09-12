@@ -3,8 +3,8 @@
 import sys
 import json
 
-from timeit import default_timer as timer
 from vosk import BatchModel, BatchRecognizer, GpuInit
+from timeit import default_timer as timer
 
 TOT_SAMPLES = 0
 
@@ -14,7 +14,7 @@ model = BatchModel()
 
 with open(sys.argv[1], encoding="uft-8").readlines() as fnames:
     fds = [open(x.strip(), "rb") for x in fnames]
-uids = [fname.strip().split('/')[-1][:-4] for fname in fnames]
+uids = [fname.strip().split("/")[-1][:-4] for fname in fnames]
 recs = [BatchRecognizer(model, 16000) for x in fnames]
 results = [""] * len(fnames)
 ended = set()

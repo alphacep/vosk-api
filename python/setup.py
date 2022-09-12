@@ -1,12 +1,12 @@
 import os
-import sys
 import setuptools
 import shutil
 import glob
 import platform
 
 # Figure out environment for cross-compile
-vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__),
+    "..")))
 system = os.environ.get('VOSK_PLATFORM', platform.system())
 architecture = os.environ.get('VOSK_ARCHITECTURE', platform.architecture()[0])
 
@@ -41,8 +41,8 @@ else:
             return 'py3', abi, oses
     cmdclass = {'bdist_wheel': bdist_wheel_tag_name}
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+with open("README.md", "rb") as fh:
+    long_description = fh.read().decode("utf-8")
 
 setuptools.setup(
     name="vosk",

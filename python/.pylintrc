@@ -154,16 +154,23 @@ disable=raw-checker-failed,
         useless-suppression,
         deprecated-pragma,
         use-symbolic-message-instead,
-	missing-module-docstring,
-	missing-class-docstring,
-	missing-function-docstring,
-	invalid-name,
-	broad-except,
-	wrong-import-order,
-	consider-using-f-string,
-	logging-format-interpolation,
-	no-member,
-	consider-using-with
+	missing-module-docstring, # added
+	missing-class-docstring, # added
+	missing-function-docstring, # added
+	invalid-name, # added
+	broad-except, # added
+	wrong-import-order, # added
+	consider-using-f-string, # added
+	logging-format-interpolation, # added
+	no-member, # added
+	consider-using-with, # added
+	unused-argument,
+	no-else-return, # added
+	too-few-public-methods, # added
+	import-error, # added
+	protected-access, # added
+	unused-variable, # added
+	R0801 # added (similarity of two scripts)
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

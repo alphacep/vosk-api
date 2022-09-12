@@ -11,8 +11,8 @@ from vosk import Model, KaldiRecognizer, SpkModel
 SPK_MODEL_PATH = "model-spk"
 
 if not os.path.exists(SPK_MODEL_PATH):
-    print('Please download the speaker model from'
-        'https://alphacephei.com/vosk/models and unpack as {SPK_MODEL_PATH}'
+    print('Please download the speaker model from '
+        'https://alphacephei.com/vosk/models and unpack as {SPK_MODEL_PATH} '
         'in the current folder.')
     sys.exit(1)
 
@@ -67,7 +67,7 @@ while True:
             print('Speaker distance:', cosine_dist(spk_sig, res["spk"]),
                 'based on', res["spk_frames"], 'frames')
 
-print ('Note that second distance is not very reliable because utterance is too short.'
+print('Note that second distance is not very reliable because utterance is too short. '
     'Utterances longer than 4 seconds give better xvector')
 
 res = json.loads(rec.FinalResult())
