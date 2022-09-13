@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import logging
 import argparse
-import os
+import logging
 import sys
+import os
 
 from pathlib import Path
 from vosk import list_models, list_languages
@@ -60,12 +60,12 @@ def main():
         return
 
     if not args.input:
-        logging.info('Please specify input file or directory')
+        logging.info("Please specify input file or directory")
         sys.exit(1)
 
     if not Path(args.input).exists():
-        logging.info('File/folder {args.input} does not exist, '\
-            'please specify an existing file/directory')
+        logging.info("File/folder {args.input} does not exist, "\
+            "please specify an existing file/directory")
         sys.exit(1)
 
     transcriber = Transcriber(args)
@@ -80,7 +80,7 @@ def main():
         else:
             task_list = [(Path(args.input), Path(args.output))]
     else:
-        logging.info('Wrong arguments')
+        logging.info("Wrong arguments")
         sys.exit(1)
 
     transcriber.process_task_list(task_list)

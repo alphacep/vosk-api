@@ -10,7 +10,7 @@ SetLogLevel(0)
 
 wf = wave.open(sys.argv[1], "rb")
 if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE":
-    print('Audio file must be WAV format mono PCM.')
+    print("Audio file must be WAV format mono PCM.")
     sys.exit(1)
 
 model = Model(lang="en-us")
@@ -29,5 +29,5 @@ while True:
         print(jres)
 
         if jres["partial"] == "one zero zero zero":
-            print('We can reset recognizer here and start over')
+            print("We can reset recognizer here and start over")
             rec.Reset()

@@ -59,9 +59,9 @@ try:
 
     with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device,
             dtype="int16", channels=1, callback=callback):
-        print('#' * 80)
-        print('Press Ctrl+C to stop the recording')
-        print('#' * 80)
+        print("#" * 80)
+        print("Press Ctrl+C to stop the recording")
+        print("#" * 80)
 
         rec = KaldiRecognizer(model, args.samplerate)
         while True:
@@ -74,7 +74,7 @@ try:
                 dump_fn.write(data)
 
 except KeyboardInterrupt:
-    print('\nDone')
+    print("\nDone")
     parser.exit(0)
 except Exception as e:
     parser.exit(type(e).__name__ + ": " + str(e))
