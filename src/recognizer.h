@@ -27,6 +27,7 @@
 #include "nnet3/am-nnet-simple.h"
 #include "nnet3/nnet-am-decodable-simple.h"
 #include "nnet3/nnet-utils.h"
+#include "lat/lattice-functions-transition-model.h"
 
 #include "model.h"
 #include "spk_model.h"
