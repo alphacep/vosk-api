@@ -146,6 +146,15 @@ VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, con
 void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model);
 
 
+/** Reconfigures recognizer to use grammar
+ *
+ * @param recognizer   Already running VoskRecognizer
+ * @param grammar      Set of phrases in JSON array of strings or "[]" to use default model graph.
+ *                     See also vosk_recognizer_new_grm
+ */
+void vosk_recognizer_set_grm(VoskRecognizer *recognizer, char const *grammar);
+
+
 /** Configures recognizer to output n-best results
  *
  * <pre>

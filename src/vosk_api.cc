@@ -121,6 +121,14 @@ void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk
     ((Recognizer *)recognizer)->SetSpkModel((SpkModel *)spk_model);
 }
 
+void vosk_recognizer_set_grm(VoskRecognizer *recognizer, char const *grammar)
+{
+    if (recognizer == nullptr) {
+       return;
+    }
+    ((Recognizer *)recognizer)->SetGrm(grammar);
+}
+
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
 {
     try {

@@ -54,45 +54,7 @@ Recognizer::Recognizer(Model *model, float sample_frequency, char const *grammar
     silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
 
     if (model_->hcl_fst_) {
-        json::JSON obj;
-        obj = json::JSON::Load(grammar);
-
-        if (obj.length() <= 0) {
-            KALDI_WARN << "Expecting array of strings, got: '" << grammar << "'";
-        } else {
-            KALDI_LOG << obj;
-
-            LanguageModelOptions opts;
-
-            opts.ngram_order = 2;
-            opts.discount = 0.5;
-
-            LanguageModelEstimator estimator(opts);
-            for (int i = 0; i < obj.length(); i++) {
-                bool ok;
-                string line = obj[i].ToString(ok);
-                if (!ok) {
-                    KALDI_ERR << "Expecting array of strings, got: '" << obj << "'";
-                }
-
-                std::vector<int32> sentence;
-                stringstream ss(line);
-                string token;
-                while (getline(ss, token, ' ')) {
-                    int32 id = model_->word_syms_->Find(token);
-                    if (id == kNoSymbol) {
-                        KALDI_WARN << "Ignoring word missing in vocabulary: '" << token << "'";
-                    } else {
-                        sentence.push_back(id);
-                    }
-                }
-                estimator.AddCounts(sentence);
-            }
-            g_fst_ = new StdVectorFst();
-            estimator.Estimate(g_fst_);
-
-            decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *g_fst_, model_->disambig_);
-        }
+        UpdateGrammarFst(grammar);
     } else {
         KALDI_WARN << "Runtime graphs are not supported by this model";
     }
@@ -266,6 +228,96 @@ void Recognizer::SetSpkModel(SpkModel *spk_model)
     spk_model_->Ref();
     spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
 }
+
+void Recognizer::SetGrm(char const *grammar)
+{
+    if (state_ == RECOGNIZER_RUNNING) {
+        KALDI_ERR << "Can't add speaker model to already running recognizer";
+        return;
+    }
+
+    if (!model_->hcl_fst_) {
+        KALDI_WARN << "Runtime graphs are not supported by this model";
+        return;
+    }
+
+    delete decode_fst_;
+
+    if (!strcmp(grammar, "[]")) {
+        decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *model_->g_fst_, model_->disambig_);
+    } else {
+        UpdateGrammarFst(grammar);
+    }
+
+    samples_round_start_ += samples_processed_;
+    samples_processed_ = 0;
+    frame_offset_ = 0;
+
+    delete decoder_;
+    delete feature_pipeline_;
+    delete silence_weighting_;
+
+    silence_weighting_ = new kaldi::OnlineSilenceWeighting(*model_->trans_model_, model_->feature_info_.silence_weighting_config, 3);
+    feature_pipeline_ = new kaldi::OnlineNnet2FeaturePipeline (model_->feature_info_);
+    decoder_ = new kaldi::SingleUtteranceNnet3IncrementalDecoder(model_->nnet3_decoding_config_,
+            *model_->trans_model_,
+            *model_->decodable_info_,
+            *decode_fst_,
+            feature_pipeline_);
+
+    if (spk_model_) {
+        delete spk_feature_;
+        spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
+    }
+
+    state_ = RECOGNIZER_INITIALIZED;
+}
+
+
+void Recognizer::UpdateGrammarFst(char const *grammar)
+{
+    json::JSON obj;
+    obj = json::JSON::Load(grammar);
+
+    if (obj.length() <= 0) {
+        KALDI_WARN << "Expecting array of strings, got: '" << grammar << "'";
+        return;
+    }
+
+    KALDI_LOG << obj;
+
+    LanguageModelOptions opts;
+
+    opts.ngram_order = 2;
+    opts.discount = 0.5;
+
+    LanguageModelEstimator estimator(opts);
+    for (int i = 0; i < obj.length(); i++) {
+        bool ok;
+        string line = obj[i].ToString(ok);
+        if (!ok) {
+            KALDI_ERR << "Expecting array of strings, got: '" << obj << "'";
+        }
+
+        std::vector<int32> sentence;
+        stringstream ss(line);
+        string token;
+        while (getline(ss, token, ' ')) {
+            int32 id = model_->word_syms_->Find(token);
+            if (id == kNoSymbol) {
+                KALDI_WARN << "Ignoring word missing in vocabulary: '" << token << "'";
+            } else {
+                sentence.push_back(id);
+            }
+        }
+        estimator.AddCounts(sentence);
+    }
+    g_fst_ = new StdVectorFst();
+    estimator.Estimate(g_fst_);
+
+    decode_fst_ = LookaheadComposeFst(*model_->hcl_fst_, *g_fst_, model_->disambig_);
+}
+
 
 bool Recognizer::AcceptWaveform(const char *data, int len)
 {

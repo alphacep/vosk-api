@@ -175,6 +175,9 @@ class KaldiRecognizer:
     def SetSpkModel(self, spk_model):
         _c.vosk_recognizer_set_spk_model(self._handle, spk_model._handle)
 
+    def SetGrammar(self, grammar):
+        _c.vosk_recognizer_set_grm(self._handle, grammar.encode("utf-8"))
+
     def AcceptWaveform(self, data):
         res = _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
         if res < 0:
@@ -193,9 +196,9 @@ class KaldiRecognizer:
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)
 
-    def SrtResult(self, stream):
-        words_per_line = 7
+    def SrtResult(self, stream, words_per_line = 7):
         results = []
+
         while True:
             data = stream.read(4000)
             if len(data) == 0:
@@ -203,8 +206,9 @@ class KaldiRecognizer:
             if self.AcceptWaveform(data):
                 results.append(self.Result())
         results.append(self.FinalResult())
+
         subs = []
-        for _, res in enumerate(results):
+        for res in results:
             jres = json.loads(res)
             if not "result" in jres:
                 continue

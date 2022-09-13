@@ -16,7 +16,7 @@ model = Model(lang="en-us")
 # the order doesn't have to be strict
 rec = KaldiRecognizer(model,
     wf.getframerate(),
-    "['oh one two three four five six seven eight nine zero', '[unk]']")
+    '["oh one two three", "four five six", "seven eight nine zero", "[unk]"]')
 
 while True:
     data = wf.readframes(4000)
@@ -24,6 +24,7 @@ while True:
         break
     if rec.AcceptWaveform(data):
         print(rec.Result())
+        rec.SetGrammar('["one zero one two three oh", "four five six", "seven eight nine zero", "[unk]"]')
     else:
         print(rec.PartialResult())
 

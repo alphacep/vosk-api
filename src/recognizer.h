@@ -48,6 +48,7 @@ class Recognizer {
         ~Recognizer();
         void SetMaxAlternatives(int max_alternatives);
         void SetSpkModel(SpkModel *spk_model);
+        void SetGrm(char const *grammar);
         void SetWords(bool words);
         void SetPartialWords(bool partial_words);
         void SetNLSML(bool nlsml);
@@ -64,6 +65,7 @@ class Recognizer {
         void InitRescoring();
         void CleanUp();
         void UpdateSilenceWeights();
+        void UpdateGrammarFst(char const *grammar);
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
         bool GetSpkVector(Vector<BaseFloat> &out_xvector, int *frames);
         const char *GetResult();
