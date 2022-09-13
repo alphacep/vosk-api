@@ -52,7 +52,7 @@ end_time = timer()
 for i, res in enumerate(results):
     print(uids[i], res.strip())
 
-print('Processed %.3f seconds of audio in %.3f seconds (%.3f xRT)'
+print("Processed %.3f seconds of audio in %.3f seconds (%.3f xRT)"
     % (TOT_SAMPLES / 16000.0 / 2,
     end_time - start_time,
     (TOT_SAMPLES / 16000.0 / 2 / (end_time - start_time))),

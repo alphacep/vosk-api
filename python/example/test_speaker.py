@@ -11,14 +11,14 @@ from vosk import Model, KaldiRecognizer, SpkModel
 SPK_MODEL_PATH = "model-spk"
 
 if not os.path.exists(SPK_MODEL_PATH):
-    print('Please download the speaker model from '
-        'https://alphacephei.com/vosk/models and unpack as {SPK_MODEL_PATH} '
-        'in the current folder.')
+    print("Please download the speaker model from "
+        "https://alphacephei.com/vosk/models and unpack as {SPK_MODEL_PATH} "
+        "in the current folder.")
     sys.exit(1)
 
 wf = wave.open(sys.argv[1], "rb")
 if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE":
-    print('Audio file must be WAV format mono PCM.')
+    print("Audio file must be WAV format mono PCM.")
     sys.exit(1)
 
 # Large vocabulary free form recognition
@@ -61,18 +61,18 @@ while True:
         break
     if rec.AcceptWaveform(data):
         res = json.loads(rec.Result())
-        print('Text:', res["text"])
+        print("Text:", res["text"])
         if "spk" in res:
-            print('X-vector:', res["spk"])
-            print('Speaker distance:', cosine_dist(spk_sig, res["spk"]),
-                'based on', res["spk_frames"], 'frames')
+            print("X-vector:", res["spk"])
+            print("Speaker distance:", cosine_dist(spk_sig, res["spk"]),
+                "based on", res["spk_frames"], "frames")
 
-print('Note that second distance is not very reliable because utterance is too short. '
-    'Utterances longer than 4 seconds give better xvector')
+print("Note that second distance is not very reliable because utterance is too short. "
+    "Utterances longer than 4 seconds give better xvector")
 
 res = json.loads(rec.FinalResult())
-print('Text:', res["text"])
+print("Text:", res["text"])
 if "spk" in res:
-    print('X-vector:', res["spk"])
-    print('Speaker distance:', cosine_dist(spk_sig, res["spk"]),
-        'based on', res["spk_frames"], 'frames')
+    print("X-vector:", res["spk"])
+    print("Speaker distance:", cosine_dist(spk_sig, res["spk"]),
+        "based on", res["spk_frames"], "frames")

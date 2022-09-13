@@ -1,15 +1,15 @@
 import json
-import subprocess
-import srt
-import datetime
 import logging
 import asyncio
 import websockets
+import srt
+import datetime
 import shlex
+import subprocess
 
+from vosk import KaldiRecognizer, Model
 from queue import Queue
 from timeit import default_timer as timer
-from vosk import KaldiRecognizer, Model
 from multiprocessing.dummy import Pool
 
 CHUNK_SIZE = 4000
@@ -97,14 +97,14 @@ class Transcriber:
         return processed_result
 
     def resample_ffmpeg(self, infile):
-        cmd = shlex.split('ffmpeg -nostdin -loglevel quiet '
-                '-i \"{}\" -ar {} -ac 1 -f s16le -'.format(str(infile), SAMPLE_RATE))
+        cmd = shlex.split("ffmpeg -nostdin -loglevel quiet "
+                "-i \'{}\' -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE))
         stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
     async def resample_ffmpeg_async(self, infile):
-        cmd = 'ffmpeg -nostdin -loglevel quiet '\
-        '-i \"{}\" -ar {} -ac 1 -f s16le -'.format(str(infile), SAMPLE_RATE)
+        cmd = "ffmpeg -nostdin -loglevel quiet "\
+        "-i \'{}\' -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
         return await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)
 
     async def server_worker(self):
@@ -114,14 +114,14 @@ class Transcriber:
             except Exception:
                 break
 
-            logging.info('Recognizing {}'.format(input_file))
+            logging.info("Recognizing {}".format(input_file))
             start_time = timer()
             proc = await self.resample_ffmpeg_async(input_file)
             result, tot_samples = await self.recognize_stream_server(proc)
 
             processed_result = self.format_result(result)
             if output_file != "":
-                logging.info('File {} processing complete'.format(output_file))
+                logging.info("File {} processing complete".format(output_file))
                 with open(output_file, "w", encoding="utf-8") as fh:
                     fh.write(processed_result)
             else:
@@ -130,18 +130,18 @@ class Transcriber:
             await proc.wait()
 
             elapsed = timer() - start_time
-            logging.info('Execution time: {:.3f} sec; '\
-                    'xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
+            logging.info("Execution time: {:.3f} sec; "\
+                    "xRT {:.3f}".format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
             self.queue.task_done()
 
     def pool_worker(self, inputdata):
-        logging.info('Recognizing {}'.format(inputdata[0]))
+        logging.info("Recognizing {}".format(inputdata[0]))
         start_time = timer()
 
         try:
             stream = self.resample_ffmpeg(inputdata[0])
         except FileNotFoundError as e:
-            print(e, 'Missing FFMPEG, please install and try again')
+            print(e, "Missing FFMPEG, please install and try again")
             return
         except Exception as e:
             logging.info(e)
@@ -153,15 +153,15 @@ class Transcriber:
         processed_result = self.format_result(result)
 
         if inputdata[1] != "":
-            logging.info('File {} processing complete'.format(inputdata[1]))
+            logging.info("File {} processing complete".format(inputdata[1]))
             with open(inputdata[1], "w", encoding="utf-8") as fh:
                 fh.write(processed_result)
         else:
             print(processed_result)
 
         elapsed = timer() - start_time
-        logging.info('Execution time: {:.3f} sec; '\
-                'xRT {:.3f}'.format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
+        logging.info("Execution time: {:.3f} sec; "\
+                "xRT {:.3f}".format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
 
     async def process_task_list_server(self, task_list):
         for x in task_list:

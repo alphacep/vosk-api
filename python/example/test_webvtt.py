@@ -62,6 +62,6 @@ def transcribe():
 
 if __name__ == "__main__":
     if not 1 < len(sys.argv) < 4:
-        print('Usage: {} audiofile [output file]'.format(sys.argv[0]))
+        print("Usage: {} audiofile [output file]".format(sys.argv[0]))
         sys.exit(1)
     transcribe()

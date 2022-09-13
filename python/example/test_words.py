@@ -7,7 +7,7 @@ from vosk import Model, KaldiRecognizer
 
 wf = wave.open(sys.argv[1], "rb")
 if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE":
-    print('Audio file must be WAV format mono PCM.')
+    print("Audio file must be WAV format mono PCM.")
     sys.exit(1)
 
 model = Model(lang="en-us")
@@ -16,7 +16,7 @@ model = Model(lang="en-us")
 # the order doesn't have to be strict
 rec = KaldiRecognizer(model,
     wf.getframerate(),
-    '["oh one two three four five six seven eight nine zero", "[unk]"]')
+    "['oh one two three four five six seven eight nine zero', '[unk]']")
 
 while True:
     data = wf.readframes(4000)

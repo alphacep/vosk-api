@@ -31,7 +31,7 @@ def open_dll():
     elif sys.platform == "darwin":
         return _ffi.dlopen(os.path.join(dlldir, "libvosk.dyld"))
     else:
-        raise TypeError('Unsupported platform')
+        raise TypeError("Unsupported platform")
 
 _c = open_dll()
 
@@ -54,7 +54,7 @@ class Model:
             model_path = self.get_model_path(model_name, lang)
             self._handle = _c.vosk_model_new(model_path.encode("utf-8"))
         if self._handle == _ffi.NULL:
-            raise Exception('Failed to create a model')
+            raise Exception("Failed to create a model")
 
     def __del__(self):
         _c.vosk_model_free(self._handle)
@@ -80,7 +80,7 @@ class Model:
         response = requests.get(MODEL_LIST_URL, timeout=10)
         result_model = [model["name"] for model in response.json() if model["name"] == model_name]
         if result_model == []:
-            print('model name %s does not exist' % (model_name))
+            print("model name %s does not exist" % (model_name))
             sys.exit(1)
         else:
             self.download_model(Path(directory, result_model[0]))
@@ -99,7 +99,7 @@ class Model:
         result_model = [model["name"] for model in response.json() if
                 model["lang"] == lang and model["type"] == "small" and model["obsolete"] == "false"]
         if result_model == []:
-            print('lang %s does not exist' % (lang))
+            print("lang %s does not exist" % (lang))
             sys.exit(1)
         else:
             self.download_model(Path(directory, result_model[0]))
@@ -135,7 +135,7 @@ class SpkModel:
         self._handle = _c.vosk_spk_model_new(model_path.encode("utf-8"))
 
         if self._handle == _ffi.NULL:
-            raise Exception('Failed to create a speaker model')
+            raise Exception("Failed to create a speaker model")
 
     def __del__(self):
         _c.vosk_spk_model_free(self._handle)
@@ -152,10 +152,10 @@ class KaldiRecognizer:
             self._handle = _c.vosk_recognizer_new_grm(args[0]._handle,
                     args[1], args[2].encode("utf-8"))
         else:
-            raise TypeError('Unknown arguments')
+            raise TypeError("Unknown arguments")
 
         if self._handle == _ffi.NULL:
-            raise Exception('Failed to create a recognizer')
+            raise Exception("Failed to create a recognizer")
 
     def __del__(self):
         _c.vosk_recognizer_free(self._handle)
@@ -178,7 +178,7 @@ class KaldiRecognizer:
     def AcceptWaveform(self, data):
         res = _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
         if res < 0:
-            raise Exception('Failed to process waveform')
+            raise Exception("Failed to process waveform")
         return res
 
     def Result(self):
@@ -236,7 +236,7 @@ class BatchModel:
         self._handle = _c.vosk_batch_model_new()
 
         if self._handle == _ffi.NULL:
-            raise Exception('Failed to create a model')
+            raise Exception("Failed to create a model")
 
     def __del__(self):
         _c.vosk_batch_model_free(self._handle)
@@ -250,7 +250,7 @@ class BatchRecognizer:
         self._handle = _c.vosk_batch_recognizer_new(args[0]._handle, args[1])
 
         if self._handle == _ffi.NULL:
-            raise Exception('Failed to create a recognizer')
+            raise Exception("Failed to create a recognizer")
 
     def __del__(self):
         _c.vosk_batch_recognizer_free(self._handle)
