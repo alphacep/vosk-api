@@ -478,7 +478,7 @@ const char *Recognizer::MbrResult(CompactLattice &rlat)
     std::vector<std::vector<int32> > phone_lengths;
     int phon_vec_size = 1;
 
-    if (model_->phone_syms_loaded_){  
+    if (model_->phone_syms_loaded_ && (result_opts_ == "phones")){  
         //Compute phone info if phone symbol table is provided  
 
         ComputePhoneInfo(*model_->trans_model_, aligned_lat, *model_->word_syms_, *model_->phone_symbol_table_, &phoneme_labels, &phone_lengths);
@@ -509,7 +509,7 @@ const char *Recognizer::MbrResult(CompactLattice &rlat)
             word["conf"] = conf[i];
             obj["result"].append(word);
         }
-
+    
     
         //When printing silences some extra silence words that we call "gaps" that have length of 0 seconds 
         //get printed out so we filter them out
@@ -522,7 +522,8 @@ const char *Recognizer::MbrResult(CompactLattice &rlat)
             word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
             word["conf"] = conf[i];
 
-            if (model_->phone_syms_loaded_){ //Add phone info to json if phone symbol table is provided
+            //Add phone info to json if phone symbol table is provided
+            if (model_->phone_syms_loaded_ && (result_opts_ == "phones")){  
                 kaldi::BaseFloat phone_start_time = 0.0;
                 kaldi::BaseFloat phone_end_time = 0.0;
                         
