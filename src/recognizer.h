@@ -32,6 +32,8 @@
 #include "model.h"
 #include "spk_model.h"
 
+#include <string>
+
 using namespace kaldi;
 
 enum RecognizerState {
@@ -98,7 +100,7 @@ class Recognizer {
 
         // Other
         int max_alternatives_ = 0; // Disable alternatives by default
-        const char *result_opts_ = "words"; // By default enable only word-level results
+        std::string result_opts_ = "words"; // By default enable only word-level results
         bool words_ = false;
         bool partial_words_ = false;
         bool nlsml_ = false;
