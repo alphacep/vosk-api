@@ -11,22 +11,26 @@ KALDI_ROOT=/opt/kaldi EXTRA_LDFLAGS="-latomic" make -j $(nproc)
 export VOSK_SOURCE=/opt/vosk-api
 case $CROSS_TRIPLE in
     *armv7-*)
-        export VOSK_ARCHITECTURE=armv7l
-        ;;
-    *aarch64-*)
-        export VOSK_ARCHITECTURE=aarch64
+        export VOSK_MACHINE=armv7l
+        export VOSK_ARCHITECTURE=32bit
         ;;
     *i686-*)
-        export VOSK_ARCHITECTURE=x86
+        export VOSK_MACHINE=x86
+        export VOSK_ARCHITECTURE=32bit
+        ;;
+    *aarch64-*)
+        export VOSK_MACHINE=aarch64
+        export VOSK_ARCHITECTURE=64bit
         ;;
     *riscv64-*)
-        export VOSK_ARCHITECTURE=riscv64
+        export VOSK_MACHINE=riscv64
+        export VOSK_ARCHITECTURE=64bit
         ;;
 esac
 
 # Copy library to output folder
-mkdir -p /io/wheelhouse/vosk-linux-$VOSK_ARCHITECTURE
-cp /opt/vosk-api/src/*.so /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vosk-linux-$VOSK_ARCHITECTURE
+mkdir -p /io/wheelhouse/vosk-linux-$VOSK_MACHINE
+cp /opt/vosk-api/src/*.so /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vosk-linux-$VOSK_MACHINE
 
 # Build wheel
 python3 -m pip install requests tqdm srt websockets wheel

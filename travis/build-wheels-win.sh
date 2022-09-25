@@ -18,6 +18,6 @@ cp /opt/vosk-api/src/*.{dll,lib} /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vos
 
 # Build wheel and put to the output folder
 export VOSK_SOURCE=/opt/vosk-api
-export VOSK_PLATFORM=Windows
+export VOSK_SYSTEM=Windows
 export VOSK_ARCHITECTURE=64bit
 python3 -m pip -v wheel /opt/vosk-api/python --no-deps -w /io/wheelhouse

@@ -7,8 +7,9 @@ import platform
 # Figure out environment for cross-compile
 vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__),
     "..")))
-system = os.environ.get('VOSK_PLATFORM', platform.system())
+system = os.environ.get('VOSK_SYSTEM', platform.system())
 architecture = os.environ.get('VOSK_ARCHITECTURE', platform.architecture()[0])
+machine = os.environ.get('VOSK_MACHINE', platform.machine())
 
 # Copy precompmilled libraries
 for lib in glob.glob(os.path.join(vosk_source, "src/lib*.*")):
@@ -30,12 +31,10 @@ else:
                 oses = 'win32'
             elif system == 'Windows' and architecture == '64bit':
                 oses = 'win_amd64'
-            elif system == 'Linux' and architecture == '64bit':
-                oses = 'linux_x86_64'
-            elif system == 'Linux' and architecture == 'aarch64':
+            elif system == 'Linux' and machine == 'aarch64' and architecture == '64bit':
                 oses = 'manylinux2014_aarch64'
             elif system == 'Linux':
-                oses = 'linux_' + architecture
+                oses = 'linux_' + machine
             else:
                 raise TypeError("Unknown build environment")
             return 'py3', abi, oses
