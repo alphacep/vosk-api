@@ -94,11 +94,11 @@ class HugeFileProcessor:
             if end_pos - start_pos == 0:
                 break
             if rec.AcceptWaveform(data):
-                rec.Result()
+                print(json.loads(rec.Result())["text"])
             else:
-                print(rec.PartialResult())
+                rec.PartialResult()
             start_pos += 4000
-        print(rec.FinalResult())
+        print(json.loads(rec.FinalResult())["text"])
         return
 
     def process(self, small_model_path):
