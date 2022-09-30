@@ -4,7 +4,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-int main() {
+int main(int argc, char *argv[]) {
+	if(argc == 1) {
+		printf("missing .mp4 filename\n");
+		return 0;
+	}
 	int p[2];
 	pid_t pid;
 	char data[4000];
@@ -25,7 +29,7 @@ int main() {
 		close(p[0]);
 		close(p[1]);
 		execl("/usr/bin/ffmpeg", "ffmpeg", "-loglevel", "quiet", 
-			"-i", "sample.mp4", "-ar", "16000", "-ac", "1", "-f", "s16le", "-", NULL);
+			"-i", argv[1], "-ar", "16000", "-ac", "1", "-f", "s16le", "-", NULL);
 		perror("error:");
 	} 
 	else {
