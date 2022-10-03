@@ -85,7 +85,6 @@ class BigFileProcessor:
 
         for data in self.queue_in.get_nowait():
             if rec.AcceptWaveform(data):
-                json.loads(rec.Result())["text"]
                 print(json.loads(rec.Result())["text"])
             else:
                 rec.PartialResult()
