@@ -67,15 +67,15 @@ class BigFileProcessor:
             if len(data) == 0:
                 break
             if rec.AcceptWaveform(data):
-                res = json.loads(rec.Result())
+                rec.Result()
                 result.append(data_list)
                 data_list = []
             else:
                 rec.PartialResult()
                 if data != "b''":
                     data_list.append(data)
-        res = json.loads(rec.FinalResult())
-        if res != '':
+        final_result = json.loads(rec.FinalResult())
+        if final_result != '':
             result.append(data_list)
         return result
 
@@ -88,7 +88,10 @@ class BigFileProcessor:
                 print(json.loads(rec.Result())["text"])
             else:
                 rec.PartialResult()
-        print(json.loads(rec.FinalResult())["text"])
+       
+        final_result = json.loads(rec.FinalResult())["text"]
+        if final_result != '':
+            print(final_result)
         return
 
     def process(self):
