@@ -28,15 +28,25 @@ parser.add_argument(
 parser.add_argument(
         "--input", "-i", type=str,
         help="audiofile")
-parser.add_argument(
-        "--cores", "-c", default=4, type=int,
-        help="PC cores used for recognize")
 
-class HugeFileProcessor:
+def get_model(args):
+    for directory in MODEL_DIRS:
+        if directory is None or not Path(directory).exists():
+            continue
+        model_file_list = os.listdir(directory)
+        model_files = [model for model in model_file_list if
+                re.match(r"vosk-model(-small)?-{}".format(args.lang), model)] 
+        if len(model_files) == 2:
+            return Path(directory, model_files[0]), Path(directory, model_files[1])
 
-    def __init__(self, args):
+class BigFileProcessor:
+
+    def __init__(self, args, small_model_path, big_model_path):
         self.args = args
-        self.queue = Queue()
+        self.queue_in = Queue()
+        self.queue_out = Queue()
+        self.small_model = Model(model_path=str(small_model_path))
+        self.big_model = Model(model_path=str(big_model_path))
 
     def resample_ffmpeg(self, infile):
         cmd = shlex.split("ffmpeg -nostdin -loglevel quiet "
@@ -44,82 +54,63 @@ class HugeFileProcessor:
         stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
-    def get_model(self):
-        for directory in MODEL_DIRS:
-            if directory is None or not Path(directory).exists():
-                continue
-            model_file_list = os.listdir(directory)
-            model_files = [model for model in model_file_list if
-                    re.match(r"vosk-model(-small)?-{}".format(self.args.lang), model)] 
-            if len(model_files) == 2:
-                return Path(directory, model_files[0]), Path(directory, model_files[1])
+    def process_by_small_model(self):
 
-    def process_by_small_model(self, small_model_path):
-
-        model = Model(model_path=str(small_model_path))
-        rec = KaldiRecognizer(model, SAMPLE_RATE)
-        rec.SetPartialWords(True)
-        fragments = []
-
+        rec = KaldiRecognizer(self.small_model, SAMPLE_RATE)
+        rec.SetWords(True)
         stream = self.resample_ffmpeg(self.args.input)
+        result = []
+        data_list = []
 
         while True:
             data = stream.stdout.read(4000)
             if len(data) == 0:
                 break
             if rec.AcceptWaveform(data):
-                rec.Result()
-                if part_res["partial"] != '' and part_res["partial_result"] != '':
-                    fragments.append((int(part_res["partial_result"][0]["start"]),
-                            int(part_res["partial_result"][-1]["end"])))
+                res = json.loads(rec.Result())
+                result.append(data_list)
+                data_list = []
             else:
-                part_res = json.loads(rec.PartialResult())
-        rec.FinalResult()
-        return fragments
+                rec.PartialResult()
+                if data != "b''":
+                    data_list.append(data)
+        res = json.loads(rec.FinalResult())
+        if res != '':
+            result.append(data_list)
+        return result
 
-    def process_by_big_model(self, timestamps):
+    def process_by_big_model(self, result):
+        
+        rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
 
-        item_0, item_1 = self.queue.get_nowait()
-
-        model = Model(model_path=str(big_model_path))
-        rec = KaldiRecognizer(model, SAMPLE_RATE)
-        start_pos = 32000 * item_0
-        end_pos = 32000 * item_1
-
-        stream = self.resample_ffmpeg(self.args.input)
-        stream.stdout.read(start_pos)
-
-        while True:
-            data = stream.stdout.read(4000)
-            if end_pos - start_pos == 0:
-                break
+        for data in self.queue_in.get_nowait():
             if rec.AcceptWaveform(data):
+                json.loads(rec.Result())["text"]
                 print(json.loads(rec.Result())["text"])
             else:
                 rec.PartialResult()
-            start_pos += 4000
         print(json.loads(rec.FinalResult())["text"])
         return
 
-    def process(self, small_model_path):
+    def process(self):
 
-        timestamps = self.process_by_small_model(small_model_path)
-        
-        for x in timestamps:
-            self.queue.put(x)
+        result = self.process_by_small_model()
 
-        with Pool(self.args.cores) as pool:
-            pool.map(self.process_by_big_model, timestamps)
+        for x in result:
+            self.queue_in.put(x)
+
+        with Pool() as pool:
+            pool.map(self.process_by_big_model, result)
 
 def main():
 
     args = parser.parse_args()
 
-    processor = HugeFileProcessor(args)
-    global big_model_path
-    small_model_path, big_model_path = processor.get_model()
+    small_model_path, big_model_path = get_model(args)
 
-    processor.process(small_model_path)
+    processor = BigFileProcessor(args, small_model_path, big_model_path)
+    
+    processor.process()
 
 if __name__ == "__main__":
     main()
