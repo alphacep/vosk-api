@@ -94,6 +94,18 @@ class Transcriber:
             for part in result:
                 if part["text"] != "":
                     processed_result += part["text"] + "\n"
+
+        elif self.args.output_type == "json":
+            monologues = {"schemaVersion":"2.0", "monologues":[]}
+            for _, res in enumerate(result):
+                if not "result" in res:
+                    continue
+                monologue = { "speaker": {"id": "unknown", "name": None}, "start": 0, "end": 0, "terms": []}
+                monologue["start"] = res["result"][0]["start"]
+                monologue["end"] = res["result"][-1]["end"]
+                monologue["terms"] = [{"confidence": t["conf"], "start": t["start"], "end": t["end"], "text": t["word"], "type": "WORD" } for t in res["result"]]
+                monologues["monologues"].append(monologue)
+            processed_result = json.dumps(monologues)
         return processed_result
 
     def resample_ffmpeg(self, infile):
