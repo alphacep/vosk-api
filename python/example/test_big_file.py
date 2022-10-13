@@ -28,6 +28,9 @@ parser.add_argument(
 parser.add_argument(
         "--input", "-i", type=str,
         help="audiofile")
+parser.add_argument(
+        "--output", "-o", default="txt", type=str,
+        help="output type")
 
 def get_model(args):
     for directory in MODEL_DIRS:
@@ -43,66 +46,76 @@ class BigFileProcessor:
 
     def __init__(self, args, small_model_path, big_model_path):
         self.args = args
-        self.queue_in = Queue()
-        self.queue_out = Queue()
+        self.queue = Queue()
         self.small_model = Model(model_path=str(small_model_path))
         self.big_model = Model(model_path=str(big_model_path))
 
-    def resample_ffmpeg(self, infile):
+    def resample_ffmpeg(self):
         cmd = shlex.split("ffmpeg -nostdin -loglevel quiet "
-                "-i \'{}\' -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE))
+                "-i \'{}\' -ar {} -ac 1 -f s16le -".format(str(self.args.input), SAMPLE_RATE))
         stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
-    def process_by_small_model(self):
-
+    def prepare_audio_fragments(self):
         rec = KaldiRecognizer(self.small_model, SAMPLE_RATE)
         rec.SetWords(True)
-        stream = self.resample_ffmpeg(self.args.input)
+        stream = self.resample_ffmpeg()
         result = []
         data_list = []
+        total_result = []
 
         while True:
             data = stream.stdout.read(4000)
             if len(data) == 0:
                 break
             if rec.AcceptWaveform(data):
-                rec.Result()
-                result.append(data_list)
-                data_list = []
+                res = json.loads(rec.Result())
+                if "result" in res.keys():
+                    result.append(data_list)
+                    result.append(res)
+                    total_result.append(result)
+                    data_list = []
+                    result = []
             else:
                 rec.PartialResult()
                 if data != "b''":
                     data_list.append(data)
-        final_result = json.loads(rec.FinalResult())
-        if final_result != '':
-            result.append(data_list)
-        return result
-
-    def process_by_big_model(self, result):
         
+        res = json.loads(rec.FinalResult())
+        if "result" in res.keys():
+            result.append(data_list)
+            result.append(res)
+            total_result.append(result)
+        return total_result
+ 
+    def txt_result(self, data_list):
         rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
-
-        for data in self.queue_in.get_nowait():
+        result = []
+        for data in data_list:
             if rec.AcceptWaveform(data):
-                print(json.loads(rec.Result())["text"])
+                res = json.loads(rec.Result())["text"]
+                result.append(res)
             else:
                 rec.PartialResult()
-       
-        final_result = json.loads(rec.FinalResult())["text"]
-        if final_result != '':
-            print(final_result)
-        return
+        res = json.loads(rec.FinalResult())["text"]
+        result.append(res)
+        return result
+
+    def process_by_big_model(self, data):
+
+        if self.args.output == "txt":
+            result = self.txt_result(data[0])
+        else:
+            print("SRT")
+        return result
 
     def process(self):
 
-        result = self.process_by_small_model()
-
-        for x in result:
-            self.queue_in.put(x)
-
+        total_result = self.prepare_audio_fragments()
         with Pool() as pool:
-            pool.map(self.process_by_big_model, result)
+            for phrase in pool.map(self.process_by_big_model, total_result):
+                for each in phrase:
+                    print(phrase[0])
 
 def main():
 
