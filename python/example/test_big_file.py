@@ -6,6 +6,8 @@ import re
 import subprocess
 import json
 import shlex
+import srt
+import datetime
 
 from pathlib import Path
 from vosk import Model, KaldiRecognizer, SetLogLevel
@@ -62,7 +64,6 @@ class BigFileProcessor:
         stream = self.resample_ffmpeg()
         result = []
         data_list = []
-        total_result = []
 
         while True:
             data = stream.stdout.read(4000)
@@ -72,10 +73,7 @@ class BigFileProcessor:
                 res = json.loads(rec.Result())
                 if "result" in res.keys():
                     result.append(data_list)
-                    result.append(res)
-                    total_result.append(result)
                     data_list = []
-                    result = []
             else:
                 rec.PartialResult()
                 if data != "b''":
@@ -84,11 +82,36 @@ class BigFileProcessor:
         res = json.loads(rec.FinalResult())
         if "result" in res.keys():
             result.append(data_list)
-            result.append(res)
-            total_result.append(result)
-        return total_result
- 
-    def txt_result(self, data_list):
+        return result
+
+    def get_srt_result(self, data_list, words_per_line = 7):
+        rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
+        rec.SetWords(True)
+        results = []
+        result = []
+        
+        for data in data_list:
+            if rec.AcceptWaveform(data):
+                results.append(rec.Result())
+        results.append(rec.FinalResult())
+
+        subs = []
+        for res in results:
+            jres = json.loads(res)
+            if not "result" in jres:
+                continue
+            words = jres["result"]
+            for j in range(0, len(words), words_per_line):
+                line = words[j : j + words_per_line]
+                s = srt.Subtitle(index=len(subs),
+                        content=" ".join([l["word"] for l in line]),
+                        start=datetime.timedelta(seconds=line[0]["start"]),
+                        end=datetime.timedelta(seconds=line[-1]["end"]))
+                subs.append(s)
+        result.append(srt.compose(subs))
+        return result
+
+    def get_txt_result(self, data_list):
         rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
         result = []
         for data in data_list:
@@ -102,11 +125,10 @@ class BigFileProcessor:
         return result
 
     def process_by_big_model(self, data):
-
         if self.args.output == "txt":
-            result = self.txt_result(data[0])
+            result = self.get_txt_result(data)
         else:
-            print("SRT")
+            result = self.get_srt_result(data)
         return result
 
     def process(self):
