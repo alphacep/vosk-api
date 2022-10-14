@@ -8,6 +8,8 @@ import json
 import shlex
 import srt
 import datetime
+import logging
+import sys
 
 from pathlib import Path
 from vosk import Model, KaldiRecognizer, SetLogLevel
@@ -33,6 +35,9 @@ parser.add_argument(
 parser.add_argument(
         "--output", "-o", default="txt", type=str,
         help="output type")
+parser.add_argument(
+        "--log-level", default="INFO",
+        help="logging level")
 
 def get_model(args):
     for directory in MODEL_DIRS:
@@ -48,7 +53,6 @@ class BigFileProcessor:
 
     def __init__(self, args, small_model_path, big_model_path):
         self.args = args
-        self.queue = Queue()
         self.small_model = Model(model_path=str(small_model_path))
         self.big_model = Model(model_path=str(big_model_path))
 
@@ -58,9 +62,8 @@ class BigFileProcessor:
         stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
-    def prepare_audio_fragments(self):
+    def prepare_fragments(self):
         rec = KaldiRecognizer(self.small_model, SAMPLE_RATE)
-        rec.SetWords(True)
         stream = self.resample_ffmpeg()
         result = []
         data_list = []
@@ -70,21 +73,17 @@ class BigFileProcessor:
             if len(data) == 0:
                 break
             if rec.AcceptWaveform(data):
-                res = json.loads(rec.Result())
-                if "result" in res.keys():
-                    result.append(data_list)
-                    data_list = []
+                rec.Result()
+                result.append(data_list)
+                data_list = []
             else:
-                rec.PartialResult()
-                if data != "b''":
-                    data_list.append(data)
-        
-        res = json.loads(rec.FinalResult())
-        if "result" in res.keys():
+                data_list.append(data)
+        if json.loads(rec.FinalResult())["text"] != "":
             result.append(data_list)
         return result
 
-    def get_srt_result(self, data_list, words_per_line = 7):
+    def format_result(self, data_list, words_per_line = 7):
+        logging.info("Process file fragment...")
         rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
         rec.SetWords(True)
         results = []
@@ -94,60 +93,47 @@ class BigFileProcessor:
             if rec.AcceptWaveform(data):
                 results.append(rec.Result())
         results.append(rec.FinalResult())
-
-        subs = []
-        for res in results:
-            jres = json.loads(res)
-            if not "result" in jres:
-                continue
-            words = jres["result"]
-            for j in range(0, len(words), words_per_line):
-                line = words[j : j + words_per_line]
-                s = srt.Subtitle(index=len(subs),
-                        content=" ".join([l["word"] for l in line]),
-                        start=datetime.timedelta(seconds=line[0]["start"]),
-                        end=datetime.timedelta(seconds=line[-1]["end"]))
-                subs.append(s)
-        result.append(srt.compose(subs))
-        return result
-
-    def get_txt_result(self, data_list):
-        rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
-        result = []
-        for data in data_list:
-            if rec.AcceptWaveform(data):
-                res = json.loads(rec.Result())["text"]
-                result.append(res)
-            else:
-                rec.PartialResult()
-        res = json.loads(rec.FinalResult())["text"]
-        result.append(res)
-        return result
-
-    def process_by_big_model(self, data):
-        if self.args.output == "txt":
-            result = self.get_txt_result(data)
+        if self.args.output == "srt":
+            subs = []
+            for res in results:
+                jres = json.loads(res)
+                if not "result" in jres:
+                    continue
+                words = jres["result"]
+                for j in range(0, len(words), words_per_line):
+                    line = words[j : j + words_per_line]
+                    s = srt.Subtitle(index=len(subs),
+                            content=" ".join([l["word"] for l in line]),
+                            start=datetime.timedelta(seconds=line[0]["start"]),
+                            end=datetime.timedelta(seconds=line[-1]["end"]))
+                    subs.append(s)
+            result.append(srt.compose(subs))
         else:
-            result = self.get_srt_result(data)
-        return result
+            return json.loads(results[0])["text"]
+        return result[0]
 
-    def process(self):
-
-        total_result = self.prepare_audio_fragments()
+    def process_file(self):
+        fragments = self.prepare_fragments()
+        logging.info("File fragments ready")
         with Pool() as pool:
-            for phrase in pool.map(self.process_by_big_model, total_result):
-                for each in phrase:
-                    print(phrase[0])
+            for fragment in pool.map(self.format_result, fragments):
+                print(fragment)
 
 def main():
 
     args = parser.parse_args()
+    log_level = args.log_level.upper()
+    logging.getLogger().setLevel(log_level)
+
+    if args.output not in ["txt", "srt"]:
+        logging.info("Wrong output format, it has to be txt(by default) or srt as optional, please try again.")
+        sys.exit(1)
 
     small_model_path, big_model_path = get_model(args)
 
     processor = BigFileProcessor(args, small_model_path, big_model_path)
     
-    processor.process()
+    processor.process_file()
 
 if __name__ == "__main__":
     main()
