@@ -143,6 +143,7 @@ class SpkModel:
 class KaldiRecognizer:
 
     def __init__(self, *args):
+        self._handle=_ffi.NULL
         if len(args) == 2:
             self._handle = _c.vosk_recognizer_new(args[0]._handle, args[1])
         elif len(args) == 3 and isinstance(args[2], SpkModel):
