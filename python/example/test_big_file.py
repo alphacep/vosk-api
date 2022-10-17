@@ -13,7 +13,7 @@ import requests
 
 from urllib.request import urlretrieve
 from pathlib import Path
-from vosk import Model, KaldiRecognizer, SetLogLevel
+from vosk import Model, KaldiRecognizer, SetLogLevel, list_languages
 from multiprocessing.dummy import Pool
 from timeit import default_timer as timer
 from re import match
@@ -42,6 +42,9 @@ parser.add_argument(
 parser.add_argument(
         "--log-level", default="INFO",
         help="logging level")
+parser.add_argument(
+        "--list-languages", default=False, action="store_true",
+        help="list available languages")
 
 def download_progress_hook(t):
     last_b = [0]
@@ -171,6 +174,10 @@ def main():
     args = parser.parse_args()
     log_level = args.log_level.upper()
     logging.getLogger().setLevel(log_level)
+
+    if args.list_languages is True:
+        list_languages()
+        return
 
     if args.output not in ["txt", "srt"]:
         logging.info("Wrong output format, it has to be txt(by default) or srt as optional, "\
