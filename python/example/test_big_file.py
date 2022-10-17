@@ -60,17 +60,16 @@ def download_model(small_model_path, big_model_path):
     for model_name in model_names:
         if model_name.exists():
             continue
-        else:
-            with tqdm(unit="B", unit_scale=True, unit_divisor=1024, miniters=1,
-                    desc=(MODEL_PRE_URL + str(model_name.name) + ".zip").rsplit("/",
-                        maxsplit=1)[-1]) as t:
-                reporthook = download_progress_hook(t)
-                urlretrieve(MODEL_PRE_URL + str(model_name.name) + ".zip",
-                        str(model_name) + ".zip", reporthook=reporthook, data=None)
-                t.total = t.n
-                with ZipFile(str(model_name) + ".zip", "r") as model_ref:
-                    model_ref.extractall(model_name.parent)
-                Path(str(model_name) + ".zip").unlink()
+        with tqdm(unit="B", unit_scale=True, unit_divisor=1024, miniters=1,
+                desc=(MODEL_PRE_URL + str(model_name.name) + ".zip").rsplit("/",
+                    maxsplit=1)[-1]) as t:
+            reporthook = download_progress_hook(t)
+            urlretrieve(MODEL_PRE_URL + str(model_name.name) + ".zip",
+                    str(model_name) + ".zip", reporthook=reporthook, data=None)
+            t.total = t.n
+            with ZipFile(str(model_name) + ".zip", "r") as model_ref:
+                model_ref.extractall(model_name.parent)
+            Path(str(model_name) + ".zip").unlink()
 
 def get_models(args):
     for directory in MODEL_DIRS:
@@ -85,9 +84,11 @@ def get_models(args):
             return Path(directory, small_model_file[0]), Path(directory, big_model_file[0])
     response = requests.get(MODEL_LIST_URL, timeout=10)
     result_small_model = [model["name"] for model in response.json() if
-            model["lang"] == args.lang and model["type"] == "small" and model["obsolete"] == "false"]
+            model["lang"] == args.lang and model["type"] == "small" and
+            model["obsolete"] == "false"]
     result_big_model = [model["name"] for model in response.json() if
-            model["lang"] == args.lang and model["type"] == "big" and model["obsolete"] == "false"]
+            model["lang"] == args.lang and model["type"] == "big" and
+            model["obsolete"] == "false"]
     if result_small_model == [] or result_big_model == []:
         print("lang %s does not exist" % (args.lang))
         sys.exit(1)
@@ -134,7 +135,7 @@ class BigFileProcessor:
         rec.SetWords(True)
         results = []
         result = []
-        
+
         for data in data_list:
             if rec.AcceptWaveform(data):
                 results.append(rec.Result())
@@ -172,19 +173,20 @@ def main():
     logging.getLogger().setLevel(log_level)
 
     if args.output not in ["txt", "srt"]:
-        logging.info("Wrong output format, it has to be txt(by default) or srt as optional, please try again.")
+        logging.info("Wrong output format, it has to be txt(by default) or srt as optional, "\
+        "please try again.")
         sys.exit(1)
 
     small_model_path, big_model_path = get_models(args)
     logging.info("Models are ready")
 
     processor = BigFileProcessor(args, small_model_path, big_model_path)
-    
+
     start_time = timer()
 
     logging.info("File processing started")
     processor.process_file()
-    
+
     elapsed = timer() - start_time
     logging.info("Execution time: {:.3f}".format(elapsed))
 
