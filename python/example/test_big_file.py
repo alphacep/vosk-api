@@ -2,7 +2,6 @@
 
 import argparse
 import os
-import re
 import subprocess
 import json
 import shlex
@@ -10,11 +9,16 @@ import srt
 import datetime
 import logging
 import sys
+import requests
 
+from urllib.request import urlretrieve
 from pathlib import Path
 from vosk import Model, KaldiRecognizer, SetLogLevel
 from multiprocessing.dummy import Pool
-from queue import Queue
+from timeit import default_timer as timer
+from re import match
+from tqdm import tqdm
+from zipfile import ZipFile
 
 SetLogLevel(0)
 
@@ -39,15 +43,57 @@ parser.add_argument(
         "--log-level", default="INFO",
         help="logging level")
 
-def get_model(args):
+def download_progress_hook(t):
+    last_b = [0]
+    def update_to(b=1, bsize=1, tsize=None):
+        if tsize not in (None, -1):
+            t.total = tsize
+        displayed = t.update((b - last_b[0]) * bsize)
+        last_b[0] = b
+        return displayed
+    return update_to
+
+def download_model(small_model_path, big_model_path):
+    if not (small_model_path.parent).exists():
+        (small_model_path.parent).mkdir(parents=True)
+    model_names = [small_model_path, big_model_path]
+    for model_name in model_names:
+        if model_name.exists():
+            continue
+        else:
+            with tqdm(unit="B", unit_scale=True, unit_divisor=1024, miniters=1,
+                    desc=(MODEL_PRE_URL + str(model_name.name) + ".zip").rsplit("/",
+                        maxsplit=1)[-1]) as t:
+                reporthook = download_progress_hook(t)
+                urlretrieve(MODEL_PRE_URL + str(model_name.name) + ".zip",
+                        str(model_name) + ".zip", reporthook=reporthook, data=None)
+                t.total = t.n
+                with ZipFile(str(model_name) + ".zip", "r") as model_ref:
+                    model_ref.extractall(model_name.parent)
+                Path(str(model_name) + ".zip").unlink()
+
+def get_models(args):
     for directory in MODEL_DIRS:
         if directory is None or not Path(directory).exists():
             continue
         model_file_list = os.listdir(directory)
-        model_files = [model for model in model_file_list if
-                re.match(r"vosk-model(-small)?-{}".format(args.lang), model)] 
-        if len(model_files) == 2:
-            return Path(directory, model_files[0]), Path(directory, model_files[1])
+        small_model_file = [model for model in model_file_list if
+                match(r"vosk-model-small-{}".format(args.lang), model)]
+        big_model_file = [model for model in model_file_list if
+                match(r"vosk-model-{}".format(args.lang), model)]
+        if small_model_file != [] and big_model_file != []:
+            return Path(directory, small_model_file[0]), Path(directory, big_model_file[0])
+    response = requests.get(MODEL_LIST_URL, timeout=10)
+    result_small_model = [model["name"] for model in response.json() if
+            model["lang"] == args.lang and model["type"] == "small" and model["obsolete"] == "false"]
+    result_big_model = [model["name"] for model in response.json() if
+            model["lang"] == args.lang and model["type"] == "big" and model["obsolete"] == "false"]
+    if result_small_model == [] or result_big_model == []:
+        print("lang %s does not exist" % (args.lang))
+        sys.exit(1)
+    else:
+        download_model(Path(directory, result_small_model[0]), Path(directory, result_big_model[0]))
+        return Path(directory, result_small_model[0]), Path(directory, result_big_model[0])
 
 class BigFileProcessor:
 
@@ -83,7 +129,7 @@ class BigFileProcessor:
         return result
 
     def format_result(self, data_list, words_per_line = 7):
-        logging.info("Process file fragment...")
+        logging.info("Process file fragment")
         rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
         rec.SetWords(True)
         results = []
@@ -114,7 +160,7 @@ class BigFileProcessor:
 
     def process_file(self):
         fragments = self.prepare_fragments()
-        logging.info("File fragments ready")
+        logging.info("File fragments are ready")
         with Pool() as pool:
             for fragment in pool.map(self.format_result, fragments):
                 print(fragment)
@@ -129,11 +175,18 @@ def main():
         logging.info("Wrong output format, it has to be txt(by default) or srt as optional, please try again.")
         sys.exit(1)
 
-    small_model_path, big_model_path = get_model(args)
+    small_model_path, big_model_path = get_models(args)
+    logging.info("Models are ready")
 
     processor = BigFileProcessor(args, small_model_path, big_model_path)
     
+    start_time = timer()
+
+    logging.info("File processing started")
     processor.process_file()
+    
+    elapsed = timer() - start_time
+    logging.info("Execution time: {:.3f}".format(elapsed))
 
 if __name__ == "__main__":
     main()
