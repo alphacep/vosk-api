@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
-import subprocess
+import argparse
+import requests
 import json
+import sys
 import shlex
+import subprocess
+import logging
 import srt
 import datetime
-import logging
-import sys
-import requests
 
-from urllib.request import urlretrieve
 from pathlib import Path
+from tqdm import tqdm
+from urllib.request import urlretrieve
+from zipfile import ZipFile
+from re import match
 from vosk import Model, KaldiRecognizer, SetLogLevel, list_languages
 from multiprocessing.dummy import Pool
 from timeit import default_timer as timer
-from re import match
-from tqdm import tqdm
-from zipfile import ZipFile
 
 SetLogLevel(0)
 
