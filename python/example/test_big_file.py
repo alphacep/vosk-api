@@ -178,6 +178,10 @@ def main():
     if args.list_languages is True:
         list_languages()
         return
+    
+    if not args.input:
+        logging.info("Please specify input file")
+        sys.exit(1)
 
     if args.output not in ["txt", "srt"]:
         logging.info("Wrong output format, it has to be txt(by default) or srt as optional, "\
