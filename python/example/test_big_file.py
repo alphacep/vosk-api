@@ -2,7 +2,6 @@
 
 import os
 import argparse
-import requests
 import json
 import sys
 import shlex
@@ -12,11 +11,8 @@ import srt
 import datetime
 
 from pathlib import Path
-from tqdm import tqdm
-from urllib.request import urlretrieve
-from zipfile import ZipFile
 from re import split
-from vosk import Model, KaldiRecognizer, SetLogLevel, list_languages
+from vosk import Model, KaldiRecognizer, SetLogLevel, list_model_pairs, list_models, list_languages
 from multiprocessing.dummy import Pool
 from timeit import default_timer as timer
 
@@ -31,6 +27,9 @@ MODEL_DIRS = [os.getenv("VOSK_MODEL_PATH"), Path("usr/share/vosk"),
 parser = argparse.ArgumentParser(
         description = "Transcribe big size audiofiles")
 parser.add_argument(
+        "--lang", "-l", default="en-us", type=str,
+        help="language")
+parser.add_argument(
         "--small", "-s", default="vosk-model-small-en-us-0.15", type=str,
         help="small model name")
 parser.add_argument(
@@ -43,11 +42,17 @@ parser.add_argument(
         "--output", "-o", default="txt", type=str,
         help="output type")
 parser.add_argument(
-        "--log-level", default="INFO",
-        help="logging level")
+        "--list-models", default=False, action="store_true",
+        help="list available models")
 parser.add_argument(
         "--list-languages", default=False, action="store_true",
         help="list available languages")
+parser.add_argument(
+        "--list-model-pairs", default=False, action="store_true",
+        help="list available model pairs")
+parser.add_argument(
+        "--log-level", default="INFO",
+        help="logging level")
 
 class BigFileProcessor:
 
@@ -125,7 +130,15 @@ def main():
     log_level = args.log_level.upper()
     logging.getLogger().setLevel(log_level)
 
-    if args.list_languages is True:
+    if args.list_model_pairs:
+        list_model_pairs(args.lang)
+        return
+
+    if args.list_models:
+        list_models()
+        return
+
+    if args.list_languages:
         list_languages()
         return
 
@@ -137,14 +150,6 @@ def main():
     big_model_lang = split(r"(-\d.+)", split(r"vosk-model-(small-)*", args.big)[-1])[0]
     if not small_model_lang == big_model_lang:
         logging.info("You have to use both models for the same language, try again.")
-        sys.exit(1)
-
-    if args.list_languages is True:
-        list_languages()
-        return
-
-    if not args.input:
-        logging.info("Please specify input file")
         sys.exit(1)
 
     if args.output not in ["txt", "srt"]:
