@@ -92,11 +92,10 @@ class BigFileProcessor:
         rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
         rec.SetWords(True)
         results = []
-        result = []
 
         for data in data_list:
             if rec.AcceptWaveform(data):
-                results.append(rec.Result())
+                rec.Result()
         results.append(rec.FinalResult())
         if self.args.output == "srt":
             subs = []
