@@ -76,7 +76,7 @@ class Transcriber:
         if self.args.output_type == "srt":
             subs = []
 
-            for _, res in enumerate(result):
+            for res in result:
                 if not "result" in res:
                     continue
                 words = res["result"]
