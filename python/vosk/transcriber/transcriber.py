@@ -97,7 +97,7 @@ class Transcriber:
 
         elif self.args.output_type == "json":
             monologues = {"schemaVersion":"2.0", "monologues":[]}
-            for _, res in enumerate(result):
+            for res in result:
                 if not "result" in res:
                     continue
                 monologue = { "speaker": {"id": "unknown", "name": None}, "start": 0, "end": 0, "terms": []}
