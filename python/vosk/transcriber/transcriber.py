@@ -96,7 +96,10 @@ class Transcriber:
                     processed_result += part["text"] + "\n"
 
         elif self.args.output_type == "json":
-            monologues = {"schemaVersion":"2.0", "monologues":[]}
+            monologues = {"schemaVersion":"2.0", "monologues":[], "text":[]}
+            for part in result:
+                if part["text"] != "":
+                    monologue["text"] += part["text"]
             for _, res in enumerate(result):
                 if not "result" in res:
                     continue
