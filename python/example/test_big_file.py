@@ -67,61 +67,82 @@ class BigFileProcessor:
         stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
+    def format_fragments(self, byte_list, res):
+        fragment = dict.fromkeys(["byte_list", "res"])
+        fragment["byte_list"] = byte_list
+        fragment["res"] = res
+        return fragment
+
     def prepare_fragments(self):
         rec = KaldiRecognizer(self.small_model, SAMPLE_RATE)
+        rec.SetWords(True)
         stream = self.resample_ffmpeg()
         result = []
-        data_list = []
-
+        byte_list = []
         while True:
             data = stream.stdout.read(4000)
             if len(data) == 0:
                 break
             if rec.AcceptWaveform(data):
-                rec.Result()
-                result.append(data_list)
-                data_list = []
+                res = rec.Result()
+                fragment = self.format_fragments(byte_list, res)
+                result.append(fragment)
+                byte_list = []
             else:
-                data_list.append(data)
-        if json.loads(rec.FinalResult())["text"] != "":
-            result.append(data_list)
+                byte_list.append(data)
+        res = rec.FinalResult()
+        if json.loads(res)["text"] != "":
+            fragment = self.format_fragments(byte_list, res)
+            result.append(fragment)
         return result
 
-    def format_result(self, data_list, words_per_line = 7):
+    def get_srt_result(self, result, words_per_line=7):
+        subs = []
+        for res in result:
+            jres = json.loads(res)
+            if not "result" in jres:
+                continue
+            words = jres["result"]
+            for j in range(0, len(words), words_per_line):
+                line = words[j : j + words_per_line]
+                s = srt.Subtitle(index=len(subs),
+                        content=" ".join([l["word"] for l in line]),
+                        start=datetime.timedelta(seconds=line[0]["start"]),
+                        end=datetime.timedelta(seconds=line[-1]["end"]))
+                subs.append(s)
+        return srt.compose(subs)
+
+    def process_fragments(self, fragment):
         logging.info("Process file fragment")
         rec = KaldiRecognizer(self.big_model, SAMPLE_RATE)
         rec.SetWords(True)
         results = []
 
-        for data in data_list:
+        for data in fragment["byte_list"]:
             if rec.AcceptWaveform(data):
                 rec.Result()
         results.append(rec.FinalResult())
-        if self.args.output == "srt":
-            subs = []
-            for res in results:
-                jres = json.loads(res)
-                if not "result" in jres:
-                    continue
-                words = jres["result"]
-                for j in range(0, len(words), words_per_line):
-                    line = words[j : j + words_per_line]
-                    s = srt.Subtitle(index=len(subs),
-                            content=" ".join([l["word"] for l in line]),
-                            start=datetime.timedelta(seconds=line[0]["start"]),
-                            end=datetime.timedelta(seconds=line[-1]["end"]))
-                    subs.append(s)
-            return srt.compose(subs)
-        else:
-            return json.loads(results[0])["text"]
+        return results
+
+    def format_result(self, small_model_results, big_model_results):
+        result = []
+        for elem in small_model_results:
+            result.append(elem["res"])
+        return result
 
     def process_file(self):
-        fragments = self.prepare_fragments()
+        small_model_results = self.prepare_fragments()
         logging.info("File fragments are ready")
-        
+
+        big_model_results = []
         with Pool() as pool:
-            for fragment in pool.map(self.format_result, fragments):
-                print(fragment)
+            for fragment in pool.map(self.process_fragments, small_model_results):
+                big_model_results.append(fragment)
+        if self.args.output == "srt":
+            result = self.format_result(small_model_results, big_model_results)
+            print(self.get_srt_result(result))
+        else:
+            [print(json.loads(fragment[0])["text"]) for fragment in big_model_results]
 
 def main():
 
