@@ -126,8 +126,8 @@ class BigFileProcessor:
 
     def format_result(self, small_model_results, big_model_results):
         result = []
-        for elem in small_model_results:
-            result.append(elem["res"])
+        for elem in big_model_results:
+            result.append(elem[0])
         return result
 
     def process_file(self):
