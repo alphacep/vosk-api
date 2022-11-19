@@ -236,8 +236,8 @@ def GpuThreadInit():
 
 class BatchModel:
 
-    def __init__(self, *args):
-        self._handle = _c.vosk_batch_model_new()
+    def __init__(self, model_path, *args):
+        self._handle = _c.vosk_batch_model_new(model_path.encode('utf-8'))
 
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create a model")

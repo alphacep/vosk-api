@@ -319,7 +319,7 @@ void vosk_gpu_thread_init();
 /** Creates the batch recognizer object
  *
  *  @returns model object or NULL if problem occured */
-VoskBatchModel *vosk_batch_model_new();
+VoskBatchModel *vosk_batch_model_new(const char *model_path);
 
 /** Releases batch model object */
 void vosk_batch_model_free(VoskBatchModel *model);

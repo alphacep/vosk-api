@@ -10,13 +10,15 @@ TOT_SAMPLES = 0
 
 GpuInit()
 
-model = BatchModel()
+model = BatchModel("model")
 
-with open(sys.argv[1], encoding="uft-8").readlines() as fnames:
+with open(sys.argv[1]) as fn:
+    fnames = fn.readlines()
     fds = [open(x.strip(), "rb") for x in fnames]
-uids = [fname.strip().split("/")[-1][:-4] for fname in fnames]
-recs = [BatchRecognizer(model, 16000) for x in fnames]
-results = [""] * len(fnames)
+    uids = [fname.strip().split("/")[-1][:-4] for fname in fnames]
+    recs = [BatchRecognizer(model, 16000) for x in fnames]
+    results = [""] * len(fnames)
+
 ended = set()
 
 start_time = timer()

@@ -42,7 +42,7 @@ class BatchRecognizer;
 
 class BatchModel {
     public:
-        BatchModel();
+        BatchModel(const char *model_path);
         ~BatchModel();
 
         uint64_t GetID(BatchRecognizer *recognizer);
@@ -51,6 +51,9 @@ class BatchModel {
     private:
         friend class BatchRecognizer;
 
+        std::string model_path_str_;
+
+        OnlineNnet2FeaturePipelineInfo feature_info_;
         kaldi::TransitionModel *trans_model_ = nullptr;
         kaldi::nnet3::AmNnetSimple *nnet_ = nullptr;
         const fst::SymbolTable *word_syms_ = nullptr;

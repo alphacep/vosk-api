@@ -20,21 +20,21 @@ using namespace fst;
 using namespace kaldi::nnet3;
 using CorrelationID = CudaOnlinePipelineDynamicBatcher::CorrelationID;
 
-BatchModel::BatchModel() {
+BatchModel::BatchModel(const char *model_path) : model_path_str_(model_path) {
     BatchedThreadedNnet3CudaOnlinePipelineConfig batched_decoder_config;
 
     kaldi::ParseOptions po("something");
     batched_decoder_config.Register(&po);
-    po.ReadConfigFile("model/conf/model.conf");
+    po.ReadConfigFile(model_path_str_ + "/conf/model.conf");
 
     struct stat buffer;
 
-    string nnet3_rxfilename_ = "model/am/final.mdl";
-    string hclg_fst_rxfilename_ = "model/graph/HCLG.fst";
-    string word_syms_rxfilename_ = "model/graph/words.txt";
-    string winfo_rxfilename_ = "model/graph/phones/word_boundary.int";
-    string std_fst_rxfilename_ = "model/rescore/G.fst";
-    string carpa_rxfilename_ = "model/rescore/G.carpa";
+    string nnet3_rxfilename_ = model_path_str_ + "/am/final.mdl";
+    string hclg_fst_rxfilename_ = model_path_str_ + "/graph/HCLG.fst";
+    string word_syms_rxfilename_ = model_path_str_ + "/graph/words.txt";
+    string winfo_rxfilename_ = model_path_str_ + "/graph/phones/word_boundary.int";
+    string std_fst_rxfilename_ = model_path_str_ + "/rescore/G.fst";
+    string carpa_rxfilename_ = model_path_str_ + "/rescore/G.carpa";
 
     trans_model_ = new kaldi::TransitionModel();
     nnet_ = new kaldi::nnet3::AmNnetSimple();
@@ -72,9 +72,23 @@ BatchModel::BatchModel() {
     batched_decoder_config.reset_on_endpoint = true;
     batched_decoder_config.use_gpu_feature_extraction = true;
 
-    batched_decoder_config.feature_opts.feature_type = "mfcc";
-    batched_decoder_config.feature_opts.mfcc_config = "model/conf/mfcc.conf";
-    batched_decoder_config.feature_opts.ivector_extraction_config = "model/conf/ivector.conf";
+    feature_info_.feature_type = "mfcc";
+    ReadConfigFromFile(model_path_str_ + "/conf/mfcc.conf", &feature_info_.mfcc_opts);
+    feature_info_.silence_weighting_config.silence_weight = 1e-3;
+    feature_info_.silence_weighting_config.silence_phones_str = batched_decoder_config.decoder_opts.endpointing_config.silence_phones;
+
+    OnlineIvectorExtractionConfig ivector_extraction_opts;
+    ivector_extraction_opts.splice_config_rxfilename = model_path_str_ + "/ivector/splice.conf";
+    ivector_extraction_opts.cmvn_config_rxfilename = model_path_str_ + "/ivector/online_cmvn.conf";
+    ivector_extraction_opts.lda_mat_rxfilename = model_path_str_ + "/ivector/final.mat";
+    ivector_extraction_opts.global_cmvn_stats_rxfilename = model_path_str_ + "/ivector/global_cmvn.stats";
+    ivector_extraction_opts.diag_ubm_rxfilename = model_path_str_ + "/ivector/final.dubm";
+    ivector_extraction_opts.ivector_extractor_rxfilename = model_path_str_ + "/ivector/final.ie";
+    ivector_extraction_opts.max_count = 100;
+    feature_info_.use_ivectors = true;
+    feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
+
+
     batched_decoder_config.decoder_opts.max_active = 7000;
     batched_decoder_config.decoder_opts.default_beam = 13.0;
     batched_decoder_config.decoder_opts.lattice_beam = 6.0;
@@ -88,7 +102,7 @@ BatchModel::BatchModel() {
     batched_decoder_config.compute_opts.frames_per_chunk = std::max(51, (nnet_right_context + 3 - nnet_right_context % 3));
 
     cuda_pipeline_ = new BatchedThreadedNnet3CudaOnlinePipeline 
-         (batched_decoder_config, *hclg_fst_, *nnet_, *trans_model_);
+         (batched_decoder_config, feature_info_, *hclg_fst_, *nnet_, *trans_model_);
     cuda_pipeline_->SetSymbolTable(*word_syms_);
 
     CudaOnlinePipelineDynamicBatcherConfig dynamic_batcher_config;

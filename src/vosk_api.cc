@@ -203,10 +203,10 @@ void vosk_gpu_thread_init()
 #endif
 }
 
-VoskBatchModel *vosk_batch_model_new()
+VoskBatchModel *vosk_batch_model_new(const char *model_path)
 {
 #if HAVE_CUDA
-    return (VoskBatchModel *)(new BatchModel());
+    return (VoskBatchModel *)(new BatchModel(model_path));
 #else
     return NULL;
 #endif
