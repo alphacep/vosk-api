@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# prerequisites: as described in https://alphacephei.com/vosk/install and also python module `sounddevice` (simply run command `pip install sounddevice`)
+# Example usage using Dutch (nl) recognition model: `python test_microphone.py -m nl`
+# For more help run: `python test_microphone.py -m nl`
+
 import argparse
 import queue
 import sys
@@ -42,6 +46,8 @@ parser.add_argument(
     help="input device (numeric ID or substring)")
 parser.add_argument(
     "-r", "--samplerate", type=int, help="sampling rate")
+parser.add_argument(
+    "-m", "--model", type=str, help="language model; e.g. en-us, fr, nl; default is en-us")
 args = parser.parse_args(remaining)
 
 try:
@@ -49,8 +55,11 @@ try:
         device_info = sd.query_devices(args.device, "input")
         # soundfile expects an int, sounddevice provides a float:
         args.samplerate = int(device_info["default_samplerate"])
-
-    model = Model(lang="en-us")
+        
+    if args.model is None:
+        model = Model(lang="en-us")
+    else:
+        model = Model(lang=args.model)
 
     if args.filename:
         dump_fn = open(args.filename, "wb")
