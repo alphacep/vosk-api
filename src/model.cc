@@ -282,7 +282,10 @@ void Model::ReadDataFiles()
         KALDI_LOG << "Loading HCL and G from " << hcl_fst_rxfilename_ << " " << g_fst_rxfilename_;
         hcl_fst_ = fst::StdFst::Read(hcl_fst_rxfilename_);
         g_fst_ = fst::StdFst::Read(g_fst_rxfilename_);
-        ReadIntegerVectorSimple(disambig_rxfilename_, &disambig_);
+        if (!ReadIntegerVectorSimple(disambig_rxfilename_, &disambig_)) {
+            KALDI_ERR << "Could not read disambig symbol table from file "
+                      << disambig_rxfilename_;
+        }
     }
 
     if (hclg_fst_ && hclg_fst_->OutputSymbols()) {
@@ -297,7 +300,9 @@ void Model::ReadDataFiles()
                       << word_syms_rxfilename_;
         word_syms_loaded_ = word_syms_;
     }
-    KALDI_ASSERT(word_syms_);
+    if (!word_syms_) {
+        KALDI_ERR << "Word symbol table empty";
+    }
 
     if (stat(winfo_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading winfo " << winfo_rxfilename_;
