@@ -78,6 +78,8 @@ public class LibVosk {
 
     public static native String vosk_recognizer_partial_result(Pointer recognizer);
 
+    public static native void vosk_recognizer_set_grm(Pointer recognizer, String grammar);
+
     public static native void vosk_recognizer_reset(Pointer recognizer);
 
     public static native void vosk_recognizer_free(Pointer recognizer);
