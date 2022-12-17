@@ -60,6 +60,16 @@ public class Recognizer extends PointerType implements AutoCloseable {
         return LibVosk.vosk_recognizer_final_result(this.getPointer());
     }
 
+    /**
+     * Reconfigures recognizer to use grammar.
+     *
+     * @param grammar      Set of phrases in JSON array of strings or "[]" to use default model graph.
+     * @see #Recognizer(Model, float, String)
+     */
+    public void setGrammar(String grammar) {
+        LibVosk.vosk_recognizer_set_grm(this.getPointer(), grammar);
+    }
+
     public void reset() {
         LibVosk.vosk_recognizer_reset(this.getPointer());
     }
