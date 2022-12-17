@@ -1,7 +1,6 @@
 package org.vosk;
 
 import com.sun.jna.Native;
-import com.sun.jna.Library;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import java.io.File;
@@ -23,7 +22,7 @@ public class LibVosk {
             // We have to unpack dependencies
             try {
                 // To get a tmp folder we unpack small library and mark it for deletion
-                File tmpFile = Native.extractFromResourcePath("/win32-x86-64/empty");
+                File tmpFile = Native.extractFromResourcePath("/win32-x86-64/empty", LibVosk.class.getClassLoader());
                 File tmpDir = tmpFile.getParentFile();
                 new File(tmpDir, tmpFile.getName() + ".x").createNewFile();
 
