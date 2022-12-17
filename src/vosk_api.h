@@ -77,7 +77,7 @@ int vosk_model_find_word(VoskModel *model, const char *word);
 /** Loads speaker model data from the file and returns the model object
  *
  * @param model_path: the path of the model on the filesystem
- * @returns model object or NULL if problem occured */
+ * @returns model object or NULL if problem occurred */
 VoskSpkModel *vosk_spk_model_new(const char *model_path);
 
 
@@ -298,7 +298,7 @@ void vosk_recognizer_free(VoskRecognizer *recognizer);
  *  @param log_level the level
  *     0 - default value to print info and error messages but no debug
  *     less than 0 - don't print info messages
- *     greather than 0 - more verbose mode
+ *     greater than 0 - more verbose mode
  */
 void vosk_set_log_level(int log_level);
 
