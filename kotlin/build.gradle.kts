@@ -20,6 +20,7 @@ kotlin {
 			useJUnitPlatform()
 		}
 	}
+	/*
 	mingwX64 {
 		binaries {
 			executable {
@@ -34,6 +35,7 @@ kotlin {
 			}
 		}
 	}
+	 */
 	android()
 	sourceSets {
 		val commonMain by getting
@@ -48,10 +50,10 @@ kotlin {
 			}
 		}
 		val jvmTest by getting
-		val mingwX64Main by getting
-		val mingwX64Test by getting
-		val linuxX64Main by getting
-		val linuxX64Test by getting
+		//val mingwX64Main by getting
+		//val mingwX64Test by getting
+		//val linuxX64Main by getting
+		//val linuxX64Test by getting
 		val androidMain by getting {
 			dependsOn(jvmMain)
 			dependencies {
