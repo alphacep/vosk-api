@@ -1,3 +1,5 @@
+import org.jetbrains.dokka.gradle.DokkaTask
+
 /*
  * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
  *
@@ -18,6 +20,7 @@ plugins {
 	kotlin("multiplatform") version "1.7.21"
 	id("com.android.library")
 	`maven-publish`
+	id("org.jetbrains.dokka") version "1.7.20"
 }
 
 group = "com.alphacephei"
@@ -28,6 +31,21 @@ repositories {
 	mavenCentral()
 }
 
+val dokkaOutputDir = "$buildDir/dokka"
+
+tasks.getByName<DokkaTask>("dokkaHtml") {
+	outputDirectory.set(file(dokkaOutputDir))
+}
+
+val deleteDokkaOutputDir by tasks.register<Delete>("deleteDokkaOutputDirectory") {
+	delete(dokkaOutputDir)
+}
+
+val javadocJar = tasks.register<Jar>("javadocJar") {
+	dependsOn(deleteDokkaOutputDir, tasks.dokkaHtml)
+	archiveClassifier.set("javadoc")
+	from(dokkaOutputDir)
+}
 kotlin {
 	jvm {
 		compilations.all {
@@ -60,6 +78,7 @@ kotlin {
 	publishing {
 		publications {
 			withType<MavenPublication> {
+				artifact(javadocJar)
 				pom {
 					url.set("http://www.alphacephei.com.com/vosk/")
 					licenses {
