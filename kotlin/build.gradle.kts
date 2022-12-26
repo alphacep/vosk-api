@@ -53,8 +53,9 @@ kotlin {
 		val linuxX64Main by getting
 		val linuxX64Test by getting
 		val androidMain by getting {
+			dependsOn(jvmMain)
 			dependencies {
-				implementation("com.google.android.material:material:1.5.0")
+				api("net.java.dev.jna:jna:5.12.1@aar")
 			}
 		}
 		val androidTest by getting {

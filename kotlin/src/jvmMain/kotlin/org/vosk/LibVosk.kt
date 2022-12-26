@@ -26,29 +26,35 @@ object LibVosk {
 	}
 
 	init {
-		if (Platform.isWindows()) {
-			// We have to unpack dependencies
-			try {
-				// To get a tmp folder we unpack small library and mark it for deletion
-				val tmpFile: File = Native.extractFromResourcePath(
-					"/win32-x86-64/empty",
-					Vosk::class.java.classLoader
-				)
-				val tmpDir = tmpFile.parentFile
-				File(tmpDir, tmpFile.name + ".x").createNewFile()
-
-				// Now unpack dependencies
-				unpackDll(tmpDir, "libwinpthread-1");
-				unpackDll(tmpDir, "libgcc_s_seh-1");
-				unpackDll(tmpDir, "libstdc++-6");
-
-			} catch (e: IOException) {
-				// Nothing for now, it will fail on next step
-			} finally {
-				Native.register(Vosk::class.java, "libvosk");
+		when {
+			Platform.isAndroid() -> {
+				Native.register(LibVosk::class.java, "vosk")
 			}
-		} else {
-			Native.register(Vosk::class.java, "vosk");
+			Platform.isWindows() -> {
+				// We have to unpack dependencies
+				try {
+					// To get a tmp folder we unpack small library and mark it for deletion
+					val tmpFile: File = Native.extractFromResourcePath(
+						"/win32-x86-64/empty",
+						Vosk::class.java.classLoader
+					)
+					val tmpDir = tmpFile.parentFile
+					File(tmpDir, tmpFile.name + ".x").createNewFile()
+
+					// Now unpack dependencies
+					unpackDll(tmpDir, "libwinpthread-1");
+					unpackDll(tmpDir, "libgcc_s_seh-1");
+					unpackDll(tmpDir, "libstdc++-6");
+
+				} catch (e: IOException) {
+					// Nothing for now, it will fail on next step
+				} finally {
+					Native.register(Vosk::class.java, "libvosk");
+				}
+			}
+			else -> {
+				Native.register(Vosk::class.java, "vosk");
+			}
 		}
 	}
 
