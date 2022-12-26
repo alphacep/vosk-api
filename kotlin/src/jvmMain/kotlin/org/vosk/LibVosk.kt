@@ -1,0 +1,164 @@
+package org.vosk
+
+import com.sun.jna.Native
+import com.sun.jna.Platform
+import com.sun.jna.Pointer
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
+/**
+ * 26 / 12 / 2022
+ */
+@Suppress("FunctionName")
+object LibVosk {
+
+	@Throws(IOException::class)
+	private fun unpackDll(targetDir: File, lib: String) {
+		val source: InputStream = Vosk::class.java.getResourceAsStream("/win32-x86-64/$lib.dll")
+		Files.copy(
+			source,
+			File(targetDir, "$lib.dll").toPath(),
+			StandardCopyOption.REPLACE_EXISTING
+		)
+	}
+
+	init {
+		if (Platform.isWindows()) {
+			// We have to unpack dependencies
+			try {
+				// To get a tmp folder we unpack small library and mark it for deletion
+				val tmpFile: File = Native.extractFromResourcePath(
+					"/win32-x86-64/empty",
+					Vosk::class.java.classLoader
+				)
+				val tmpDir = tmpFile.parentFile
+				File(tmpDir, tmpFile.name + ".x").createNewFile()
+
+				// Now unpack dependencies
+				unpackDll(tmpDir, "libwinpthread-1");
+				unpackDll(tmpDir, "libgcc_s_seh-1");
+				unpackDll(tmpDir, "libstdc++-6");
+
+			} catch (e: IOException) {
+				// Nothing for now, it will fail on next step
+			} finally {
+				Native.register(Vosk::class.java, "libvosk");
+			}
+		} else {
+			Native.register(Vosk::class.java, "vosk");
+		}
+	}
+
+
+	external fun vosk_model_new(path: String): Pointer
+
+	external fun vosk_model_free(model: Model)
+
+	external fun vosk_model_find_word(model: Model, word: String): Int
+
+
+	external fun vosk_spk_model_new(path: String): Pointer
+
+	external fun vosk_spk_model_free(model: SpeakerModel)
+
+
+	external fun vosk_recognizer_new(model: Model, sampleRate: Float): Pointer
+
+	external fun vosk_recognizer_new_spk(
+		model: Model,
+		sampleRate: Float,
+		spkModel: SpeakerModel
+	): Pointer
+
+	external fun vosk_recognizer_new_grm(
+		model: Model,
+		sampleRate: Float,
+		grammar: String?
+	): Pointer
+
+	external fun vosk_recognizer_set_spk_model(recognizer: Recognizer, spk_model: SpeakerModel)
+
+	external fun vosk_recognizer_set_grm(recognizer: Recognizer, grammar: String)
+
+	external fun vosk_recognizer_set_max_alternatives(recognizer: Recognizer, maxAlternatives: Int)
+
+	external fun vosk_recognizer_set_words(recognizer: Recognizer, words: Boolean)
+
+	external fun vosk_recognizer_set_partial_words(recognizer: Recognizer, partial_words: Boolean)
+
+	external fun vosk_recognizer_set_nlsml(recognizer: Recognizer, nlsml: Boolean)
+
+
+	external fun vosk_recognizer_accept_waveform(
+		recognizer: Recognizer,
+		data: ByteArray?,
+		len: Int
+	): Boolean
+
+	external fun vosk_recognizer_accept_waveform_s(
+		recognizer: Recognizer,
+		data: ShortArray?,
+		len: Int
+	): Boolean
+
+	external fun vosk_recognizer_accept_waveform_f(
+		recognizer: Recognizer,
+		data: FloatArray?,
+		len: Int
+	): Boolean
+
+
+	external fun vosk_recognizer_result(recognizer: Recognizer): String
+
+	external fun vosk_recognizer_final_result(recognizer: Recognizer): String
+
+	external fun vosk_recognizer_partial_result(recognizer: Recognizer): String
+
+
+	external fun vosk_recognizer_reset(recognizer: Recognizer)
+
+	external fun vosk_recognizer_free(recognizer: Recognizer)
+
+	external fun vosk_set_log_level(level: Int)
+
+	external fun vosk_gpu_init()
+
+	external fun vosk_gpu_thread_init()
+
+
+	external fun vosk_batch_model_new(path: String): Pointer
+
+	external fun vosk_batch_model_free(model: BatchModel)
+
+	external fun vosk_batch_model_wait(model: BatchModel)
+
+	external fun vosk_batch_recognizer_new(batchModel: BatchModel, sampleRate: Float): Pointer
+
+	external fun vosk_batch_recognizer_free(recognizer: BatchRecognizer)
+
+	external fun vosk_batch_recognizer_accept_waveform(
+		recognizer: BatchRecognizer,
+		data: ByteArray?,
+		length: Int
+	)
+
+	external fun vosk_batch_recognizer_set_nlsml(
+		recognizer: BatchRecognizer,
+		nlsml: Boolean
+	)
+
+	external fun vosk_batch_recognizer_finish_stream(
+		recognizer: BatchRecognizer
+	)
+
+	external fun vosk_batch_recognizer_front_result(
+		recognizer: BatchRecognizer
+	): String
+
+	external fun vosk_batch_recognizer_pop(recognizer: BatchRecognizer)
+
+	external fun vosk_batch_recognizer_get_pending_chunks(recognizer: BatchRecognizer): Int
+}

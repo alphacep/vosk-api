@@ -42,7 +42,11 @@ kotlin {
 				implementation(kotlin("test"))
 			}
 		}
-		val jvmMain by getting
+		val jvmMain by getting {
+			dependencies {
+				api("net.java.dev.jna:jna:5.12.1")
+			}
+		}
 		val jvmTest by getting
 		val mingwX64Main by getting
 		val mingwX64Test by getting
