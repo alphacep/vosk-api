@@ -17,9 +17,10 @@
 plugins {
 	kotlin("multiplatform") version "1.7.21"
 	id("com.android.library")
+	`maven-publish`
 }
 
-group = "org.vosk"
+group = "com.alphacephei"
 version = "0.0.0"
 
 repositories {
@@ -52,7 +53,37 @@ kotlin {
 		}
 	}
 	 */
-	android()
+	android {
+		publishAllLibraryVariants()
+	}
+
+	publishing {
+		publications {
+			withType<MavenPublication> {
+				pom {
+					url.set("http://www.alphacephei.com.com/vosk/")
+					licenses {
+						license {
+							name.set("The Apache License, Version 2.0")
+							url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+						}
+					}
+					developers {
+						developer {
+							id.set("com.alphacephei")
+							name.set("Alpha Cephei Inc")
+							email.set("contact@alphacephei.com")
+						}
+					}
+					scm {
+						connection.set("scm:git:git://github.com/alphacep/vosk-api.git")
+						url.set("https://github.com/alphacep/vosk-api/")
+					}
+				}
+			}
+		}
+	}
+
 	sourceSets {
 		val commonMain by getting
 		val commonTest by getting {
