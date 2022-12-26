@@ -17,7 +17,9 @@ object LibVosk {
 
 	@Throws(IOException::class)
 	private fun unpackDll(targetDir: File, lib: String) {
-		val source: InputStream = Vosk::class.java.getResourceAsStream("/win32-x86-64/$lib.dll")
+		val source: InputStream =
+			Vosk::class.java.getResourceAsStream("/win32-x86-64/$lib.dll")!!
+
 		Files.copy(
 			source,
 			File(targetDir, "$lib.dll").toPath(),
@@ -38,7 +40,7 @@ object LibVosk {
 						"/win32-x86-64/empty",
 						Vosk::class.java.classLoader
 					)
-					val tmpDir = tmpFile.parentFile
+					val tmpDir = tmpFile.parentFile!!
 					File(tmpDir, tmpFile.name + ".x").createNewFile()
 
 					// Now unpack dependencies
