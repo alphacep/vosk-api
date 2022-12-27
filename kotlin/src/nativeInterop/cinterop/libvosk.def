@@ -1,0 +1,25 @@
+headers = libvosk/vosk_api.h
+package = libvosk
+
+noStringConversion = \
+	vosk_batch_recognizer_accept_waveform \
+	vosk_recognizer_accept_waveform
+
+compilerOpts.linux = \
+	-I/usr/include/libvosk/ \
+	-I/usr/local/include/libvosk/ \
+	-I/usr/include/ \
+	-I/usr/local/include/
+
+compilerOpts.linux_x64 = \
+	-I/usr/lib64/libvosk/ \
+    -I/usr/local/lib64/libvosk/
+
+linkerOpts.linux = \
+	-L/usr/lib/ \
+	-L/usr/local/lib/ \
+	-llibvosk
+
+linkerOpts.linux_x64 = \
+	-L/usr/lib64/ \
+	-L/usr/local/lib64/

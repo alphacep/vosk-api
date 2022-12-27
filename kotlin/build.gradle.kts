@@ -46,6 +46,23 @@ val javadocJar = tasks.register<Jar>("javadocJar") {
 	archiveClassifier.set("javadoc")
 	from(dokkaOutputDir)
 }
+
+fun org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.native(
+	configure: org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests.() -> Unit = {}
+) {
+	when {
+		org.jetbrains.kotlin.konan.target.HostManager.hostIsMingw -> mingwX64("native")
+		org.jetbrains.kotlin.konan.target.HostManager.hostIsLinux -> linuxX64("native")
+		org.jetbrains.kotlin.konan.target.HostManager.hostIsMac -> if (org.jetbrains.kotlin.konan.target.HostManager.hostArch() == "arm64") {
+			macosArm64("native")
+		} else {
+			macosX64("native")
+		}
+
+		else -> error("Unsupported Host OS: ${org.jetbrains.kotlin.konan.target.HostManager.hostOs()}")
+	}.apply(configure)
+}
+
 kotlin {
 	jvm {
 		compilations.all {
@@ -55,25 +72,21 @@ kotlin {
 			useJUnitPlatform()
 		}
 	}
-	/*
-	mingwX64 {
-		binaries {
-			executable {
-				entryPoint = "main"
-			}
-		}
-	}
-	linuxX64 {
-		binaries {
-			executable {
-				entryPoint = "main"
-			}
-		}
-	}
-	 */
+
 	android {
 		publishAllLibraryVariants()
 	}
+
+	/*
+	native {
+		val main by compilations.getting
+		val libvosk by main.cinterops.creating
+
+		binaries {
+			sharedLib()
+		}
+	}
+	 */
 
 	publishing {
 		publications {
@@ -116,10 +129,7 @@ kotlin {
 			}
 		}
 		val jvmTest by getting
-		//val mingwX64Main by getting
-		//val mingwX64Test by getting
-		//val linuxX64Main by getting
-		//val linuxX64Test by getting
+		//val nativeMain by getting
 		val androidMain by getting {
 			dependsOn(jvmMain)
 			dependencies {
