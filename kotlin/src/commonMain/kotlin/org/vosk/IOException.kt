@@ -16,22 +16,4 @@
 
 package org.vosk
 
-/**
- * Batch model object
- *
- * 26 / 12 / 2022
- *
- * @constructor Creates the batch recognizer object
- */
-expect class BatchModel @Throws(IOException::class) constructor(path: String) : Freeable {
-
-	/**
-	 *  Releases batch model object
-	 */
-	override fun free()
-
-	/**
-	 * Wait for the processing
-	 */
-	fun await()
-}
+expect class IOException(message: String? = null) : Exception

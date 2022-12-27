@@ -27,8 +27,9 @@ package org.vosk
  *
  * @constructor Loads model data from the file and returns the model object
  * @param path the path of the model on the filesystem
+ * @throws IOException if the path provided is invalid
  */
-expect class Model constructor(path: String) : Freeable {
+expect class Model @Throws(IOException::class) constructor(path: String) : Freeable {
 
 	/**
 	 * Check if a word can be recognized by the model

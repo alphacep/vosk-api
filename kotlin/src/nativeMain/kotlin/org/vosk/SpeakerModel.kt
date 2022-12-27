@@ -16,8 +16,10 @@
 
 package org.vosk
 
+import cnames.structs.VoskSpkModel
 import kotlinx.cinterop.CPointer
-import libvosk.*
+import libvosk.vosk_spk_model_free
+import libvosk.vosk_spk_model_new
 
 /**
  * Speaker model is the same as model but contains the data
@@ -32,7 +34,8 @@ actual class SpeakerModel(val pointer: CPointer<VoskSpkModel>) : Freeable {
 	 * @param path: the path of the model on the filesystem
 	 * @returns model object or NULL if problem occurred
 	 */
-	actual constructor(path: String) : this(vosk_spk_model_new(path)!!)
+	@Throws(IOException::class)
+	actual constructor(path: String) : this(vosk_spk_model_new(path) ?: throw ioException(path))
 
 	/**
 	 * Releases the model memory

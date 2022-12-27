@@ -30,13 +30,18 @@ actual class Model : Freeable, PointerType, AutoCloseable {
 	 * Empty constructor for JNA
 	 */
 	constructor()
-	actual constructor(path: String) : super(LibVosk.vosk_model_new(path))
+
+	@Throws(IOException::class)
+	actual constructor(path: String) : super(
+		LibVosk.vosk_model_new(path) ?: throw ioException(path)
+	)
 
 	/**
 	 * Constructor using a Path, will retrieve absolutePath
 	 *
 	 * @param path to batch model
 	 */
+	@Throws(IOException::class)
 	constructor(path: Path) : this(path.absolutePathString())
 
 	/**
@@ -44,6 +49,7 @@ actual class Model : Freeable, PointerType, AutoCloseable {
 	 *
 	 * @param file to batch model
 	 */
+	@Throws(IOException::class)
 	constructor(file: File) : this(file.absolutePath)
 
 	actual fun findWord(word: String): Int =

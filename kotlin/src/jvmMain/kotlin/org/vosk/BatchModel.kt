@@ -31,13 +31,17 @@ actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	 */
 	constructor()
 
-	actual constructor(path: String) : super(LibVosk.vosk_batch_model_new(path))
+	@Throws(IOException::class)
+	actual constructor(path: String) : super(
+		LibVosk.vosk_batch_model_new(path) ?: throw ioException(path)
+	)
 
 	/**
 	 * Constructor using a Path, will retrieve absolutePath
 	 *
 	 * @param path to batch model
 	 */
+	@Throws(IOException::class)
 	constructor(path: Path) : this(path.absolutePathString())
 
 	/**
@@ -45,6 +49,7 @@ actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	 *
 	 * @param file to batch model
 	 */
+	@Throws(IOException::class)
 	constructor(file: File) : this(file.absolutePath)
 
 	actual override fun free() {

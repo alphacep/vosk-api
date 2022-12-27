@@ -16,8 +16,11 @@
 
 package org.vosk
 
+import cnames.structs.VoskBatchModel
 import kotlinx.cinterop.CPointer
-import libvosk.*
+import libvosk.vosk_batch_model_free
+import libvosk.vosk_batch_model_new
+import libvosk.vosk_batch_model_wait
 
 /**
  * Batch model object
@@ -28,7 +31,8 @@ actual class BatchModel(val pointer: CPointer<VoskBatchModel>) : Freeable {
 	/**
 	 * Creates the batch recognizer object
 	 */
-	actual constructor(path: String) : this(vosk_batch_model_new(path)!!)
+	@Throws(IOException::class)
+	actual constructor(path: String) : this(vosk_batch_model_new(path) ?: throw ioException(path))
 
 	/**
 	 *  Releases batch model object

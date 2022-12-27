@@ -16,8 +16,11 @@
 
 package org.vosk
 
+import cnames.structs.VoskModel
 import kotlinx.cinterop.CPointer
-import libvosk.*
+import libvosk.vosk_model_find_word
+import libvosk.vosk_model_free
+import libvosk.vosk_model_new
 
 /**
  * Model stores all the data required for recognition
@@ -34,7 +37,8 @@ actual class Model(val pointer: CPointer<VoskModel>) : Freeable {
 	 * @param path: the path of the model on the filesystem
 	 * @returns model object or NULL if problem occured
 	 */
-	actual constructor(path: String) : this(vosk_model_new(path)!!)
+	@Throws(IOException::class)
+	actual constructor(path: String) : this(vosk_model_new(path) ?: throw ioException(path))
 
 	/**
 	 * Check if a word can be recognized by the model

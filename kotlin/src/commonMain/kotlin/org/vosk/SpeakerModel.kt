@@ -24,8 +24,9 @@ package org.vosk
  *
  * @constructor Loads speaker model data from the file and returns the model object
  * @param path the path of the model on the filesystem
+ * @throws IOException if the path provided is invalid
  */
-expect class SpeakerModel constructor(path: String) : Freeable {
+expect class SpeakerModel @Throws(IOException::class) constructor(path: String) : Freeable {
 
 	/**
 	 * Releases the model memory

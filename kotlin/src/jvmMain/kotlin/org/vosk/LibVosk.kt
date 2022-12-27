@@ -77,14 +77,14 @@ object LibVosk {
 	}
 
 
-	external fun vosk_model_new(path: String): Pointer
+	external fun vosk_model_new(path: String): Pointer?
 
 	external fun vosk_model_free(model: Model)
 
 	external fun vosk_model_find_word(model: Model, word: String): Int
 
 
-	external fun vosk_spk_model_new(path: String): Pointer
+	external fun vosk_spk_model_new(path: String): Pointer?
 
 	external fun vosk_spk_model_free(model: SpeakerModel)
 
@@ -153,7 +153,7 @@ object LibVosk {
 	external fun vosk_gpu_thread_init()
 
 
-	external fun vosk_batch_model_new(path: String): Pointer
+	external fun vosk_batch_model_new(path: String): Pointer?
 
 	external fun vosk_batch_model_free(model: BatchModel)
 
