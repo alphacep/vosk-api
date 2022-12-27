@@ -17,6 +17,9 @@
 package org.vosk
 
 import com.sun.jna.PointerType
+import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 
 /**
  * 26 / 12 / 2022
@@ -27,7 +30,22 @@ actual class SpeakerModel : Freeable, PointerType, AutoCloseable {
 	 * Empty constructor for JNA
 	 */
 	constructor()
+
 	actual constructor(path: String) : super(LibVosk.vosk_spk_model_new(path))
+
+	/**
+	 * Constructor using a Path, will retrieve absolutePath
+	 *
+	 * @param path to batch model
+	 */
+	constructor(path: Path) : this(path.absolutePathString())
+
+	/**
+	 * Constructor using a File, will retrieve absolutePath
+	 *
+	 * @param file to batch model
+	 */
+	constructor(file: File) : this(file.absolutePath)
 
 	actual override fun free() {
 		LibVosk.vosk_spk_model_free(this)

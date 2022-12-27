@@ -27,6 +27,7 @@ actual class BatchRecognizer : Freeable, PointerType, AutoCloseable {
 	 * Empty constructor for JNA
 	 */
 	constructor()
+
 	actual constructor(model: BatchModel, sampleRate: Float) :
 			super(LibVosk.vosk_batch_recognizer_new(model, sampleRate))
 
