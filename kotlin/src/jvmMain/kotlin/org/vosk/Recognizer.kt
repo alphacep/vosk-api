@@ -22,6 +22,7 @@ import com.sun.jna.PointerType
  * 26 / 12 / 2022
  */
 actual class Recognizer : PointerType, AutoCloseable {
+	constructor()
 	actual constructor(model: Model, sampleRate: Float) :
 			super(LibVosk.vosk_recognizer_new(model, sampleRate))
 
