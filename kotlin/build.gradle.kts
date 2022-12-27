@@ -1,4 +1,5 @@
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.config.JvmTarget
 
 /*
  * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
@@ -17,7 +18,7 @@ import org.jetbrains.dokka.gradle.DokkaTask
  */
 
 plugins {
-	kotlin("multiplatform") version "1.7.21"
+	kotlin("multiplatform") version "1.7.22"
 	id("com.android.library")
 	`maven-publish`
 	id("org.jetbrains.dokka") version "1.7.20"
@@ -66,10 +67,15 @@ fun org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.native(
 kotlin {
 	jvm {
 		compilations.all {
-			kotlinOptions.jvmTarget = "17"
+			kotlinOptions.jvmTarget = JvmTarget.JVM_11.description
 		}
 		testRuns["test"].executionTask.configure {
 			useJUnitPlatform()
+			environment("MODEL", "model")
+			//environment("MODEL", "/home/doomsdayrs/Downloads/vosk-model-small-en-us-0.15/")
+			environment("LIBRARY","PATH")
+			//environment("LIBRARY", "/usr/local/lib64/libvosk/libvosk.so")
+			environment("AUDIO", "$projectDir/../python/example/test.wav")
 		}
 	}
 
