@@ -8,13 +8,13 @@ import org.vosk.Recognizer
  * 26 / 12 / 2022
  */
 
-val json = Json { encodeDefaults = true }
+val voskJson = Json { encodeDefaults = true }
 
 fun Recognizer.resultAsJson(): ResultOutput =
-	json.decodeFromString(result)
+	voskJson.decodeFromString(result)
 
 fun Recognizer.finalResultAsJson(): ResultOutput =
-	json.decodeFromString(finalResult)
+	voskJson.decodeFromString(finalResult)
 
 fun Recognizer.partialResultAsJson(): PartialResultOutput =
-	json.decodeFromString(partialResult)
+	voskJson.decodeFromString(partialResult)
