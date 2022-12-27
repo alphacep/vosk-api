@@ -20,13 +20,10 @@ package org.vosk
  * Batch recognizer object
  *
  * 26 / 12 / 2022
+ *
+ * @constructor Creates batch recognizer object
  */
-expect class BatchRecognizer: Freeable {
-
-	/**
-	 * Creates batch recognizer object
-	 */
-	constructor(model: BatchModel, sampleRate: Float)
+expect class BatchRecognizer constructor(model: BatchModel, sampleRate: Float) : Freeable {
 
 	/**
 	 * Releases batch recognizer object

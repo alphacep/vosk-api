@@ -24,15 +24,11 @@ package org.vosk
  * threads.
  *
  * 26 / 12 / 2022
+ *
+ * @constructor Loads model data from the file and returns the model object
+ * @param path the path of the model on the filesystem
  */
-expect class Model : Freeable {
-	/**
-	 * Loads model data from the file and returns the model object
-	 *
-	 * @param path: the path of the model on the filesystem
-	 * @returns model object or NULL if problem occured
-	 */
-	constructor(path: String)
+expect class Model constructor(path: String) : Freeable {
 
 	/**
 	 * Check if a word can be recognized by the model

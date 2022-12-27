@@ -21,15 +21,11 @@ package org.vosk
  * for speaker identification.
  *
  * 26 / 12 / 2022
+ *
+ * @constructor Loads speaker model data from the file and returns the model object
+ * @param path the path of the model on the filesystem
  */
-expect class SpeakerModel : Freeable {
-	/**
-	 * Loads speaker model data from the file and returns the model object
-	 *
-	 * @param path: the path of the model on the filesystem
-	 * @returns model object or NULL if problem occurred
-	 */
-	constructor(path: String)
+expect class SpeakerModel constructor(path: String) : Freeable {
 
 	/**
 	 * Releases the model memory
