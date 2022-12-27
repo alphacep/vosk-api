@@ -27,7 +27,7 @@ import libvosk.*
  *
  * 26 / 12 / 2022
  */
-actual class Model(val pointer: CPointer<VoskModel>) {
+actual class Model(val pointer: CPointer<VoskModel>) : Freeable {
 	/**
 	 * Loads model data from the file and returns the model object
 	 *
@@ -53,7 +53,7 @@ actual class Model(val pointer: CPointer<VoskModel>) {
 	 *  depends on this model, model might still stay alive. When
 	 *  last recognizer is released, model will be released too.
 	 */
-	actual fun free() {
+	actual override fun free() {
 		vosk_model_free(pointer)
 	}
 }

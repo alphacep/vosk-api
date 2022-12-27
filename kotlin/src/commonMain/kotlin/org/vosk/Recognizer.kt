@@ -26,7 +26,7 @@ package org.vosk
  *
  * 26 / 12 / 2022
  */
-expect class Recognizer {
+expect class Recognizer : Freeable {
 	/**
 	 * Creates the recognizer object
 	 *
@@ -240,5 +240,5 @@ expect class Recognizer {
 	 * Releases recognizer object
 	 *
 	 *  Underlying model is also unreferenced and if needed released */
-	fun free()
+	override fun free()
 }

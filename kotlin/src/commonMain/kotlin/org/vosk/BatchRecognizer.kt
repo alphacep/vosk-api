@@ -21,7 +21,7 @@ package org.vosk
  *
  * 26 / 12 / 2022
  */
-expect class BatchRecognizer {
+expect class BatchRecognizer: Freeable {
 
 	/**
 	 * Creates batch recognizer object
@@ -31,7 +31,7 @@ expect class BatchRecognizer {
 	/**
 	 * Releases batch recognizer object
 	 */
-	fun free()
+	override fun free()
 
 	/**
 	 * Accept batch voice data

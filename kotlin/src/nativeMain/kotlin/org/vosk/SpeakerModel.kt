@@ -25,7 +25,7 @@ import libvosk.*
  *
  * 26 / 12 / 2022
  */
-actual class SpeakerModel(val pointer: CPointer<VoskSpkModel>) {
+actual class SpeakerModel(val pointer: CPointer<VoskSpkModel>) : Freeable {
 	/**
 	 * Loads speaker model data from the file and returns the model object
 	 *
@@ -41,7 +41,7 @@ actual class SpeakerModel(val pointer: CPointer<VoskSpkModel>) {
 	 * depends on this model, model might still stay alive. When
 	 * last recognizer is released, model will be released too.
 	 */
-	actual fun free() {
+	actual override fun free() {
 		vosk_spk_model_free(pointer)
 	}
 }

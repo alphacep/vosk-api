@@ -21,11 +21,11 @@ import com.sun.jna.PointerType
 /**
  * 26 / 12 / 2022
  */
-actual class BatchModel : PointerType, AutoCloseable {
+actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	constructor()
 	actual constructor(path: String) : super(LibVosk.vosk_batch_model_new(path))
 
-	actual fun free() {
+	actual override fun free() {
 		LibVosk.vosk_batch_model_free(this)
 	}
 

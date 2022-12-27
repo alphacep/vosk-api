@@ -16,21 +16,8 @@
 
 package org.vosk
 
-import com.sun.jna.PointerType
-
 /**
- * 26 / 12 / 2022
+ * Use a [Freeable], then immediately free it and return any values.
  */
-actual class SpeakerModel : Freeable, PointerType, AutoCloseable {
-	constructor()
-	actual constructor(path: String) : super(LibVosk.vosk_spk_model_new(path))
-
-	actual override fun free() {
-		LibVosk.vosk_spk_model_free(this)
-	}
-
-	override fun close() {
-		free()
-	}
-
-}
+fun <T : Freeable, R> T.use(block: (T) -> R): R =
+	block(this).also { free() }

@@ -31,7 +31,7 @@ import libvosk.*
  *
  * 26 / 12 / 2022
  */
-actual class Recognizer(val pointer: CPointer<VoskRecognizer>) {
+actual class Recognizer(val pointer: CPointer<VoskRecognizer>) : Freeable {
 	/**
 	 * Creates the recognizer object
 	 *
@@ -292,7 +292,7 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) {
 	 * Releases recognizer object
 	 *
 	 *  Underlying model is also unreferenced and if needed released */
-	actual fun free() {
+	actual override fun free() {
 		vosk_recognizer_free(pointer)
 	}
 }

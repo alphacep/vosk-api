@@ -16,21 +16,12 @@
 
 package org.vosk
 
-import com.sun.jna.PointerType
-
 /**
- * 26 / 12 / 2022
+ * Denotes an object that must be freed afterwards.
+ *
+ * On JVM, This is done via AutoClosable.
  */
-actual class SpeakerModel : Freeable, PointerType, AutoCloseable {
-	constructor()
-	actual constructor(path: String) : super(LibVosk.vosk_spk_model_new(path))
-
-	actual override fun free() {
-		LibVosk.vosk_spk_model_free(this)
-	}
-
-	override fun close() {
-		free()
-	}
-
+@Suppress("SpellCheckingInspection")
+interface Freeable {
+	fun free()
 }

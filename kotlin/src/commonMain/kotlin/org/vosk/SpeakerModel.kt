@@ -22,7 +22,7 @@ package org.vosk
  *
  * 26 / 12 / 2022
  */
-expect class SpeakerModel {
+expect class SpeakerModel : Freeable {
 	/**
 	 * Loads speaker model data from the file and returns the model object
 	 *
@@ -38,5 +38,5 @@ expect class SpeakerModel {
 	 * depends on this model, model might still stay alive. When
 	 * last recognizer is released, model will be released too.
 	 */
-	fun free()
+	override fun free()
 }

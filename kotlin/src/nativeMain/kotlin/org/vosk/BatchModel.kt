@@ -24,7 +24,7 @@ import libvosk.*
  *
  * 26 / 12 / 2022
  */
-actual class BatchModel(val pointer: CPointer<VoskBatchModel>) {
+actual class BatchModel(val pointer: CPointer<VoskBatchModel>) : Freeable {
 	/**
 	 * Creates the batch recognizer object
 	 */
@@ -33,7 +33,7 @@ actual class BatchModel(val pointer: CPointer<VoskBatchModel>) {
 	/**
 	 *  Releases batch model object
 	 */
-	actual fun free() {
+	actual override fun free() {
 		vosk_batch_model_free(pointer)
 	}
 

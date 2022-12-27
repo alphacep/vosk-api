@@ -21,7 +21,7 @@ package org.vosk
  *
  * 26 / 12 / 2022
  */
-expect class BatchModel {
+expect class BatchModel : Freeable {
 
 	/**
 	 * Creates the batch recognizer object
@@ -31,7 +31,7 @@ expect class BatchModel {
 	/**
 	 *  Releases batch model object
 	 */
-	fun free()
+	override fun free()
 
 	/**
 	 * Wait for the processing

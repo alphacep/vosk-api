@@ -25,7 +25,7 @@ package org.vosk
  *
  * 26 / 12 / 2022
  */
-expect class Model {
+expect class Model : Freeable {
 	/**
 	 * Loads model data from the file and returns the model object
 	 *
@@ -50,5 +50,5 @@ expect class Model {
 	 *  depends on this model, model might still stay alive. When
 	 *  last recognizer is released, model will be released too.
 	 */
-	fun free()
+	override fun free()
 }
