@@ -54,7 +54,7 @@ object LibVosk {
 					// To get a tmp folder we unpack small library and mark it for deletion
 					val tmpFile: File = Native.extractFromResourcePath(
 						"/win32-x86-64/empty",
-						Vosk::class.java.classLoader
+						LibVosk::class.java.classLoader
 					)
 					val tmpDir = tmpFile.parentFile!!
 					File(tmpDir, tmpFile.name + ".x").createNewFile()
@@ -67,11 +67,11 @@ object LibVosk {
 				} catch (e: IOException) {
 					// Nothing for now, it will fail on next step
 				} finally {
-					Native.register(Vosk::class.java, "libvosk");
+					Native.register(LibVosk::class.java, "libvosk");
 				}
 			}
 			else -> {
-				Native.register(Vosk::class.java, "vosk");
+				Native.register(LibVosk::class.java, "vosk");
 			}
 		}
 	}
