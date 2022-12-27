@@ -29,4 +29,4 @@ pluginManagement {
     }
 }
 rootProject.name = "vosk-api-kotlin"
-
+include("test")
