@@ -22,6 +22,10 @@ import com.sun.jna.PointerType
  * 26 / 12 / 2022
  */
 actual class Recognizer : Freeable, PointerType, AutoCloseable {
+
+	/**
+	 * Empty constructor for JNA
+	 */
 	constructor()
 	actual constructor(model: Model, sampleRate: Float) :
 			super(LibVosk.vosk_recognizer_new(model, sampleRate))

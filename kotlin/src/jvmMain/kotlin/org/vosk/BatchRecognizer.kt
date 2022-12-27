@@ -22,6 +22,10 @@ import com.sun.jna.PointerType
  * 26 / 12 / 2022
  */
 actual class BatchRecognizer : Freeable, PointerType, AutoCloseable {
+
+	/**
+	 * Empty constructor for JNA
+	 */
 	constructor()
 	actual constructor(model: BatchModel, sampleRate: Float) :
 			super(LibVosk.vosk_batch_recognizer_new(model, sampleRate))

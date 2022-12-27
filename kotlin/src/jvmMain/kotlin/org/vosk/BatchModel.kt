@@ -22,6 +22,10 @@ import com.sun.jna.PointerType
  * 26 / 12 / 2022
  */
 actual class BatchModel : Freeable, PointerType, AutoCloseable {
+
+	/**
+	 * Empty constructor for JNA
+	 */
 	constructor()
 	actual constructor(path: String) : super(LibVosk.vosk_batch_model_new(path))
 
