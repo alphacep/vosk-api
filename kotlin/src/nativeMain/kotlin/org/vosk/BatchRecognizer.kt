@@ -52,8 +52,8 @@ actual class BatchRecognizer(val pointer: CPointer<VoskBatchRecognizer>) {
 	/**
 	 * Return results
 	 */
-	actual fun frontResult(): String =
-		vosk_batch_recognizer_front_result(pointer)!!.toKString()
+	actual val frontResult: String
+		get() = vosk_batch_recognizer_front_result(pointer)!!.toKString()
 
 	/**
 	 * Release and free first retrieved result
@@ -65,6 +65,6 @@ actual class BatchRecognizer(val pointer: CPointer<VoskBatchRecognizer>) {
 	/**
 	 * Get amount of pending chunks for more intelligent waiting
 	 */
-	actual fun getPendingChunks(): Int =
-		vosk_batch_recognizer_get_pending_chunks(pointer)
+	actual val pendingChunks: Int
+		get() = vosk_batch_recognizer_get_pending_chunks(pointer)
 }

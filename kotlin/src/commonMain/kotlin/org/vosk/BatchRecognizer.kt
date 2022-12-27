@@ -52,7 +52,7 @@ expect class BatchRecognizer {
 	/**
 	 * Return results
 	 */
-	fun frontResult(): String
+	val frontResult: String
 
 	/**
 	 * Release and free first retrieved result
@@ -62,5 +62,5 @@ expect class BatchRecognizer {
 	/**
 	 * Get amount of pending chunks for more intelligent waiting
 	 */
-	fun getPendingChunks(): Int
+	val pendingChunks: Int
 }

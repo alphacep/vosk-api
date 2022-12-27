@@ -205,7 +205,7 @@ expect class Recognizer {
 	 *
 	 * If word times enabled returns word time, see also vosk_recognizer_set_word_times().
 	 */
-	fun result(): String
+	val result: String
 
 	/**
 	 * Returns partial speech recognition
@@ -219,7 +219,7 @@ expect class Recognizer {
 	 * }
 	 * </pre>
 	 */
-	fun finalResult(): String
+	val finalResult: String
 
 	/**
 	 * Returns speech recognition result. Same as result, but doesn't wait for silence
@@ -228,7 +228,7 @@ expect class Recognizer {
 	 *
 	 *  @returns speech result in JSON format.
 	 */
-	fun partialResult(): String
+	val partialResult: String
 
 	/**
 	 * Resets the recognizer

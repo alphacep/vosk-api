@@ -24,12 +24,12 @@ class DecoderDemo {
 							val b = ByteArray(4096)
 							while (ais.read(b) >= 0) {
 								if (recognizer.acceptWaveform(b)) {
-									println(recognizer.result())
+									println(recognizer.result)
 								} else {
-									println(recognizer.partialResult())
+									println(recognizer.partialResult)
 								}
 							}
-							println(recognizer.finalResult())
+							println(recognizer.finalResult)
 						}
 					}
 			}

@@ -72,14 +72,14 @@ actual class Recognizer : PointerType, AutoCloseable {
 		LibVosk.vosk_recognizer_accept_waveform_f(this, data, data.size)
 
 
-	actual fun result(): String =
-		LibVosk.vosk_recognizer_result(this)
+	actual val result: String
+		get() = LibVosk.vosk_recognizer_result(this)
 
-	actual fun finalResult(): String =
-		LibVosk.vosk_recognizer_final_result(this)
+	actual val finalResult: String
+		get() = LibVosk.vosk_recognizer_final_result(this)
 
-	actual fun partialResult(): String =
-		LibVosk.vosk_recognizer_partial_result(this)
+	actual val partialResult: String
+		get() = LibVosk.vosk_recognizer_partial_result(this)
 
 	actual fun reset() {
 		LibVosk.vosk_recognizer_reset(this)

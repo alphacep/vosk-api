@@ -236,8 +236,8 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) {
 	 *
 	 * If word times enabled returns word time, see also vosk_recognizer_set_word_times().
 	 */
-	actual fun result(): String =
-		vosk_recognizer_result(pointer)!!.toKString()
+	actual val result: String
+		get() = vosk_recognizer_result(pointer)!!.toKString()
 
 	/**
 	 * Returns partial speech recognition
@@ -251,8 +251,8 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) {
 	 * }
 	 * </pre>
 	 */
-	actual fun finalResult(): String =
-		vosk_recognizer_result(pointer)!!.toKString()
+	actual val finalResult: String
+		get() = vosk_recognizer_result(pointer)!!.toKString()
 
 	/**
 	 * Returns speech recognition result. Same as result, but doesn't wait for silence
@@ -261,8 +261,8 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) {
 	 *
 	 *  @returns speech result in JSON format.
 	 */
-	actual fun partialResult(): String =
-		vosk_recognizer_partial_result(pointer)!!.toKString()
+	actual val partialResult: String
+		get() = vosk_recognizer_partial_result(pointer)!!.toKString()
 
 	/**
 	 * Resets the recognizer

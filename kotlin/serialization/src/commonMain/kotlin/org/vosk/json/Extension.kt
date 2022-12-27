@@ -11,10 +11,10 @@ import org.vosk.Recognizer
 val json = Json { encodeDefaults = true }
 
 fun Recognizer.resultAsJson(): ResultOutput =
-	json.decodeFromString(result())
+	json.decodeFromString(result)
 
 fun Recognizer.finalResultAsJson(): ResultOutput =
-	json.decodeFromString(finalResult())
+	json.decodeFromString(finalResult)
 
 fun Recognizer.partialResultAsJson(): PartialResultOutput =
-	json.decodeFromString(partialResult())
+	json.decodeFromString(partialResult)
