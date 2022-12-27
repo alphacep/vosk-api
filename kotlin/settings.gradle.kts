@@ -29,4 +29,5 @@ pluginManagement {
     }
 }
 rootProject.name = "vosk-api-kotlin"
+include("serialization")
 include("test")
