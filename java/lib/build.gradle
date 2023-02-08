@@ -25,7 +25,7 @@ mavenPublish {
 }
 
 dependencies {
-    api group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
+    api group: 'net.java.dev.jna', name: 'jna', version: '5.13.0'
     testImplementation 'junit:junit:4.13'
 }
 
