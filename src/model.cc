@@ -244,6 +244,7 @@ void Model::ReadDataFiles()
 
     decodable_info_ = new nnet3::DecodableNnetSimpleLoopedInfo(decodable_opts_,
                                                                nnet_);
+
     if (stat(final_ie_rxfilename_.c_str(), &buffer) == 0) {
         KALDI_LOG << "Loading i-vector extractor from " << final_ie_rxfilename_;
 
@@ -258,6 +259,8 @@ void Model::ReadDataFiles()
 
         feature_info_.use_ivectors = true;
         feature_info_.ivector_extractor_info.Init(ivector_extraction_opts);
+    } else if (nnet_->IvectorDim() > 0) {
+        KALDI_ERR << "Can't find required ivector extractor";
     } else {
         feature_info_.use_ivectors = false;
     }
