@@ -35,9 +35,14 @@ public class Recognizer extends PointerType implements AutoCloseable {
      *                     Make sure this rate matches the audio content, it is a common
      *                     issue causing accuracy problems.
      *  @param spkModel speaker model for speaker identification
+     *  @throws IOException if the recognizer could not be created
      */
-    public Recognizer(Model model, float sampleRate, SpeakerModel spkModel) {
+    public Recognizer(Model model, float sampleRate, SpeakerModel spkModel) throws IOException {
         super(LibVosk.vosk_recognizer_new_spk(model.getPointer(), sampleRate, spkModel.getPointer()));
+
+        if (getPointer() == null) {
+            throw new IOException("Failed to create a recognizer");
+        }
     }
 
     /**
@@ -58,9 +63,14 @@ public class Recognizer extends PointerType implements AutoCloseable {
      *                     issue causing accuracy problems.
      *  @param grammar The string with the list of phrases to recognize as JSON array of strings,
      *                 for example "["one two three four five", "[unk]"]".
+     *  @throws IOException if the recognizer could not be created
      */
-    public Recognizer(Model model, float sampleRate, String grammar) {
+    public Recognizer(Model model, float sampleRate, String grammar) throws IOException {
         super(LibVosk.vosk_recognizer_new_grm(model.getPointer(), sampleRate, grammar));
+
+        if (getPointer() == null) {
+            throw new IOException("Failed to create a recognizer");
+        }
     }
 
     /**
