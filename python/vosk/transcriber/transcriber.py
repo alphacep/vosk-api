@@ -133,6 +133,12 @@ class Transcriber:
             start_time = timer()
             proc = await self.resample_ffmpeg_async(input_file)
             result, tot_samples = await self.recognize_stream_server(proc)
+            await proc.wait()
+
+            # Bad input, continue
+            if tot_samples == 0:
+                 self.queue.task_done()
+                 continue
 
             processed_result = self.format_result(result)
             if output_file != "":
@@ -141,8 +147,6 @@ class Transcriber:
                     fh.write(processed_result)
             else:
                 print(processed_result)
-
-            await proc.wait()
 
             elapsed = timer() - start_time
             logging.info("Execution time: {:.3f} sec; "\
@@ -165,8 +169,10 @@ class Transcriber:
         rec = KaldiRecognizer(self.model, SAMPLE_RATE)
         rec.SetWords(True)
         result, tot_samples = self.recognize_stream(rec, stream)
-        processed_result = self.format_result(result)
+        if tot_samples == 0:
+            return
 
+        processed_result = self.format_result(result)
         if inputdata[1] != "":
             logging.info("File {} processing complete".format(inputdata[1]))
             with open(inputdata[1], "w", encoding="utf-8") as fh:
