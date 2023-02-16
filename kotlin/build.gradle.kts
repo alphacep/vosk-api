@@ -135,7 +135,7 @@ kotlin {
 		}
 		val jvmMain by getting {
 			dependencies {
-				api("net.java.dev.jna:jna:5.12.1")
+				api("net.java.dev.jna:jna:5.13.0")
 			}
 		}
 		val jvmTest by getting
@@ -143,7 +143,7 @@ kotlin {
 		val androidMain by getting {
 			dependsOn(jvmMain)
 			dependencies {
-				api("net.java.dev.jna:jna:5.12.1@aar")
+				api("net.java.dev.jna:jna:5.13.0@aar")
 			}
 		}
 		val androidTest by getting {
