@@ -83,16 +83,23 @@ kotlin {
 		publishAllLibraryVariants()
 	}
 
-	/*
-	native {
-		val main by compilations.getting
-		val libvosk by main.cinterops.creating
-
-		binaries {
-			sharedLib()
-		}
-	}
+	/**
+	 * If native target should be enabled or not.
+	 *
+	 * Currently disabled as there is no proper packaging distribution currently.
 	 */
+	@Suppress("SimplifyBooleanWithConstants") // Ignore, the false is for overrides
+	val enableNative = System.getenv("NATIVE_EXPERIMENT") == "true" || false
+
+	if (enableNative)
+		native {
+			val main by compilations.getting
+			val libvosk by main.cinterops.creating
+
+			binaries {
+				sharedLib()
+			}
+		}
 
 	publishing {
 		publications {
@@ -139,7 +146,9 @@ kotlin {
 			}
 		}
 		val jvmTest by getting
-		//val nativeMain by getting
+		if (enableNative){
+			val nativeMain by getting
+		}
 		val androidMain by getting {
 			dependsOn(jvmMain)
 			dependencies {
