@@ -218,22 +218,34 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) : Freeable {
 	 *           0 if decoding continues
 	 *           -1 if exception occured
 	 */
-	actual fun acceptWaveform(data: ByteArray): Boolean =
-		vosk_recognizer_accept_waveform(pointer, data.toCValues(), data.size).toBoolean()
+	@Throws(AcceptWaveformException::class)
+	actual fun acceptWaveform(data: ByteArray): Boolean {
+		val result= vosk_recognizer_accept_waveform(pointer, data.toCValues(), data.size)
+		if (result == -1) throw AcceptWaveformException(data)
+		return result == 1
+	}
 
 	/**
 	 * Same as above but the version with the short data for language bindings where you have
 	 *  audio as array of shorts
 	 */
-	actual fun acceptWaveform(data: ShortArray): Boolean =
-		vosk_recognizer_accept_waveform_s(pointer, data.toCValues(), data.size).toBoolean()
+	@Throws(AcceptWaveformException::class)
+	actual fun acceptWaveform(data: ShortArray): Boolean {
+		val result=  vosk_recognizer_accept_waveform_s(pointer, data.toCValues(), data.size)
+		if (result == -1) throw AcceptWaveformException(data)
+		return result == 1
+	}
 
 	/**
 	 * Same as above but the version with the float data for language bindings where you have
 	 *  audio as array of floats
 	 */
-	actual fun acceptWaveform(data: FloatArray): Boolean =
-		vosk_recognizer_accept_waveform_f(pointer, data.toCValues(), data.size).toBoolean()
+	@Throws(AcceptWaveformException::class)
+	actual fun acceptWaveform(data: FloatArray): Boolean {
+		val result=  vosk_recognizer_accept_waveform_f(pointer, data.toCValues(), data.size)
+		if (result == -1) throw AcceptWaveformException(data)
+		return result == 1
+	}
 
 	/**
 	 * Returns speech recognition result

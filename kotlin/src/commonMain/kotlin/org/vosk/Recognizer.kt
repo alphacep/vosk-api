@@ -174,18 +174,21 @@ expect class Recognizer : Freeable {
 	 *           0 if decoding continues
 	 *           -1 if exception occured
 	 */
+	@Throws(AcceptWaveformException::class)
 	fun acceptWaveform(data: ByteArray): Boolean
 
 	/**
 	 * Same as above but the version with the short data for language bindings where you have
 	 *  audio as array of shorts
 	 */
+	@Throws(AcceptWaveformException::class)
 	fun acceptWaveform(data: ShortArray): Boolean
 
 	/**
 	 * Same as above but the version with the float data for language bindings where you have
 	 *  audio as array of floats
 	 */
+	@Throws(AcceptWaveformException::class)
 	fun acceptWaveform(data: FloatArray): Boolean
 
 	/**

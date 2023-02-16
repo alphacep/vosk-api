@@ -120,19 +120,19 @@ object LibVosk {
 		recognizer: Recognizer,
 		data: ByteArray?,
 		len: Int
-	): Boolean
+	): Int
 
 	external fun vosk_recognizer_accept_waveform_s(
 		recognizer: Recognizer,
 		data: ShortArray?,
 		len: Int
-	): Boolean
+	): Int
 
 	external fun vosk_recognizer_accept_waveform_f(
 		recognizer: Recognizer,
 		data: FloatArray?,
 		len: Int
-	): Boolean
+	): Int
 
 
 	external fun vosk_recognizer_result(recognizer: Recognizer): String

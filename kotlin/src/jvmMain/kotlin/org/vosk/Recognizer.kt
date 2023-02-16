@@ -67,14 +67,26 @@ actual class Recognizer : Freeable, PointerType, AutoCloseable {
 		LibVosk.vosk_recognizer_set_nlsml(this, nlsml)
 	}
 
-	actual fun acceptWaveform(data: ByteArray): Boolean =
-		LibVosk.vosk_recognizer_accept_waveform(this, data, data.size)
+	@Throws(AcceptWaveformException::class)
+	actual fun acceptWaveform(data: ByteArray): Boolean {
+		val result = LibVosk.vosk_recognizer_accept_waveform(this, data, data.size)
+		if (result == -1) throw AcceptWaveformException(data)
+		return result == 1
+	}
 
-	actual fun acceptWaveform(data: ShortArray): Boolean =
-		LibVosk.vosk_recognizer_accept_waveform_s(this, data, data.size)
+	@Throws(AcceptWaveformException::class)
+	actual fun acceptWaveform(data: ShortArray): Boolean {
+		val result = LibVosk.vosk_recognizer_accept_waveform_s(this, data, data.size)
+		if (result == -1) throw AcceptWaveformException(data)
+		return result == 1
+	}
 
-	actual fun acceptWaveform(data: FloatArray): Boolean =
-		LibVosk.vosk_recognizer_accept_waveform_f(this, data, data.size)
+	@Throws(AcceptWaveformException::class)
+	actual fun acceptWaveform(data: FloatArray): Boolean {
+		val result = LibVosk.vosk_recognizer_accept_waveform_f(this, data, data.size)
+		if (result == -1) throw AcceptWaveformException(data)
+		return result == 1
+	}
 
 
 	actual val result: String
