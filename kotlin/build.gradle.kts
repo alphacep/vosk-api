@@ -22,6 +22,7 @@ plugins {
 	id("com.android.library")
 	`maven-publish`
 	id("org.jetbrains.dokka") version "1.7.20"
+	kotlin("plugin.serialization") version "1.8.10"
 }
 
 group = "com.alphacephei"
@@ -133,11 +134,13 @@ kotlin {
 		val commonMain by getting {
 			dependencies {
 				api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+				api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 			}
 		}
 		val commonTest by getting {
 			dependencies {
 				implementation(kotlin("test"))
+				implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 			}
 		}
 		val jvmMain by getting {
@@ -146,7 +149,7 @@ kotlin {
 			}
 		}
 		val jvmTest by getting
-		if (enableNative){
+		if (enableNative) {
 			val nativeMain by getting
 		}
 		val androidMain by getting {

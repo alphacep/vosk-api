@@ -1,3 +1,5 @@
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.vosk.*
 import java.io.BufferedInputStream
 import java.io.FileInputStream
@@ -14,12 +16,12 @@ class DecoderTest {
 
 	init {
 		System.load(System.getenv("LIBRARY"))
+		Vosk.setLogLevel(LogLevel.DEBUG)
 	}
 
 	@Test
 	@Throws(IOException::class, UnsupportedAudioFileException::class)
 	fun decoderTest() {
-		Vosk.setLogLevel(LogLevel.DEBUG)
 		Model(modelPath).use { model ->
 			AudioSystem.getAudioInputStream(BufferedInputStream(FileInputStream(testFile)))
 				.use { ais ->
@@ -42,10 +44,29 @@ class DecoderTest {
 		}
 	}
 
+	@OptIn(ExperimentalCoroutinesApi::class)
+	@Test
+	@Throws(IOException::class, UnsupportedAudioFileException::class)
+	fun decoderTestFlow() {
+		runTest {
+			Model(modelPath).use { model ->
+				Recognizer(model, 16000f).apply {
+					setMaxAlternatives(10)
+					setWords(true)
+					setPartialWords(true)
+				}.use { recognizer ->
+					AudioSystem.getAudioInputStream(BufferedInputStream(FileInputStream(testFile)))
+						.feed(recognizer).collect {
+							println(it)
+						}
+				}
+			}
+		}
+	}
+
 	@Test
 	@Throws(IOException::class, UnsupportedAudioFileException::class)
 	fun decoderTestShort() {
-		Vosk.setLogLevel(LogLevel.DEBUG)
 		Model(modelPath).use { model ->
 			AudioSystem.getAudioInputStream(BufferedInputStream(FileInputStream(testFile)))
 				.use { ais ->
@@ -69,7 +90,6 @@ class DecoderTest {
 	@Test
 	@Throws(IOException::class, UnsupportedAudioFileException::class)
 	fun decoderTestGrammar() {
-		Vosk.setLogLevel(LogLevel.DEBUG)
 		Model(modelPath).use { model ->
 			AudioSystem.getAudioInputStream(BufferedInputStream(FileInputStream(testFile)))
 				.use { ais ->
