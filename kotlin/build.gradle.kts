@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.config.JvmTarget
  */
 
 plugins {
-	kotlin("multiplatform") version "1.7.22"
+	kotlin("multiplatform") version "1.8.10"
 	id("com.android.library")
 	`maven-publish`
 	id("org.jetbrains.dokka") version "1.7.20"
