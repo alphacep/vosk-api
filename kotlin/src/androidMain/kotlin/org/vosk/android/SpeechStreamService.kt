@@ -18,7 +18,6 @@ import android.os.Looper
 import org.vosk.Recognizer
 import java.io.IOException
 import java.io.InputStream
-import kotlin.jvm.JvmOverloads
 import kotlin.math.roundToInt
 
 /**

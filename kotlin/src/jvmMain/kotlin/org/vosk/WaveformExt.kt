@@ -2,10 +2,12 @@ package org.vosk
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import org.vosk.json.*
+import org.vosk.json.WaveformResult
+import org.vosk.json.finalResultAsJson
+import org.vosk.json.partialResultAsJson
+import org.vosk.json.resultAsJson
 
 /**
  * Feed an [Flow] of [ByteArray] into a [Recognizer].

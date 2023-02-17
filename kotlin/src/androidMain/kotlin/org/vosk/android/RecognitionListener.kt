@@ -13,8 +13,6 @@
 // limitations under the License.
 package org.vosk.android
 
-import java.lang.Exception
-
 /**
  * Interface to receive recognition results
  */

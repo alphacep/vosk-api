@@ -220,7 +220,7 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) : Freeable {
 	 */
 	@Throws(AcceptWaveformException::class)
 	actual fun acceptWaveform(data: ByteArray): Boolean {
-		val result= vosk_recognizer_accept_waveform(pointer, data.toCValues(), data.size)
+		val result = vosk_recognizer_accept_waveform(pointer, data.toCValues(), data.size)
 		if (result == -1) throw AcceptWaveformException(data)
 		return result == 1
 	}
@@ -231,7 +231,7 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) : Freeable {
 	 */
 	@Throws(AcceptWaveformException::class)
 	actual fun acceptWaveform(data: ShortArray): Boolean {
-		val result=  vosk_recognizer_accept_waveform_s(pointer, data.toCValues(), data.size)
+		val result = vosk_recognizer_accept_waveform_s(pointer, data.toCValues(), data.size)
 		if (result == -1) throw AcceptWaveformException(data)
 		return result == 1
 	}
@@ -242,7 +242,7 @@ actual class Recognizer(val pointer: CPointer<VoskRecognizer>) : Freeable {
 	 */
 	@Throws(AcceptWaveformException::class)
 	actual fun acceptWaveform(data: FloatArray): Boolean {
-		val result=  vosk_recognizer_accept_waveform_f(pointer, data.toCValues(), data.size)
+		val result = vosk_recognizer_accept_waveform_f(pointer, data.toCValues(), data.size)
 		if (result == -1) throw AcceptWaveformException(data)
 		return result == 1
 	}
