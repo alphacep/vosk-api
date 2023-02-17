@@ -4,15 +4,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import org.vosk.json.*
-import java.io.InputStream
 
 /**
- * Feed an [InputStream] into a [Recognizer].
+ * Feed an [Flow] of [ByteArray] into a [Recognizer].
  *
- * The flow will emit an [WaveformResult] for each result parsed.
+ * The returned flow will emit an [WaveformResult] for each result parsed.
  *
- * This will close the [InputStream] at the end of reading.
+ * This expects a null terminator to signify the end of a stream.
  *
  * This will not close the [recognizer] at the end of reading.
  *
@@ -23,18 +23,15 @@ import java.io.InputStream
  *
  * @see [Recognizer.acceptWaveform]
  */
-fun InputStream.feed(recognizer: Recognizer): Flow<WaveformResult> =
-	flow {
-		val b = ByteArray(4096)
-
-		while (read(b) >= 0) {
-			if (recognizer.acceptWaveform(b)) {
-				emit(WaveformResult.Result(recognizer.resultAsJson()))
+fun Flow<ByteArray?>.feed(recognizer: Recognizer): Flow<WaveformResult> =
+	map {
+		if (it != null) {
+			if (recognizer.acceptWaveform(it)) {
+				WaveformResult.Result(recognizer.resultAsJson())
 			} else {
-				emit(WaveformResult.PartialResult(recognizer.partialResultAsJson()))
+				WaveformResult.PartialResult(recognizer.partialResultAsJson())
 			}
+		} else {
+			WaveformResult.FinalResult(recognizer.finalResultAsJson())
 		}
-
-		emit(WaveformResult.FinalResult(recognizer.finalResultAsJson()))
-		close()
 	}.flowOn(Dispatchers.IO)
