@@ -30,7 +30,10 @@ import kotlin.math.roundToInt
  * recognition results. Recognition events are passed to a client using
  * [RecognitionListener]
  */
-class SpeechService(private val recognizer: Recognizer, sampleRate: Float) {
+class SpeechService @Throws(IOException::class) constructor(
+	private val recognizer: Recognizer,
+	sampleRate: Float
+) {
 	private val sampleRate: Int
 	private val bufferSize: Int
 	private val recorder: AudioRecord
