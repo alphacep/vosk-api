@@ -18,9 +18,12 @@ package org.vosk
 
 /**
  * 26 / 12 / 2022
+ *
+ * Control overarching features of libvosk.
  */
 expect object Vosk {
-	/** Set log level for Kaldi messages
+	/**
+	 * Set log level for Kaldi messages
 	 *
 	 *  @param logLevel the level
 	 */
