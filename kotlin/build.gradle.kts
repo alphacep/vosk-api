@@ -72,9 +72,9 @@ kotlin {
         }
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
-            environment("MODEL", "model")
+            environment("MODEL", "VOSK_MODEL")
             //environment("MODEL", "/home/doomsdayrs/Downloads/vosk-model-small-en-us-0.15/")
-            environment("LIBRARY", "PATH")
+            environment("LIBRARY", "VOSK_PATH")
             //environment("LIBRARY", "/usr/local/lib64/libvosk/libvosk.so")
             environment("AUDIO", "$projectDir/../python/example/test.wav")
         }
