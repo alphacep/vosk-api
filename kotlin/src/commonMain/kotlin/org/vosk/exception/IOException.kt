@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package org.vosk
+package org.vosk.exception
 
-actual typealias IOException = java.io.IOException
+expect open class IOException(message: String? = null) : Exception

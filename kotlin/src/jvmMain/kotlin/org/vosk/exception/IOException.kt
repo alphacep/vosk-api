@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package org.vosk
+package org.vosk.exception
 
-@Throws(IOException::class)
-inline fun ioException(path: String): IOException =
-	IOException("Failed to find model: $path")
+actual typealias IOException = java.io.IOException

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package org.vosk
+package org.vosk.exception
 
-expect class IOException(message: String? = null) : Exception
+class ModelException(path: String): IOException("Failed to find model: $path")

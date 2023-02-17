@@ -16,6 +16,8 @@
 
 package org.vosk
 
+import org.vosk.exception.RecognizerException
+
 /**
  * Recognizer object is the main object which processes data.
  *
@@ -36,8 +38,9 @@ expect class Recognizer : Freeable {
 	 *  @param sampleRate The sample rate of the audio you going to feed into the recognizer.
 	 *                     Make sure this rate matches the audio content, it is a common
 	 *                     issue causing accuracy problems.
-	 *  @returns recognizer object or NULL if problem occured
+	 * @throws RecognizerException if a problem occurred
 	 */
+	@Throws(RecognizerException::class)
 	constructor(model: Model, sampleRate: Float)
 
 	/**
@@ -52,8 +55,9 @@ expect class Recognizer : Freeable {
 	 *                     Make sure this rate matches the audio content, it is a common
 	 *                     issue causing accuracy problems.
 	 *  @param speakerModel speaker model for speaker identification
-	 *  @returns recognizer object or NULL if problem occured
+	 * @throws RecognizerException if a problem occurred
 	 */
+	@Throws(RecognizerException::class)
 	constructor(model: Model, sampleRate: Float, speakerModel: SpeakerModel)
 
 	/**
@@ -69,14 +73,15 @@ expect class Recognizer : Freeable {
 	 *
 	 *  @param model       VoskModel containing static data for recognizer. Model can be
 	 *                     shared across recognizers, even running in different threads.
-	 *  @param sampleRate The sample rate of the audio you going to feed into the recognizer.
+	 *  @param sampleRate The valuesample rate of the audio you going to feed into the recognizer.
 	 *                     Make sure this rate matches the audio content, it is a common
 	 *                     issue causing accuracy problems.
 	 *  @param grammar The string with the list of phrases to recognize as JSON array of strings,
 	 *                 for example "["one two three four five", "[unk]"]".
 	 *
-	 *  @returns recognizer object or NULL if problem occured
+	 * @throws RecognizerException if a problem occurred
 	 */
+	@Throws(RecognizerException::class)
 	constructor(model: Model, sampleRate: Float, grammar: String)
 
 	/**

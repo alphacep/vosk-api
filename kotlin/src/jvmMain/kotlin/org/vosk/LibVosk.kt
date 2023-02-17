@@ -98,19 +98,19 @@ internal object LibVosk {
 	external fun vosk_spk_model_free(model: SpeakerModel)
 
 
-	external fun vosk_recognizer_new(model: Model, sampleRate: Float): Pointer
+	external fun vosk_recognizer_new(model: Model, sampleRate: Float): Pointer?
 
 	external fun vosk_recognizer_new_spk(
 		model: Model,
 		sampleRate: Float,
 		spkModel: SpeakerModel
-	): Pointer
+	): Pointer?
 
 	external fun vosk_recognizer_new_grm(
 		model: Model,
 		sampleRate: Float,
 		grammar: String?
-	): Pointer
+	): Pointer?
 
 	external fun vosk_recognizer_set_spk_model(recognizer: Recognizer, spk_model: SpeakerModel)
 

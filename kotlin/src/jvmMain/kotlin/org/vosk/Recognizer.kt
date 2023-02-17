@@ -17,6 +17,7 @@
 package org.vosk
 
 import com.sun.jna.PointerType
+import org.vosk.exception.RecognizerException
 
 /**
  * 26 / 12 / 2022
@@ -28,20 +29,23 @@ actual class Recognizer : Freeable, PointerType, AutoCloseable {
 	 */
 	constructor()
 
+	@Throws(RecognizerException::class)
 	actual constructor(model: Model, sampleRate: Float) :
-			super(LibVosk.vosk_recognizer_new(model, sampleRate))
+			super(LibVosk.vosk_recognizer_new(model, sampleRate) ?: throw RecognizerException())
 
+	@Throws(RecognizerException::class)
 	actual constructor(
 		model: Model,
 		sampleRate: Float,
 		speakerModel: SpeakerModel
-	) : super(LibVosk.vosk_recognizer_new_spk(model, sampleRate, speakerModel))
+	) : super(LibVosk.vosk_recognizer_new_spk(model, sampleRate, speakerModel) ?: throw RecognizerException())
 
+	@Throws(RecognizerException::class)
 	actual constructor(
 		model: Model,
 		sampleRate: Float,
 		grammar: String
-	) : super(LibVosk.vosk_recognizer_new_grm(model, sampleRate, grammar))
+	) : super(LibVosk.vosk_recognizer_new_grm(model, sampleRate, grammar) ?: throw RecognizerException())
 
 	actual fun setSpeakerModel(speakerModel: SpeakerModel) {
 		LibVosk.vosk_recognizer_set_spk_model(this, speakerModel)

@@ -17,6 +17,8 @@
 package org.vosk
 
 import com.sun.jna.PointerType
+import org.vosk.exception.IOException
+import org.vosk.exception.ModelException
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
@@ -33,7 +35,7 @@ actual class Model : Freeable, PointerType, AutoCloseable {
 
 	@Throws(IOException::class)
 	actual constructor(path: String) : super(
-		LibVosk.vosk_model_new(path) ?: throw ioException(path)
+		LibVosk.vosk_model_new(path) ?: throw ModelException(path)
 	)
 
 	/**

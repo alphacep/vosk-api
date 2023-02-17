@@ -16,6 +16,8 @@
 
 package org.vosk
 
+import org.vosk.exception.IOException
+
 
 /**
  * Model stores all the data required for recognition
