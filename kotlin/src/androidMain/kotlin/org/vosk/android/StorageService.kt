@@ -25,6 +25,7 @@ import org.vosk.Model
 import java.io.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.function.Consumer
 
 /**
  * Provides utility methods to sync model files to external storage to allow
@@ -38,8 +39,8 @@ object StorageService {
 		context: Context,
 		sourcePath: String,
 		targetPath: String,
-		completeCallback: (Model) -> Unit,
-		errorCallback: (IOException) -> Unit
+		completeCallback: Consumer<Model>,
+		errorCallback: Consumer<IOException>
 	) {
 		val executor: Executor =
 			Executors.newSingleThreadExecutor() // change according to your requirements
@@ -48,9 +49,9 @@ object StorageService {
 			try {
 				val outputPath = sync(context, sourcePath, targetPath)
 				val model = Model(outputPath)
-				handler.post { completeCallback(model) }
+				handler.post { completeCallback.accept(model) }
 			} catch (e: IOException) {
-				handler.post { errorCallback(e) }
+				handler.post { errorCallback.accept(e) }
 			}
 		}
 	}
