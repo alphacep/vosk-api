@@ -21,14 +21,17 @@ package org.vosk
  * 26 / 12 / 2022
  */
 actual object Vosk {
+	@JvmStatic
 	actual fun setLogLevel(logLevel: LogLevel) {
 		LibVosk.vosk_set_log_level(logLevel.value)
 	}
 
+	@JvmStatic
 	actual fun gpuInit() {
 		LibVosk.vosk_gpu_init()
 	}
 
+	@JvmStatic
 	actual fun gpuThreadInit() {
 		LibVosk.vosk_gpu_thread_init()
 	}

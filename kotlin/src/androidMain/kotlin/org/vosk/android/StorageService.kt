@@ -33,6 +33,7 @@ import java.util.concurrent.Executors
 object StorageService {
 	private val TAG = StorageService::class.simpleName
 
+	@JvmStatic
 	fun unpack(
 		context: Context,
 		sourcePath: String,
@@ -54,6 +55,7 @@ object StorageService {
 		}
 	}
 
+	@JvmStatic
 	@Throws(IOException::class)
 	fun sync(context: Context, sourcePath: String, targetPath: String): String {
 		val assetManager = context.assets
