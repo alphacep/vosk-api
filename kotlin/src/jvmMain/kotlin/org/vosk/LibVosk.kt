@@ -29,7 +29,16 @@ import java.nio.file.StandardCopyOption
  * 26 / 12 / 2022
  */
 @Suppress("FunctionName")
-object LibVosk {
+internal object LibVosk {
+
+	@JvmStatic
+	@Deprecated(
+		"LibVosk is now for internal JNA, use Vosk instead",
+		ReplaceWith("Vosk.setLogLevel(logLevel)", "org.vosk.Vosk")
+	)
+	fun setLogLevel(logLevel: LogLevel) {
+		Vosk.setLogLevel(logLevel)
+	}
 
 	@Throws(IOException::class)
 	private fun unpackDll(targetDir: File, lib: String) {
