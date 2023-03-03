@@ -23,5 +23,9 @@ package org.vosk
  */
 @Suppress("SpellCheckingInspection")
 interface Freeable {
+
+	/**
+	 * Dereference the related object
+	 */
 	fun free()
 }

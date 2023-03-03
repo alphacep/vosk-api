@@ -21,6 +21,8 @@ import kotlinx.serialization.Serializable
 
 /**
  * 26 / 12 / 2022
+ *
+ * Represents a partial result
  */
 @Serializable
 data class PartialResultOutput(

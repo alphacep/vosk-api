@@ -16,4 +16,7 @@
 
 package org.vosk.exception
 
+/**
+ * Thrown when there is an exception creating a model.
+ */
 class ModelException(path: String): IOException("Failed to find model: $path")

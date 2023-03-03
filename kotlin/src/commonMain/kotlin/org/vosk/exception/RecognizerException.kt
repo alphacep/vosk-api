@@ -16,4 +16,7 @@
 
 package org.vosk.exception
 
+/**
+ * Thrown when the recognizer fails to be created
+ */
 class RecognizerException: IOException("Failed to create recognizer.")

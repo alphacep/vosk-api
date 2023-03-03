@@ -59,7 +59,7 @@ actual class Recognizer : Freeable, PointerType, AutoCloseable {
 		LibVosk.vosk_recognizer_set_max_alternatives(this, maxAlternatives)
 	}
 
-	actual fun setWords(words: Boolean) {
+	actual fun setOutputWordTimes(words: Boolean) {
 		LibVosk.vosk_recognizer_set_words(this, words)
 	}
 

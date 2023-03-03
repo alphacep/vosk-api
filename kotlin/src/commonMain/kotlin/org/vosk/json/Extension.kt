@@ -24,13 +24,25 @@ import org.vosk.Recognizer
  * 26 / 12 / 2022
  */
 
+/**
+ * Vosk JSON encoder
+ */
 val voskJson = Json { encodeDefaults = true }
 
+/**
+ * Get the result as a JSON object
+ */
 fun Recognizer.resultAsJson(): ResultOutput =
 	voskJson.decodeFromString(result)
 
+/**
+ * Get the final result as a JSON object
+ */
 fun Recognizer.finalResultAsJson(): ResultOutput =
 	voskJson.decodeFromString(finalResult)
 
+/**
+ * Get the partial result as a JSON object
+ */
 fun Recognizer.partialResultAsJson(): PartialResultOutput =
 	voskJson.decodeFromString(partialResult)

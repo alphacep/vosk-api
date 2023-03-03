@@ -20,6 +20,8 @@ import kotlinx.serialization.Serializable
 
 /**
  * 26 / 12 / 2022
+ *
+ * Represents an alternative result.
  */
 @Serializable
 data class Alternative(

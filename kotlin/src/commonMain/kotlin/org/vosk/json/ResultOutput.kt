@@ -20,6 +20,8 @@ import kotlinx.serialization.Serializable
 
 /**
  * 26 / 12 / 2022
+ *
+ * Result output
  */
 @Serializable
 data class ResultOutput(

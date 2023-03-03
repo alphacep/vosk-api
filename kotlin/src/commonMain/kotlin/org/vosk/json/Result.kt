@@ -20,6 +20,8 @@ import kotlinx.serialization.Serializable
 
 /**
  * 26 / 12 / 2022
+ *
+ * Represents a result for any given word.
  */
 @Serializable
 data class Result(

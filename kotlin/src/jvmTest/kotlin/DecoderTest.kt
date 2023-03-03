@@ -44,7 +44,7 @@ class DecoderTest {
 				.use { ais ->
 					Recognizer(model, 16000f).apply {
 						setMaxAlternatives(10)
-						setWords(true)
+						setOutputWordTimes(true)
 						setPartialWords(true)
 					}.use { recognizer ->
 						val b = ByteArray(4096)
@@ -68,7 +68,7 @@ class DecoderTest {
 		Model(modelPath).use { model ->
 			Recognizer(model, 16000f).apply {
 				setMaxAlternatives(10)
-				setWords(true)
+				setOutputWordTimes(true)
 				setPartialWords(true)
 			}.use { recognizer ->
 				AudioSystem.getAudioInputStream(BufferedInputStream(FileInputStream(testFile)))
@@ -123,7 +123,7 @@ class DecoderTest {
 
 				Recognizer(model, 16000f).apply {
 					setMaxAlternatives(10)
-					setWords(true)
+					setOutputWordTimes(true)
 					setPartialWords(true)
 				}.use { recognizer ->
 					resultTime = System.currentTimeMillis() - startTime
