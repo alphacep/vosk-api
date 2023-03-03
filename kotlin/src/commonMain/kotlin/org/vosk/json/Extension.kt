@@ -18,7 +18,10 @@ package org.vosk.json
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import org.vosk.Recognizer
+import org.vosk.Model
+import org.vosk.exception.RecognizerException
 
 /*
  * 26 / 12 / 2022
@@ -46,3 +49,13 @@ fun Recognizer.finalResultAsJson(): ResultOutput =
  */
 fun Recognizer.partialResultAsJson(): PartialResultOutput =
 	voskJson.decodeFromString(partialResult)
+
+
+/**
+ * Create a [Recognizer], but using a list for grammar instead.
+ *
+ * The grammar list is converted into a JSON array
+ */
+@Throws(RecognizerException::class)
+fun Recognizer(model: Model, sampleRate: Float, grammar: List<String>) =
+	Recognizer(model, sampleRate, voskJson.encodeToJsonElement(grammar).toString())

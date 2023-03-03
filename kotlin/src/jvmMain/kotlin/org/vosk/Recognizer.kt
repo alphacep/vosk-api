@@ -47,6 +47,21 @@ actual class Recognizer : Freeable, PointerType, AutoCloseable {
 		grammar: String
 	) : super(LibVosk.vosk_recognizer_new_grm(model, sampleRate, grammar) ?: throw RecognizerException())
 
+	/**
+	 * JVM analog of Kotlin extension
+	 * @see [org.vosk.json.Recognizer]
+	 */
+	@Throws(RecognizerException::class)
+	constructor(
+		model: Model,
+		sampleRate: Float,
+		grammar: List<String>
+	) : super(
+		// We need the full qualifer to avoid any build issues
+		@Suppress("RemoveRedundantQualifierName")
+		org.vosk.json.Recognizer(model, sampleRate, grammar).pointer
+	)
+
 	actual fun setSpeakerModel(speakerModel: SpeakerModel) {
 		LibVosk.vosk_recognizer_set_spk_model(this, speakerModel)
 	}

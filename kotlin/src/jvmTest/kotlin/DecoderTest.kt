@@ -37,6 +37,17 @@ class DecoderTest {
 	}
 
 	@Test
+	fun grammarList() {
+		Model(modelPath).use { model ->
+			Recognizer(model, 16000f, listOf("one")).apply {
+				setMaxAlternatives(10)
+				setOutputWordTimes(true)
+				setPartialWords(true)
+			}
+		}
+	}
+
+	@Test
 	@Throws(IOException::class, UnsupportedAudioFileException::class)
 	fun decoderTest() {
 		Model(modelPath).use { model ->
