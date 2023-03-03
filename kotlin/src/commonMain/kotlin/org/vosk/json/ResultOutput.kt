@@ -19,9 +19,9 @@ package org.vosk.json
 import kotlinx.serialization.Serializable
 
 /**
- * 26 / 12 / 2022
- *
  * Result output
+ *
+ * @since 26 / 12 / 2022
  */
 @Serializable
 data class ResultOutput(

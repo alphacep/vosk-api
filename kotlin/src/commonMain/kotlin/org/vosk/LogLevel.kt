@@ -19,7 +19,7 @@ package org.vosk
 /**
  * Log level for Kaldi messages.
  *
- * 26 / 12 / 2022
+ * @since 26 / 12 / 2022
  */
 enum class LogLevel(val value: Int) {
 

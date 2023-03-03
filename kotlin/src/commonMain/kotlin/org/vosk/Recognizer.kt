@@ -26,7 +26,7 @@ import org.vosk.exception.RecognizerException
  * which represent decoded information - words, confidences, times, n-best lists,
  * speaker information and so on
  *
- * 26 / 12 / 2022
+ * @since 26 / 12 / 2022
  */
 expect class Recognizer : Freeable {
 	/**

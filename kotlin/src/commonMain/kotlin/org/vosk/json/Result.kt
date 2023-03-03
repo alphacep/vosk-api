@@ -19,9 +19,9 @@ package org.vosk.json
 import kotlinx.serialization.Serializable
 
 /**
- * 26 / 12 / 2022
- *
  * Represents a result for any given word.
+ *
+ * @since 26 / 12 / 2022
  */
 @Serializable
 data class Result(

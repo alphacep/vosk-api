@@ -16,4 +16,7 @@
 
 package org.vosk.exception
 
+/**
+ * Analog of [java.io.IOException]
+ */
 actual typealias IOException = java.io.IOException

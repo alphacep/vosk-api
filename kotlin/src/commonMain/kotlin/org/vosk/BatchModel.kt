@@ -21,8 +21,7 @@ import org.vosk.exception.ModelException
 /**
  * Batch model object
  *
- * 26 / 12 / 2022
- *
+ * @since 26 / 12 / 2022
  * @constructor Creates the batch recognizer object
  */
 expect class BatchModel @Throws(ModelException::class) constructor(path: String) : Freeable {

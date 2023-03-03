@@ -23,8 +23,16 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
+
 /**
- * 26 / 12 / 2022
+ * Model stores all the data required for recognition
+ *
+ * It contains static data and can be shared across processing
+ * threads.
+ *
+ * @since 26 / 12 / 2022
+ * @constructor Loads model data from the file and returns the model object
+ * @throws IOException if the path provided is invalid
  */
 actual class Model : Freeable, PointerType, AutoCloseable {
 
@@ -33,6 +41,9 @@ actual class Model : Freeable, PointerType, AutoCloseable {
 	 */
 	constructor()
 
+	/**
+	 * Loads model data from the file and returns the model object
+	 */
 	@Throws(IOException::class)
 	actual constructor(path: String) : super(
 		LibVosk.vosk_model_new(path) ?: throw ModelException(path)
@@ -54,13 +65,30 @@ actual class Model : Freeable, PointerType, AutoCloseable {
 	@Throws(IOException::class)
 	constructor(file: File) : this(file.absolutePath)
 
+	/**
+	 * Check if a word can be recognized by the model
+	 * @param word: the word
+	 * @returns the word symbol if @param word exists inside the model
+	 * or -1 otherwise.
+	 * Reminding that word symbol 0 is for <epsilon>
+	 */
 	actual fun findWord(word: String): Int =
 		LibVosk.vosk_model_find_word(this, word)
 
+	/**
+	 * Releases the model memory
+	 *
+	 *  The model object is reference-counted so if some recognizer
+	 *  depends on this model, model might still stay alive. When
+	 *  last recognizer is released, model will be released too.
+	 */
 	actual override fun free() {
 		LibVosk.vosk_model_free(this)
 	}
 
+	/**
+	 * @see free
+	 */
 	override fun close() {
 		free()
 	}

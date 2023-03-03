@@ -23,7 +23,12 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
 /**
- * 26 / 12 / 2022
+ * Speaker model is the same as model but contains the data
+ * for speaker identification.
+ *
+ * @since 26 / 12 / 2022
+ * @constructor Loads speaker model data from the file and returns the model object
+ * @throws ModelException if the path provided is invalid
  */
 actual class SpeakerModel : Freeable, PointerType, AutoCloseable {
 
@@ -32,6 +37,11 @@ actual class SpeakerModel : Freeable, PointerType, AutoCloseable {
 	 */
 	constructor()
 
+	/**
+	 * Loads speaker model data from the file and returns the model object
+	 *
+	 * @param path the path of the model on the filesystem
+	 */
 	@Throws(ModelException::class)
 	actual constructor(path: String) : super(
 		LibVosk.vosk_spk_model_new(path) ?: throw ModelException(path)
@@ -53,10 +63,20 @@ actual class SpeakerModel : Freeable, PointerType, AutoCloseable {
 	@Throws(ModelException::class)
 	constructor(file: File) : this(file.absolutePath)
 
+	/**
+	 * Releases the model memory
+	 *
+	 * The model object is reference-counted so if some recognizer
+	 * depends on this model, model might still stay alive. When
+	 * last recognizer is released, model will be released too.
+	 */
 	actual override fun free() {
 		LibVosk.vosk_spk_model_free(this)
 	}
 
+	/**
+	 * @see free
+	 */
 	override fun close() {
 		free()
 	}

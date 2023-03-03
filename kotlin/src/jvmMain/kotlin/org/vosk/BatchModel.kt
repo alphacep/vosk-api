@@ -22,8 +22,11 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
+
 /**
- * 26 / 12 / 2022
+ * Batch model object
+ *
+ * @since 26 / 12 / 2022
  */
 actual class BatchModel : Freeable, PointerType, AutoCloseable {
 
@@ -32,6 +35,9 @@ actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	 */
 	constructor()
 
+	/**
+	 * Creates the batch recognizer object
+	 */
 	@Throws(ModelException::class)
 	actual constructor(path: String) : super(
 		LibVosk.vosk_batch_model_new(path) ?: throw ModelException(path)
@@ -53,14 +59,23 @@ actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	@Throws(ModelException::class)
 	constructor(file: File) : this(file.absolutePath)
 
+	/**
+	 * Releases batch model object
+	 */
 	actual override fun free() {
 		LibVosk.vosk_batch_model_free(this)
 	}
 
+	/**
+	 * Wait for the processing
+	 */
 	actual fun await() {
 		LibVosk.vosk_batch_model_wait(this)
 	}
 
+	/**
+	 * @see free
+	 */
 	override fun close() {
 		free()
 	}

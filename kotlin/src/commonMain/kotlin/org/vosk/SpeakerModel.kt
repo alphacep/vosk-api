@@ -22,8 +22,7 @@ import org.vosk.exception.ModelException
  * Speaker model is the same as model but contains the data
  * for speaker identification.
  *
- * 26 / 12 / 2022
- *
+ * @since 26 / 12 / 2022
  * @constructor Loads speaker model data from the file and returns the model object
  * @param path the path of the model on the filesystem
  * @throws ModelException if the path provided is invalid

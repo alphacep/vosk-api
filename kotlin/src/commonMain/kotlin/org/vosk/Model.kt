@@ -25,8 +25,7 @@ import org.vosk.exception.IOException
  * It contains static data and can be shared across processing
  * threads.
  *
- * 26 / 12 / 2022
- *
+ * @since 26 / 12 / 2022
  * @constructor Loads model data from the file and returns the model object
  * @param path the path of the model on the filesystem
  * @throws IOException if the path provided is invalid
