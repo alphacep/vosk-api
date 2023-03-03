@@ -26,7 +26,7 @@ plugins {
 }
 
 group = "com.alphacephei"
-version = "0.0.0"
+version = "0.4.0-alpha0"
 
 repositories {
 	google()
@@ -72,9 +72,9 @@ kotlin {
 		}
 		testRuns["test"].executionTask.configure {
 			useJUnitPlatform()
-			environment("MODEL", "model")
+			environment("MODEL", "VOSK_MODEL")
 			//environment("MODEL", "/home/doomsdayrs/Downloads/vosk-model-small-en-us-0.15/")
-			environment("LIBRARY","PATH")
+			environment("LIBRARY", "VOSK_PATH")
 			//environment("LIBRARY", "/usr/local/lib64/libvosk/libvosk.so")
 			environment("AUDIO", "$projectDir/../python/example/test.wav")
 		}
@@ -130,22 +130,25 @@ kotlin {
 		}
 	}
 
+	val jna_version = "5.13.0"
+	val coroutines_version = "1.6.4"
+
 	sourceSets {
 		val commonMain by getting {
 			dependencies {
 				api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-				api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+				api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
 			}
 		}
 		val commonTest by getting {
 			dependencies {
 				implementation(kotlin("test"))
-				implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+				implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version")
 			}
 		}
 		val jvmMain by getting {
 			dependencies {
-				api("net.java.dev.jna:jna:5.13.0")
+				api("net.java.dev.jna:jna:$jna_version")
 			}
 		}
 		val jvmTest by getting
@@ -155,7 +158,7 @@ kotlin {
 		val androidMain by getting {
 			dependsOn(jvmMain)
 			dependencies {
-				api("net.java.dev.jna:jna:5.13.0@aar")
+				api("net.java.dev.jna:jna:$jna_version@aar")
 			}
 		}
 		val androidTest by getting {

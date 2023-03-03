@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,16 @@
 package org.vosk
 
 import com.sun.jna.PointerType
+import org.vosk.exception.ModelException
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
+
 /**
- * 26 / 12 / 2022
+ * Batch model object
+ *
+ * @since 26 / 12 / 2022
  */
 actual class BatchModel : Freeable, PointerType, AutoCloseable {
 
@@ -31,9 +35,12 @@ actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	 */
 	constructor()
 
-	@Throws(IOException::class)
+	/**
+	 * Creates the batch recognizer object
+	 */
+	@Throws(ModelException::class)
 	actual constructor(path: String) : super(
-		LibVosk.vosk_batch_model_new(path) ?: throw ioException(path)
+		LibVosk.vosk_batch_model_new(path) ?: throw ModelException(path)
 	)
 
 	/**
@@ -41,7 +48,7 @@ actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	 *
 	 * @param path to batch model
 	 */
-	@Throws(IOException::class)
+	@Throws(ModelException::class)
 	constructor(path: Path) : this(path.absolutePathString())
 
 	/**
@@ -49,17 +56,26 @@ actual class BatchModel : Freeable, PointerType, AutoCloseable {
 	 *
 	 * @param file to batch model
 	 */
-	@Throws(IOException::class)
+	@Throws(ModelException::class)
 	constructor(file: File) : this(file.absolutePath)
 
+	/**
+	 * Releases batch model object
+	 */
 	actual override fun free() {
 		LibVosk.vosk_batch_model_free(this)
 	}
 
+	/**
+	 * Wait for the processing
+	 */
 	actual fun await() {
 		LibVosk.vosk_batch_model_wait(this)
 	}
 
+	/**
+	 * @see free
+	 */
 	override fun close() {
 		free()
 	}

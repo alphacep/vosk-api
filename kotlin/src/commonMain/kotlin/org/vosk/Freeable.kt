@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,5 +23,9 @@ package org.vosk
  */
 @Suppress("SpellCheckingInspection")
 interface Freeable {
+
+	/**
+	 * Dereference the related object
+	 */
 	fun free()
 }

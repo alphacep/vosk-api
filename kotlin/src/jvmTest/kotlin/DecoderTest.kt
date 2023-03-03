@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Alpha Cephei Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
@@ -9,7 +25,6 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.UnsupportedAudioFileException
-import kotlin.system.measureTimeMillis
 import kotlin.test.Test
 
 class DecoderTest {
@@ -22,6 +37,17 @@ class DecoderTest {
 	}
 
 	@Test
+	fun grammarList() {
+		Model(modelPath).use { model ->
+			Recognizer(model, 16000f, listOf("one")).apply {
+				setMaxAlternatives(10)
+				setOutputWordTimes(true)
+				setPartialWords(true)
+			}
+		}
+	}
+
+	@Test
 	@Throws(IOException::class, UnsupportedAudioFileException::class)
 	fun decoderTest() {
 		Model(modelPath).use { model ->
@@ -29,7 +55,7 @@ class DecoderTest {
 				.use { ais ->
 					Recognizer(model, 16000f).apply {
 						setMaxAlternatives(10)
-						setWords(true)
+						setOutputWordTimes(true)
 						setPartialWords(true)
 					}.use { recognizer ->
 						val b = ByteArray(4096)
@@ -53,7 +79,7 @@ class DecoderTest {
 		Model(modelPath).use { model ->
 			Recognizer(model, 16000f).apply {
 				setMaxAlternatives(10)
-				setWords(true)
+				setOutputWordTimes(true)
 				setPartialWords(true)
 			}.use { recognizer ->
 				AudioSystem.getAudioInputStream(BufferedInputStream(FileInputStream(testFile)))
@@ -108,7 +134,7 @@ class DecoderTest {
 
 				Recognizer(model, 16000f).apply {
 					setMaxAlternatives(10)
-					setWords(true)
+					setOutputWordTimes(true)
 					setPartialWords(true)
 				}.use { recognizer ->
 					resultTime = System.currentTimeMillis() - startTime

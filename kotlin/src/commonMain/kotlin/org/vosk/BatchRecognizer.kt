@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@ package org.vosk
 /**
  * Batch recognizer object
  *
- * 26 / 12 / 2022
- *
+ * @since 26 / 12 / 2022
  * @constructor Creates batch recognizer object
  */
 expect class BatchRecognizer constructor(model: BatchModel, sampleRate: Float) : Freeable {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.vosk
 /**
  * Log level for Kaldi messages.
  *
- * 26 / 12 / 2022
+ * @since 26 / 12 / 2022
  */
 enum class LogLevel(val value: Int) {
 

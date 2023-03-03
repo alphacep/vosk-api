@@ -1,16 +1,18 @@
-// Copyright 2019 Alpha Cephei Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright 2023 Alpha Cephei Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.vosk.android
 
 import android.content.Context
@@ -23,6 +25,7 @@ import org.vosk.Model
 import java.io.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.function.Consumer
 
 /**
  * Provides utility methods to sync model files to external storage to allow
@@ -31,12 +34,13 @@ import java.util.concurrent.Executors
 object StorageService {
 	private val TAG = StorageService::class.simpleName
 
+	@JvmStatic
 	fun unpack(
 		context: Context,
 		sourcePath: String,
 		targetPath: String,
-		completeCallback: (Model) -> Unit,
-		errorCallback: (IOException) -> Unit
+		completeCallback: Consumer<Model>,
+		errorCallback: Consumer<IOException>
 	) {
 		val executor: Executor =
 			Executors.newSingleThreadExecutor() // change according to your requirements
@@ -45,13 +49,14 @@ object StorageService {
 			try {
 				val outputPath = sync(context, sourcePath, targetPath)
 				val model = Model(outputPath)
-				handler.post { completeCallback(model) }
+				handler.post { completeCallback.accept(model) }
 			} catch (e: IOException) {
-				handler.post { errorCallback(e) }
+				handler.post { errorCallback.accept(e) }
 			}
 		}
 	}
 
+	@JvmStatic
 	@Throws(IOException::class)
 	fun sync(context: Context, sourcePath: String, targetPath: String): String {
 		val assetManager = context.assets

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package org.vosk
 
+import org.vosk.exception.ModelException
+
 /**
  * Batch model object
  *
- * 26 / 12 / 2022
- *
+ * @since 26 / 12 / 2022
  * @constructor Creates the batch recognizer object
  */
-expect class BatchModel @Throws(IOException::class) constructor(path: String) : Freeable {
+expect class BatchModel @Throws(ModelException::class) constructor(path: String) : Freeable {
 
 	/**
 	 *  Releases batch model object

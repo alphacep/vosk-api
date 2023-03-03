@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-package org.vosk
+package org.vosk.exception
 
-expect class IOException(message: String? = null) : Exception
+/**
+ * Thrown when there is an exception creating a model.
+ */
+class ModelException(path: String): IOException("Failed to find model: $path")

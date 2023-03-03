@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.vosk
 
+import org.vosk.exception.RecognizerException
+
 /**
  * Recognizer object is the main object which processes data.
  *
@@ -24,7 +26,7 @@ package org.vosk
  * which represent decoded information - words, confidences, times, n-best lists,
  * speaker information and so on
  *
- * 26 / 12 / 2022
+ * @since 26 / 12 / 2022
  */
 expect class Recognizer : Freeable {
 	/**
@@ -36,8 +38,9 @@ expect class Recognizer : Freeable {
 	 *  @param sampleRate The sample rate of the audio you going to feed into the recognizer.
 	 *                     Make sure this rate matches the audio content, it is a common
 	 *                     issue causing accuracy problems.
-	 *  @returns recognizer object or NULL if problem occured
+	 * @throws RecognizerException if a problem occurred
 	 */
+	@Throws(RecognizerException::class)
 	constructor(model: Model, sampleRate: Float)
 
 	/**
@@ -52,8 +55,9 @@ expect class Recognizer : Freeable {
 	 *                     Make sure this rate matches the audio content, it is a common
 	 *                     issue causing accuracy problems.
 	 *  @param speakerModel speaker model for speaker identification
-	 *  @returns recognizer object or NULL if problem occured
+	 * @throws RecognizerException if a problem occurred
 	 */
+	@Throws(RecognizerException::class)
 	constructor(model: Model, sampleRate: Float, speakerModel: SpeakerModel)
 
 	/**
@@ -69,14 +73,15 @@ expect class Recognizer : Freeable {
 	 *
 	 *  @param model       VoskModel containing static data for recognizer. Model can be
 	 *                     shared across recognizers, even running in different threads.
-	 *  @param sampleRate The sample rate of the audio you going to feed into the recognizer.
+	 *  @param sampleRate The valuesample rate of the audio you going to feed into the recognizer.
 	 *                     Make sure this rate matches the audio content, it is a common
 	 *                     issue causing accuracy problems.
 	 *  @param grammar The string with the list of phrases to recognize as JSON array of strings,
 	 *                 for example "["one two three four five", "[unk]"]".
 	 *
-	 *  @returns recognizer object or NULL if problem occured
+	 * @throws RecognizerException if a problem occurred
 	 */
+	@Throws(RecognizerException::class)
 	constructor(model: Model, sampleRate: Float, grammar: String)
 
 	/**
@@ -148,10 +153,10 @@ expect class Recognizer : Freeable {
 	 *
 	 * @param words - boolean value
 	 */
-	fun setWords(words: Boolean)
+	fun setOutputWordTimes(words: Boolean)
 
 	/**
-	 * Like above return words and confidences in partial results
+	 * Like [setOutputWordTimes] return words and confidences in partial results
 	 *
 	 * @param partialWords - boolean value
 	 */
@@ -168,24 +173,25 @@ expect class Recognizer : Freeable {
 	 *
 	 *  accept and process new chunk of voice data
 	 *
-	 *  @param data - audio data in PCM 16-bit mono format
-	 *  @param length - length of the audio data
-	 *  @returns 1 if silence is occured and you can retrieve a new utterance with result method
-	 *           0 if decoding continues
-	 *           -1 if exception occured
+	 *  @param data Audio data in PCM 16-bit mono format.
+	 *  @param length Length of the audio data.
+	 *  @returns
+	 *       1 - If silence is occurred and you can retrieve a new utterance with result method
+	 *       0 - If decoding continues
+	 *      -1 - If exception occurred
 	 */
 	@Throws(AcceptWaveformException::class)
 	fun acceptWaveform(data: ByteArray): Boolean
 
 	/**
-	 * Same as above but the version with the short data for language bindings where you have
+	 * Same as [acceptWaveform] but the version with the short data for language bindings where you have
 	 *  audio as array of shorts
 	 */
 	@Throws(AcceptWaveformException::class)
 	fun acceptWaveform(data: ShortArray): Boolean
 
 	/**
-	 * Same as above but the version with the float data for language bindings where you have
+	 * Same as [acceptWaveform] but the version with the float data for language bindings where you have
 	 *  audio as array of floats
 	 */
 	@Throws(AcceptWaveformException::class)
@@ -204,9 +210,9 @@ expect class Recognizer : Freeable {
 	 *  }
 	 * </pre>
 	 *
-	 * If alternatives enabled it returns result with alternatives, see also vosk_recognizer_set_max_alternatives().
+	 * If alternatives enabled it returns result with alternatives, see also [setMaxAlternatives].
 	 *
-	 * If word times enabled returns word time, see also vosk_recognizer_set_word_times().
+	 * If word times enabled returns word time, see also [setOutputWordTimes].
 	 */
 	val result: String
 
@@ -236,12 +242,14 @@ expect class Recognizer : Freeable {
 	/**
 	 * Resets the recognizer
 	 *
-	 *  Resets current results so the recognition can continue from scratch */
+	 *  Resets current results so the recognition can continue from scratch
+	 */
 	fun reset()
 
 	/**
 	 * Releases recognizer object
 	 *
-	 *  Underlying model is also unreferenced and if needed released */
+	 *  Underlying model is also unreferenced and if needed released
+	 */
 	override fun free()
 }

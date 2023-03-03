@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package org.vosk.json
-
-import kotlinx.serialization.Serializable
+package org.vosk.exception
 
 /**
- * Represents an alternative result.
- *
- * @since 26 / 12 / 2022
+ * Analog of [java.io.IOException]
  */
-@Serializable
-data class Alternative(
-	val confidence: Double,
-	val result: List<Result> = emptyList(),
-	val text: String
-)
+actual typealias IOException = java.io.IOException

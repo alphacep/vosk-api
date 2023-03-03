@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
+ * Copyright 2023 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,16 @@ import java.nio.file.StandardCopyOption
  * 26 / 12 / 2022
  */
 @Suppress("FunctionName")
-object LibVosk {
+internal object LibVosk {
+
+	@JvmStatic
+	@Deprecated(
+		"LibVosk is now for internal JNA, use Vosk instead",
+		ReplaceWith("Vosk.setLogLevel(logLevel)", "org.vosk.Vosk")
+	)
+	fun setLogLevel(logLevel: LogLevel) {
+		Vosk.setLogLevel(logLevel)
+	}
 
 	@Throws(IOException::class)
 	private fun unpackDll(targetDir: File, lib: String) {
@@ -89,19 +98,19 @@ object LibVosk {
 	external fun vosk_spk_model_free(model: SpeakerModel)
 
 
-	external fun vosk_recognizer_new(model: Model, sampleRate: Float): Pointer
+	external fun vosk_recognizer_new(model: Model, sampleRate: Float): Pointer?
 
 	external fun vosk_recognizer_new_spk(
 		model: Model,
 		sampleRate: Float,
 		spkModel: SpeakerModel
-	): Pointer
+	): Pointer?
 
 	external fun vosk_recognizer_new_grm(
 		model: Model,
 		sampleRate: Float,
 		grammar: String?
-	): Pointer
+	): Pointer?
 
 	external fun vosk_recognizer_set_spk_model(recognizer: Recognizer, spk_model: SpeakerModel)
 
