@@ -3,11 +3,12 @@ def pomName = "Vosk English Model"
 def pomDescription = "Small English model for Android"
 
 android {
-    compileSdkVersion 29
+    namespace "org.vosk"
+    compileSdkVersion 33
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 6
+        targetSdkVersion 33
+        versionCode 10
         versionName = version
         archivesBaseName = archiveName
     }
@@ -33,15 +34,10 @@ tasks.register('genUUID') {
 
 preBuild.dependsOn(genUUID)
 
-publishing {
-    publications {
-        aar(MavenPublication) {
-            artifactId = archiveName
-            artifact("$buildDir/outputs/aar/$archiveName-release.aar")
-            pom {
-                name = pomName
-                description = pomDescription
-            }
-        }
+mavenPublishing {
+    coordinates("com.alphacephei", archiveName, version)
+    pom {
+        name = pomName
+        description = pomDescription
     }
 }
