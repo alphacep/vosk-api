@@ -73,6 +73,41 @@ class VoskPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_gpu_thread_init")]
   public static extern void GpuThreadInit();
-}
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_model_new")]
+  public static extern global::System.IntPtr new_BatchModel(string jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_model_free")]
+  public static extern void delete_BatchModel(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_model_wait")]
+  public static extern void wait_BatchModel(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_new")]
+  public static extern global::System.IntPtr new_VoskBatchRecognizer(global::System.Runtime.InteropServices.HandleRef jarg1, float jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_free")]
+  public static extern void delete_VoskBatchRecognizer(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_accept_waveform")]
+  public static extern bool VoskBatchRecognizer_AcceptWaveform(global::System.Runtime.InteropServices.HandleRef jarg1, [global::System.Runtime.InteropServices.In, global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPArray)] byte[] jarg2, int jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_set_nlsml")]
+  public static extern void VoskBatchRecognizer_SetNLSML(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_finish_stream")]
+  public static extern void VoskBatchRecognizer_FinishStream(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_front_result")]
+  public static extern global::System.IntPtr VoskBatchRecognizer_FrontResult(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_pop")]
+  public static extern void VoskBatchRecognizer_Pop(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_get_pending_chunks")]
+  public static extern int VoskBatchRecognizer_GetPendingChunks(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+
+    }
 
 }
