@@ -63,11 +63,9 @@ namespace Vosk
             return PtrToStringUTF8(VoskPINVOKE.VoskBatchRecognizer_FrontResult(handle));
         }
 
-        public string Result()
+        public void Pop()
         {
-            string result = PtrToStringUTF8(VoskPINVOKE.VoskBatchRecognizer_FrontResult(handle));
             VoskPINVOKE.VoskBatchRecognizer_Pop(handle);
-            return result;
         }
 
         public int GetNumPendingChunks()

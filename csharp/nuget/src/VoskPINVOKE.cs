@@ -108,6 +108,6 @@ class VoskPINVOKE {
   public static extern int VoskBatchRecognizer_GetPendingChunks(global::System.Runtime.InteropServices.HandleRef jarg1);
 
 
-}
+    }
 
 }
