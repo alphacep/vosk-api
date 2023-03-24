@@ -39,7 +39,7 @@ namespace Vosk
             }
         }
 
-        public VoskBatchRecognizer(Model model, float sample_rate) : this(VoskPINVOKE.new_VoskBatchRecognizer(Model.getCPtr(model), sample_rate))
+        public VoskBatchRecognizer(BatchModel model, float sample_rate) : this(VoskPINVOKE.new_VoskBatchRecognizer(BatchModel.getCPtr(model), sample_rate))
         {
         }
 
@@ -56,6 +56,11 @@ namespace Vosk
             byte[] array = new byte[len];
             System.Runtime.InteropServices.Marshal.Copy(ptr, array, 0, len);
             return System.Text.Encoding.UTF8.GetString(array);
+        }
+
+        public string FrontResult()
+        {
+            return PtrToStringUTF8(VoskPINVOKE.VoskBatchRecognizer_FrontResult(handle));
         }
 
         public string Result()
