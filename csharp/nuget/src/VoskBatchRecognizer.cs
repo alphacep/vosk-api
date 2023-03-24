@@ -58,14 +58,11 @@ namespace Vosk
             return System.Text.Encoding.UTF8.GetString(array);
         }
 
-        public string FrontResult()
+        public string Result()
         {
-            return PtrToStringUTF8(VoskPINVOKE.VoskBatchRecognizer_FrontResult(handle));
-        }
-
-        public void Pop()
-        {
+            string result = PtrToStringUTF8(VoskPINVOKE.VoskBatchRecognizer_FrontResult(handle));
             VoskPINVOKE.VoskBatchRecognizer_Pop(handle);
+            return result;
         }
 
         public int GetNumPendingChunks()
