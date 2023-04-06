@@ -1,0 +1,31 @@
+FROM quay.io/pypa/manylinux2010_x86_64
+
+LABEL description="A docker image for building portable Python linux binary wheels and Kaldi"
+LABEL maintainer="contact@alphacephei.com"
+
+RUN yum -y update && yum -y install \
+    devtoolset-8-libatomic-devel \
+    automake \
+    autoconf \
+    libtool \
+    cmake \
+    libffi-devel \
+    gperftools-devel \
+    && yum clean all
+
+RUN cd /opt \
+    && git clone -b vosk --single-branch https://github.com/alphacep/kaldi \
+    && cd /opt/kaldi/tools \
+    && ./extras/install_mkl.sh \
+    && cd /opt/kaldi/tools \
+    && git clone --single-branch https://github.com/alphacep/openfst openfst \
+    && cd openfst \
+    && autoreconf -i \
+    && CFLAGS="-g -O3" ./configure --prefix=/opt/kaldi/tools/openfst --enable-static --enable-shared --enable-far --enable-ngram-fsts --enable-lookahead-fsts --with-pic --disable-bin \
+    && make -j 10 && make install \
+    && cd /opt/kaldi/src \
+    && ./configure --mathlib=MKL --shared --use-cuda=no \
+    && sed -i 's:-msse -msse2:-msse -msse2 -mavx -mavx2:g' kaldi.mk \
+    && sed -i 's: -O1 : -O3 :g' kaldi.mk \
+    && make -j $(nproc) online2 lm rnnlm \
+    && find /opt/kaldi -name "*.o" -exec rm {} \;
