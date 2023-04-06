@@ -24,6 +24,12 @@
 #include <fst/matcher-fst.h>
 #include <fst/extensions/ngram/ngram-fst.h>
 
+
+#ifdef HAVE_MKL
+// We need to set num threads
+#include <mkl.h>
+#endif
+
 namespace fst {
 
 static FstRegisterer<StdOLabelLookAheadFst> OLabelLookAheadFst_StdArc_registerer;
@@ -106,6 +112,10 @@ static void KaldiLogHandler(const LogMessageEnvelope &env, const char *message)
 Model::Model(const char *model_path) : model_path_str_(model_path) {
 
     SetLogHandler(KaldiLogHandler);
+
+#ifdef HAVE_MKL
+    mkl_set_num_threads(1);
+#endif
 
     struct stat buffer;
     string am_v2_path = model_path_str_ + "/am/final.mdl";
