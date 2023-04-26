@@ -44,6 +44,9 @@ parser.add_argument(
 parser.add_argument(
         "--log-level", default="INFO",
         help="logging level")
+parser.add_argument(
+        "--show_progress_bar","-bar", default=False, action="store_true",
+        help="display a progressbar")
 
 def main():
 
