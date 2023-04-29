@@ -102,6 +102,13 @@ func (r *VoskRecognizer) SetSpkModel(spkModel *VoskSpkModel) {
 	C.vosk_recognizer_set_spk_model(r.rec, spkModel.spkModel)
 }
 
+// SetGrm sets which phrases to recognize on an already initialized recognizer.
+func (r *VoskRecognizer) SetGrm(grammar string) {
+	cgrammar := C.CString(grammar)
+	defer C.free(unsafe.Pointer(cgrammar))
+	C.vosk_recognizer_set_grm(r.rec, cgrammar)
+}
+
 // SetMaxAlternatives configures the recognizer to output n-best results.
 func (r *VoskRecognizer) SetMaxAlternatives(maxAlternatives int) {
 	C.vosk_recognizer_set_max_alternatives(r.rec, C.int(maxAlternatives))
