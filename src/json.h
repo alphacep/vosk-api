@@ -371,8 +371,11 @@ class JSON
                 }
                 case Class::String:
                     return "\"" + json_escape( *Internal.String ) + "\"";
-                case Class::Floating:
-                    return std::to_string( Internal.Float );
+                case Class::Floating: {
+                    auto str = std::to_string(Internal.Float);
+                    auto it = str.find(',');
+                    return (std::string::npos != it) ? str.replace(it, it, 1, '.') : str;
+                }
                 case Class::Integral:
                     return std::to_string( Internal.Int );
                 case Class::Boolean:
