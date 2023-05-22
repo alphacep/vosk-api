@@ -972,14 +972,9 @@ void Recognizer::RebuildLexicon(std::vector<std::string> &words,
     return;
   }
 
-  Label silence_phone_id = model_->phone_syms_->Find("SIL");
-  if (silence_phone_id == kNoSymbol) {
-    KALDI_ERR << "Silence phone not found in the phone symbol table";
-    return;
-  }
-
   // Maybe make this adjustable?:
 
+  string silence_phone = "SIL";
   // At the beginning of sentence and after each word, we output silence with
   // probability 0.5;
   // the probability mass assigned to having no silence is 1.0 - 0.5 = 0.5.
@@ -990,6 +985,12 @@ void Recognizer::RebuildLexicon(std::vector<std::string> &words,
   // the parts of the transitions that do not relate to self-loop probabilities,
   // and in the normal topology (Bakis model) it has no effect at all
   float transition_scale = 1.0;
+
+  Label silence_phone_id = model_->phone_syms_->Find(silence_phone);
+  if (silence_phone_id == kNoSymbol) {
+    KALDI_ERR << "Silence phone not found in the phone symbol table";
+    return;
+  }
 
   // Create a new word symbol table for the new words
   SymbolTable word_syms("words");
@@ -1012,6 +1013,11 @@ void Recognizer::RebuildLexicon(std::vector<std::string> &words,
 
   l_fst.SetFinal(loop_state, Weight::One());
 
+  // Insert the epsilon symbol at the begining of words and pronunciations
+  // In the loop we skip any further `<eps> SIL` pairs
+  words.insert(words.begin(), "<eps>");
+  pronunciations.insert(pronunciations.begin(), silence_phone);
+
   // Add a map to store existing pronunciations
   SymbolTable disambiguation_syms("disambiguation");
   unordered_map<string, int64> last_disambiguation_symbol;
@@ -1019,6 +1025,18 @@ void Recognizer::RebuildLexicon(std::vector<std::string> &words,
   for (size_t i = 0; i < words.size(); ++i) {
     const string &word = words[i];
     const string &pronunciation = pronunciations[i];
+
+    // Skip any manually added epsion entries
+    if (i != 0 && word == "<eps>" && pronunciation == silence_phone) {
+      continue;
+    }
+
+    if (word.empty() || pronunciation.empty()) {
+      KALDI_WARN << "Skipping word with empty word or pronunciation in line "
+                 << i + 1;
+      continue;
+    }
+
     Label word_id = word_syms.AddSymbol(word);
 
     Label disambiguation_symbol = kNoLabel;
