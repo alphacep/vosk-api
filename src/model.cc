@@ -24,9 +24,10 @@
 #include <fst/matcher-fst.h>
 #include <fst/extensions/ngram/ngram-fst.h>
 
-
+#ifdef HAVE_OPENBLAS_CLAPACK
+#include <cblas.h>
+#endif
 #ifdef HAVE_MKL
-// We need to set num threads
 #include <mkl.h>
 #endif
 
@@ -113,6 +114,9 @@ Model::Model(const char *model_path) : model_path_str_(model_path) {
 
     SetLogHandler(KaldiLogHandler);
 
+#ifdef HAVE_OPENBLAS_CLAPACK
+    openblas_set_num_threads(1);
+#endif
 #ifdef HAVE_MKL
     mkl_set_num_threads(1);
 #endif
