@@ -30,6 +30,7 @@
 #include "online2/onlinebin-util.h"
 #include "rnnlm/rnnlm-lattice-rescoring.h"
 #include "rnnlm/rnnlm-utils.h"
+#include "tree/context-dep.h"
 #include "util/parse-options.h"
 #include <atomic>
 

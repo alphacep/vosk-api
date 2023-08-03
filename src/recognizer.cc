@@ -967,7 +967,7 @@ void Recognizer::RebuildLexicon(std::vector<std::string> &words,
     return;
   }
 
-  if (!model_->phone_syms_loaded_ || model_->ctx_dep_ == nullptr) {
+  if (model_->ctx_dep_ == nullptr) {
     KALDI_ERR << "Can't rebuild lexicon without phone symbols and ctx dep tree";
     return;
   }
