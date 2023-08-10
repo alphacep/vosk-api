@@ -12,8 +12,9 @@ import java.nio.file.StandardCopyOption;
 public class LibVosk {
 
     private static void unpackDll(File targetDir, String lib) throws IOException {
-        InputStream source = LibVosk.class.getResourceAsStream("/win32-x86-64/" + lib + ".dll");
-        Files.copy(source, new File(targetDir, lib + ".dll").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        try (InputStream source = LibVosk.class.getResourceAsStream("/win32-x86-64/" + lib + ".dll")) {
+            Files.copy(source, new File(targetDir, lib + ".dll").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     static {
