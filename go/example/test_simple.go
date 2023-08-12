@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"encoding/json"
 
 	vosk "github.com/alphacep/vosk-api/go"
 )
@@ -38,11 +37,10 @@ func main() {
 	}
 	defer file.Close()
 
-	reader := bufio.NewReader(file)
 	buf := make([]byte, 4096)
 
 	for {
-		_, err := reader.Read(buf)
+		_, err := file.Read(buf)
 		if err != nil {
 			if err != io.EOF {
 				log.Fatal(err)
