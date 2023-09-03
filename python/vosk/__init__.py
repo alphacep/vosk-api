@@ -57,7 +57,8 @@ class Model:
             raise Exception("Failed to create a model")
 
     def __del__(self):
-        _c.vosk_model_free(self._handle)
+        if _c is not None:
+            _c.vosk_model_free(self._handle)
 
     def vosk_model_find_word(self, word):
         return _c.vosk_model_find_word(self._handle, word.encode("utf-8"))
