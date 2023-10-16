@@ -129,6 +129,14 @@ void vosk_recognizer_set_grm(VoskRecognizer *recognizer, char const *grammar)
     ((Recognizer *)recognizer)->SetGrm(grammar);
 }
 
+void vosk_recognizer_set_ep_mode(VoskRecognizer *recognizer, VoskEpMode mode)
+{
+    if (recognizer == nullptr) {
+       return;
+    }
+    ((Recognizer *)recognizer)->SetEpMode(mode);
+}
+
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
 {
     try {

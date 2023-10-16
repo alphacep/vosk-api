@@ -119,6 +119,8 @@ Recognizer::~Recognizer() {
 
 void Recognizer::InitState()
 {
+    endpoint_config_ = model_->endpoint_config_;
+
     frame_offset_ = 0;
     samples_processed_ = 0;
     samples_round_start_ = 0;
@@ -216,6 +218,26 @@ void Recognizer::SetPartialWords(bool partial_words)
 void Recognizer::SetNLSML(bool nlsml)
 {
     nlsml_ = nlsml;
+}
+
+void Recognizer::SetEpMode(int mode)
+{
+    float scale = 1.0;
+    switch(mode) {
+        case 1:
+           scale = 0.75;
+           break;
+        case 2:
+           scale = 1.50;
+           break;
+        default:
+           scale = 4.0;
+    }
+    KALDI_LOG << "Endpointer Scale " << scale;
+    endpoint_config_ = model_->endpoint_config_;
+    endpoint_config_.rule2.min_trailing_silence *= scale;
+    endpoint_config_.rule3.min_trailing_silence *= scale;
+    endpoint_config_.rule4.min_trailing_silence *= scale;
 }
 
 void Recognizer::SetSpkModel(SpkModel *spk_model)
@@ -367,7 +389,7 @@ bool Recognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
         spk_feature_->AcceptWaveform(sample_frequency_, wdata);
     }
 
-    if (decoder_->EndpointDetected(model_->endpoint_config_)) {
+    if (decoder_->EndpointDetected(endpoint_config_)) {
         return true;
     }
 

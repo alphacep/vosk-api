@@ -217,6 +217,18 @@ void vosk_recognizer_set_partial_words(VoskRecognizer *recognizer, int partial_w
  */
 void vosk_recognizer_set_nlsml(VoskRecognizer *recognizer, int nlsml);
 
+typedef enum VoskEpMode {
+    VOSK_EP_ANSWER_DEFAULT = 0,
+    VOSK_EP_ANSWER_SHORT = 1,
+    VOSK_EP_ANSWER_LONG = 2,
+} VoskEpMode;
+
+/**
+ * Set endpointer scaling factor
+ *
+ * @param mode - Endpointer mode
+ **/
+void vosk_recognizer_set_ep_mode(VoskRecognizer *recognizer,  VoskEpMode mode);
 
 /** Accept voice data
  *
