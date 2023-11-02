@@ -3,7 +3,6 @@ import sys
 import srt
 import datetime
 import json
-import enum
 
 import requests
 from urllib.request import urlretrieve
@@ -142,11 +141,6 @@ class SpkModel:
     def __del__(self):
         _c.vosk_spk_model_free(self._handle)
 
-class EpMode(enum.Enum):
-    DEFAULT = 0
-    SHORT = 1
-    LONG = 2
-
 class KaldiRecognizer:
 
     def __init__(self, *args):
@@ -179,8 +173,8 @@ class KaldiRecognizer:
     def SetNLSML(self, enable_nlsml):
         _c.vosk_recognizer_set_nlsml(self._handle, 1 if enable_nlsml else 0)
 
-    def SetEpMode(self, mode):
-        _c.vosk_recognizer_set_ep_mode(self._handle, mode.value)
+    def SetPause(self, seconds):
+        _c.vosk_recognizer_set_pause(self._handle, seconds)
 
     def SetSpkModel(self, spk_model):
         _c.vosk_recognizer_set_spk_model(self._handle, spk_model._handle)

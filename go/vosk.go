@@ -109,6 +109,11 @@ func (r *VoskRecognizer) SetGrm(grammar string) {
 	C.vosk_recognizer_set_grm(r.rec, cgrammar)
 }
 
+// SetPause sets the duration of silence which terminates a result.
+func (r *VoskRecognizer) SetPause(seconds float64) {
+	C.vosk_recognizer_set_pause(r.rec, C.float(seconds))
+}
+
 // SetMaxAlternatives configures the recognizer to output n-best results.
 func (r *VoskRecognizer) SetMaxAlternatives(maxAlternatives int) {
 	C.vosk_recognizer_set_max_alternatives(r.rec, C.int(maxAlternatives))
