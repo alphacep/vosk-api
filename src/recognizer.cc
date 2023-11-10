@@ -220,24 +220,83 @@ void Recognizer::SetNLSML(bool nlsml)
     nlsml_ = nlsml;
 }
 
-void Recognizer::SetEpMode(int mode)
+void Recognizer::SetEndpointerMode(int mode)
 {
+    float rule2, rule3, rule4, rule5;
+    if (mode == 0) {
+        endpoint_config_ = model_->endpoint_config_;
+        return;
+    }
+
     float scale = 1.0;
     switch(mode) {
-        case 1:
-           scale = 0.75;
+        case 1: // SINGLE_WORD
+           rule2 = 0.1;
+           rule3 = 0.15;
+           rule4 = 0.2;
+           rule5 = 7.0;
            break;
-        case 2:
-           scale = 1.50;
+        case 2: // VERY_SHORT
+           rule2 = 0.3;
+           rule3 = 0.3;
+           rule4 = 0.6;
+           rule5 = 5.0;
            break;
-        default:
-           scale = 4.0;
+        case 3: // SHORT
+           rule2 = 0.3;
+           rule3 = 0.4;
+           rule4 = 0.6;
+           rule5 = 5.0;
+           break;
+        case 4: // STANDARD
+           rule2 = 0.8;
+           rule3 = 0.9;
+           rule4 = 1.0;
+           rule5 = 7.0;
+           break;
+        case 5: // STANDARD_5
+           rule2 = 0.8;
+           rule3 = 0.9;
+           rule4 = 1.5;
+           rule5 = 7.0;
+           break;
+        case 6: // STANDARD_180
+           rule2 = 0.8;
+           rule3 = 0.9;
+           rule4 = 1.5;
+           rule5 = 180.0;
+           break;
+        case 7: // LONG
+           rule2 = 1.0;
+           rule3 = 1.2;
+           rule4 = 2.0;
+           rule5 = 10.0;
+           break;
+        case 8: // VERY_LONG
+           rule2 = 2.0;
+           rule3 = 2.5;
+           rule4 = 3.0;
+           rule5 = 15.0;
+           break;
+        case 9: // VERY_LONG_180
+           rule2 = 2.0;
+           rule3 = 2.5;
+           rule4 = 3.0;
+           rule5 = 180.0;
+           break;
+        default: // STANDARD
+           rule2 = 0.8;
+           rule3 = 0.9;
+           rule4 = 1.0;
+           rule5 = 7.0;
+           break;
     }
-    KALDI_LOG << "Endpointer Scale " << scale;
+    KALDI_LOG << "Updating endpointer timeouts to " << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
     endpoint_config_ = model_->endpoint_config_;
-    endpoint_config_.rule2.min_trailing_silence *= scale;
-    endpoint_config_.rule3.min_trailing_silence *= scale;
-    endpoint_config_.rule4.min_trailing_silence *= scale;
+    endpoint_config_.rule2.min_trailing_silence = rule2;
+    endpoint_config_.rule3.min_trailing_silence = rule3;
+    endpoint_config_.rule4.min_trailing_silence = rule4;
+    endpoint_config_.rule5.min_trailing_silence = rule5;
 }
 
 void Recognizer::SetSpkModel(SpkModel *spk_model)
