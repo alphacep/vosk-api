@@ -1,7 +1,8 @@
 package vosk
 
 // #cgo CPPFLAGS: -I ${SRCDIR}/../src
-// #cgo LDFLAGS: -L ${SRCDIR}/../src -lvosk -ldl -lpthread
+// #cgo !windows LDFLAGS: -L ${SRCDIR}/../src -lvosk -ldl -lpthread
+// #cgo windows LDFLAGS: -L ${SRCDIR}/../src -lvosk -lpthread
 // #include <stdlib.h>
 // #include <vosk_api.h>
 import "C"
