@@ -129,12 +129,20 @@ void vosk_recognizer_set_grm(VoskRecognizer *recognizer, char const *grammar)
     ((Recognizer *)recognizer)->SetGrm(grammar);
 }
 
-void vosk_recognizer_set_ep_mode(VoskRecognizer *recognizer, VoskEpMode mode)
+void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer, VoskEndpointerMode mode)
 {
     if (recognizer == nullptr) {
        return;
     }
-    ((Recognizer *)recognizer)->SetEpMode(mode);
+    ((Recognizer *)recognizer)->SetEndpointerMode(mode);
+}
+
+void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, float t_end, float t_max)
+{
+    if (recognizer == nullptr) {
+       return;
+    }
+    ((Recognizer *)recognizer)->SetEndpointerDelays(t_end, t_max);
 }
 
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)

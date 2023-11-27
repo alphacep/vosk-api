@@ -221,14 +221,23 @@ typedef enum VoskEpMode {
     VOSK_EP_ANSWER_DEFAULT = 0,
     VOSK_EP_ANSWER_SHORT = 1,
     VOSK_EP_ANSWER_LONG = 2,
-} VoskEpMode;
+    VOSK_EP_ANSWER_VERY_LONG = 3,
+} VoskEndpointerMode;
 
 /**
  * Set endpointer scaling factor
  *
  * @param mode - Endpointer mode
  **/
-void vosk_recognizer_set_ep_mode(VoskRecognizer *recognizer,  VoskEpMode mode);
+void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer,  VoskEndpointerMode mode);
+
+/**
+ * Set endpointer delays
+ *
+ * @param t1     timeout for stopping recognition in milliseconds (usually around 0.5 - 1.0)
+ * @param t2     timeout for forcing utterance end in milliseconds (usually around 20-30)
+ **/
+void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, float t_end, float t_max);
 
 /** Accept voice data
  *

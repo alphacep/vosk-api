@@ -220,7 +220,7 @@ void Recognizer::SetNLSML(bool nlsml)
     nlsml_ = nlsml;
 }
 
-void Recognizer::SetEpMode(int mode)
+void Recognizer::SetEndpointerMode(int mode)
 {
     float scale = 1.0;
     switch(mode) {
@@ -230,15 +230,34 @@ void Recognizer::SetEpMode(int mode)
         case 2:
            scale = 1.50;
            break;
-        default:
+        case 3:
            scale = 4.0;
+           break;
     }
-    KALDI_LOG << "Endpointer Scale " << scale;
+    KALDI_LOG << "Updating endpointer scale " << scale;
     endpoint_config_ = model_->endpoint_config_;
     endpoint_config_.rule2.min_trailing_silence *= scale;
     endpoint_config_.rule3.min_trailing_silence *= scale;
     endpoint_config_.rule4.min_trailing_silence *= scale;
 }
+
+void Recognizer::SetEndpointerDelays(float t_end, float t_max)
+{
+    float rule2, rule3, rule4, rule5;
+
+    rule2 = t_end;
+    rule3 = t_end * 1.5;
+    rule4 = t_end * 2;
+    rule5 = t_max;
+
+    KALDI_LOG << "Updating endpointer delays " << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
+    endpoint_config_ = model_->endpoint_config_;
+    endpoint_config_.rule2.min_trailing_silence = rule2;
+    endpoint_config_.rule3.min_trailing_silence = rule3;
+    endpoint_config_.rule4.min_trailing_silence = rule4;
+    endpoint_config_.rule5.min_trailing_silence = rule5;
+}
+
 
 void Recognizer::SetSpkModel(SpkModel *spk_model)
 {
