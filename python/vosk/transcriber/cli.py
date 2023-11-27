@@ -15,8 +15,8 @@ parser.add_argument(
         "--model", "-m", type=str,
         help="model path")
 parser.add_argument(
-        "--server", "-s", action="store",
-        help="use server for recognition. example ws://localhost:2700")
+        "--server", "-s", type=str,
+        help="use server for recognition. For example ws://localhost:2700")
 parser.add_argument(
         "--list-models", default=False, action="store_true",
         help="list available models")
