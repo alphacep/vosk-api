@@ -6,7 +6,7 @@ import srt
 import datetime
 import shlex
 import subprocess
-
+from tqdm.auto import tqdm
 from vosk import KaldiRecognizer, Model
 from queue import Queue
 from timeit import default_timer as timer
@@ -22,15 +22,36 @@ class Transcriber:
         self.args = args
         self.queue = Queue()
 
-    def recognize_stream(self, rec, stream):
+    def recognize_stream(self, rec, stream, duration):
+
         tot_samples = 0
         result = []
+
+        show_bar=self.args.show_progress_bar
+
+        progress_bar = tqdm(
+            total=int(duration * SAMPLE_RATE),
+            unit="samples",
+            unit_scale=True,
+            unit_divisor=SAMPLE_RATE,
+            desc="Processing",
+            disable=not show_bar
+        )
+
+
 
         while True:
             data = stream.stdout.read(CHUNK_SIZE)
 
+
             if len(data) == 0:
+                progress_bar.update(int(duration))
                 break
+            progress_bar.update((len(data) // 2) )
+
+
+
+
 
             tot_samples += len(data)
             if rec.AcceptWaveform(data):
@@ -42,8 +63,10 @@ class Transcriber:
                 if jres["partial"] != "":
                     logging.info(jres)
 
+        progress_bar.close()
         jres = json.loads(rec.FinalResult())
         result.append(jres)
+
 
         return result, tot_samples
 
@@ -99,7 +122,7 @@ class Transcriber:
             monologues = {"schemaVersion":"2.0", "monologues":[], "text":[]}
             for part in result:
                 if part["text"] != "":
-                    monologues["text"] += part["text"]
+                    monologue["text"] += part["text"]
             for _, res in enumerate(result):
                 if not "result" in res:
                     continue
@@ -133,12 +156,6 @@ class Transcriber:
             start_time = timer()
             proc = await self.resample_ffmpeg_async(input_file)
             result, tot_samples = await self.recognize_stream_server(proc)
-            await proc.wait()
-
-            # Bad input, continue
-            if tot_samples == 0:
-                 self.queue.task_done()
-                 continue
 
             processed_result = self.format_result(result)
             if output_file != "":
@@ -148,6 +165,8 @@ class Transcriber:
             else:
                 print(processed_result)
 
+            await proc.wait()
+
             elapsed = timer() - start_time
             logging.info("Execution time: {:.3f} sec; "\
                     "xRT {:.3f}".format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
@@ -156,6 +175,15 @@ class Transcriber:
     def pool_worker(self, inputdata):
         logging.info("Recognizing {}".format(inputdata[0]))
         start_time = timer()
+
+        # Get the duration of the input file in seconds
+        duration = float(
+            subprocess.check_output(
+                ["ffprobe", "-v", "quiet", "-print_format", "compact=print_section=0:nokey=1:escape=csv",
+                 "-show_entries", "format=duration", inputdata[0]]
+            ).decode("utf-8").strip()
+        )
+        total_samples = int(duration * SAMPLE_RATE)
 
         try:
             stream = self.resample_ffmpeg(inputdata[0])
@@ -168,11 +196,9 @@ class Transcriber:
 
         rec = KaldiRecognizer(self.model, SAMPLE_RATE)
         rec.SetWords(True)
-        result, tot_samples = self.recognize_stream(rec, stream)
-        if tot_samples == 0:
-            return
-
+        result, tot_samples = self.recognize_stream(rec, stream,duration)
         processed_result = self.format_result(result)
+
         if inputdata[1] != "":
             logging.info("File {} processing complete".format(inputdata[1]))
             with open(inputdata[1], "w", encoding="utf-8") as fh:
