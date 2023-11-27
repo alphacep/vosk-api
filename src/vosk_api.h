@@ -237,6 +237,16 @@ typedef enum VoskEndpointerMode {
  **/
 void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer,  VoskEndpointerMode mode);
 
+/**
+ * Set endpointer delays
+ *
+ * @param sct   speech complete timeout
+ * @param sint  speech incomplete timeout
+ * @param nit   no input timeout
+ * @param t     recognition timeout
+ **/
+void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, int sct, int sint, int nit, int t);
+
 /** Accept voice data
  *
  *  accept and process new chunk of voice data

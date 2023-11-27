@@ -22,7 +22,26 @@ model = Model(lang="en-us")
 rec = KaldiRecognizer(model, wf.getframerate())
 rec.SetWords(True)
 rec.SetPartialWords(True)
-rec.SetEpMode(EndpointerMode.VERY_LONG)
+rec.SetEndpointerMode(EndpointerMode.VERY_LONG)
+
+while True:
+    data = wf.readframes(4000)
+    if len(data) == 0:
+        break
+    if rec.AcceptWaveform(data):
+        print(rec.Result())
+    else:
+        print(rec.PartialResult())
+
+print(rec.FinalResult())
+
+
+wf = wave.open(sys.argv[1], "rb")
+if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE":
+    print("Audio file must be WAV format mono PCM.")
+    sys.exit(1)
+
+rec.SetEndpointerDelays(300, 400, 1000, 2000)
 
 while True:
     data = wf.readframes(4000)

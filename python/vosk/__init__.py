@@ -189,6 +189,9 @@ class KaldiRecognizer:
     def SetEndpointerMode(self, mode):
         _c.vosk_recognizer_set_endpointer_mode(self._handle, mode.value)
 
+    def SetEndpointerDelays(self, sct, sint, nit, t):
+        _c.vosk_recognizer_set_endpointer_delays(self._handle, sct, sint, nit, t)
+
     def SetSpkModel(self, spk_model):
         _c.vosk_recognizer_set_spk_model(self._handle, spk_model._handle)
 

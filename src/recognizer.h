@@ -53,6 +53,7 @@ class Recognizer {
         void SetPartialWords(bool partial_words);
         void SetNLSML(bool nlsml);
         void SetEndpointerMode(int mode);
+        void SetEndpointerDelays(int sct, int sint, int nit, int t);
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);

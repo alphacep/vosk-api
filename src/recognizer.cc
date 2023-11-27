@@ -299,6 +299,29 @@ void Recognizer::SetEndpointerMode(int mode)
     endpoint_config_.rule5.min_trailing_silence = rule5;
 }
 
+void Recognizer::SetEndpointerDelays(int sct, int sint, int nit, int t)
+{
+    float rule2, rule3, rule4, rule5;
+
+    rule2 = sct / 1000.0;
+    if (sct < 500) {
+        rule3 = sct / 1000.0 * 1.5;
+        rule4 = sct / 1000.0 * 2;
+    } else  {
+        rule3 = sct / 1000.0 + 0.5;
+        rule4 = sct / 1000.0 + 1.0;
+    }
+    rule5 = t / 1000.0;
+
+    KALDI_LOG << "Updating endpointer timeouts to " << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
+    endpoint_config_ = model_->endpoint_config_;
+    endpoint_config_.rule2.min_trailing_silence = rule2;
+    endpoint_config_.rule3.min_trailing_silence = rule3;
+    endpoint_config_.rule4.min_trailing_silence = rule4;
+    endpoint_config_.rule5.min_trailing_silence = rule5;
+}
+
+
 void Recognizer::SetSpkModel(SpkModel *spk_model)
 {
     if (state_ == RECOGNIZER_RUNNING) {
