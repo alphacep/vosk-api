@@ -137,12 +137,12 @@ void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer, VoskEndpoin
     ((Recognizer *)recognizer)->SetEndpointerMode(mode);
 }
 
-void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, int sct, int sint, int nit, int t)
+void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, int sct, int nit, int t)
 {
     if (recognizer == nullptr) {
        return;
     }
-    ((Recognizer *)recognizer)->SetEndpointerDelays(sct, sint, nit, t);
+    ((Recognizer *)recognizer)->SetEndpointerDelays(sct, nit, t);
 }
 
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)

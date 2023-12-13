@@ -245,7 +245,7 @@ void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer,  VoskEndpoi
  * @param nit   no input timeout
  * @param t     recognition timeout
  **/
-void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, int sct, int sint, int nit, int t);
+void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, int sct, int nit, int t);
 
 /** Accept voice data
  *

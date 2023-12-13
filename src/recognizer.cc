@@ -222,7 +222,7 @@ void Recognizer::SetNLSML(bool nlsml)
 
 void Recognizer::SetEndpointerMode(int mode)
 {
-    float rule2, rule3, rule4, rule5;
+    float rule1, rule2, rule3, rule4, rule5;
     if (mode == 0) {
         endpoint_config_ = model_->endpoint_config_;
         return;
@@ -234,74 +234,85 @@ void Recognizer::SetEndpointerMode(int mode)
            rule2 = 0.1;
            rule3 = 0.15;
            rule4 = 0.2;
+           rule1 = 4.0;
            rule5 = 7.0;
            break;
         case 2: // VERY_SHORT
            rule2 = 0.3;
            rule3 = 0.3;
            rule4 = 0.6;
+           rule1 = 3.0;
            rule5 = 5.0;
            break;
         case 3: // SHORT
            rule2 = 0.3;
            rule3 = 0.4;
            rule4 = 0.6;
+           rule1 = 3.0;
            rule5 = 5.0;
            break;
         case 4: // STANDARD
            rule2 = 0.8;
            rule3 = 0.9;
            rule4 = 1.0;
+           rule1 = 3.0;
            rule5 = 7.0;
            break;
         case 5: // STANDARD_5
            rule2 = 0.8;
            rule3 = 0.9;
            rule4 = 1.5;
+           rule1 = 5.0;
            rule5 = 7.0;
            break;
         case 6: // STANDARD_180
            rule2 = 0.8;
            rule3 = 0.9;
            rule4 = 1.5;
+           rule1 = 3.0;
            rule5 = 180.0;
            break;
         case 7: // LONG
            rule2 = 1.0;
            rule3 = 1.2;
            rule4 = 2.0;
+           rule1 = 4.0;
            rule5 = 10.0;
            break;
         case 8: // VERY_LONG
            rule2 = 2.0;
            rule3 = 2.5;
            rule4 = 3.0;
+           rule1 = 4.0;
            rule5 = 15.0;
            break;
         case 9: // VERY_LONG_180
            rule2 = 2.0;
            rule3 = 2.5;
            rule4 = 3.0;
+           rule1 = 4.0;
            rule5 = 180.0;
            break;
         default: // STANDARD
            rule2 = 0.8;
            rule3 = 0.9;
            rule4 = 1.0;
+           rule1 = 5.0;
            rule5 = 7.0;
            break;
     }
-    KALDI_LOG << "Updating endpointer timeouts to " << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
+    KALDI_LOG << "Updating endpointer timeouts to " << rule1 << "," << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
     endpoint_config_ = model_->endpoint_config_;
+    endpoint_config_.rule1.min_trailing_silence = rule1;
     endpoint_config_.rule2.min_trailing_silence = rule2;
     endpoint_config_.rule3.min_trailing_silence = rule3;
     endpoint_config_.rule4.min_trailing_silence = rule4;
-    endpoint_config_.rule5.min_trailing_silence = rule5;
+    endpoint_config_.rule5.min_utterance_length = rule5;
 }
 
-void Recognizer::SetEndpointerDelays(int sct, int sint, int nit, int t)
+void Recognizer::SetEndpointerDelays(int sct, int nit, int t)
 {
-    float rule2, rule3, rule4, rule5;
+    float rule1, rule2, rule3, rule4, rule5;
 
     rule2 = sct / 1000.0;
     if (sct < 500) {
@@ -311,14 +322,16 @@ void Recognizer::SetEndpointerDelays(int sct, int sint, int nit, int t)
         rule3 = sct / 1000.0 + 0.5;
         rule4 = sct / 1000.0 + 1.0;
     }
+    rule1 = nit / 1000.0;
     rule5 = t / 1000.0;
 
-    KALDI_LOG << "Updating endpointer timeouts to " << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
+    KALDI_LOG << "Updating endpointer timeouts to " << rule1 << "," << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
     endpoint_config_ = model_->endpoint_config_;
+    endpoint_config_.rule1.min_trailing_silence = rule1;
     endpoint_config_.rule2.min_trailing_silence = rule2;
     endpoint_config_.rule3.min_trailing_silence = rule3;
     endpoint_config_.rule4.min_trailing_silence = rule4;
-    endpoint_config_.rule5.min_trailing_silence = rule5;
+    endpoint_config_.rule5.min_utterance_length = rule5;
 }
 
 

@@ -41,7 +41,7 @@ if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE
     print("Audio file must be WAV format mono PCM.")
     sys.exit(1)
 
-rec.SetEndpointerDelays(300, 400, 1000, 2000)
+rec.SetEndpointerDelays(300, 500, 2000)
 
 while True:
     data = wf.readframes(4000)
