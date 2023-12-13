@@ -234,10 +234,11 @@ void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer,  VoskEndpoi
 /**
  * Set endpointer delays
  *
- * @param t1     timeout for stopping recognition in milliseconds (usually around 0.5 - 1.0)
- * @param t2     timeout for forcing utterance end in milliseconds (usually around 20-30)
+ * @param t_start_max     timeout for stopping recognition in case of initial silence (usually around 5.0)
+ * @param t_end           timeout for stopping recognition in milliseconds after we recognized something (usually around 0.5 - 1.0)
+ * @param t_max           timeout for forcing utterance end in milliseconds (usually around 20-30)
  **/
-void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, float t_end, float t_max);
+void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, float t_start_max, float t_end, float t_max);
 
 /** Accept voice data
  *

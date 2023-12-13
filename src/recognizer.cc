@@ -241,21 +241,23 @@ void Recognizer::SetEndpointerMode(int mode)
     endpoint_config_.rule4.min_trailing_silence *= scale;
 }
 
-void Recognizer::SetEndpointerDelays(float t_end, float t_max)
+void Recognizer::SetEndpointerDelays(float t_start_max, float t_end, float t_max)
 {
-    float rule2, rule3, rule4, rule5;
+    float rule1, rule2, rule3, rule4, rule5;
 
+    rule1 = t_start_max;
     rule2 = t_end;
     rule3 = t_end * 1.5;
     rule4 = t_end * 2;
     rule5 = t_max;
 
-    KALDI_LOG << "Updating endpointer delays " << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
+    KALDI_LOG << "Updating endpointer delays " << rule1 << "," << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
     endpoint_config_ = model_->endpoint_config_;
+    endpoint_config_.rule1.min_trailing_silence = rule1;
     endpoint_config_.rule2.min_trailing_silence = rule2;
     endpoint_config_.rule3.min_trailing_silence = rule3;
     endpoint_config_.rule4.min_trailing_silence = rule4;
-    endpoint_config_.rule5.min_trailing_silence = rule5;
+    endpoint_config_.rule5.min_utterance_length = rule5;
 }
 
 
