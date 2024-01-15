@@ -1,4 +1,4 @@
-// Copyright 2020 Alpha Cephei Inc.
+// Copyright 2020-2024 Alpha Cephei Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,24 +13,48 @@
 // limitations under the License.
 
 #include "vosk_api.h"
+#include "offline-recognizer.h"
+#include "voice-activity-detector.h"
+#include "offline-stream.h"
+#include "macros.h"
 
-#include "recognizer.h"
-#include "model.h"
-#include "spk_model.h"
+#include <string>
+#include <iostream>
 
-#if HAVE_CUDA
-#include "cudamatrix/cu-device.h"
-#include "batch_recognizer.h"
-#endif
+using namespace sherpa_onnx;
 
-#include <string.h>
-
-using namespace kaldi;
+struct VoskModel {
+    std::string model_path_str;
+    std::unique_ptr<OfflineRecognizer> recognizer;
+};
 
 VoskModel *vosk_model_new(const char *model_path)
 {
     try {
-        return (VoskModel *)new Model(model_path);
+
+      VoskModel *model = new VoskModel;
+
+      OfflineRecognizerConfig config;
+
+      config.model_config.debug = 0;
+      config.model_config.num_threads = 8;
+      config.model_config.provider = "cpu";
+      config.model_config.model_type = "transducer";
+
+      model->model_path_str = model_path;
+      config.model_config.tokens = model->model_path_str + "/lang/tokens.txt";
+      config.model_config.transducer.encoder_filename = model->model_path_str + "/am-onnx/encoder.onnx";
+      config.model_config.transducer.decoder_filename = model->model_path_str + "/am-onnx/decoder.onnx";
+      config.model_config.transducer.joiner_filename = model->model_path_str + "/am-onnx/joiner.onnx";
+
+      config.decoding_method = "modified_beam_search";
+      config.max_active_paths = 10;
+      config.feat_config.sampling_rate = 16000;
+      config.feat_config.feature_dim = 80;
+
+      model->recognizer = std::make_unique<OfflineRecognizer>(config);
+
+      return model;
     } catch (...) {
         return nullptr;
     }
@@ -41,266 +65,95 @@ void vosk_model_free(VoskModel *model)
     if (model == nullptr) {
        return;
     }
-    ((Model *)model)->Unref();
+    model->recognizer.release();
+    delete model;
 }
 
-int vosk_model_find_word(VoskModel *model, const char *word)
-{
-    return (int) ((Model *)model)->FindWord(word);
-}
-
-VoskSpkModel *vosk_spk_model_new(const char *model_path)
-{
-    try {
-        return (VoskSpkModel *)new SpkModel(model_path);
-    } catch (...) {
-        return nullptr;
-    }
-}
-
-void vosk_spk_model_free(VoskSpkModel *model)
-{
-    if (model == nullptr) {
-       return;
-    }
-    ((SpkModel *)model)->Unref();
-}
+struct VoskRecognizer {
+    VoiceActivityDetector *vad;
+    std::unique_ptr<OfflineRecognizer> recognizer;
+    float sample_rate;
+    std::string last_result;
+};
 
 VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
 {
-    try {
-        return (VoskRecognizer *)new Recognizer((Model *)model, sample_rate);
-    } catch (...) {
-        return nullptr;
-    }
-}
+    VoskRecognizer *rec = new VoskRecognizer;
 
-VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, float sample_rate, VoskSpkModel *spk_model)
-{
-    try {
-        return (VoskRecognizer *)new Recognizer((Model *)model, sample_rate, (SpkModel *)spk_model);
-    } catch (...) {
-        return nullptr;
-    }
-}
-
-VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, const char *grammar)
-{
-    try {
-        return (VoskRecognizer *)new Recognizer((Model *)model, sample_rate, grammar);
-    } catch (...) {
-        return nullptr;
-    }
-}
-
-void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives)
-{
-    ((Recognizer *)recognizer)->SetMaxAlternatives(max_alternatives);
-}
-
-void vosk_recognizer_set_words(VoskRecognizer *recognizer, int words)
-{
-    ((Recognizer *)recognizer)->SetWords((bool)words);
-}
-
-void vosk_recognizer_set_partial_words(VoskRecognizer *recognizer, int partial_words)
-{
-    ((Recognizer *)recognizer)->SetPartialWords((bool)partial_words);
-}
-
-void vosk_recognizer_set_nlsml(VoskRecognizer *recognizer, int nlsml)
-{
-    ((Recognizer *)recognizer)->SetNLSML((bool)nlsml);
-}
-
-void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model)
-{
-    if (recognizer == nullptr || spk_model == nullptr) {
-       return;
-    }
-    ((Recognizer *)recognizer)->SetSpkModel((SpkModel *)spk_model);
-}
-
-void vosk_recognizer_set_grm(VoskRecognizer *recognizer, char const *grammar)
-{
-    if (recognizer == nullptr) {
-       return;
-    }
-    ((Recognizer *)recognizer)->SetGrm(grammar);
-}
-
-void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer, VoskEndpointerMode mode)
-{
-    if (recognizer == nullptr) {
-       return;
-    }
-    ((Recognizer *)recognizer)->SetEndpointerMode(mode);
-}
-
-void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, float t_start_max, float t_end, float t_max)
-{
-    if (recognizer == nullptr) {
-       return;
-    }
-    ((Recognizer *)recognizer)->SetEndpointerDelays(t_start_max, t_end, t_max);
+    VadModelConfig vad_config;
+    vad_config.silero_vad.model = model->model_path_str + "/vad/vad.onnx";
+    vad_config.silero_vad.min_silence_duration = 0.25;
+    rec->vad = new VoiceActivityDetector(vad_config);
+    rec->sample_rate = sample_rate;
+    rec->recognizer = std::move(model->recognizer);
+    return rec;
 }
 
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
 {
-    try {
-        return ((Recognizer *)(recognizer))->AcceptWaveform(data, length);
-    } catch (...) {
-        return -1;
+    float wave[length / 2];
+    for (int i = 0; i < length / 2; i++) {
+        wave[i] = *(((short *)data) + i) / 32768.;
     }
+    return vosk_recognizer_accept_waveform_f(recognizer, wave, length / 2);
 }
 
 int vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length)
 {
-    try {
-        return ((Recognizer *)(recognizer))->AcceptWaveform(data, length);
-    } catch (...) {
-        return -1;
-    }
+    float wave[length];
+    for (int i = 0; i < length / 2; i++)
+        wave[i] = data[i];
+    return vosk_recognizer_accept_waveform_f(recognizer, wave, length);
 }
 
 int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length)
 {
-    try {
-        return ((Recognizer *)(recognizer))->AcceptWaveform(data, length);
-    } catch (...) {
-        return -1;
+    recognizer->vad->AcceptWaveform(data, length);
+    if (recognizer->vad->Empty()) {
+         return 0;
     }
+
+    SpeechSegment segment = recognizer->vad->Front();
+    auto stream = recognizer->recognizer->CreateStream();
+    stream->AcceptWaveform(recognizer->sample_rate, segment.samples.data(), segment.samples.size());
+    recognizer->vad->Pop();
+    recognizer->recognizer->DecodeStream(stream.get());
+    OfflineRecognitionResult res = stream->GetResult();
+    recognizer->last_result = "{\"text\" : \"" + res.text + "\"}";
+    stream.reset();
+    return 1;
 }
 
 const char *vosk_recognizer_result(VoskRecognizer *recognizer)
 {
-    return ((Recognizer *)recognizer)->Result();
+    return recognizer->last_result.c_str();
 }
 
 const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer)
 {
-    return ((Recognizer *)recognizer)->PartialResult();
+    return "{\"partial\" : \"\"}";
 }
 
 const char *vosk_recognizer_final_result(VoskRecognizer *recognizer)
 {
-    return ((Recognizer *)recognizer)->FinalResult();
+    if (!recognizer->vad->IsSpeechDetected()) {
+        return "{\"text\" : \"\"}";
+    }
+    return "{\"text\" : \"\"}";
 }
 
 void vosk_recognizer_reset(VoskRecognizer *recognizer)
 {
-    ((Recognizer *)recognizer)->Reset();
+    // Nothing here for now
 }
 
 void vosk_recognizer_free(VoskRecognizer *recognizer)
 {
-    delete (Recognizer *)(recognizer);
+    delete recognizer->vad;
+    delete recognizer;
 }
 
 void vosk_set_log_level(int log_level)
 {
-    SetVerboseLevel(log_level);
-}
-
-void vosk_gpu_init()
-{
-#if HAVE_CUDA
-//    kaldi::CuDevice::EnableTensorCores(true);
-//    kaldi::CuDevice::EnableTf32Compute(true);
-    kaldi::CuDevice::Instantiate().SelectGpuId("yes");
-    kaldi::CuDevice::Instantiate().AllowMultithreading();
-#endif
-}
-
-void vosk_gpu_thread_init()
-{
-#if HAVE_CUDA
-    kaldi::CuDevice::Instantiate();
-#endif
-}
-
-VoskBatchModel *vosk_batch_model_new(const char *model_path)
-{
-#if HAVE_CUDA
-    return (VoskBatchModel *)(new BatchModel(model_path));
-#else
-    return NULL;
-#endif
-}
-
-void vosk_batch_model_free(VoskBatchModel *model)
-{
-#if HAVE_CUDA
-    delete ((BatchModel *)model);
-#endif
-}
-
-void vosk_batch_model_wait(VoskBatchModel *model)
-{
-#if HAVE_CUDA
-    ((BatchModel *)model)->WaitForCompletion();
-#endif
-}
-
-VoskBatchRecognizer *vosk_batch_recognizer_new(VoskBatchModel *model, float sample_rate)
-{
-#if HAVE_CUDA
-    return (VoskBatchRecognizer *)(new BatchRecognizer((BatchModel *)model, sample_rate));
-#else
-    return NULL;
-#endif
-}
-
-void vosk_batch_recognizer_free(VoskBatchRecognizer *recognizer)
-{
-#if HAVE_CUDA
-    delete ((BatchRecognizer *)recognizer);
-#endif
-}
-
-void vosk_batch_recognizer_accept_waveform(VoskBatchRecognizer *recognizer, const char *data, int length)
-{
-#if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->AcceptWaveform(data, length);
-#endif
-}
-
-void vosk_batch_recognizer_set_nlsml(VoskBatchRecognizer *recognizer, int nlsml)
-{
-#if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->SetNLSML((bool)nlsml);
-#endif
-}
-
-void vosk_batch_recognizer_finish_stream(VoskBatchRecognizer *recognizer)
-{
-#if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->FinishStream();
-#endif
-}
-
-const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer)
-{
-#if HAVE_CUDA
-    return ((BatchRecognizer *)recognizer)->FrontResult();
-#else
-    return NULL;
-#endif
-}
-
-void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer)
-{
-#if HAVE_CUDA
-    ((BatchRecognizer *)recognizer)->Pop();
-#endif
-}
-
-
-int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer)
-{
-#if HAVE_CUDA
-    return ((BatchRecognizer *)recognizer)->GetNumPendingChunks();
-#else
-    return 0;
-#endif
+    // Nothing for now
 }
