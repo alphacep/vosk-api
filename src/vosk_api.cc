@@ -25,7 +25,7 @@ using namespace sherpa_onnx;
 
 struct VoskModel {
     std::string model_path_str;
-    std::unique_ptr<OfflineRecognizer> recognizer;
+    std::shared_ptr<OfflineRecognizer> recognizer;
 };
 
 VoskModel *vosk_model_new(const char *model_path)
@@ -52,7 +52,7 @@ VoskModel *vosk_model_new(const char *model_path)
       config.feat_config.sampling_rate = 16000;
       config.feat_config.feature_dim = 80;
 
-      model->recognizer = std::make_unique<OfflineRecognizer>(config);
+      model->recognizer = std::make_shared<OfflineRecognizer>(config);
 
       return model;
     } catch (...) {
@@ -65,13 +65,13 @@ void vosk_model_free(VoskModel *model)
     if (model == nullptr) {
        return;
     }
-    model->recognizer.release();
+    model->recognizer.reset();
     delete model;
 }
 
 struct VoskRecognizer {
     VoiceActivityDetector *vad;
-    std::unique_ptr<OfflineRecognizer> recognizer;
+    std::shared_ptr<OfflineRecognizer> recognizer;
     float sample_rate;
     std::string last_result;
 };
@@ -85,7 +85,7 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
     vad_config.silero_vad.min_silence_duration = 0.25;
     rec->vad = new VoiceActivityDetector(vad_config);
     rec->sample_rate = sample_rate;
-    rec->recognizer = std::move(model->recognizer);
+    rec->recognizer = model->recognizer;
     return rec;
 }
 
@@ -149,6 +149,7 @@ void vosk_recognizer_reset(VoskRecognizer *recognizer)
 
 void vosk_recognizer_free(VoskRecognizer *recognizer)
 {
+    recognizer->recognizer.reset();
     delete recognizer->vad;
     delete recognizer;
 }

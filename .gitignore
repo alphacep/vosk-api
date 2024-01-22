@@ -29,9 +29,9 @@ cmake_install.cmake
 wheelhouse
 __pycache__
 *.egg-info
-python/dist
-python/build
-python/vosk/*.so
+bindings/python/dist
+bindings/python/build
+bindings/python/vosk/*.so
 python/test/db
 python/test/hyp
 python/test/model
@@ -41,10 +41,10 @@ python/test/wav.scp
 
 # Java
 *.class
-java/lib/model
-java/demo/model
-java/lib/build
-java/demo/build
+bindings/java/lib/model
+bindings/java/demo/model
+bindings/java/lib/build
+bindings/java/demo/build
 
 # CSharp
 *.dll
