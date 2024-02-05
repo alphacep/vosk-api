@@ -193,19 +193,13 @@ class KaldiRecognizer:
         _c.vosk_recognizer_set_grm(self._handle, grammar.encode("utf-8"))
 
     def AcceptWaveform(self, data):
-        res = _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
-        if res < 0:
-            raise Exception("Failed to process waveform")
-        return res
+        _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
 
     def Result(self):
-        return _ffi.string(_c.vosk_recognizer_result(self._handle)).decode("utf-8")
+        return _ffi.string(_c.vosk_recognizer_result_front(self._handle)).decode("utf-8")
 
-    def PartialResult(self):
-        return _ffi.string(_c.vosk_recognizer_partial_result(self._handle)).decode("utf-8")
-
-    def FinalResult(self):
-        return _ffi.string(_c.vosk_recognizer_final_result(self._handle)).decode("utf-8")
+    def Pop(self):
+        return _c.vosk_recognizer_result_pop(self._handle)
 
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)

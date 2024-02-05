@@ -67,21 +67,18 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate);
  *  accept and process new chunk of voice data
  *
  *  @param data - audio data in PCM 16-bit mono format
- *  @param length - length of the audio data
- *  @returns 1 if silence is occured and you can retrieve a new utterance with result method 
- *           0 if decoding continues
- *           -1 if exception occured */
-int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length);
+ *  @param length - length of the audio data */
+void vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length);
 
 
 /** Same as above but the version with the short data for language bindings where you have
  *  audio as array of shorts */
-int vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length);
+void vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length);
 
 
 /** Same as above but the version with the float data for language bindings where you have
  *  audio as array of floats */
-int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length);
+void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length);
 
 
 /** Returns speech recognition result
@@ -100,31 +97,11 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
  *
  * If word times enabled returns word time, see also vosk_recognizer_set_word_times().
  */
-const char *vosk_recognizer_result(VoskRecognizer *recognizer);
+const char *vosk_recognizer_result_front(VoskRecognizer *recognizer);
 
-
-/** Returns partial speech recognition
- *
- * @returns partial speech recognition text which is not yet finalized.
- *          result may change as recognizer process more data.
- *
- * <pre>
- * {
- *    "partial" : "cyril one eight zero"
- * }
- * </pre>
+/** TODO: WRITEME
  */
-const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer);
-
-
-/** Returns speech recognition result. Same as result, but doesn't wait for silence
- *  You usually call it in the end of the stream to get final bits of audio. It
- *  flushes the feature pipeline, so all remaining audio chunks got processed.
- *
- *  @returns speech result in JSON format.
- */
-const char *vosk_recognizer_final_result(VoskRecognizer *recognizer);
-
+void vosk_recognizer_result_pop(VoskRecognizer *recognizer);
 
 /** Resets the recognizer
  *

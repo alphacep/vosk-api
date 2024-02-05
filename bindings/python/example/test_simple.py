@@ -2,6 +2,7 @@
 
 import wave
 import sys
+import time
 
 from vosk import Model, KaldiRecognizer, SetLogLevel
 
@@ -13,7 +14,7 @@ if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE
     print("Audio file must be WAV format mono PCM.")
     sys.exit(1)
 
-model = Model("model")
+model = Model("vosk-model-ru-0.53-private-0.1")
 
 rec = KaldiRecognizer(model, wf.getframerate())
 
@@ -21,7 +22,6 @@ while True:
     data = wf.readframes(512)
     if len(data) == 0:
         break
-    if rec.AcceptWaveform(data):
-        print(rec.Result())
-
-print(rec.FinalResult())
+    rec.AcceptWaveform(data)
+    time.sleep(0.5)
+    print (rec.Result())

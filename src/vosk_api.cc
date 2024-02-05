@@ -20,13 +20,78 @@
 
 #include <string>
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <set>
+#include <queue>
+#include <string>
 
 using namespace sherpa_onnx;
+
+typedef struct VoskModel VoskModel;
 
 struct VoskModel {
     std::string model_path_str;
     std::shared_ptr<OfflineRecognizer> recognizer;
+
+    std::mutex active_lock;
+    std::set<VoskRecognizer *> active;
+    std::thread recognizer_thread;
+    bool running;
 };
+
+struct VoskRecognizer {
+    VoiceActivityDetector *vad;
+    VoskModel *model;
+    float sample_rate;
+    std::queue<std::string> results;
+};
+
+
+void recognizer_loop(VoskModel *model)
+{
+    while (model->running) {
+        int size = 0;
+        std::vector<std::unique_ptr<OfflineStream>> streams;
+        std::vector<OfflineStream *> p_streams;
+        std::vector<VoskRecognizer *> p_recs;
+
+        {
+            std::unique_lock<std::mutex> lock(model->active_lock);
+            size = model->active.size();
+            if (size > 0) {
+                std::set<int>::iterator itr;
+                for (auto itr = model->active.begin(); itr != model->active.end(); itr++) {
+                    VoskRecognizer *recognizer = *itr;
+                    p_recs.push_back(recognizer);
+                    SpeechSegment segment = recognizer->vad->Front();
+                    std::unique_ptr<OfflineStream> stream = model->recognizer->CreateStream();
+                    stream->AcceptWaveform(recognizer->sample_rate, segment.samples.data(), segment.samples.size());
+                    p_streams.push_back(stream.get());
+                    streams.push_back(std::move(stream));
+                    recognizer->vad->Pop();
+                    SHERPA_ONNX_LOGE("!!!!! Pushed stream");
+                }
+             }
+        }
+
+        if (size > 0) {
+            model->recognizer->DecodeStreams(p_streams.data(), size);
+
+            std::unique_lock<std::mutex> lock(model->active_lock);
+            for (int i = 0; i < size; i++) {
+                SHERPA_ONNX_LOGE("!!!!! %s", streams[i]->GetResult().text);
+                p_recs[i]->results.push(std::string("{\"text\" : \"") + streams[i]->GetResult().text + "\"}");
+                streams[i].reset();
+                if (p_recs[i]->vad->Empty()) {
+                    model->active.erase(p_recs[i]);
+                }
+            }
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
+}
 
 VoskModel *vosk_model_new(const char *model_path)
 {
@@ -54,6 +119,9 @@ VoskModel *vosk_model_new(const char *model_path)
 
       model->recognizer = std::make_shared<OfflineRecognizer>(config);
 
+      model->running = true;
+      model->recognizer_thread = std::thread(recognizer_loop, model);
+
       return model;
     } catch (...) {
         return nullptr;
@@ -65,16 +133,12 @@ void vosk_model_free(VoskModel *model)
     if (model == nullptr) {
        return;
     }
+    model->running = false;
+    model->recognizer_thread.join();
     model->recognizer.reset();
     delete model;
 }
 
-struct VoskRecognizer {
-    VoiceActivityDetector *vad;
-    std::shared_ptr<OfflineRecognizer> recognizer;
-    float sample_rate;
-    std::string last_result;
-};
 
 VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
 {
@@ -85,11 +149,11 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
     vad_config.silero_vad.min_silence_duration = 0.25;
     rec->vad = new VoiceActivityDetector(vad_config);
     rec->sample_rate = sample_rate;
-    rec->recognizer = model->recognizer;
+    rec->model = model;
     return rec;
 }
 
-int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
+void vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
 {
     float wave[length / 2];
     for (int i = 0; i < length / 2; i++) {
@@ -98,7 +162,7 @@ int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data
     return vosk_recognizer_accept_waveform_f(recognizer, wave, length / 2);
 }
 
-int vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length)
+void vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length)
 {
     float wave[length];
     for (int i = 0; i < length / 2; i++)
@@ -106,40 +170,28 @@ int vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *d
     return vosk_recognizer_accept_waveform_f(recognizer, wave, length);
 }
 
-int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length)
+void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length)
 {
     recognizer->vad->AcceptWaveform(data, length);
-    if (recognizer->vad->Empty()) {
-         return 0;
+
+    if (!recognizer->vad->Empty()) {
+        std::unique_lock<std::mutex> lock(recognizer->model->active_lock);
+        SHERPA_ONNX_LOGE("!!!!! Adding new task");
+        recognizer->model->active.insert(recognizer);
     }
-
-    SpeechSegment segment = recognizer->vad->Front();
-    auto stream = recognizer->recognizer->CreateStream();
-    stream->AcceptWaveform(recognizer->sample_rate, segment.samples.data(), segment.samples.size());
-    recognizer->vad->Pop();
-    recognizer->recognizer->DecodeStream(stream.get());
-    OfflineRecognitionResult res = stream->GetResult();
-    recognizer->last_result = "{\"text\" : \"" + res.text + "\"}";
-    stream.reset();
-    return 1;
 }
 
-const char *vosk_recognizer_result(VoskRecognizer *recognizer)
+const char *vosk_recognizer_result_front(VoskRecognizer *recognizer)
 {
-    return recognizer->last_result.c_str();
-}
-
-const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer)
-{
-    return "{\"partial\" : \"\"}";
-}
-
-const char *vosk_recognizer_final_result(VoskRecognizer *recognizer)
-{
-    if (!recognizer->vad->IsSpeechDetected()) {
-        return "{\"text\" : \"\"}";
+    if (recognizer->results.empty()) {
+       return "{\"partial\" : \"\"}";
     }
-    return "{\"text\" : \"\"}";
+    return recognizer->results.front().c_str();
+}
+
+void vosk_recognizer_result_pop(VoskRecognizer *recognizer)
+{
+    return recognizer->results.pop();
 }
 
 void vosk_recognizer_reset(VoskRecognizer *recognizer)
@@ -149,7 +201,7 @@ void vosk_recognizer_reset(VoskRecognizer *recognizer)
 
 void vosk_recognizer_free(VoskRecognizer *recognizer)
 {
-    recognizer->recognizer.reset();
+    recognizer->model->recognizer.reset();
     delete recognizer->vad;
     delete recognizer;
 }
