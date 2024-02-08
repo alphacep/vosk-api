@@ -28,8 +28,6 @@
 
 using namespace sherpa_onnx;
 
-typedef struct VoskModel VoskModel;
-
 struct VoskModel {
     std::string model_path_str;
     std::shared_ptr<OfflineRecognizer> recognizer;
@@ -45,6 +43,7 @@ struct VoskRecognizer {
     VoskModel *model;
     float sample_rate;
     std::queue<std::string> results;
+    int pending;
 };
 
 
@@ -70,18 +69,19 @@ void recognizer_loop(VoskModel *model)
                     p_streams.push_back(stream.get());
                     streams.push_back(std::move(stream));
                     recognizer->vad->Pop();
-                    SHERPA_ONNX_LOGE("!!!!! Pushed stream");
                 }
              }
         }
 
         if (size > 0) {
+            SHERPA_ONNX_LOGE("Running batch of %d chunks", size);
             model->recognizer->DecodeStreams(p_streams.data(), size);
+            SHERPA_ONNX_LOGE("Done running batch of %d chunks", size);
 
             std::unique_lock<std::mutex> lock(model->active_lock);
             for (int i = 0; i < size; i++) {
-                SHERPA_ONNX_LOGE("!!!!! %s", streams[i]->GetResult().text);
                 p_recs[i]->results.push(std::string("{\"text\" : \"") + streams[i]->GetResult().text + "\"}");
+                p_recs[i]->pending--;
                 streams[i].reset();
                 if (p_recs[i]->vad->Empty()) {
                     model->active.erase(p_recs[i]);
@@ -113,7 +113,7 @@ VoskModel *vosk_model_new(const char *model_path)
       config.model_config.transducer.joiner_filename = model->model_path_str + "/am-onnx/joiner.onnx";
 
       config.decoding_method = "modified_beam_search";
-      config.max_active_paths = 10;
+      config.max_active_paths = 5;
       config.feat_config.sampling_rate = 16000;
       config.feat_config.feature_dim = 80;
 
@@ -148,6 +148,7 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
     vad_config.silero_vad.model = model->model_path_str + "/vad/vad.onnx";
     vad_config.silero_vad.min_silence_duration = 0.25;
     rec->vad = new VoiceActivityDetector(vad_config);
+    rec->pending = 0;
     rec->sample_rate = sample_rate;
     rec->model = model;
     return rec;
@@ -176,8 +177,8 @@ void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *
 
     if (!recognizer->vad->Empty()) {
         std::unique_lock<std::mutex> lock(recognizer->model->active_lock);
-        SHERPA_ONNX_LOGE("!!!!! Adding new task");
         recognizer->model->active.insert(recognizer);
+        recognizer->pending++;
     }
 }
 
@@ -191,7 +192,15 @@ const char *vosk_recognizer_result_front(VoskRecognizer *recognizer)
 
 void vosk_recognizer_result_pop(VoskRecognizer *recognizer)
 {
-    return recognizer->results.pop();
+    if (!recognizer->results.empty()) {
+        recognizer->results.pop();
+    }
+}
+
+/** Get amount of pending chunks for more intelligent waiting */
+int vosk_recognizer_get_pending_results(VoskRecognizer *recognizer)
+{
+    return recognizer->pending;
 }
 
 void vosk_recognizer_reset(VoskRecognizer *recognizer)
@@ -201,7 +210,6 @@ void vosk_recognizer_reset(VoskRecognizer *recognizer)
 
 void vosk_recognizer_free(VoskRecognizer *recognizer)
 {
-    recognizer->model->recognizer.reset();
     delete recognizer->vad;
     delete recognizer;
 }

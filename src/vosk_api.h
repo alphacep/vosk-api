@@ -99,9 +99,14 @@ void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *
  */
 const char *vosk_recognizer_result_front(VoskRecognizer *recognizer);
 
-/** TODO: WRITEME
- */
+
+/** TODO: WRITEME */
 void vosk_recognizer_result_pop(VoskRecognizer *recognizer);
+
+
+/** Get amount of pending chunks for more intelligent waiting */
+int vosk_recognizer_get_pending_results(VoskRecognizer *recognizer);
+
 
 /** Resets the recognizer
  *

@@ -15,6 +15,7 @@ if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE
     sys.exit(1)
 
 model = Model("vosk-model-ru-0.53-private-0.1")
+#model = Model("vosk-model-small-ru")
 
 rec = KaldiRecognizer(model, wf.getframerate())
 
@@ -23,5 +24,8 @@ while True:
     if len(data) == 0:
         break
     rec.AcceptWaveform(data)
-    time.sleep(0.5)
+    while rec.GetPendingResults() > 0:
+        time.sleep(0.1)
     print (rec.Result())
+    rec.Pop()
+

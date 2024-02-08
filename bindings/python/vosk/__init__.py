@@ -201,6 +201,9 @@ class KaldiRecognizer:
     def Pop(self):
         return _c.vosk_recognizer_result_pop(self._handle)
 
+    def GetPendingResults(self):
+        return _c.vosk_recognizer_get_pending_results(self._handle)
+
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)
 

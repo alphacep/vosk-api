@@ -50,17 +50,17 @@ public class LibVosk {
 
     public static native Pointer vosk_recognizer_new(Model model, float sample_rate);
 
-    public static native boolean vosk_recognizer_accept_waveform(Pointer recognizer, byte[] data, int len);
+    public static native void vosk_recognizer_accept_waveform(Pointer recognizer, byte[] data, int len);
 
-    public static native boolean vosk_recognizer_accept_waveform_s(Pointer recognizer, short[] data, int len);
+    public static native void vosk_recognizer_accept_waveform_s(Pointer recognizer, short[] data, int len);
 
-    public static native boolean vosk_recognizer_accept_waveform_f(Pointer recognizer, float[] data, int len);
+    public static native void vosk_recognizer_accept_waveform_f(Pointer recognizer, float[] data, int len);
 
-    public static native String vosk_recognizer_result(Pointer recognizer);
+    public static native String vosk_recognizer_result_front(Pointer recognizer);
 
-    public static native String vosk_recognizer_final_result(Pointer recognizer);
+    public static native void vosk_recognizer_result_pop(Pointer recognizer);
 
-    public static native String vosk_recognizer_partial_result(Pointer recognizer);
+    public static native int vosk_recognizer_get_pending_results(Pointer recognizer);
 
     public static native void vosk_recognizer_reset(Pointer recognizer);
 

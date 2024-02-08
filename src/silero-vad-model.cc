@@ -21,6 +21,7 @@ class SileroVadModel::Impl {
         env_(ORT_LOGGING_LEVEL_ERROR),
         sess_opts_(GetSessionOptions(config)),
         allocator_{} {
+
     auto buf = ReadFile(config.silero_vad.model);
     Init(buf.data(), buf.size());
 
@@ -192,6 +193,8 @@ class SileroVadModel::Impl {
 
  private:
   void Init(void *model_data, size_t model_data_length) {
+    sess_opts_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_DISABLE_ALL);
+
     sess_ = std::make_unique<Ort::Session>(env_, model_data, model_data_length,
                                            sess_opts_);
 

@@ -28,20 +28,17 @@ public class Recognizer extends PointerType implements AutoCloseable {
      *
      *  @param data - audio data in PCM 16-bit mono format
      *  @param len - length of the audio data
-     *  @return 1 if silence is occurred and you can retrieve a new utterance with result method
-     *           0 if decoding continues
-     *           -1 if exception occurred
      */
-    public boolean acceptWaveForm(byte[] data, int len) {
-        return LibVosk.vosk_recognizer_accept_waveform(this.getPointer(), data, len);
+    public void acceptWaveForm(byte[] data, int len) {
+        LibVosk.vosk_recognizer_accept_waveform(this.getPointer(), data, len);
     }
 
-    public boolean acceptWaveForm(short[] data, int len) {
-        return LibVosk.vosk_recognizer_accept_waveform_s(this.getPointer(), data, len);
+    public void acceptWaveForm(short[] data, int len) {
+        LibVosk.vosk_recognizer_accept_waveform_s(this.getPointer(), data, len);
     }
 
-    public boolean acceptWaveForm(float[] data, int len) {
-        return LibVosk.vosk_recognizer_accept_waveform_f(this.getPointer(), data, len);
+    public void acceptWaveForm(float[] data, int len) {
+        LibVosk.vosk_recognizer_accept_waveform_f(this.getPointer(), data, len);
     }
 
     /**
@@ -62,34 +59,21 @@ public class Recognizer extends PointerType implements AutoCloseable {
      * If word times enabled returns word time, see also #setWordTimes().
      */
     public String getResult() {
-        return LibVosk.vosk_recognizer_result(this.getPointer());
+        return LibVosk.vosk_recognizer_result_front(this.getPointer());
     }
 
     /**
-     * Returns partial speech recognition.
-     *
-     * @return partial speech recognition text which is not yet finalized.
-     *          result may change as recognizer process more data.
-     *
-     * <pre>
-     * {
-     *    "partial" : "cyril one eight zero"
-     * }
-     * </pre>
+     * Removes the latest result from the result queue
      */
-    public String getPartialResult() {
-        return LibVosk.vosk_recognizer_partial_result(this.getPointer());
+    public void popResult() {
+        LibVosk.vosk_recognizer_result_pop(this.getPointer());
     }
 
     /**
-     * Returns speech recognition result. Same as result, but doesn't wait for silence.
-     *  You usually call it in the end of the stream to get final bits of audio. It
-     *  flushes the feature pipeline, so all remaining audio chunks got processed.
-     *
-     *  @return speech result in JSON format.
+     * Counts pending results
      */
-    public String getFinalResult() {
-        return LibVosk.vosk_recognizer_final_result(this.getPointer());
+    public int getPendingResults() {
+        return LibVosk.vosk_recognizer_get_pending_results(this.getPointer());
     }
 
     /**

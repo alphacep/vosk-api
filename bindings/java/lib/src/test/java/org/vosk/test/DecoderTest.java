@@ -21,24 +21,23 @@ import org.vosk.Model;
 public class DecoderTest {
 
     @Test
-    public void decoderTest() throws IOException, UnsupportedAudioFileException {
+    public void decoderTest() throws IOException, UnsupportedAudioFileException, InterruptedException {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
-        try (Model model = new Model("../../python/example/model");
+        try (Model model = new Model("../../python/example/vosk-model-small-ru");
             InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
             Recognizer recognizer = new Recognizer(model, 16000)) {
 
             int nbytes;
             byte[] b = new byte[1024];
             while ((nbytes = ais.read(b)) >= 0) {
-                if (recognizer.acceptWaveForm(b, nbytes)) {
-                    System.out.println(recognizer.getResult());
-                } else {
-                    System.out.println(recognizer.getPartialResult());
+                recognizer.acceptWaveForm(b, nbytes);
+                while (recognizer.getPendingResults() > 0) {
+                    Thread.sleep(50);
                 }
+                System.out.println(recognizer.getResult());
+                recognizer.popResult();
             }
-
-            System.out.println(recognizer.getFinalResult());
         }
         Assert.assertTrue(true);
     }
