@@ -1,5 +1,7 @@
-class Vosk
-  def self.hi
-    puts "Hello world!"
-  end
+# frozen_string_literal: true
+
+module Vosk
 end
+
+require_relative "vosk/version"
+require_relative "vosk/ffi"
