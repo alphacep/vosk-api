@@ -275,7 +275,7 @@ void Recognizer::SetSpkModel(SpkModel *spk_model)
 void Recognizer::SetGrm(char const *grammar)
 {
     if (state_ == RECOGNIZER_RUNNING) {
-        KALDI_ERR << "Can't add speaker model to already running recognizer";
+        KALDI_ERR << "Can't add grammar to already running recognizer";
         return;
     }
 
