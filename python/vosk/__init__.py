@@ -36,6 +36,19 @@ def open_dll():
 
 _c = open_dll()
 
+def list_model_pairs(lang, small_model_name=None, big_model_name=None):
+    response = requests.get(MODEL_LIST_URL, timeout=10)
+    for model in response.json():
+        if model["obsolete"] == "false" and model["type"] == "small" and model["lang"] == lang:
+            small_model_name = model["name"]
+        if model["obsolete"] == "false" and model["type"] == "big" and model["lang"] == lang:
+            big_model_name = model["name"]
+    if small_model_name != None and big_model_name != None:
+        print(small_model_name, big_model_name)
+    else:
+        print("There is no small or big model for this language")
+        sys.exit(1)
+
 def list_models():
     response = requests.get(MODEL_LIST_URL, timeout=10)
     for model in response.json():
@@ -45,7 +58,7 @@ def list_languages():
     response = requests.get(MODEL_LIST_URL, timeout=10)
     languages = {m["lang"] for m in response.json()}
     for lang in languages:
-        print (lang)
+        print(lang)
 
 class Model:
     def __init__(self, model_path=None, model_name=None, lang=None):
