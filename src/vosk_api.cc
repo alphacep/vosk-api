@@ -17,6 +17,7 @@
 #include "voice-activity-detector.h"
 #include "offline-stream.h"
 #include "macros.h"
+#include "resample.h"
 
 #include <string>
 #include <iostream>
@@ -42,8 +43,12 @@ struct VoskRecognizer {
     VoiceActivityDetector *vad;
     VoskModel *model;
     float sample_rate;
-    std::queue<std::string> results;
     int pending;
+
+    std::queue<std::string> results;
+    std::queue<std::vector<float>> input;
+    LinearResample *resampler;
+    std::vector<float> buffer;
 };
 
 
@@ -59,20 +64,39 @@ void recognizer_loop(VoskModel *model)
             std::unique_lock<std::mutex> lock(model->active_lock);
             size = model->active.size();
             if (size > 0) {
-                std::set<int>::iterator itr;
                 for (auto itr = model->active.begin(); itr != model->active.end(); itr++) {
                     VoskRecognizer *recognizer = *itr;
-                    p_recs.push_back(recognizer);
-                    SpeechSegment segment = recognizer->vad->Front();
-                    std::unique_ptr<OfflineStream> stream = model->recognizer->CreateStream();
-                    stream->AcceptWaveform(recognizer->sample_rate, segment.samples.data(), segment.samples.size());
-                    p_streams.push_back(stream.get());
-                    streams.push_back(std::move(stream));
-                    recognizer->vad->Pop();
+
+                    while (!recognizer->input.empty()) {
+                        std::vector<float> &data = recognizer->input.front();
+                        recognizer->vad->AcceptWaveform(data.data(), data.size());
+                        if (!recognizer->vad->Empty()) {
+                            SpeechSegment segment = recognizer->vad->Front();
+                            std::unique_ptr<OfflineStream> stream = model->recognizer->CreateStream();
+                            stream->AcceptWaveform(recognizer->sample_rate, segment.samples.data(), segment.samples.size());
+    	    	            p_streams.push_back(stream.get());
+                            streams.push_back(std::move(stream));
+                            p_recs.push_back(recognizer);
+                            recognizer->vad->Pop();
+                            recognizer->pending++;
+                        }
+                        recognizer->input.pop();
+                    }
+                    recognizer->pending--; // We processed current queue
                 }
-             }
+                // Delete inactive
+                for (auto itr = model->active.begin(); itr != model->active.end();) {
+                    VoskRecognizer *recognizer = *itr;
+                    if (recognizer->pending == 0) {
+                         model->active.erase(itr++);
+                    } else {
+                        ++ itr;
+                    }
+                }
+            }
         }
 
+        size = p_streams.size();
         if (size > 0) {
             SHERPA_ONNX_LOGE("Running batch of %d chunks", size);
             model->recognizer->DecodeStreams(p_streams.data(), size);
@@ -81,9 +105,9 @@ void recognizer_loop(VoskModel *model)
             std::unique_lock<std::mutex> lock(model->active_lock);
             for (int i = 0; i < size; i++) {
                 p_recs[i]->results.push(std::string("{\"text\" : \"") + streams[i]->GetResult().text + "\"}");
-                p_recs[i]->pending--;
                 streams[i].reset();
-                if (p_recs[i]->vad->Empty()) {
+                p_recs[i]->pending--;
+                if (p_recs[i]->pending == 0) {
                     model->active.erase(p_recs[i]);
                 }
             }
@@ -151,6 +175,9 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
     rec->pending = 0;
     rec->sample_rate = sample_rate;
     rec->model = model;
+    rec->resampler = new LinearResample(
+        sample_rate, 16000.0f,
+        std::min(sample_rate / 2, 16000.0f / 2), 6);
     return rec;
 }
 
@@ -171,11 +198,37 @@ void vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *
     return vosk_recognizer_accept_waveform_f(recognizer, wave, length);
 }
 
+#define SAMPLES_PER_CHUNK 512
 void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length)
 {
-    recognizer->vad->AcceptWaveform(data, length);
+    std::vector<float> resampled_data;
+    recognizer->resampler->Resample(data, length, true, &resampled_data);
 
-    if (!recognizer->vad->Empty()) {
+    recognizer->buffer.insert(std::end(recognizer->buffer), std::begin(resampled_data), std::end(resampled_data));
+
+    // Pick chunks and submit them to the batcher
+    std::vector<float>::const_iterator first = recognizer->buffer.begin();
+    std::vector<float>::const_iterator second = recognizer->buffer.begin() + SAMPLES_PER_CHUNK;
+
+    // Queue chunks
+    while (second < recognizer->buffer.end()) {
+        std::vector<float> chunk(first, second);
+        recognizer->input.push(chunk);
+        first += SAMPLES_PER_CHUNK;
+        second += SAMPLES_PER_CHUNK;
+    }
+
+    // Keep remaining data
+    int i = first - recognizer->buffer.begin();
+    if (i > 0) {
+        int tail = recognizer->buffer.size() - i;
+        for (int j = 0; j < tail; j++) {
+            recognizer->buffer[j] = recognizer->buffer[i + j];
+        }
+        recognizer->buffer.resize(tail);
+     }
+
+    {
         std::unique_lock<std::mutex> lock(recognizer->model->active_lock);
         recognizer->model->active.insert(recognizer);
         recognizer->pending++;
