@@ -18,18 +18,21 @@ def recognize(line):
 
     results = []
     while True:
-        data = wf.readframes(512)
+        data = wf.readframes(4000)
         if len(data) == 0:
             break
+
         rec.AcceptWaveform(data)
-        while rec.GetPendingResults() > 0:
+        while rec.GetNumPendingResults() > 0:
             time.sleep(0.05)
-        jres = json.loads(rec.Result())
-        if 'text' in jres:
-            print (jres)
-            results.append(jres['text'])
-        rec.Pop()
-    results.append("\n")
+
+        while not rec.ResultsEmpty():
+            jres = json.loads(rec.Result())
+            if 'text' in jres:
+                print (jres)
+                results.append(jres['text'])
+            rec.Pop()
+        results.append("\n")
     owf = open(fn.replace(".wav", ".hyp"), "w")
     owf.write(" ".join(results))
 

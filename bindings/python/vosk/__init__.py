@@ -201,8 +201,14 @@ class KaldiRecognizer:
     def Pop(self):
         return _c.vosk_recognizer_result_pop(self._handle)
 
-    def GetPendingResults(self):
-        return _c.vosk_recognizer_get_pending_results(self._handle)
+    def GetNumPendingResults(self):
+        return _c.vosk_recognizer_get_num_pending_results(self._handle)
+
+    def GetNumResults(self):
+        return _c.vosk_recognizer_get_num_results(self._handle)
+
+    def ResultsEmpty(self):
+        return _c.vosk_recognizer_results_empty(self._handle)
 
     def Reset(self):
         return _c.vosk_recognizer_reset(self._handle)
@@ -236,51 +242,3 @@ class KaldiRecognizer:
 
 def SetLogLevel(level):
     return _c.vosk_set_log_level(level)
-
-
-def GpuInit():
-    _c.vosk_gpu_init()
-
-
-def GpuThreadInit():
-    _c.vosk_gpu_thread_init()
-
-class BatchModel:
-
-    def __init__(self, model_path, *args):
-        self._handle = _c.vosk_batch_model_new(model_path.encode('utf-8'))
-
-        if self._handle == _ffi.NULL:
-            raise Exception("Failed to create a model")
-
-    def __del__(self):
-        _c.vosk_batch_model_free(self._handle)
-
-    def Wait(self):
-        _c.vosk_batch_model_wait(self._handle)
-
-class BatchRecognizer:
-
-    def __init__(self, *args):
-        self._handle = _c.vosk_batch_recognizer_new(args[0]._handle, args[1])
-
-        if self._handle == _ffi.NULL:
-            raise Exception("Failed to create a recognizer")
-
-    def __del__(self):
-        _c.vosk_batch_recognizer_free(self._handle)
-
-    def AcceptWaveform(self, data):
-        res = _c.vosk_batch_recognizer_accept_waveform(self._handle, data, len(data))
-
-    def Result(self):
-        ptr = _c.vosk_batch_recognizer_front_result(self._handle)
-        res = _ffi.string(ptr).decode("utf-8")
-        _c.vosk_batch_recognizer_pop(self._handle)
-        return res
-
-    def FinishStream(self):
-        _c.vosk_batch_recognizer_finish_stream(self._handle)
-
-    def GetPendingChunks(self):
-        return _c.vosk_batch_recognizer_get_pending_chunks(self._handle)

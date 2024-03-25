@@ -19,19 +19,15 @@ model = Model("vosk-model-small-ru")
 
 rec = KaldiRecognizer(model, wf.getframerate())
 
-while True:
-    data = wf.readframes(4000)
-    if len(data) == 0:
-        break
+data = wf.readframes(wf.getnframes() // 4)
+# Feed into waveform
+rec.AcceptWaveform(data)
 
-    # Feed into waveform
-    rec.AcceptWaveform(data)
+# Wait for processing
+while rec.GetNumPendingResults() > 0:
+    time.sleep(0.05)
 
-    # Wait for processing
-    while rec.GetNumPendingResults() > 0:
-        time.sleep(0.05)
-
-    # Retrieve the results
-    while not rec.ResultsEmpty():
-        print (rec.Result())
-        rec.Pop()
+# Retrieve the results
+while not rec.ResultsEmpty():
+    print (rec.Result())
+    rec.Pop()

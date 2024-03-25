@@ -104,8 +104,16 @@ const char *vosk_recognizer_result_front(VoskRecognizer *recognizer);
 void vosk_recognizer_result_pop(VoskRecognizer *recognizer);
 
 
-/** Get amount of pending chunks for more intelligent waiting */
-int vosk_recognizer_get_pending_results(VoskRecognizer *recognizer);
+/** Get number of pending chunks for more intelligent waiting */
+int vosk_recognizer_get_num_pending_results(VoskRecognizer *recognizer);
+
+
+/** Get number of already processed with results */
+int vosk_recognizer_get_num_results(VoskRecognizer *recognizer);
+
+
+/** If result queue is empty */
+int vosk_recognizer_results_empty(VoskRecognizer *recognizer);
 
 
 /** Resets the recognizer

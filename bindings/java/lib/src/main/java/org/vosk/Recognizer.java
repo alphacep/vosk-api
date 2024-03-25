@@ -72,8 +72,22 @@ public class Recognizer extends PointerType implements AutoCloseable {
     /**
      * Counts pending results
      */
-    public int getPendingResults() {
-        return LibVosk.vosk_recognizer_get_pending_results(this.getPointer());
+    public int getNumPendingResults() {
+        return LibVosk.vosk_recognizer_get_num_pending_results(this.getPointer());
+    }
+
+    /**
+     * Counts pending results
+     */
+    public int getNumResults() {
+        return LibVosk.vosk_recognizer_get_num_results(this.getPointer());
+    }
+
+    /**
+     * Check if output queue is empty
+     */
+    public boolean getResultsEmpty() {
+        return LibVosk.vosk_recognizer_results_empty(this.getPointer()) == 0;
     }
 
     /**

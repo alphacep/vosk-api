@@ -60,7 +60,11 @@ public class LibVosk {
 
     public static native void vosk_recognizer_result_pop(Pointer recognizer);
 
-    public static native int vosk_recognizer_get_pending_results(Pointer recognizer);
+    public static native int vosk_recognizer_get_num_pending_results(Pointer recognizer);
+
+    public static native int vosk_recognizer_get_num_results(Pointer recognizer);
+
+    public static native int vosk_recognizer_results_empty(Pointer recognizer);
 
     public static native void vosk_recognizer_reset(Pointer recognizer);
 

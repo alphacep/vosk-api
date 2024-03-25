@@ -29,14 +29,16 @@ public class DecoderTest {
             Recognizer recognizer = new Recognizer(model, 16000)) {
 
             int nbytes;
-            byte[] b = new byte[1024];
+            byte[] b = new byte[4000];
             while ((nbytes = ais.read(b)) >= 0) {
                 recognizer.acceptWaveForm(b, nbytes);
-                while (recognizer.getPendingResults() > 0) {
+                while (recognizer.getNumPendingResults() > 0) {
                     Thread.sleep(50);
                 }
-                System.out.println(recognizer.getResult());
-                recognizer.popResult();
+                while (!recognizer.getResultsEmpty()) {
+                    System.out.println(recognizer.getResult());
+                    recognizer.popResult();
+                }
             }
         }
         Assert.assertTrue(true);
