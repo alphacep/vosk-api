@@ -87,7 +87,7 @@ public class Recognizer extends PointerType implements AutoCloseable {
      * Check if output queue is empty
      */
     public boolean getResultsEmpty() {
-        return LibVosk.vosk_recognizer_results_empty(this.getPointer()) == 0;
+        return (LibVosk.vosk_recognizer_results_empty(this.getPointer()) == 1);
     }
 
     /**

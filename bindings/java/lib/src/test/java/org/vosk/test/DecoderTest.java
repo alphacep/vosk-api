@@ -25,11 +25,35 @@ public class DecoderTest {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
         try (Model model = new Model("../../python/example/vosk-model-small-ru");
-            InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test.wav")));
+            InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test-ru.wav")));
             Recognizer recognizer = new Recognizer(model, 16000)) {
 
             int nbytes;
             byte[] b = new byte[4000];
+            while ((nbytes = ais.read(b)) >= 0) {
+                recognizer.acceptWaveForm(b, nbytes);
+                while (recognizer.getNumPendingResults() > 0) {
+                    Thread.sleep(50);
+                }
+                while (!recognizer.getResultsEmpty()) {
+                    System.out.println(recognizer.getResult());
+                    recognizer.popResult();
+                }
+            }
+        }
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void decoderTestBig() throws IOException, UnsupportedAudioFileException, InterruptedException {
+        LibVosk.setLogLevel(LogLevel.DEBUG);
+
+        try (Model model = new Model("../../python/example/vosk-model-small-ru");
+            InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream("../../python/example/test-ru.wav")));
+            Recognizer recognizer = new Recognizer(model, 16000)) {
+
+            int nbytes;
+            byte[] b = new byte[400000];
             while ((nbytes = ais.read(b)) >= 0) {
                 recognizer.acceptWaveForm(b, nbytes);
                 while (recognizer.getNumPendingResults() > 0) {
