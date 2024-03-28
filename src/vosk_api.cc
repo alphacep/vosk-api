@@ -169,6 +169,7 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
     rec->vad = new VoiceActivityDetector(vad_config);
     rec->sample_rate = sample_rate;
     rec->model = model;
+    rec->processing = 0;
     rec->resampler = new LinearResample(
         sample_rate, 16000.0f,
         std::min(sample_rate / 2, 16000.0f / 2), 6);
