@@ -39,6 +39,8 @@ typedef struct VoskSpkModel VoskSpkModel;
  *  speaker information and so on */
 typedef struct VoskRecognizer VoskRecognizer;
 
+/** Inverse text normalization */
+typedef struct VoskTextProcessor VoskTextProcessor;
 
 /**
  * Batch model object
@@ -375,6 +377,15 @@ void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer);
 
 /** Get amount of pending chunks for more intelligent waiting */
 int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer);
+
+/** Create text processor */
+VoskTextProcessor *vosk_text_processor_new(const char *tagger, const char *verbalizer);
+
+/** Release text processor */
+void vosk_text_processor_free(VoskTextProcessor *processor);
+
+/** Convert string */
+char *vosk_text_processor_itn(const char *input);
 
 #ifdef __cplusplus
 }

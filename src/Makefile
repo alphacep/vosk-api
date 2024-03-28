@@ -23,17 +23,24 @@ VOSK_SOURCES= \
 	language_model.cc \
 	model.cc \
 	spk_model.cc \
-	vosk_api.cc
+	vosk_api.cc \
+	wetext_processor.cc \
+	wetext_string.cc \
+	wetext_token_parser.cc
 
 VOSK_HEADERS= \
 	recognizer.h \
 	language_model.h \
 	model.h \
 	spk_model.h \
-	vosk_api.h
+	vosk_api.h \
+	wetext_flags.h \
+        wetext_log.h \
+        wetext_processor.h \
+        wetext_string.h \
+	wetext_token_parser.h
 
-CFLAGS=-g -O3 -std=c++17 -Wno-deprecated-declarations -fPIC -DFST_NO_DYNAMIC_LINKING \
-       -I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include $(EXTRA_CFLAGS)
+CFLAGS=-g -O3 -std=c++17 -Wno-deprecated-declarations -fPIC -DFST_NO_DYNAMIC_LINKING -I. -I$(KALDI_ROOT)/src -I$(OPENFST_ROOT)/include $(EXTRA_CFLAGS)
 
 LDFLAGS=
 
