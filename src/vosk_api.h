@@ -385,7 +385,7 @@ VoskTextProcessor *vosk_text_processor_new(const char *tagger, const char *verba
 void vosk_text_processor_free(VoskTextProcessor *processor);
 
 /** Convert string */
-char *vosk_text_processor_itn(const char *input);
+char *vosk_text_processor_itn(VoskTextProcessor *processor, const char *input);
 
 #ifdef __cplusplus
 }

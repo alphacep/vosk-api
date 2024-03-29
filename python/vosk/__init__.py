@@ -291,7 +291,7 @@ class BatchRecognizer:
 class Processor:
 
     def __init__(self, *args):
-        self._handle = _c.vosk_text_processor_new(args[0], args[1])
+        self._handle = _c.vosk_text_processor_new(args[0].encode('utf-8'), args[1].encode('utf-8'))
 
         if self._handle == _ffi.NULL:
             raise Exception("Failed to create processor")
@@ -300,5 +300,4 @@ class Processor:
         _c.vosk_text_processor_free(self._handle)
 
     def process(self, text):
-        res = _c.vosk_text_processor_itn(self._handle, text)
-        return res
+        return _ffi.string(_c.vosk_text_processor_itn(self._handle, text.encode('utf-8'))).decode('utf-8')
