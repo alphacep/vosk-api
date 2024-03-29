@@ -17,6 +17,7 @@
 #include "recognizer.h"
 #include "model.h"
 #include "spk_model.h"
+#include "postprocessor.h"
 
 #if HAVE_CUDA
 #include "cudamatrix/cu-device.h"
@@ -303,4 +304,29 @@ int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer)
 #else
     return 0;
 #endif
+}
+
+VoskTextProcessor *vosk_text_processor_new(const char *tagger, const char *verbalizer)
+{
+    try {
+        return (VoskTextProcessor *)new Processor(tagger, verbalizer);
+    } catch (...) {
+        return nullptr;
+    }
+}
+
+void vosk_text_processor_free(VoskTextProcessor *processor)
+{
+    delete ((Processor *)processor);
+}
+
+char *vosk_text_processor_itn(VoskTextProcessor *processor, const char *input)
+{
+    Processor *wprocessor = (Processor *)processor;
+    std::string sinput(input);
+
+    std::string tagged_text = wprocessor->Tag(sinput);
+    std::string normalized_text = wprocessor->Verbalize(tagged_text);
+
+    return strdup(normalized_text.c_str());
 }

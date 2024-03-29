@@ -287,3 +287,17 @@ class BatchRecognizer:
 
     def GetPendingChunks(self):
         return _c.vosk_batch_recognizer_get_pending_chunks(self._handle)
+
+class Processor:
+
+    def __init__(self, *args):
+        self._handle = _c.vosk_text_processor_new(args[0].encode('utf-8'), args[1].encode('utf-8'))
+
+        if self._handle == _ffi.NULL:
+            raise Exception("Failed to create processor")
+
+    def __del__(self):
+        _c.vosk_text_processor_free(self._handle)
+
+    def process(self, text):
+        return _ffi.string(_c.vosk_text_processor_itn(self._handle, text.encode('utf-8'))).decode('utf-8')
