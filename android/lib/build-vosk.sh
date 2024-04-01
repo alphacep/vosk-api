@@ -118,7 +118,7 @@ CXX=$CXX AR=$AR RANLIB=$RANLIB CXXFLAGS="$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING
     --fst-root=${WORKDIR}/local --fst-version=${OPENFST_VERSION}
 make -j 8 depend
 cd $WORKDIR/kaldi/src
-make -j 8 online2 lm rnnlm
+make -j 8 online2 rnnlm
 
 # Vosk-api
 cd $WORKDIR

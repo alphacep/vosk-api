@@ -27,5 +27,5 @@ RUN cd /opt \
     && ./configure --mathlib=MKL --shared --use-cuda=no \
     && sed -i 's:-msse -msse2:-msse -msse2 -mavx -mavx2:g' kaldi.mk \
     && sed -i 's: -O1 : -O3 :g' kaldi.mk \
-    && make -j $(nproc) online2 lm rnnlm \
+    && make -j $(nproc) online2 rnnlm \
     && find /opt/kaldi -name "*.o" -exec rm {} \;
