@@ -84,6 +84,23 @@ class VoiceActivityDetector::Impl {
     }
   }
 
+  void Flush() {
+    // non-speech
+    if (start_ != -1 && buffer_.Size()) {
+      // end of speech, save the speech segment
+      int32_t end = buffer_.Tail() - model_->MinSilenceDurationSamples();
+
+      std::vector<float> s = buffer_.Get(start_, end - start_); 
+      SpeechSegment segment;
+
+      segment.start = start_;
+      segment.samples = std::move(s);
+      segments_.push(std::move(segment));
+
+      buffer_.Pop(end - buffer_.Head());
+    }
+  }
+
   bool Empty() const { return segments_.empty(); }
 
   void Pop() { segments_.pop(); }
@@ -134,6 +151,8 @@ void VoiceActivityDetector::AcceptWaveform(const float *samples, int32_t n) {
 bool VoiceActivityDetector::Empty() const { return impl_->Empty(); }
 
 void VoiceActivityDetector::Pop() { impl_->Pop(); }
+
+void VoiceActivityDetector::Flush() { impl_->Flush(); }
 
 void VoiceActivityDetector::Clear() { impl_->Clear(); }
 

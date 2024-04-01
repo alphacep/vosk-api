@@ -80,6 +80,17 @@ public class DecoderMultiTest {
                     recognizer.popResult();
                 }
             }
+            recognizer.flush();
+            while (recognizer.getNumPendingResults() > 0) {
+                Thread.sleep(50);
+            }
+            while (!recognizer.getResultsEmpty()) {
+                System.out.println("Result [" + name + "] [i=" + i + "] - " + recognizer.getResult());                
+                result.append(recognizer.getResult());
+                result.append(' ');
+                recognizer.popResult();
+            }
+
             return result.toString();
         }
     }

@@ -32,9 +32,21 @@ def recognize(line):
                 print (jres)
                 results.append(jres['text'])
             rec.Pop()
-        results.append("\n")
+
+    rec.Flush()
+
+    while rec.GetNumPendingResults() > 0:
+        time.sleep(0.05)
+
+    while not rec.ResultsEmpty():
+        jres = json.loads(rec.Result())
+        if 'text' in jres:
+            print (jres)
+            results.append(jres['text'])
+        rec.Pop()
+
     owf = open(fn.replace(".wav", ".hyp"), "w")
-    owf.write(" ".join(results))
+    owf.write("\n".join(results))
 
 def main():
     p = Pool(30)

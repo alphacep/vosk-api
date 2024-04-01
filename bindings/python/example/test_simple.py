@@ -35,3 +35,14 @@ while True:
     while not rec.ResultsEmpty():
         print (rec.Result())
         rec.Pop()
+
+rec.Flush()
+
+# Wait for processing
+while rec.GetNumPendingResults() > 0:
+    time.sleep(0.05)
+
+# Retrieve the results
+while not rec.ResultsEmpty():
+    print (rec.Result())
+    rec.Pop()

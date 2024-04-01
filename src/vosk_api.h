@@ -116,6 +116,10 @@ int vosk_recognizer_get_num_results(VoskRecognizer *recognizer);
 int vosk_recognizer_results_empty(VoskRecognizer *recognizer);
 
 
+/** Flush all internal buffers and produce final results */
+void vosk_recognizer_flush(VoskRecognizer *recognizer);
+
+
 /** Resets the recognizer
  *
  *  Resets current results so the recognition can continue from scratch */

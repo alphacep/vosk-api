@@ -40,6 +40,14 @@ public class DecoderTest {
                     recognizer.popResult();
                 }
             }
+            recognizer.flush();
+            while (recognizer.getNumPendingResults() > 0) {
+                Thread.sleep(50);
+            }
+            while (!recognizer.getResultsEmpty()) {
+                System.out.println(recognizer.getResult());
+                recognizer.popResult();
+            }
         }
         Assert.assertTrue(true);
     }
@@ -63,6 +71,14 @@ public class DecoderTest {
                     System.out.println(recognizer.getResult());
                     recognizer.popResult();
                 }
+            }
+            recognizer.flush();
+            while (recognizer.getNumPendingResults() > 0) {
+                Thread.sleep(50);
+            }
+            while (!recognizer.getResultsEmpty()) {
+                System.out.println(recognizer.getResult());
+                recognizer.popResult();
             }
         }
         Assert.assertTrue(true);

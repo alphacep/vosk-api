@@ -37,6 +37,7 @@ class VoiceActivityDetector {
   bool Empty() const;
   void Pop();
   void Clear();
+  void Flush();
   const SpeechSegment &Front() const;
 
   bool IsSpeechDetected() const;

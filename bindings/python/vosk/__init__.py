@@ -195,6 +195,9 @@ class KaldiRecognizer:
     def AcceptWaveform(self, data):
         _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
 
+    def Flush(self):
+        return _c.vosk_recognizer_flush(self._handle)
+
     def Result(self):
         return _ffi.string(_c.vosk_recognizer_result_front(self._handle)).decode("utf-8")
 

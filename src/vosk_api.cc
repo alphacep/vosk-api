@@ -26,6 +26,7 @@
 #include <set>
 #include <queue>
 #include <string>
+#include <cstring>
 
 using namespace sherpa_onnx;
 
@@ -215,6 +216,28 @@ void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *
 
     if (i > 0) {
         recognizer->buffer.erase(recognizer->buffer.begin(), recognizer->buffer.begin() + i);
+    }
+}
+
+void vosk_recognizer_flush(VoskRecognizer *recognizer)
+{
+    if (!recognizer->vad->IsSpeechDetected()) {
+        return;
+    }
+
+    // Flush remaining signal
+    float buf[SAMPLES_PER_CHUNK];
+    std::memset(buf, 0, SAMPLES_PER_CHUNK);
+    std::memcpy(buf, recognizer->buffer.data(), recognizer->buffer.size());
+    recognizer->vad->AcceptWaveform(buf, SAMPLES_PER_CHUNK);
+    recognizer->vad->Flush();
+
+    {
+        std::unique_lock<std::mutex> lock(recognizer->model->active_lock);
+        SpeechSegment segment = recognizer->vad->Front();
+        recognizer->input.push(segment.samples);
+        recognizer->model->active.insert(recognizer);
+        recognizer->vad->Pop();
     }
 }
 

@@ -41,6 +41,10 @@ public class Recognizer extends PointerType implements AutoCloseable {
         LibVosk.vosk_recognizer_accept_waveform_f(this.getPointer(), data, len);
     }
 
+    public void flush() {
+        LibVosk.vosk_recognizer_flush(this.getPointer());
+    }
+
     /**
      * Returns speech recognition result
      *

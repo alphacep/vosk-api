@@ -56,6 +56,8 @@ public class LibVosk {
 
     public static native void vosk_recognizer_accept_waveform_f(Pointer recognizer, float[] data, int len);
 
+    public static native void vosk_recognizer_flush(Pointer recognizer);
+
     public static native String vosk_recognizer_result_front(Pointer recognizer);
 
     public static native void vosk_recognizer_result_pop(Pointer recognizer);
