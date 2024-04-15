@@ -54,6 +54,8 @@ struct VoskRecognizer {
 
 #define BATCH_SIZE 16
 
+// static int allcnt;
+
 void recognizer_loop(VoskModel *model)
 {
     while (model->running) {
@@ -76,8 +78,20 @@ void recognizer_loop(VoskModel *model)
                         }
                         added++;
                         std::vector<float> samples = recognizer->input.front();
+//                        std::cerr << "Processing chunk of " << samples.size() << " samples" << std::endl;
                         std::unique_ptr<OfflineStream> stream = model->recognizer->CreateStream();
                         stream->AcceptWaveform(16000, samples.data(), samples.size());
+
+//                        char name[50];
+//                        snprintf(name, 50, "a%d.raw", allcnt);
+//                        FILE *fh = fopen(name, "wb");
+//                        for (int k = 0; k < samples.size(); k++) {
+//                           short val = (short) (samples[k] * 32768);
+//                           fwrite((char *)&val, 2, 1, fh);
+//                        }
+//                        fclose(fh);
+//                        allcnt++;
+
                         p_streams.push_back(stream.get());
                         streams.push_back(std::move(stream));
                         p_recs.push_back(recognizer);
@@ -194,7 +208,7 @@ void vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *
     return vosk_recognizer_accept_waveform_f(recognizer, wave, length);
 }
 
-#define SAMPLES_PER_CHUNK 512
+#define SAMPLES_PER_CHUNK 1024
 void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length)
 {
     std::vector<float> resampled_data;
@@ -227,7 +241,7 @@ void vosk_recognizer_flush(VoskRecognizer *recognizer)
 
     // Flush remaining signal
     float buf[SAMPLES_PER_CHUNK];
-    std::memset(buf, 0, SAMPLES_PER_CHUNK);
+    std::memset(buf, 0, SAMPLES_PER_CHUNK * sizeof(float));
     std::memcpy(buf, recognizer->buffer.data(), recognizer->buffer.size());
     recognizer->vad->AcceptWaveform(buf, SAMPLES_PER_CHUNK);
     recognizer->vad->Flush();

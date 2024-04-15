@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
+#include <iostream>
 
 #include "online-feature.h"
 #include "macros.h"
@@ -82,6 +83,7 @@ class OfflineStream::Impl {
     opts_.frame_opts.snip_edges = false;
     opts_.frame_opts.samp_freq = config.sampling_rate;
     opts_.mel_opts.num_bins = config.feature_dim;
+    opts_.mel_opts.high_freq = -400;
 
     fbank_ = std::make_unique<knf::OnlineFbank>(opts_);
   }
@@ -148,6 +150,14 @@ class OfflineStream::Impl {
 
     for (int32_t i = 0; i != n; ++i) {
       const float *f = fbank_->GetFrame(i);
+
+//      std::cout << "Frame " << i;
+//      for (int j = 0; j < feature_dim; j++) {
+//          std::cout << " " << f[j];
+//      }
+//      std::cout << std::endl;
+
+
       std::copy(f, f + feature_dim, p);
       p += feature_dim;
     }

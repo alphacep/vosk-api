@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include "macros.h"
 #include "onnx-utils.h"
@@ -26,8 +27,8 @@ class SileroVadModel::Impl {
     Init(buf.data(), buf.size());
 
     sample_rate_ = config.sample_rate;
-    if (sample_rate_ != 16000) {
-      SHERPA_ONNX_LOGE("Expected sample rate 16000. Given: %d",
+    if (sample_rate_ != 16000 && sample_rate_ != 8000) {
+      SHERPA_ONNX_LOGE("Expected sample rate 16000 or 8000. Given: %d",
                        config.sample_rate);
       exit(-1);
     }
@@ -125,6 +126,8 @@ class SileroVadModel::Impl {
 
     current_sample_ += config_.silero_vad.window_size;
 
+//    std::cerr << "Silero " << current_sample_ << " " << current_sample_ / 16000.0 << " " << prob << std::endl;
+
     if (prob > threshold && temp_end_ != 0) {
       temp_end_ = 0;
     }
@@ -146,6 +149,13 @@ class SileroVadModel::Impl {
       return true;
     }
 
+    // Avoid too long utterances
+//    if (prob > threshold && temp_start_ != 0 && triggered_) {
+//      if (current_sample_ - temp_start_ > 16000 * 20) {
+//        return false;
+//      }
+//    }
+
     if ((prob < threshold) && !triggered_) {
       // silence
       temp_start_ = 0;
@@ -153,7 +163,7 @@ class SileroVadModel::Impl {
       return false;
     }
 
-    if ((prob > threshold - 0.15) && triggered_) {
+    if ((prob > threshold) && triggered_) {
       // speaking
       return true;
     }
