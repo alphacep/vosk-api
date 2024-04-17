@@ -14,12 +14,12 @@ type VoskModel struct {
 }
 
 // NewModel creates a new VoskModel instance
-func NewModel(modelPath string) (*VoskModel, error) {
+func NewModel(modelPath string) *VoskModel {
 	cmodelPath := C.CString(modelPath)
 	defer C.free(unsafe.Pointer(cmodelPath))
 	internal := C.vosk_model_new(cmodelPath)
 	model := &VoskModel{model: internal}
-	return model, nil
+	return model
 }
 
 func (m *VoskModel) Free() {
@@ -58,7 +58,7 @@ func freeSpkModel(model *VoskSpkModel) {
 	C.vosk_spk_model_free(model.spkModel)
 }
 
-func(s *VoskSpkModel) Free() {
+func (s *VoskSpkModel) Free() {
 	C.vosk_spk_model_free(s.spkModel)
 }
 
