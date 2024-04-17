@@ -16,6 +16,7 @@ func main() {
 	flag.StringVar(&filename, "f", "", "file to transcribe")
 	flag.Parse()
 
+	vosk.SetLogLevel(vosk.Verbose)
 	model := vosk.NewModel("model")
 
 	// we can check if word is in the vocabulary

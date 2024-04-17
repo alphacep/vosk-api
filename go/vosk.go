@@ -154,8 +154,14 @@ func (r *VoskRecognizer) Reset() {
 	C.vosk_recognizer_reset(r.rec)
 }
 
+type LogLevel int
+
+const Disabled LogLevel = -1
+const Default LogLevel = 0
+const Verbose LogLevel = 1
+
 // SetLogLevel sets the log level for Kaldi messages.
-func SetLogLevel(logLevel int) {
+func SetLogLevel(logLevel LogLevel) {
 	C.vosk_set_log_level(C.int(logLevel))
 }
 
