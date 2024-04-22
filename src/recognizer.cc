@@ -247,8 +247,8 @@ void Recognizer::SetEndpointerDelays(float t_start_max, float t_end, float t_max
 
     rule1 = t_start_max;
     rule2 = t_end;
-    rule3 = t_end * 1.5;
-    rule4 = t_end * 2;
+    rule3 = t_end + 0.5;
+    rule4 = t_end + 1.0;
     rule5 = t_max;
 
     KALDI_LOG << "Updating endpointer delays " << rule1 << "," << rule2 << "," << rule3 << "," << rule4 << "," << rule5;
