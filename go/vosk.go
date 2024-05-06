@@ -125,6 +125,16 @@ func (r *VoskRecognizer) SetPartialWords(words int) {
 	C.vosk_recognizer_set_partial_words(r.rec, C.int(words))
 }
 
+// SetEndpointerDelays sets the recognition timeouts, where startMax
+// is the timeout for stopping recognition in case of initial silence
+// (usually around 5), end is the timeout for stopping recognition
+// in milliseconds after we recognized something (usually around 0.5-1.0),
+// and max is the timeout for forcing utterance end in milliseconds
+// (usually around 20-30).
+func (r *VoskRecognizer) SetEndpointerDelays(startMax, end, max float64) {
+	C.vosk_recognizer_set_endpointer_delays(r.rec, C.float(startMax), C.float(end), C.float(max))
+}
+
 // AcceptWaveform accepts and processes a new chunk of the voice data.
 func (r *VoskRecognizer) AcceptWaveform(buffer []byte) int {
 	cbuf := C.CBytes(buffer)
