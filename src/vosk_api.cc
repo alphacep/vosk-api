@@ -223,10 +223,8 @@ void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *
         if (!recognizer->vad->Empty()) {
             std::unique_lock<std::mutex> lock(recognizer->model->active_lock);
             SpeechSegment segment = recognizer->vad->Front();
-            if (segment.samples.size() > 1000) { // Don't process small chunks
-                recognizer->input.push(segment.samples);
-                recognizer->model->active.insert(recognizer);
-            }
+            recognizer->input.push(segment.samples);
+            recognizer->model->active.insert(recognizer);
             recognizer->vad->Pop();
         }
     }

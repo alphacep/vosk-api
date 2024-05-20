@@ -18,8 +18,8 @@ struct SileroVadModelConfig {
   // If the predicted probability of a segment is larger than this
   // value, then it is classified as speech.
 
-//  float threshold = 0.4;
-  float threshold = 0.05;
+  float threshold = 0.4; // Skips noises, but also some speech
+//  float threshold = 0.05;
 
   float min_silence_duration = 0.5;  // in seconds
   float min_speech_duration = 0.25;  // in seconds

@@ -84,6 +84,7 @@ class SileroVadModel::Impl {
     states_.push_back(std::move(c));
 
     triggered_ = false;
+    silence_repeated_ = false;
     current_sample_ = 0;
     temp_start_ = 0;
     temp_end_ = 0;
@@ -136,16 +137,16 @@ class SileroVadModel::Impl {
       // start speaking, but we require that it must satisfy
       // min_speech_duration
       temp_start_ = current_sample_;
+      silence_repeated_ = false;
       return false;
     }
 
     if (prob > threshold && temp_start_ != 0 && !triggered_) {
+      silence_repeated_ = false;
       if (current_sample_ - temp_start_ < min_speech_samples_) {
         return false;
       }
-
       triggered_ = true;
-
       return true;
     }
 
@@ -156,7 +157,13 @@ class SileroVadModel::Impl {
       }
     }
 
-    if ((prob < threshold) && !triggered_) {
+    if ((prob < threshold) && !triggered_ && !silence_repeated_) {
+      // Don't reset start immediately, wait for the next silence
+      silence_repeated_ = true;
+      return false;
+    }
+
+    if ((prob < threshold) && !triggered_ && silence_repeated_) {
       // silence
       temp_start_ = 0;
       temp_end_ = 0;
@@ -189,6 +196,7 @@ class SileroVadModel::Impl {
       temp_start_ = 0;
       temp_end_ = 0;
       triggered_ = false;
+      silence_repeated_ = false;
       return false;
     }
 
@@ -288,6 +296,7 @@ class SileroVadModel::Impl {
   int32_t min_speech_samples_;
 
   bool triggered_ = false;
+  bool silence_repeated_ = false;
   int32_t current_sample_ = 0;
   int32_t temp_start_ = 0;
   int32_t temp_end_ = 0;
