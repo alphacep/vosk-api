@@ -99,7 +99,7 @@ VOSK_HEADERS= \
 	voice-activity-detector.h \
 	vosk_api.h
 
-CFLAGS=-g -O0 -fPIC -std=c++17 \
+CFLAGS=-g -O3 -fPIC -std=c++17 \
        -I$(ONNX_ROOT)/include $(EXTRA_CFLAGS)
 
 LDFLAGS=-Wl,-rpath=$(ONNX_ROOT)/lib -L$(ONNX_ROOT)/lib -lonnxruntime 

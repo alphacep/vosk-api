@@ -78,7 +78,7 @@ void recognizer_loop(VoskModel *model)
                         }
                         added++;
                         std::vector<float> samples = recognizer->input.front();
-//                        std::cerr << "Processing chunk of " << samples.size() << " samples" << std::endl;
+                        std::cerr << "Processing chunk of " << samples.size() << " samples" << std::endl;
                         std::unique_ptr<OfflineStream> stream = model->recognizer->CreateStream();
                         stream->AcceptWaveform(16000, samples.data(), samples.size());
 
@@ -147,7 +147,7 @@ VoskModel *vosk_model_new(const char *model_path)
       config.model_config.transducer.joiner_filename = model->model_path_str + "/am-onnx/joiner.onnx";
 
       config.decoding_method = "modified_beam_search";
-      config.max_active_paths = 5;
+      config.max_active_paths = 10;
       config.feat_config.sampling_rate = 16000;
       config.feat_config.feature_dim = 80;
 
@@ -180,14 +180,13 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
 
     VadModelConfig vad_config;
     vad_config.silero_vad.model = model->model_path_str + "/vad/vad.onnx";
-    vad_config.silero_vad.min_silence_duration = 0.25;
     rec->vad = new VoiceActivityDetector(vad_config);
     rec->sample_rate = sample_rate;
     rec->model = model;
     rec->processing = 0;
     rec->resampler = new LinearResample(
         sample_rate, 16000.0f,
-        std::min(sample_rate / 2, 16000.0f / 2), 6);
+        std::min(sample_rate, 16000.0f) / 2, 16);
     return rec;
 }
 
@@ -212,7 +211,9 @@ void vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *
 void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length)
 {
     std::vector<float> resampled_data;
-    recognizer->resampler->Resample(data, length, true, &resampled_data);
+    recognizer->resampler->Resample(data, length, false, &resampled_data);
+
+//  std::vector<float> resampled_data(data, data + length);
 
     recognizer->buffer.insert(std::end(recognizer->buffer), std::begin(resampled_data), std::end(resampled_data));
 
@@ -222,8 +223,10 @@ void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *
         if (!recognizer->vad->Empty()) {
             std::unique_lock<std::mutex> lock(recognizer->model->active_lock);
             SpeechSegment segment = recognizer->vad->Front();
-            recognizer->input.push(segment.samples);
-            recognizer->model->active.insert(recognizer);
+            if (segment.samples.size() > 1000) { // Don't process small chunks
+                recognizer->input.push(segment.samples);
+                recognizer->model->active.insert(recognizer);
+            }
             recognizer->vad->Pop();
         }
     }

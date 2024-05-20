@@ -51,7 +51,7 @@ class VoiceActivityDetector::Impl {
     if (is_speech) {
       if (start_ == -1) {
         // beginning of speech
-        start_ = std::max(buffer_.Tail() - 2 * model_->WindowSize() -
+        start_ = std::max(buffer_.Tail() - 4 * model_->WindowSize() -
                               model_->MinSpeechDurationSamples(),
                           buffer_.Head());
       }
