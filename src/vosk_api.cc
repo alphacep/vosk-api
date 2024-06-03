@@ -295,6 +295,7 @@ void vosk_recognizer_reset(VoskRecognizer *recognizer)
 void vosk_recognizer_free(VoskRecognizer *recognizer)
 {
     delete recognizer->vad;
+    delete recognizer->resampler;
     delete recognizer;
 }
 

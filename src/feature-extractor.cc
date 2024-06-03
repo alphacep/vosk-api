@@ -2,7 +2,7 @@
 //
 // Copyright (c)  2023  Xiaomi Corporation
 
-#include "features.h"
+#include "feature-extractor.h"
 
 #include <algorithm>
 #include <memory>

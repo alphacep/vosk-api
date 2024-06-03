@@ -13,7 +13,7 @@ VOSK_SOURCES= \
 	context-graph.cc \
 	feature-fbank.cc \
 	feature-functions.cc \
-	features.cc \
+	feature-extractor.cc \
 	feature-window.cc \
 	fftsg.cc \
 	file-utils.cc \
@@ -57,7 +57,7 @@ VOSK_HEADERS= \
 	context-graph.h \
 	feature-fbank.h \
 	feature-functions.h \
-	features.h \
+	feature-extractor.h \
 	feature-window.h \
 	file-utils.h \
 	hypothesis.h \
