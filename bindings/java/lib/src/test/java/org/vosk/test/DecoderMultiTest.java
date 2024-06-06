@@ -1,57 +1,56 @@
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream; 
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileReader;
 
 import org.junit.Test;
 import org.junit.Assert;
 
 public class DecoderMultiTest {
 
-    private static List<InputStream> getTestFiles() {
-        List<InputStream> testFiles = new ArrayList<>(5);
-        for (int i = 0; i < 5; i++) {
-            testFiles.add(DecoderMultiTest.class.getResourceAsStream("/warm-up/" + (i + 1) + ".wav"));
+    private static ArrayList<String> getTestFiles() throws IOException {
+        ArrayList<String> testFiles = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("../../python/example/file.list"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                testFiles.add("../../python/example/" + line);
+            }
         }
         return testFiles;
     }
 
     @Test
-    public void decoderMultiTest() throws IOException, UnsupportedAudioFileException, InterruptedException {
+    public void decoderMultiTest() throws IOException, InterruptedException {
 
 //        String pathToModel = "../../python/example/vosk-model-ru-0.53-private-0.1";
         String pathToModel = "../../python/example/vosk-model-small-ru";
 
-        int nStreams = Runtime.getRuntime().availableProcessors();
+        int nStreams = 30;
+        int nAttempts = 4;
 
         Model model = new Model(pathToModel);
         ExecutorService executor = Executors.newFixedThreadPool(nStreams);
-        Map<String, AtomicInteger> results = new ConcurrentHashMap<>();
+        ArrayList<String> testFiles = getTestFiles();
 
         IntStream.range(0, nStreams).mapToObj(it -> executor.submit(() -> {
             try {
-                List<InputStream> testFiles = getTestFiles();
-                for (int i = 0; i < testFiles.size(); i++) {
-                    InputStream testFile = testFiles.get(i);
-                    String file = "/warm-up/" + (i + 1) + ".wav";
+                Random rnd = new Random();        
+                for (int j = 0; j < nAttempts; j++) {
+                    String testFile = testFiles.get(rnd.nextInt(testFiles.size()));
                     Recognizer recognizer = new Recognizer(model, 8000.0f);
-                    String result = recognize(recognizer, "rec file=" + file + " thread=" + Thread.currentThread().getName(), testFile);
-                    results.computeIfAbsent(result, (resultString) -> new AtomicInteger()).incrementAndGet();
-                }
+                    recognize(recognizer, "rec file=" + testFile + " thread=" + Thread.currentThread().getName(), testFile);
+               }
              } catch (Exception e) {
                 throw new RuntimeException(e);
                 // Do nothing
@@ -59,55 +58,30 @@ public class DecoderMultiTest {
         })).collect(Collectors.toList());
         executor.shutdown();
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        System.out.println("RESULTS:" + printMap(results));
     }
 
-    private static String recognize(Recognizer recognizer, String name, InputStream ais) throws IOException, InterruptedException {
-        try (ais) {
-            int nbytes;
-            byte[] b = new byte[4000];
-            int i = 0;
-            StringBuilder result = new StringBuilder();
-            while ((nbytes = ais.read(b)) >= 0) {
-                recognizer.acceptWaveForm(b, nbytes);    
-                while (recognizer.getNumPendingResults() > 0) {
-                    Thread.sleep(50);
-                }
-                while (!recognizer.getResultsEmpty()) {
-                    System.out.println("Result [" + name + "] [i=" + i + "] - " + recognizer.getResult());                
-                    result.append(recognizer.getResult());
-                    result.append(' ');
-                    recognizer.popResult();
-                }
-            }
-            recognizer.flush();
+    private static void recognize(Recognizer recognizer, String name, String inputFile) throws IOException, InterruptedException {
+        FileInputStream ais = new FileInputStream(inputFile);
+        int nbytes;
+        byte[] b = new byte[4000];
+        while ((nbytes = ais.read(b)) >= 0) {
+            recognizer.acceptWaveForm(b, nbytes);
             while (recognizer.getNumPendingResults() > 0) {
                 Thread.sleep(50);
             }
             while (!recognizer.getResultsEmpty()) {
-                System.out.println("Result [" + name + "] [i=" + i + "] - " + recognizer.getResult());                
-                result.append(recognizer.getResult());
-                result.append(' ');
+                System.out.println("Result [" + name + "] " + recognizer.getResult());                
                 recognizer.popResult();
             }
-
-            return result.toString();
         }
-    }
-
-    private static String printMap(Map<?, ?> map) {
-        StringBuilder sb = new StringBuilder();
-        Iterator<? extends Map.Entry<?, ?>> iter = map.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<?, ?> entry = iter.next();
-            sb.append(entry.getKey());
-            sb.append('=').append('"');
-            sb.append(entry.getValue());
-            sb.append('"');
-            if (iter.hasNext()) {
-                sb.append(',').append('\n');
-            }
+        recognizer.flush();
+        while (recognizer.getNumPendingResults() > 0) {
+            Thread.sleep(50);
         }
-        return sb.toString();
+        while (!recognizer.getResultsEmpty()) {
+            System.out.println("Result [" + name + "] " + recognizer.getResult());
+            recognizer.popResult();
+        }
+        return;
     }
 }
