@@ -76,7 +76,6 @@ void recognizer_loop(VoskModel *model)
                         if (recognizer->input.empty()) {
                             continue;
                         }
-                        added++;
                         std::vector<float> samples = recognizer->input.front();
                         std::cerr << "Processing chunk of " << samples.size() << " samples" << std::endl;
                         std::unique_ptr<OfflineStream> stream = model->recognizer->CreateStream();
@@ -97,10 +96,17 @@ void recognizer_loop(VoskModel *model)
                         p_recs.push_back(recognizer);
                         recognizer->input.pop();
                         recognizer->processing++;
+                        added++;
+
+                        if (streams.size() == BATCH_SIZE) {
+                            break;
+                        }
                     }
+                    // We haven't found anything
                     if (added == 0)
                         break;
-                    if (streams.size() > BATCH_SIZE)
+                    // Enough already
+                    if (streams.size() == BATCH_SIZE)
                         break;
                 }
             }
