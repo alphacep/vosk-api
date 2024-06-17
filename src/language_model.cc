@@ -46,9 +46,6 @@ void LanguageModelEstimator::AddCounts(const std::vector<int32> &sentence) {
 void LanguageModelEstimator::IncrementCount(const std::vector<int32> &history,
                                             int32 next_phone) {
   int32 lm_state_index = FindOrCreateLmStateIndexForHistory(history);
-  if (lm_states_[lm_state_index].tot_count == 0) {
-    num_active_lm_states_++;
-  }
   lm_states_[lm_state_index].AddCount(next_phone, 1);
 }
 
@@ -106,6 +103,7 @@ int32 LanguageModelEstimator::FindOrCreateLmStateIndexForHistory(
     int32 backoff_lm_state = FindOrCreateLmStateIndexForHistory(backoff_hist);
     lm_states_[ans].backoff_lmstate_index = backoff_lm_state;
   }
+  num_active_lm_states_++;
   return ans;
 }
 
