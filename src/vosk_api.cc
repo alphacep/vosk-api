@@ -52,7 +52,7 @@ struct VoskRecognizer {
     std::vector<float> buffer;
 };
 
-#define BATCH_SIZE 16
+#define BATCH_SIZE 32
 
 // static int allcnt;
 
@@ -60,9 +60,18 @@ void recognizer_loop(VoskModel *model)
 {
     while (model->running) {
         int size = 0;
-        std::vector<std::unique_ptr<OfflineStream>> streams;
-        std::vector<OfflineStream *> p_streams;
-        std::vector<VoskRecognizer *> p_recs;
+
+        std::vector<std::unique_ptr<OfflineStream>> streams1;
+        std::vector<OfflineStream *> p_streams1;
+        std::vector<VoskRecognizer *> p_recs1;
+
+        std::vector<std::unique_ptr<OfflineStream>> streams2;
+        std::vector<OfflineStream *> p_streams2;
+        std::vector<VoskRecognizer *> p_recs2;
+
+        std::vector<std::unique_ptr<OfflineStream>> streams3;
+        std::vector<OfflineStream *> p_streams3;
+        std::vector<VoskRecognizer *> p_recs3;
 
         {
             std::unique_lock<std::mutex> lock(model->active_lock);
@@ -91,45 +100,93 @@ void recognizer_loop(VoskModel *model)
 //                        fclose(fh);
 //                        allcnt++;
 
-                        p_streams.push_back(stream.get());
-                        streams.push_back(std::move(stream));
-                        p_recs.push_back(recognizer);
+                        if (samples.size() < 30000) {
+                            p_streams1.push_back(stream.get());
+                            streams1.push_back(std::move(stream));
+                            p_recs1.push_back(recognizer);
+                        } else if (samples.size() < 100000) {
+                            p_streams2.push_back(stream.get());
+                            streams2.push_back(std::move(stream));
+                            p_recs2.push_back(recognizer);
+                        } else {
+                            p_streams3.push_back(stream.get());
+                            streams3.push_back(std::move(stream));
+                            p_recs3.push_back(recognizer);
+                        }
+
                         recognizer->input.pop();
                         recognizer->processing++;
                         added++;
 
-                        if (streams.size() == BATCH_SIZE) {
+                        if (streams1.size() + streams2.size() + streams3.size() >= BATCH_SIZE)
                             break;
-                        }
                     }
                     // We haven't found anything
                     if (added == 0)
                         break;
                     // Enough already
-                    if (streams.size() == BATCH_SIZE)
+                    if (streams1.size() + streams2.size() + streams3.size() >= BATCH_SIZE)
                         break;
                 }
             }
         }
 
-        int batch_size = streams.size();
-        if (batch_size > 0) {
-            SHERPA_ONNX_LOGE("Running batch of %d chunks", batch_size);
-            model->recognizer->DecodeStreams(p_streams.data(), batch_size);
+        if (streams1.size() + streams2.size() + streams3.size() == 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            continue;
+        }
+
+        if (streams1.size() > 0) {
+            int batch_size = streams1.size();
+            SHERPA_ONNX_LOGE("Running 1 batch of %d chunks", batch_size);
+            model->recognizer->DecodeStreams(p_streams1.data(), batch_size);
             SHERPA_ONNX_LOGE("Done running batch of %d chunks", batch_size);
 
             std::unique_lock<std::mutex> lock(model->active_lock);
             for (int i = 0; i < batch_size; i++) {
-                p_recs[i]->results.push(std::string("{\"text\" : \"") + streams[i]->GetResult().text + "\"}");
-                streams[i].reset();
-                p_recs[i]->processing--;
-                if (p_recs[i]->input.empty() && p_recs[i]->processing == 0) {
-                    model->active.erase(p_recs[i]);
+                p_recs1[i]->results.push(std::string("{\"text\" : \"") + streams1[i]->GetResult().text + "\"}");
+                streams1[i].reset();
+                p_recs1[i]->processing--;
+                if (p_recs1[i]->input.empty() && p_recs1[i]->processing == 0) {
+                    model->active.erase(p_recs1[i]);
                 }
             }
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+
+        if (streams2.size() > 0) {
+            int batch_size = streams2.size();
+            SHERPA_ONNX_LOGE("Running 2 batch of %d chunks", batch_size);
+            model->recognizer->DecodeStreams(p_streams2.data(), batch_size);
+            SHERPA_ONNX_LOGE("Done running batch of %d chunks", batch_size);
+
+            std::unique_lock<std::mutex> lock(model->active_lock);
+            for (int i = 0; i < batch_size; i++) {
+                p_recs2[i]->results.push(std::string("{\"text\" : \"") + streams2[i]->GetResult().text + "\"}");
+                streams2[i].reset();
+                p_recs2[i]->processing--;
+                if (p_recs2[i]->input.empty() && p_recs2[i]->processing == 0) {
+                    model->active.erase(p_recs2[i]);
+                }
+            }
+        }
+
+        if (streams3.size() > 0) {
+            int batch_size = streams3.size();
+            SHERPA_ONNX_LOGE("Running 3 batch of %d chunks", batch_size);
+            model->recognizer->DecodeStreams(p_streams3.data(), batch_size);
+            SHERPA_ONNX_LOGE("Done running batch of %d chunks", batch_size);
+
+            std::unique_lock<std::mutex> lock(model->active_lock);
+            for (int i = 0; i < batch_size; i++) {
+                p_recs3[i]->results.push(std::string("{\"text\" : \"") + streams3[i]->GetResult().text + "\"}");
+                streams3[i].reset();
+                p_recs3[i]->processing--;
+                if (p_recs3[i]->input.empty() && p_recs3[i]->processing == 0) {
+                    model->active.erase(p_recs3[i]);
+                }
+            }
+        }
+
     }
 }
 
