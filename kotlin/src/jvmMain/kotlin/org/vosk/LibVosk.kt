@@ -42,14 +42,13 @@ internal object LibVosk {
 
 	@Throws(IOException::class)
 	private fun unpackDll(targetDir: File, lib: String) {
-		val source: InputStream =
-			Vosk::class.java.getResourceAsStream("/win32-x86-64/$lib.dll")!!
-
-		Files.copy(
-			source,
-			File(targetDir, "$lib.dll").toPath(),
-			StandardCopyOption.REPLACE_EXISTING
-		)
+		Vosk::class.java.getResourceAsStream("/win32-x86-64/$lib.dll")!!.use {
+			Files.copy(
+				it,
+				File(targetDir, "$lib.dll").toPath(),
+				StandardCopyOption.REPLACE_EXISTING
+			)
+		}
 	}
 
 	init {
