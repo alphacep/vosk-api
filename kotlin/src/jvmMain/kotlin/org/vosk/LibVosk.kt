@@ -57,6 +57,7 @@ internal object LibVosk {
 			Platform.isAndroid() -> {
 				Native.register(LibVosk::class.java, "vosk")
 			}
+
 			Platform.isWindows() -> {
 				// We have to unpack dependencies
 				try {
@@ -79,6 +80,7 @@ internal object LibVosk {
 					Native.register(LibVosk::class.java, "libvosk");
 				}
 			}
+
 			else -> {
 				Native.register(LibVosk::class.java, "vosk");
 			}
@@ -194,4 +196,10 @@ internal object LibVosk {
 	external fun vosk_batch_recognizer_pop(recognizer: BatchRecognizer)
 
 	external fun vosk_batch_recognizer_get_pending_chunks(recognizer: BatchRecognizer): Int
+
+	external fun vosk_text_processor_new(tagger: Char, verbalizer: Char): Pointer
+
+	external fun vosk_text_processor_free(processor: TextProcessor)
+
+	external fun vosk_text_processor_itn(processor: TextProcessor, input: Char): Char
 }
