@@ -151,6 +151,7 @@ expect class Recognizer : Freeable {
 	 *     }],
 	 * </pre>
 	 *
+	 * C equivalent = vosk_recognizer_set_words
 	 * @param words - boolean value
 	 */
 	fun setOutputWordTimes(words: Boolean)
@@ -167,6 +168,23 @@ expect class Recognizer : Freeable {
 	 * @param nlsml - boolean value
 	 */
 	fun setNLSML(nlsml: Boolean)
+
+
+	/**
+	 * Set endpointer scaling factor
+	 *
+	 * @param mode Endpointer mode
+	 **/
+	fun setEndPointerMode(mode: EndPointerMode)
+
+	/**
+	 * Set endpointer delays
+	 *
+	 * @param tStartMax timeout for stopping recognition in case of initial silence (usually around 5.0)
+	 * @param tEnd      timeout for stopping recognition in milliseconds after we recognized something (usually around 0.5 - 1.0)
+	 * @param tMax      timeout for forcing utterance end in milliseconds (usually around 20-30)
+	 **/
+	fun setEndPointerDelays(tStartMax: Float, tEnd: Float, tMax: Float)
 
 	/**
 	 * Accept voice data

@@ -202,4 +202,13 @@ internal object LibVosk {
 	external fun vosk_text_processor_free(processor: TextProcessor)
 
 	external fun vosk_text_processor_itn(processor: TextProcessor, input: Char): Char
+
+	external fun vosk_recognizer_set_endpointer_mode(recognizer: Recognizer, ordinal: Int)
+
+	external fun vosk_recognizer_set_endpointer_delays(
+		recognizer: Recognizer,
+		tStartMax: Float,
+		tEnd: Float,
+		tMax: Float
+	)
 }
