@@ -1,5 +1,6 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.config.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 /*
  * Copyright 2020 Alpha Cephei Inc. & Doomsdayrs
@@ -18,11 +19,11 @@ import org.jetbrains.kotlin.config.JvmTarget
  */
 
 plugins {
-	kotlin("multiplatform") version "1.8.10"
+	kotlin("multiplatform") version "2.0.0"
 	id("com.android.library")
 	`maven-publish`
-	id("org.jetbrains.dokka") version "1.7.20"
-	kotlin("plugin.serialization") version "1.8.10"
+	id("org.jetbrains.dokka") version "1.9.20"
+	kotlin("plugin.serialization") version "2.0.0"
 }
 
 group = "com.alphacephei"
@@ -67,9 +68,11 @@ fun org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.native(
 
 kotlin {
 	jvm {
-		compilations.all {
-			kotlinOptions.jvmTarget = JvmTarget.JVM_11.description
+		@OptIn(ExperimentalKotlinGradlePluginApi::class)
+		compilerOptions {
+			jvmTarget.set(JvmTarget.JVM_17)
 		}
+
 		testRuns["test"].executionTask.configure {
 			useJUnitPlatform()
 			environment("MODEL", "VOSK_MODEL")
@@ -80,7 +83,7 @@ kotlin {
 		}
 	}
 
-	android {
+	androidTarget {
 		publishAllLibraryVariants()
 	}
 
@@ -101,6 +104,16 @@ kotlin {
 				sharedLib()
 			}
 		}
+
+
+	@OptIn(ExperimentalKotlinGradlePluginApi::class)
+	applyDefaultHierarchyTemplate {
+		withJvm()
+		withAndroidTarget()
+
+		if (enableNative)
+			withNative()
+	}
 
 	publishing {
 		publications {
@@ -130,13 +143,13 @@ kotlin {
 		}
 	}
 
-	val jna_version = "5.13.0"
-	val coroutines_version = "1.6.4"
+	val jna_version = "5.14.0"
+	val coroutines_version = "1.7.3"
 
 	sourceSets {
 		val commonMain by getting {
 			dependencies {
-				api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+				api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")
 				api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
 			}
 		}
@@ -161,7 +174,7 @@ kotlin {
 				api("net.java.dev.jna:jna:$jna_version@aar")
 			}
 		}
-		val androidTest by getting {
+		val androidUnitTest by getting {
 			dependencies {
 				implementation("junit:junit:4.13.2")
 			}
@@ -170,15 +183,16 @@ kotlin {
 }
 
 android {
-	compileSdk = 33
+	namespace = "com.alphacephei.library"
+	compileSdk = 34
 	sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 	defaultConfig {
 		minSdk = 24
-		targetSdk = 33
+		targetSdk = 34
 	}
 	compileOptions {
-		sourceCompatibility = JavaVersion.VERSION_11
-		targetCompatibility = JavaVersion.VERSION_11
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
 	}
 	publishing {
 		multipleVariants {

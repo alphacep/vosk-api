@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Alpha Cephei Inc.
+ * Copyright 2024 Alpha Cephei Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package org.vosk.exception
+package org.vosk
 
 /**
- * Internal common IO exception. On JVM this is just a type alias.
+ * Inverse text normalization
+ *
+ * @since 2024/06/19
+ * @constructor Create text processor
  */
-expect open class IOException(message: String?) : Exception
+expect class TextProcessor constructor(tagger: Char, verbalizer: Char) : Freeable {
+
+	/** Release text processor */
+	override fun free()
+
+	/** Convert string */
+	fun itn(input: Char): Char
+}

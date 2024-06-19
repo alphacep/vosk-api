@@ -327,4 +327,27 @@ actual class Recognizer : Freeable, PointerType, AutoCloseable {
 		free()
 	}
 
+	/**
+	 * Set endpointer scaling factor
+	 *
+	 * @param mode Endpointer mode
+	 **/
+	actual fun setEndPointerMode(mode: EndPointerMode) {
+		LibVosk.vosk_recognizer_set_endpointer_mode(this, mode.ordinal)
+	}
+
+	/**
+	 * Set endpointer delays
+	 *
+	 * @param tStartMax timeout for stopping recognition in case of initial silence (usually around 5.0)
+	 * @param tEnd      timeout for stopping recognition in milliseconds after we recognized something (usually around 0.5 - 1.0)
+	 * @param tMax      timeout for forcing utterance end in milliseconds (usually around 20-30)
+	 **/
+	actual fun setEndPointerDelays(
+		tStartMax: Float,
+		tEnd: Float,
+		tMax: Float
+	) {
+		LibVosk.vosk_recognizer_set_endpointer_delays(this, tStartMax, tEnd, tMax)
+	}
 }
