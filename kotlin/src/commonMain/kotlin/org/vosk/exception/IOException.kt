@@ -19,4 +19,4 @@ package org.vosk.exception
 /**
  * Internal common IO exception. On JVM this is just a type alias.
  */
-expect open class IOException(message: String? = null) : Exception
+expect open class IOException(message: String?) : Exception
