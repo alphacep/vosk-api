@@ -19,8 +19,12 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder.AudioSource
-import android.os.Handler
-import android.os.Looper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.vosk.Recognizer
 import java.io.IOException
 import kotlin.math.roundToInt
@@ -37,8 +41,13 @@ class SpeechService @Throws(IOException::class) constructor(
 	private val sampleRate: Int
 	private val bufferSize: Int
 	private val recorder: AudioRecord
-	private var recognizerThread: RecognizerThread? = null
-	private val mainHandler = Handler(Looper.getMainLooper())
+
+	private val scope = CoroutineScope(Dispatchers.IO)
+	private var recognizerThread: Job? = null
+
+	private var paused = false
+	private var reset = false
+	private var interrupt = false
 
 	/**
 	 * Creates speech service. Service holds the AudioRecord object, so you
@@ -70,8 +79,7 @@ class SpeechService @Throws(IOException::class) constructor(
 	 */
 	fun startListening(listener: RecognitionListener): Boolean {
 		if (null != recognizerThread) return false
-		recognizerThread = RecognizerThread(listener)
-		recognizerThread!!.start()
+		recognizerThread = scope.launch { startRecognizer(listener) }
 		return true
 	}
 
@@ -86,21 +94,21 @@ class SpeechService @Throws(IOException::class) constructor(
 	 */
 	fun startListening(listener: RecognitionListener, timeout: Int): Boolean {
 		if (null != recognizerThread) return false
-		recognizerThread = RecognizerThread(listener, timeout)
-		recognizerThread!!.start()
+		recognizerThread = scope.launch { startRecognizer(listener, timeout) }
 		return true
 	}
 
-	private fun stopRecognizerThread(): Boolean {
+	private suspend fun stopRecognizerThread(): Boolean {
 		if (null == recognizerThread) return false
 		try {
-			recognizerThread!!.interrupt()
+			interrupt = true
 			recognizerThread!!.join()
 		} catch (e: InterruptedException) {
 			// Restore the interrupted status.
 			Thread.currentThread().interrupt()
 		}
 		recognizerThread = null
+		interrupt = false
 		return true
 	}
 
@@ -111,7 +119,7 @@ class SpeechService @Throws(IOException::class) constructor(
 	 * @return true if recognition was actually stopped
 	 */
 	fun stop(): Boolean {
-		return stopRecognizerThread()
+		return runBlocking { stopRecognizerThread() }
 	}
 
 	/**
@@ -121,10 +129,8 @@ class SpeechService @Throws(IOException::class) constructor(
 	 * @return true if recognition was actually stopped
 	 */
 	fun cancel(): Boolean {
-		if (recognizerThread != null) {
-			recognizerThread!!.setPause(true)
-		}
-		return stopRecognizerThread()
+		paused = true
+		return runBlocking { stopRecognizerThread() }
 	}
 
 	/**
@@ -135,101 +141,72 @@ class SpeechService @Throws(IOException::class) constructor(
 	}
 
 	fun setPause(paused: Boolean) {
-		if (recognizerThread != null) {
-			recognizerThread!!.setPause(paused)
-		}
+		this.paused = paused
 	}
 
 	/**
 	 * Resets recognizer in a thread, starts recognition over again
 	 */
 	fun reset() {
-		if (recognizerThread != null) {
-			recognizerThread!!.reset()
-		}
+		reset = true
 	}
 
-	private inner class RecognizerThread @JvmOverloads constructor(
-		var listener: RecognitionListener,
-		timeout: Int = Companion.NO_TIMEOUT
-	) : Thread() {
-		private var remainingSamples: Int
-		private val timeoutSamples: Int
+	private suspend fun startRecognizer(
+		listener: RecognitionListener,
+		timeout: Int = NO_TIMEOUT
+	) {
+		var remainingSamples: Int
 
-		@Volatile
-		private var paused = false
-
-		@Volatile
-		private var reset = false
-
-		init {
-			timeoutSamples = if (timeout != Companion.NO_TIMEOUT) {
-				timeout * sampleRate / 1000
-			} else {
-				Companion.NO_TIMEOUT
-			}
-			remainingSamples = timeoutSamples
+		val timeoutSamples: Int = if (timeout != NO_TIMEOUT) {
+			timeout * sampleRate / 1000
+		} else {
+			NO_TIMEOUT
 		}
 
-		/**
-		 * When we are paused, don't process audio by the recognizer and don't emit
-		 * any listener results
-		 *
-		 * @param paused the status of pause
-		 */
-		fun setPause(paused: Boolean) {
-			this.paused = paused
-		}
+		remainingSamples = timeoutSamples
 
-		/**
-		 * Set reset state to signal reset of the recognizer and start over
-		 */
-		fun reset() {
-			reset = true
-		}
-
-		override fun run() {
-			recorder.startRecording()
-			if (recorder.recordingState == AudioRecord.RECORDSTATE_STOPPED) {
-				recorder.stop()
-				val ioe = IOException(
-					"Failed to start recording. Microphone might be already in use."
-				)
-				mainHandler.post { listener.onError(ioe) }
-			}
-			val buffer = ShortArray(bufferSize)
-			while (!interrupted()
-				&& (timeoutSamples == Companion.NO_TIMEOUT || remainingSamples > 0)
-			) {
-				val nread = recorder.read(buffer, 0, buffer.size)
-				if (paused) {
-					continue
-				}
-				if (reset) {
-					recognizer.reset()
-					reset = false
-				}
-				if (nread < 0) throw RuntimeException("error reading audio buffer")
-				if (recognizer.acceptWaveform(buffer)) {
-					val result = recognizer.result
-					mainHandler.post { listener.onResult(result) }
-				} else {
-					val partialResult = recognizer.partialResult
-					mainHandler.post { listener.onPartialResult(partialResult) }
-				}
-				if (timeoutSamples != NO_TIMEOUT) {
-					remainingSamples -= nread
-				}
-			}
+		recorder.startRecording()
+		if (recorder.recordingState == AudioRecord.RECORDSTATE_STOPPED) {
 			recorder.stop()
-			if (!paused) {
-				// If we met timeout signal that speech ended
-				if (timeoutSamples != NO_TIMEOUT && remainingSamples <= 0) {
-					mainHandler.post { listener.onTimeout() }
-				} else {
-					val finalResult = recognizer.finalResult
-					mainHandler.post { listener.onFinalResult(finalResult) }
-				}
+			val ioe = IOException(
+				"Failed to start recording. Microphone might be already in use."
+			)
+			withContext(Dispatchers.Main) { listener.onError(ioe) }
+		}
+		val buffer = ShortArray(bufferSize)
+		while (!interrupt
+			&& (timeoutSamples == NO_TIMEOUT || remainingSamples > 0)
+		) {
+			val nread = recorder.read(buffer, 0, buffer.size)
+			if (paused) {
+				continue
+			}
+			if (reset) {
+				recognizer.reset()
+				reset = false
+			}
+			if (nread < 0) throw RuntimeException("error reading audio buffer")
+			if (recognizer.acceptWaveform(buffer)) {
+				val result = recognizer.result
+				withContext(Dispatchers.Main) { listener.onResult(result) }
+			} else {
+				val partialResult = recognizer.partialResult
+				withContext(Dispatchers.Main) { listener.onPartialResult(partialResult) }
+			}
+			if (timeoutSamples != NO_TIMEOUT) {
+				remainingSamples -= nread
+			}
+		}
+
+		recorder.stop()
+
+		if (!paused) {
+			// If we met timeout signal that speech ended
+			if (timeoutSamples != NO_TIMEOUT && remainingSamples <= 0) {
+				withContext(Dispatchers.Main) { listener.onTimeout() }
+			} else {
+				val finalResult = recognizer.finalResult
+				withContext(Dispatchers.Main) { listener.onFinalResult(finalResult) }
 			}
 		}
 	}
