@@ -27,6 +27,8 @@ BatchRecognizer::BatchRecognizer(BatchModel *model, float
     resampler_ = new LinearResample(
         sample_frequency, 16000.0f,
         std::min(sample_frequency / 2, 16000.0f / 2), 6);
+
+    partial_result_ = "{\n  \"partial\" : \"\"\n}";
 }
 
 BatchRecognizer::~BatchRecognizer() {
@@ -114,27 +116,38 @@ void BatchRecognizer::SetNLSML(bool nlsml)
 
 void BatchRecognizer::AcceptWaveform(const char *data, int len)
 {
+    #define KALDI_BESTPATH_LOGS_ON 0
+
     uint64_t id = id_;
     if (!callbacks_set_) {
-        // Define the callback for results.
-#if 0
-         model_->cuda_pipeline_->SetBestPathCallback(
+        // Define the callbacks for results.
+        model_->cuda_pipeline_->SetBestPathCallback(
           id,
           [&, id](const std::string &str, bool partial,
-                       bool endpoint_detected) {
+                  bool endpoint_detected) {
               if (partial) {
-                  KALDI_LOG << "id #" << id << " [partial] : " << str << ":";
+                  #if KALDI_BESTPATH_LOGS_ON
+                      KALDI_LOG << "id #" << id << " [partial] : " << str << ":";
+                  #endif
+                  partial_result_ = "{\n  \"partial\" : \"" + str + "\"\n}"; // json-like partial result format
               }
 
               if (endpoint_detected) {
-                  KALDI_LOG << "id #" << id << " [endpoint detected]";
+                  #if KALDI_BESTPATH_LOGS_ON
+                      KALDI_LOG << "id #" << id << " [endpoint detected]";
+                  #endif
+                  if(!partial) {
+                      partial_result_ = "{\n  \"partial\" : \"\"\n}"; // clear partial result
+                  }
               }
 
               if (!partial) {
-                  KALDI_LOG << "id #" << id << " : " << str;
+                  #if KALDI_BESTPATH_LOGS_ON
+                      KALDI_LOG << "id #" << id << " : " << str;
+                  #endif
               }
-            });
-#endif
+          });
+
         model_->cuda_pipeline_->SetLatticeCallback(
           id,
           [&, id](SegmentedLatticeCallbackParams& params) {
@@ -186,6 +199,11 @@ const char* BatchRecognizer::FrontResult()
         return "";
     }
     return results_.front().c_str();
+}
+
+const char *BatchRecognizer::PartialResult()
+{
+    return partial_result_.c_str();
 }
 
 void BatchRecognizer::Pop()

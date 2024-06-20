@@ -1,7 +1,10 @@
 CFLAGS=-I../src
 LDFLAGS=-L../src -lvosk -ldl -lpthread -Wl,-rpath,../src
 
-all: test_vosk test_vosk_speaker
+all: test_vosk_gpu_batch test_vosk test_vosk_speaker
+
+test_vosk_gpu_batch: test_vosk_gpu_batch.o
+	gcc $^ -o $@ $(LDFLAGS)
 
 test_vosk: test_vosk.o
 	gcc $^ -o $@ $(LDFLAGS)
@@ -13,4 +16,4 @@ test_vosk_speaker: test_vosk_speaker.o
 	gcc $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o *.a test_vosk test_vosk_speaker
+	rm -f *.o *.a test_vosk_gpu_batch test_vosk test_vosk_speaker
