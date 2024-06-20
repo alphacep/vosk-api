@@ -159,7 +159,15 @@ kotlin {
 				implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version")
 			}
 		}
+		val commonJVM = create("commonJVM") {
+			dependsOn(commonMain)
+			dependencies {
+				compileOnly("net.java.dev.jna:jna:$jna_version")
+			}
+		}
+
 		val jvmMain by getting {
+			dependsOn(commonJVM)
 			dependencies {
 				api("net.java.dev.jna:jna:$jna_version")
 			}
@@ -169,7 +177,7 @@ kotlin {
 			val nativeMain by getting
 		}
 		val androidMain by getting {
-			dependsOn(jvmMain)
+			dependsOn(commonJVM)
 			dependencies {
 				api("net.java.dev.jna:jna:$jna_version@aar")
 			}
