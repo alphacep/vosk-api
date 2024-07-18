@@ -152,7 +152,7 @@ class SileroVadModel::Impl {
 
     // Avoid too long utterances
     if (prob > threshold && temp_start_ != 0 && triggered_) {
-      if (current_sample_ - temp_start_ > 16000 * 20) {
+      if (current_sample_ - temp_start_ > 16000 * 19) {
         return false;
       }
     }
