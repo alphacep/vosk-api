@@ -86,7 +86,7 @@ void recognizer_loop(VoskModel *model)
                             continue;
                         }
                         std::vector<float> samples = recognizer->input.front();
-                        std::cerr << "Processing chunk of " << samples.size() << " samples" << std::endl;
+                        SHERPA_ONNX_LOGE("Processing chunk of %d samples", samples.size());
                         std::unique_ptr<OfflineStream> stream = model->recognizer->CreateStream();
                         stream->AcceptWaveform(16000, samples.data(), samples.size());
 
@@ -100,6 +100,12 @@ void recognizer_loop(VoskModel *model)
 //                        fclose(fh);
 //                        allcnt++;
 
+
+#ifdef USE_ONE_QUEUE
+                        p_streams1.push_back(stream.get());
+                        streams1.push_back(std::move(stream));
+                        p_recs1.push_back(recognizer);
+#else
                         if (samples.size() < 30000) {
                             p_streams1.push_back(stream.get());
                             streams1.push_back(std::move(stream));
@@ -113,7 +119,7 @@ void recognizer_loop(VoskModel *model)
                             streams3.push_back(std::move(stream));
                             p_recs3.push_back(recognizer);
                         }
-
+#endif
                         recognizer->input.pop();
                         recognizer->processing++;
                         added++;
@@ -199,7 +205,7 @@ VoskModel *vosk_model_new(const char *model_path)
       OfflineRecognizerConfig config;
 
       config.model_config.debug = 0;
-      config.model_config.num_threads = 16;
+      config.model_config.num_threads = 4;
       config.model_config.provider = "cpu";
       config.model_config.model_type = "transducer";
 
@@ -353,6 +359,39 @@ int vosk_recognizer_results_empty(VoskRecognizer *recognizer)
 void vosk_recognizer_reset(VoskRecognizer *recognizer)
 {
     // Nothing here for now
+}
+
+void vosk_recognizer_set_endpointer_mode(VoskRecognizer *recognizer,  VoskEndpointerMode mode)
+{
+    float t_start_max, t_end, t_max;
+
+    switch(mode) {
+        case VOSK_EP_ANSWER_DEFAULT:
+           t_start_max = 5.0;
+           t_end = 0.5;
+           t_max = 19.0;
+        case VOSK_EP_ANSWER_SHORT:
+           t_start_max = 5.0;
+           t_end = 0.3;
+           t_max = 10.0;
+           break;
+        case VOSK_EP_ANSWER_LONG:
+           t_start_max = 10.0;
+           t_end = 2.0;
+           t_max = 19.0;
+           break;
+        case VOSK_EP_ANSWER_VERY_LONG:
+           t_start_max = 10.0;
+           t_end = 3.0;
+           t_max = 19.0;
+           break;
+    }
+    vosk_recognizer_set_endpointer_delays(recognizer, t_start_max, t_end, t_max);
+}
+
+void vosk_recognizer_set_endpointer_delays(VoskRecognizer *recognizer, float t_start_max, float t_end, float t_max)
+{
+    recognizer->vad->SetEndpointerDelays(t_start_max, t_end, t_max);
 }
 
 void vosk_recognizer_free(VoskRecognizer *recognizer)

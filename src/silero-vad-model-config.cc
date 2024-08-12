@@ -73,6 +73,7 @@ std::string SileroVadModelConfig::ToString() const {
   os << "threshold=" << threshold << ", ";
   os << "min_silence_duration=" << min_silence_duration << ", ";
   os << "min_speech_duration=" << min_speech_duration << ", ";
+  os << "max_duration=" << max_duration << ", ";
   os << "window_size=" << window_size << ")";
 
   return os.str();

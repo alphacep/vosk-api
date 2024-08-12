@@ -44,6 +44,8 @@ class VoiceActivityDetector {
 
   void Reset();
 
+  void SetEndpointerDelays(float t_start_max, float t_end, float t_max);
+
  private:
   class Impl;
   std::unique_ptr<Impl> impl_;

@@ -123,6 +123,8 @@ class VoiceActivityDetector::Impl {
 
   bool IsSpeechDetected() const { return start_ != -1; }
 
+  void SetEndpointerDelays(float t_start_max, float t_end, float t_max) { model_->SetEndpointerDelays(t_start_max, t_end, t_max); }
+
  private:
   std::queue<SpeechSegment> segments_;
 
@@ -164,6 +166,8 @@ const SpeechSegment &VoiceActivityDetector::Front() const {
 }
 
 void VoiceActivityDetector::Reset() { impl_->Reset(); }
+
+void VoiceActivityDetector::SetEndpointerDelays(float t_start_max, float t_end, float t_max) { impl_->SetEndpointerDelays(t_start_max, t_end, t_max); }
 
 bool VoiceActivityDetector::IsSpeechDetected() const {
   return impl_->IsSpeechDetected();

@@ -42,6 +42,8 @@ class SileroVadModel : public VadModel {
   int32_t MinSilenceDurationSamples() const override;
   int32_t MinSpeechDurationSamples() const override;
 
+  void SetEndpointerDelays(float t_start_max, float t_end, float t_max) const override;
+
  private:
   class Impl;
   std::unique_ptr<Impl> impl_;

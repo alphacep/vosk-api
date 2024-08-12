@@ -24,6 +24,7 @@ struct SileroVadModelConfig {
 
   float min_silence_duration = 0.5;  // in seconds
   float min_speech_duration = 0.25;  // in seconds
+  float max_duration = 19.0; // in seconds
 
   // 512, 1024, 1536 samples for 16000 Hz
   // 256, 512, 768 samples for 800 Hz

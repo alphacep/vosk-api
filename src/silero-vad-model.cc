@@ -37,6 +37,7 @@ class SileroVadModel::Impl {
         sample_rate_ * config_.silero_vad.min_silence_duration;
 
     min_speech_samples_ = sample_rate_ * config_.silero_vad.min_speech_duration;
+    max_samples_ = sample_rate_ * config_.silero_vad.max_duration;
   }
 
 #if __ANDROID_API__ >= 9
@@ -59,6 +60,8 @@ class SileroVadModel::Impl {
         sample_rate_ * config_.silero_vad.min_silence_duration;
 
     min_speech_samples_ = sample_rate_ * config_.silero_vad.min_speech_duration;
+
+    max_samples_ = sample_rate_ * config_.silero_vad.max_duration;
   }
 #endif
 
@@ -152,7 +155,7 @@ class SileroVadModel::Impl {
 
     // Avoid too long utterances
     if (prob > threshold && temp_start_ != 0 && triggered_) {
-      if (current_sample_ - temp_start_ > 16000 * 19) {
+      if (current_sample_ - temp_start_ > max_samples_) {
         return false;
       }
     }
@@ -208,6 +211,11 @@ class SileroVadModel::Impl {
   int32_t MinSilenceDurationSamples() const { return min_silence_samples_; }
 
   int32_t MinSpeechDurationSamples() const { return min_speech_samples_; }
+
+  void SetEndpointerDelays(float t_start_max, float t_end, float t_max) { 
+    min_silence_samples_ = sample_rate_ * t_end;
+    max_samples_ = sample_rate_ * t_max;
+  }
 
  private:
   void Init(void *model_data, size_t model_data_length) {
@@ -294,6 +302,7 @@ class SileroVadModel::Impl {
   int64_t sample_rate_;
   int32_t min_silence_samples_;
   int32_t min_speech_samples_;
+  int32_t max_samples_;
 
   bool triggered_ = false;
   bool silence_repeated_ = false;
@@ -326,6 +335,10 @@ int32_t SileroVadModel::MinSilenceDurationSamples() const {
 
 int32_t SileroVadModel::MinSpeechDurationSamples() const {
   return impl_->MinSpeechDurationSamples();
+}
+
+void SileroVadModel::SetEndpointerDelays(float t_start_max, float t_end, float t_max) const {
+  impl_->SetEndpointerDelays(t_start_max, t_end, t_max); 
 }
 
 }  // namespace sherpa_onnx

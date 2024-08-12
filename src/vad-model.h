@@ -42,6 +42,8 @@ class VadModel {
 
   virtual int32_t MinSilenceDurationSamples() const = 0;
   virtual int32_t MinSpeechDurationSamples() const = 0;
+
+  virtual void SetEndpointerDelays(float t_start_max, float t_end, float t_max) const = 0;
 };
 
 }  // namespace sherpa_onnx
