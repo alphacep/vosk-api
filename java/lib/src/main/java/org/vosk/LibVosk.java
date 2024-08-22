@@ -84,6 +84,12 @@ public class LibVosk {
 
     public static native void vosk_recognizer_free(Pointer recognizer);
 
+    public static native Pointer vosk_text_processor_new(String verbalizer, String tagger);
+
+    public static native void vosk_text_processor_free(Pointer processor);
+
+    public static native String vosk_text_processor_itn(Pointer processor, String input);
+
     /**
      * Set log level for Kaldi messages.
      *

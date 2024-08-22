@@ -17,6 +17,7 @@ import org.vosk.LogLevel;
 import org.vosk.Recognizer;
 import org.vosk.LibVosk;
 import org.vosk.Model;
+import org.vosk.TextProcessor;
 
 public class DecoderTest {
 
@@ -99,5 +100,11 @@ public class DecoderTest {
     @Test(expected = IOException.class)
     public void decoderTestException() throws IOException {
         Model model = new Model("model_missing");
+    }
+
+    @Test
+    public void testItn() throws IOException {
+        TextProcessor p = new TextProcessor("model/itn/en_itn_tagger.fst", "model/itn/en_itn_verbalizer.fst");
+        System.out.println(p.itn("as easy as one two three"));
     }
 }
