@@ -1,0 +1,70 @@
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y --no-install-recommends \
+        ca-certificates \
+        g++ \
+        bzip2 \
+        unzip \
+        make \
+        wget \
+        git \
+        python3 \
+        python3-pip \
+        python3-wheel \
+        python3-setuptools \
+        python3-cffi \
+        zlib1g-dev \
+        patch \
+        cmake \
+        xz-utils \
+        automake \
+        autoconf \
+        libtool \
+        pkg-config \
+        sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cd /opt && \
+    wget https://github.com/mstorsjo/llvm-mingw/releases/download/20240820/llvm-mingw-20240820-msvcrt-ubuntu-20.04-x86_64.tar.xz \
+    && tar xf llvm-mingw-20240820-msvcrt-ubuntu-20.04-x86_64.tar.xz \
+    && mv llvm-mingw-20240820-msvcrt-ubuntu-20.04-x86_64 llvm-mingw
+
+ENV PATH="$PATH:/opt/llvm-mingw/bin"
+
+RUN mkdir /opt/kaldi \
+    && git clone https://github.com/alphacep/openfst \
+    && cd openfst \
+    && autoreconf -i \
+    && CXX=aarch64-w64-mingw32-g++ CXXFLAGS="-O3 -ftree-vectorize -DFST_NO_DYNAMIC_LINKING" \
+        ./configure --prefix=/opt/kaldi/local \
+        --enable-shared --enable-static --with-pic --disable-bin \
+        --enable-lookahead-fsts --enable-ngram-fsts --host=aarch64-w64-mingw32 \
+    && make -j $(nproc) \
+    && make install
+
+RUN cd /opt/kaldi \
+    && git clone -b v0.3.20 --single-branch https://github.com/xianyi/OpenBLAS \
+    && cd OpenBLAS \
+    && make HOSTCC=gcc CC=aarch64-w64-mingw32-gcc ONLY_CBLAS=1 USE_LOCKING=1 USE_THREAD=0 USE_OPENMP=0 DYNAMIC_ARCH=0 TARGET=ARMV8 ARCH=arm64 BINARY=64 -j $(nproc) \
+    && make PREFIX=/opt/kaldi/local install
+
+RUN cd /opt/kaldi \
+    && git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack \
+    && mkdir clapack/BUILD \
+    && cd clapack/BUILD \
+    && cmake -DCMAKE_C_COMPILER_TARGET=aarch64-w64-mingw32 -DCMAKE_C_COMPILER=aarch64-w64-mingw32-gcc -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_CROSSCOMPILING=True .. \
+    && make -C F2CLIBS/libf2c \
+    && make -C BLAS \
+    && make -C SRC \
+    && find . -name *.a -exec cp {} /opt/kaldi/local/lib \;
+
+RUN cd /opt/kaldi \
+    && git clone -b vosk-android --single-branch https://github.com/alphacep/kaldi \
+    && cd kaldi/src \
+    && CXX=aarch64-w64-mingw32-g++ CXXFLAGS="-O3 -ftree-vectorize -DFST_NO_DYNAMIC_LINKING" ./configure --shared --mingw=yes --use-cuda=no \
+        --mathlib=OPENBLAS_CLAPACK \
+        --host=aarch64-w64-mingw32 --openblas-clapack-root=/opt/kaldi/local \
+        --fst-root=/opt/kaldi/local --fst-version=1.8.0 \
+    && make depend -j \
+    && make LLVM_BUILD=1 -j $(nproc) online2 rnnlm
