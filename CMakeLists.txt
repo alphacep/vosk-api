@@ -10,6 +10,7 @@ add_library(vosk
   src/recognizer.cc
   src/spk_model.cc
   src/vosk_api.cc
+  src/postprocessor.cc
 )
 
 find_package(kaldi REQUIRED)
