@@ -22,6 +22,7 @@ import android.os.Looper;
 import android.annotation.SuppressLint;
 
 import org.vosk.Recognizer;
+import org.vosk.LibVosk;
 import java.io.IOException;
 
 /**
@@ -141,6 +142,9 @@ public class SpeechService {
      * Shutdown the recognizer and release the recorder
      */
     public void shutdown() {
+        if (recognizer != null) {
+            LibVosk.vosk_recognizer_free(recognizer.getPointer())
+        }
         recorder.release();
     }
 
