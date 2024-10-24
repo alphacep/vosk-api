@@ -698,6 +698,17 @@ const char *Recognizer::NbestResult(CompactLattice &clat)
       obj["alternatives"].append(entry);
     }
 
+    if (spk_model_) {
+        Vector<BaseFloat> xvector;
+        int num_spk_frames;
+        if (GetSpkVector(xvector, &num_spk_frames)) {
+            for (int i = 0; i < xvector.Dim(); i++) {
+                obj["spk"].append(xvector(i));
+            }
+            obj["spk_frames"] = num_spk_frames;
+        }
+    }
+
     return StoreReturn(obj.dump());
 }
 
