@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NUM_THREADS 50
+#define NUM_THREADS 10
+#define NUM_FILES_PER_THREAD 3
 #define NUM_FILES 400
 #define MAX_FILE 100
 
@@ -17,7 +18,7 @@ pthread_t thread_ids[NUM_THREADS];
 static void *worker(void *data) {
     int j;
 
-    for (j = 0; j < 30; j++) {
+    for (j = 0; j < NUM_FILES_PER_THREAD; j++) {
         FILE *wavin;
         char buf[4000];
         int nread;

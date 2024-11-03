@@ -156,6 +156,11 @@ class SileroVadModel::Impl {
     // Avoid too long utterances
     if (prob > threshold && temp_start_ != 0 && triggered_) {
       if (current_sample_ - temp_start_ > max_samples_) {
+        // force stop speaking
+        temp_start_ = 0;
+        temp_end_ = 0;
+        triggered_ = false;
+        silence_repeated_ = false;
         return false;
       }
     }
