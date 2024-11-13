@@ -69,16 +69,18 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
 let soname;
 if (os.platform() == 'win32') {
-    // Update path to load dependent dlls
-    let currentPath = process.env.Path;
-    let dllDirectory = path.resolve(path.join(__dirname, "lib", "win-x86_64"));
-    process.env.Path = dllDirectory + path.delimiter + currentPath;
+	// Update path to load dependent dlls
+	let currentPath = process.env.Path;
+	let dllDirectory = path.resolve(path.join(__dirname, 'lib', 'win-x86_64'));
+	process.env.Path = dllDirectory + path.delimiter + currentPath;
 
-    soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
+	soname = path.join(__dirname, 'lib', 'win-x86_64', 'libvosk.dll');
 } else if (os.platform() == 'darwin') {
-    soname = path.join(__dirname, "lib", "osx-universal", "libvosk.dylib")
+	soname = path.join(__dirname, 'lib', 'osx-universal', 'libvosk.dylib');
+} else if (os.platform() == 'linux' && os.arch() == 'arm64') {
+	soname = path.join(__dirname, 'lib', 'linux-arm64', 'libvosk.so');
 } else {
-    soname = path.join(__dirname, "lib", "linux-x86_64", "libvosk.so")
+	soname = path.join(__dirname, 'lib', 'linux-x86_64', 'libvosk.so');
 }
 
 const libvosk = ffi.Library(soname, {
