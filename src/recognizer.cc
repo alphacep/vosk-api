@@ -855,7 +855,7 @@ const char* Recognizer::PartialResult()
 
         clat = decoder_->GetLattice(decoder_->NumFramesInLattice(), false);
         if (model_->winfo_) {
-            WordAlignLatticePartial(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
+            WordAlignLattice(clat, *model_->trans_model_, *model_->winfo_, 0, &aligned_lat);
         } else {
             CopyLatticeForMbr(clat, &aligned_lat);
         }
