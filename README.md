@@ -28,7 +28,7 @@ In order to build it on Fedora 41 using the libraries that are provided by the d
 then build the package as follows:
 
 ```
-cmake -S ./ -Bbuild/Release -DBuildForFedora=ON
+cmake -S ./ -Bbuild/Release -DBuildForFedora=ON -DBUILD_SHARED_LIBS=ON
 cmake --build ./build/Release
 ```
 
