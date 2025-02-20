@@ -3,6 +3,12 @@
 require_relative 'vosk/version'
 require 'ffi'
 require 'httparty'
+# gem 'progressbar'
+require 'progressbar'
+require 'bytesize'
+# gem 'rubyzip', '~> 2.4', '>= 2.4.1'
+require 'zip'
+require 'fileutils'
 
 module Vosk
   class Error < StandardError; end
@@ -31,7 +37,14 @@ module Vosk
   module C
     extend FFI::Library
     # FIXME: Load same way as in Python, test on Windows
-    ffi_lib File.join(__dir__, 'vosk', FFI.map_library_name('vosk'))
+    # This second option, 'vosk', allows system-wide installed library to be loaded.
+    # I see you search /usr/share/vosk, so I guess it's supported somehow.
+    # It'll allow the gem to be used on systems not supported in pre-compiled releases.
+    # (in fact, we only need the first in a pre-compiled release and the second otherwise,
+    # but not worth the effort to put more configuration in the build stage - not possible without hacks)
+    # But when we load a lib not shipped with the gem itself, we (migth) need to ensure it's a compatible version
+    # Note: options in the array are alternatives, only the first found is loaded
+    ffi_lib [File.join(__dir__, FFI.map_library_name('vosk')), 'vosk']
 
     class VoskModel < FFI::AutoPointer
       def self.from_native(ptr, _ctx)
@@ -96,6 +109,30 @@ module Vosk
 
     def find_word(word)
       C.vosk_model_find_word(@handle, word)
+    end
+
+    def download_model(name)
+      dirname = File.dirname(name)
+      # Python version won't try to create the directory if a file with the same name exists
+      FileUtils.makedirs(dirname) unless Dir.exists?(dirname)
+    end
+
+    def download_progress_bar(name)
+      # Why add MODEL_PRE_URL and then split it away?
+      desc = "#{File.basename(name)}.zip"
+      begin
+        progressbar = ProgressBar.create(
+          title: desc, total: nil, progress_mark: '█',
+          # | 105M/191G [01:39<46:44:25, 1.22MB/s]
+          format: '%t: %j%%|%B| %c/%u [%a<%l, %R/sec]', # or '%r KB/sec' if rate_scale doesn't work,
+          rate_scale: lambda { |rate| ByteSize.new(rate).to_s },
+        )
+        bsize, tsize = yield
+        progressbar.total = tsize if tsize && tsize >= progressbar.progress
+        progressbar.progress += bsize
+      ensure
+        progressbar&.finish
+      end
     end
   end
 
