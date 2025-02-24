@@ -22,11 +22,12 @@ static Ort::SessionOptions GetSessionOptionsImpl(int32_t num_threads,
   Provider p = StringToProvider(std::move(provider_str));
 
   Ort::SessionOptions sess_opts;
+
   sess_opts.SetIntraOpNumThreads(num_threads);
   sess_opts.SetInterOpNumThreads(num_threads);
 
   // Other possible options
-  // sess_opts.SetGraphOptimizationLevel(ORT_ENABLE_EXTENDED);
+  sess_opts.SetGraphOptimizationLevel(ORT_ENABLE_ALL);
   // sess_opts.SetLogSeverityLevel(ORT_LOGGING_LEVEL_VERBOSE);
   // sess_opts.EnableProfiling("profile");
 

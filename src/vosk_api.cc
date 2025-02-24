@@ -205,7 +205,7 @@ VoskModel *vosk_model_new(const char *model_path)
       OfflineRecognizerConfig config;
 
       config.model_config.debug = 0;
-      config.model_config.num_threads = 4;
+      config.model_config.num_threads = 0;
       config.model_config.provider = "cpu";
       config.model_config.model_type = "transducer";
 

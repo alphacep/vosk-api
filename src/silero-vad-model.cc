@@ -224,6 +224,8 @@ class SileroVadModel::Impl {
 
  private:
   void Init(void *model_data, size_t model_data_length) {
+    sess_opts_.SetIntraOpNumThreads(1);
+    sess_opts_.SetInterOpNumThreads(1);
     sess_opts_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_DISABLE_ALL);
 
     sess_ = std::make_unique<Ort::Session>(env_, model_data, model_data_length,
