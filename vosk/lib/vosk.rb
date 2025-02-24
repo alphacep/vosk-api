@@ -1,37 +1,35 @@
 # frozen_string_literal: true
 
-require_relative 'vosk/version'
-require 'ffi'
-require 'httparty'
-# gem 'progressbar'
-require 'progressbar'
-require 'bytesize'
-# gem 'rubyzip', '~> 2.4', '>= 2.4.1'
-require 'zip'
-require 'fileutils'
+require_relative "vosk/version"
+require "ffi"
+require "httparty"
+require "progressbar"
+require "bytesize"
+require "zip"
+require "fileutils"
 
 module Vosk
   class Error < StandardError; end
 
   # Remote location of the models and local folders
-  MODEL_PRE_URL = 'https://alphacephei.com/vosk/models/'
+  MODEL_PRE_URL = "https://alphacephei.com/vosk/models/"
   MODEL_LIST_URL = "#{MODEL_PRE_URL}model-list.json"
   # TODO: Test on Windows
   MODEL_DIRS = [
-    ENV['VOSK_MODEL_PATH'], '/usr/share/vosk',
-    File.join(Dir.home, 'AppData/Local/vosk'), File.join(Dir.home, '.cache/vosk'),
+    ENV["VOSK_MODEL_PATH"], "/usr/share/vosk",
+    File.join(Dir.home, "AppData/Local/vosk"), File.join(Dir.home, ".cache/vosk"),
   ]
 
-  # Different from Python: no need to print inside the method, simply +puts Vosk.models+
+  # Different from Python: no need to print inside the method, simply use +puts Vosk.models+
   def self.models
     response = HTTParty.get(MODEL_LIST_URL, timeout: 10)
-    response.map { |model| model['name'] }
+    response.map { |model| model["name"] }
   end
 
-  # Different from Python: no need to print inside the method, simply +puts Vosk.languages+
+  # Different from Python: no need to print inside the method, simply use +puts Vosk.languages+
   def self.languages
     response = HTTParty.get(MODEL_LIST_URL, timeout: 10)
-    response.map { |model| model['lang'] }.uniq
+    response.map { |model| model["lang"] }.uniq
   end
 
   module C
@@ -44,11 +42,11 @@ module Vosk
     # but not worth the effort to put more configuration in the build stage - not possible without hacks)
     # But when we load a lib not shipped with the gem itself, we (migth) need to ensure it's a compatible version
     # Note: options in the array are alternatives, only the first found is loaded
-    ffi_lib [File.join(__dir__, FFI.map_library_name('vosk')), 'vosk']
+    ffi_lib [File.join(__dir__, FFI.map_library_name("vosk")), "vosk"]
 
     class VoskModel < FFI::AutoPointer
       def self.from_native(ptr, _ctx)
-        raise Error, 'Failed to create a model' if ptr.null?
+        raise Error, "Failed to create a model" if ptr.null?
         super
       end
 
@@ -59,7 +57,7 @@ module Vosk
 
     class VoskSpkModel < FFI::AutoPointer
       def self.from_native(ptr, _ctx)
-        raise Error, 'Failed to create a speaker model' if ptr.null?
+        raise Error, "Failed to create a speaker model" if ptr.null?
         super
       end
 
@@ -122,14 +120,17 @@ module Vosk
       desc = "#{File.basename(name)}.zip"
       begin
         progressbar = ProgressBar.create(
-          title: desc, total: nil, progress_mark: '█',
+          title: desc, total: nil, progress_mark: "█",
           # | 105M/191G [01:39<46:44:25, 1.22MB/s]
-          format: '%t: %j%%|%B| %c/%u [%a<%l, %R/sec]', # or '%r KB/sec' if rate_scale doesn't work,
+          format: "%t: %j%%|%B| %c/%u [%a<%l, %R/sec]", # or '%r KB/sec' if rate_scale doesn't work,
           rate_scale: lambda { |rate| ByteSize.new(rate).to_s },
         )
-        bsize, tsize = yield
-        progressbar.total = tsize if tsize && tsize >= progressbar.progress
-        progressbar.progress += bsize
+        loop do
+          # fragment.http_response['Content-Length']&.to_i
+          bsize, tsize = yield
+          progressbar.total = tsize if tsize && tsize >= progressbar.progress
+          progressbar.progress += bsize
+        end
       ensure
         progressbar&.finish
       end
@@ -162,7 +163,7 @@ module Vosk
 end
 
 Vosk.set_log_level(-1)
-model = Vosk::Model.new(path: '/home/vladimir/.cache/vosk/vosk-model-small-en-us-0.4')
-p model.find_word('one')
+model = Vosk::Model.new(path: "/home/vladimir/.cache/vosk/vosk-model-small-en-us-0.4")
+p model.find_word("one")
 
 # Vosk::Model.new(path: '/home/vladimir/.cache/vosk/vosk-model-small-en-us-0.5')

@@ -9,4 +9,7 @@ require "rubocop/rake_task"
 
 RuboCop::RakeTask.new
 
+# TODO: modify 'build' task somehow to include pre-compiled binary
+# (or add this logic into gemspec)
+
 task default: %i[spec rubocop]
