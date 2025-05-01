@@ -33,5 +33,5 @@ mkdir -p /io/wheelhouse/vosk-linux-$VOSK_MACHINE
 cp /opt/vosk-api/src/*.so /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vosk-linux-$VOSK_MACHINE
 
 # Build wheel
-python3 -m pip install requests tqdm srt websockets wheel
+python3 -m pip install requests tqdm srt websockets wheel --break-system-packages
 python3 -m pip wheel /opt/vosk-api/python --no-deps -w /io/wheelhouse
