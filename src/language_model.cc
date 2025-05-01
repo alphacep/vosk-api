@@ -154,12 +154,13 @@ int32 LanguageModelEstimator::FindInitialFstState() const {
 
 void LanguageModelEstimator::OutputToFst(
     int32 num_states,
-    fst::StdVectorFst *fst) const {
+    fst::StdVectorFst *out_fst) const {
   KALDI_ASSERT(num_states == num_active_lm_states_);
-  fst->DeleteStates();
+  fst::StdVectorFst fst;
+
   for (int32 i = 0; i < num_states; i++)
-    fst->AddState();
-  fst->SetStart(FindInitialFstState());
+    fst.AddState();
+  fst.SetStart(FindInitialFstState());
 
   int64 tot_count = 0;
   double tot_logprob = 0.0;
@@ -182,28 +183,29 @@ void LanguageModelEstimator::OutputToFst(
       tot_count += count;
       tot_logprob += logprob * count;
       if (phone == 0) {  // Go to final state
-        fst->SetFinal(lm_state.fst_state, fst::TropicalWeight(-logprob));
+        fst.SetFinal(lm_state.fst_state, fst::TropicalWeight(-logprob));
       } else {  // It becomes a transition.
         std::vector<int32> next_history(lm_state.history);
         next_history.push_back(phone);
         int32 dest_lm_state = FindNonzeroLmStateIndexForHistory(next_history),
             dest_fst_state = lm_states_[dest_lm_state].fst_state;
         KALDI_ASSERT(dest_fst_state != -1);
-        fst->AddArc(lm_state.fst_state,
+        fst.AddArc(lm_state.fst_state,
                     fst::StdArc(phone, phone, fst::TropicalWeight(-logprob),
                                 dest_fst_state));
       }
     }
     if (lm_state.backoff_lmstate_index >= 0) {
-      fst->AddArc(lm_state.fst_state, fst::StdArc(0, 0, fst::TropicalWeight(-log(1 - opts_.discount)), lm_states_[lm_state.backoff_lmstate_index].fst_state));
+      fst.AddArc(lm_state.fst_state, fst::StdArc(0, 0, fst::TropicalWeight(-log(1 - opts_.discount)), lm_states_[lm_state.backoff_lmstate_index].fst_state));
     }
   }
-  fst::Connect(fst);
-  // Make sure that Connect does not delete any states.
-  int32 num_states_connected = fst->NumStates();
-  KALDI_ASSERT(num_states_connected == num_states);
+  fst::DeterminizeOptions<fst::StdArc> opts;
+  fst::Determinize(fst, out_fst, opts);
+  fst::Connect(out_fst);
   // arc-sort.  ilabel or olabel doesn't matter, it's an acceptor.
-  fst::ArcSort(fst, fst::ILabelCompare<fst::StdArc>());
-  KALDI_LOG << "Created language model with " << num_states
-            << " states and " << fst::NumArcs(*fst) << " arcs.";
+  fst::ArcSort(out_fst, fst::ILabelCompare<fst::StdArc>());
+  KALDI_LOG << "Created language model with " << out_fst->NumStates()
+            << " states and " << fst::NumArcs(*out_fst) << " arcs.";
+  KALDI_LOG << "Originally language model with " << fst.NumStates()
+            << " states and " << fst::NumArcs(fst) << " arcs.";
 }
