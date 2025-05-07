@@ -14,12 +14,12 @@ type VoskModel struct {
 }
 
 // NewModel creates a new VoskModel instance
-func NewModel(modelPath string) (*VoskModel, error) {
+func NewModel(modelPath string) *VoskModel {
 	cmodelPath := C.CString(modelPath)
 	defer C.free(unsafe.Pointer(cmodelPath))
 	internal := C.vosk_model_new(cmodelPath)
 	model := &VoskModel{model: internal}
-	return model, nil
+	return model
 }
 
 func (m *VoskModel) Free() {
@@ -58,7 +58,7 @@ func freeSpkModel(model *VoskSpkModel) {
 	C.vosk_spk_model_free(model.spkModel)
 }
 
-func(s *VoskSpkModel) Free() {
+func (s *VoskSpkModel) Free() {
 	C.vosk_spk_model_free(s.spkModel)
 }
 
@@ -164,8 +164,14 @@ func (r *VoskRecognizer) Reset() {
 	C.vosk_recognizer_reset(r.rec)
 }
 
+type LogLevel int
+
+const Disabled LogLevel = -1
+const Default LogLevel = 0
+const Verbose LogLevel = 1
+
 // SetLogLevel sets the log level for Kaldi messages.
-func SetLogLevel(logLevel int) {
+func SetLogLevel(logLevel LogLevel) {
 	C.vosk_set_log_level(C.int(logLevel))
 }
 
