@@ -24,14 +24,17 @@ plugins {
 	`maven-publish`
 	id("org.jetbrains.dokka") version "1.9.20"
 	kotlin("plugin.serialization") version "2.0.0"
+	id("org.jetbrains.kotlin.android") version "1.9.0" apply false
 }
 
 group = "com.alphacephei"
 version = "0.3.50"
 
-repositories {
-	google()
-	mavenCentral()
+allprojects {
+	repositories {
+		google()
+		mavenCentral()
+	}
 }
 
 val dokkaOutputDir = "$buildDir/dokka"
@@ -159,7 +162,15 @@ kotlin {
 				implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version")
 			}
 		}
+		val commonJVM = create("commonJVM") {
+			dependsOn(commonMain)
+			dependencies {
+				compileOnly("net.java.dev.jna:jna:$jna_version")
+			}
+		}
+
 		val jvmMain by getting {
+			dependsOn(commonJVM)
 			dependencies {
 				api("net.java.dev.jna:jna:$jna_version")
 			}
@@ -169,9 +180,12 @@ kotlin {
 			val nativeMain by getting
 		}
 		val androidMain by getting {
-			dependsOn(jvmMain)
+			dependsOn(commonJVM)
 			dependencies {
 				api("net.java.dev.jna:jna:$jna_version@aar")
+				implementation(project(":kaldi"))
+				implementation(project(":openfst"))
+				implementation(project(":openblas"))
 			}
 		}
 		val androidUnitTest by getting {
@@ -189,6 +203,12 @@ android {
 	defaultConfig {
 		minSdk = 24
 		targetSdk = 34
+		externalNativeBuild {
+			cmake {
+				cppFlags("")
+				arguments("-Wno-dev")
+			}
+		}
 	}
 	compileOptions {
 		sourceCompatibility = JavaVersion.VERSION_17
@@ -199,6 +219,13 @@ android {
 			withSourcesJar()
 			withJavadocJar()
 			allVariants()
+		}
+	}
+
+	externalNativeBuild {
+		cmake {
+			path("../CMakeLists.txt")
+			version = "3.22.1"
 		}
 	}
 }
