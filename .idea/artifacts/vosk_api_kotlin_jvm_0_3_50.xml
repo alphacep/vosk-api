@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="vosk-api-kotlin-jvm-0.3.50">
+    <output-path>$PROJECT_DIR$/kotlin/build/libs</output-path>
+    <root id="archive" name="vosk-api-kotlin-jvm-0.3.50.jar" />
+  </artifact>
+</component>
