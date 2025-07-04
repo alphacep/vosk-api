@@ -1,0 +1,21 @@
+root = true
+
+[*]
+indent_style = tab
+tab_width = 4
+indent_size = 4
+end_of_line = lf
+max_line_length = 120
+ij_visual_guides = 120
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{js,py,html}]
+charset = utf-8
+
+[*.md]
+trim_trailing_whitespace = false
+
+
+[*.py]
+ij_python_from_import_parentheses_force_if_multiline = true

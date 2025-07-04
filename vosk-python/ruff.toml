@@ -1,0 +1,105 @@
+fix = true
+line-length = 120
+target-version = "py313"
+indent-width = 4
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = 100
+indent-style = "tab"
+quote-style = "double"
+skip-magic-trailing-comma = false
+
+[lint]
+exclude = ["migrations/versions/*", ".venv", "tests"]
+ignore = [
+    "E712", # equality comparison messes with SQL
+    "RUF003", # quotes in comment
+    "B006", # mutable default arguments like []
+    "ANN401", # don't allow Any as type
+    "UP033", # prefer e!s
+    "S311", # no random generators
+    "D200", # one line docstring one line
+    "RUF006", # store ref to create_task
+    "G004", # logging statement uses f string
+    "PERF203", # try except in loop
+    "ANN003", # kwargs type annotation
+    "EM101", # string literal
+    "SIM103", # return condition directly
+    "RET504", # assignment before return
+    "D205", # docstring rules
+    "C901", # too complex names for functions
+    "PERF401", # do not use .append()
+    "PERF102", # no _ with .items()
+    "EM102", # F string in exception
+    "FBT001", # Boolean default args
+    "FBT002", # Boolean default args
+    "ANN201", # Return type
+    "D400", # Docstring period
+    "D415", # Docstring
+    "E722", # Bare except
+    "D401", # Imperative mode
+    "D417", # Argument description required
+    "E501", # Line too long (exceeds the maximum line length)
+    "S101", # Use of assert detected
+    "S102", # Use of exec detected
+    "S104", # Possible binding to all interfaces
+    "S324", # Use of insecure hash function
+    "EXE002", # File executable but no shebang found
+    "D100", # Missing docstring in public module
+    "D102", # Missing docstring in public method
+    "D203", # 1 blank line required before class docstring
+    "D206", # Docstring should be indented with spaces, not tabs
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D105", # Missing docstring in magic method
+    "D106", # Missing docstring in public nested class
+    "D101", # Missing docstring in public class
+    "D107", # Missing docstring in __init__
+    "D212", # Multi-line docstring summary should start at the first line
+    "D211", # No blank lines allowed before class docstring
+    "PGH003", # Use specific rule codes when ignoring type issues
+    "PGH004", # Use specific rule codes when using noqa
+    "N811", # Constant variable imported as non-constant
+    "N804", # The first argument of class method should be named 'cls'
+    "N818", # Error suffix should be used for exception names
+    "N806", # Variable in function should be lowercase
+    "N815", # Variable in function should be lowercase
+    "ARG001", # Unused function argument
+    "ARG002", # Unused method argument
+    "DTZ003", # Use of datetime.now() without timezone
+    "DTZ005", # Use of datetime.utcnow() without timezone
+    "RSE102", # Use of 'sys.exit()' or 'exit()' detected
+    "SLF001", # Private member accessed outside of class
+    "PLR", # Refactoring related issues https://docs.astral.sh/ruff/rules/#refactor-r
+    "INP", # Implicit namespace package
+    "TRY", # Tryceptor related issues https://docs.astral.sh/ruff/rules/#tryceratops-try
+    "SIM300", # Use of 'len(SEQUENCE) == 0' detected
+    "SIM114", # Use of 'if x is not None' detected
+    "DJ008", # Model does not define __str__ method
+    "FIX002", # Line contains TODO
+    "S603", # Use of 'subprocess.call' detected
+    "S607", # Use of 'subprocess.run' detected
+    "TD002", # Missing TODO Author
+    "TD003", # Missing TODO Link
+    "W191", # Indentation contains tabs
+    "COM812", # Missing trailing comma
+    "ISC001", # Handled by formatter (Implicit string concatenation)
+    "BLE001", # Bare Exception / Blind Exception
+    "ERA001", # For ignoring False positive commented code like TODO
+    "S105", # For hardcoded passwords / secrets
+    "SLOT000", # For using __slots__ without str inherited classes
+    "PLW2901", # For overriding for loop variable
+    "S113", # Ruff call without TimeOut
+    "N812", # Lowercase imported as non-lowercase
+    "B008", # Don't allow function calls in argument default
+]
+select = ["ALL"]
+
+[lint.flake8-annotations]
+suppress-none-returning = true
+
+[lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "double"
+multiline-quotes = "double"

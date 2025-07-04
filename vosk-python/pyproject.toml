@@ -1,0 +1,38 @@
+[project]
+name = "vosk-python"
+version = "0.1.0"
+description = "Vosk is an offline open source speech recognition toolkit. It enables speech recognition for 20+ languages and dialects - English, Indian English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish, Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino, Ukrainian, Kazakh, Swedish, Japanese, Esperanto, Hindi, Czech, Polish. More to come."
+readme = "README.md"
+authors = [
+    { name = "Vetrichelvan", email = "pythonhubdev@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "cffi>=1.17.1",
+    "gradio>=5.35.0",
+    "pre-commit>=4.2.0",
+    "pyrefly>=0.22.1",
+    "pytest-asyncio>=1.0.0",
+    "requests>=2.32.4",
+    "setuptools>=80.9.0",
+    "sounddevice>=0.5.2",
+    "srt>=3.5.3",
+    "tqdm>=4.67.1",
+    "uv-build>=0.7.19",
+    "websockets>=15.0.1",
+    "webvtt-py>=0.5.1",
+    "wheel>=0.45.1",
+]
+
+
+[build-system]
+requires = ["uv_build>=0.7.19,<0.8"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "pytest-rich>=0.2.0",
+    "ruff>=0.12.2",
+]

@@ -1,83 +1,10 @@
-# Object files
-*.o
-
-# Temp files
-nohup.out
-
-# Gradle files
-.gradle/
-gradlew
-gradlew.bat
-gradle
-local.properties
-gradle.properties
-
-# Android
-android/build
-android/lib/build
-android/model-en/build
-android/model-en/src/main/assets/model-en-us
-android/repo
-*.apk
-*.ap_
-
-# Cmake
-.cxx
-cmake_install.cmake
-
-# Python
-wheelhouse
-__pycache__
-*.egg-info
-python/dist
-python/build
-python/vosk/*.so
-python/test/db
-python/test/hyp
-python/test/model
-python/test/ref
-python/test/result.txt
-python/test/wav.scp
-
-# Java
-*.class
-java/lib/model
-java/demo/model
-java/lib/build
-java/demo/build
-
-# CSharp
-*.dll
-*.so
-*.dylib
-*.nupkg
-csharp/demo/model
-csharp/demo/test.wav
-csharp/demo/bin
-csharp/demo/obj
-
-# Node
-nodejs/demo/model
-nodejs/demo/model-spk
-nodejs/demo/test.wav
-nodejs/node_modules
-nodejs/package-lock.json
-
-# C
-c/test_vosk
-c/test_vosk_speaker
-c/oprofile_data
-c/model
-c/test.wav
-
-.idea/
-
 # Python-generated files
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
+*.egg-info
 
 # Virtual environments
 .venv
@@ -87,6 +14,7 @@ wheels/
 *$py.class
 
 # C extensions
+*.so
 
 # Distribution / packaging
 .Python
@@ -318,6 +246,7 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
+.idea/
 .vscode/
 .env.*
 *.key
@@ -344,3 +273,9 @@ node_modules/
 *.sw?
 # OS specific
 .DS_Store
+
+opencode.json
+
+# Task files
+# tasks.json
+# tasks/

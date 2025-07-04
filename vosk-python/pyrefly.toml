@@ -1,0 +1,12 @@
+project_includes = ["**/*"]
+project_excludes = [
+	"**/.[!/.]*",
+	"**/*venv/**/*",
+	"example/**"
+]
+search_path = ["."]
+python_version = "3.12"
+site_package_path = [
+	".venv/lib/python3.12/site-packages",
+]
+python_interpreter = ".venv/bin/python"

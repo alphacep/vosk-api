@@ -1,0 +1,79 @@
+repos:
+    -   repo: https://github.com/pre-commit/pre-commit-hooks
+        rev: v5.0.0
+        hooks:
+            -   id: check-ast
+                language_version: python3.12
+                files: ^vosk-python/
+            -   id: trailing-whitespace
+                files: ^vosk-python/
+            -   id: end-of-file-fixer
+                files: ^vosk-python/
+            -   id: check-yaml
+                files: ^vosk-python/
+            -   id: check-toml
+                files: ^vosk-python/
+            -   id: no-commit-to-branch
+                args: [ "--branch", "main", "--branch", "master" ]
+
+    -   repo: https://github.com/asottile/add-trailing-comma
+        rev: v3.2.0
+        hooks:
+            -   id: add-trailing-comma
+                files: ^vosk-python/
+
+    -   repo: https://github.com/asottile/pyupgrade
+        rev: v3.20.0
+        hooks:
+            -   id: pyupgrade
+                files: ^vosk-python/
+                args: [ "--py313-plus" ]
+
+    -   repo: local
+        hooks:
+            -   id: format
+                files: ^vosk-python/
+                name: format
+                entry: uv run ruff format
+                require_serial: true
+                language: system
+                types: [ python ]
+
+    -   repo: local
+        hooks:
+            -   id: lint
+                files: ^vosk-python/
+                name: lint
+                entry: uv run ruff check --config vosk-python/ruff.toml --fix --unsafe-fixes
+                require_serial: true
+                language: system
+                types: [ python ]
+
+
+    -   repo: local
+        hooks:
+
+            -   id: pyrefly
+                files: ^vosk-python/
+                name: Validate types with Pyrefly
+                entry: uv run pyrefly check --config vosk-python/pyrefly.toml
+                language: system
+                types: [ python ]
+                pass_filenames: false
+
+    #    -   repo: local
+    #        hooks:
+    #
+    #            -   id: mypy
+    #                name: Validate types with Mypy
+    #                entry: uv run mypy --strict src
+    #                language: system
+    #                types: [ python ]
+    #                pass_filenames: false
+
+    -   repo: https://github.com/gitguardian/ggshield
+        rev: v1.40.0
+        hooks:
+            -   id: ggshield
+                language_version: python3
+                stages: [ pre-commit ]
