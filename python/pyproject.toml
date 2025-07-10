@@ -1,0 +1,35 @@
+[project]
+name = "vosk"
+version = "0.1.0"
+description = "Offline speech recognition API for Android, iOS, Raspberry Pi and servers with Python, Java, C# and Node"
+readme = "README.md"
+authors = [
+    { name = "Nickolay V. Shmyrev", email = "nshmyrev@gmail.com" }
+]
+maintainers = [
+    { name = "Vetrichelvan", email = "pythonhubdev@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "websockets",
+    "srt2",
+    "hatch>=1.14.1",
+    "cffi>=1.17.1",
+    "tqdm>=4.67.1",
+    "srt>=3.5.3",
+    "requests>=2.32.4",
+]
+
+[project.scripts]
+transcribe = "vosk.transcriber.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["vosk"]
+
+[tool.uv_build.build.targets.wheel]
+packages = ["vosk"]
