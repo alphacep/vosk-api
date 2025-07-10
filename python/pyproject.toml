@@ -33,3 +33,8 @@ packages = ["vosk"]
 
 [tool.uv_build.build.targets.wheel]
 packages = ["vosk"]
+
+[dependency-groups]
+dev = [
+    "pylint>=3.3.7",
+]
