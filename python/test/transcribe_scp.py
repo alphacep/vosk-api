@@ -28,7 +28,7 @@ def recognize(line):
 
 def main():
     p = Pool(8)
-    texts = p.map(recognize, open(sys.argv[1], encoding="uft-8").readlines())
+    texts = p.map(recognize, open(sys.argv[1], encoding="utf-8").readlines())
     print ("\n".join(texts))
 
 main()
