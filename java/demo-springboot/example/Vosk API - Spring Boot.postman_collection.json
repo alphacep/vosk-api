@@ -1,0 +1,45 @@
+{
+	"info": {
+		"_postman_id": "d25bac7e-d363-4b28-8c25-84006e9d1f13",
+		"name": "Vosk API - Spring Boot",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42945226"
+	},
+	"item": [
+		{
+			"name": "Detect WAV",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "wav",
+							"type": "file",
+							"src": "/C:/Users/drzhk/dev/vosk-api/java/demo-springboot/example/test.wav"
+						},
+						{
+							"key": "wavSize",
+							"value": "265914",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/detect",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"detect"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
