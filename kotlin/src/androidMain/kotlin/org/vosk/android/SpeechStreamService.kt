@@ -15,8 +15,12 @@
  */
 package org.vosk.android
 
-import android.os.Handler
-import android.os.Looper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.vosk.Recognizer
 import java.io.IOException
 import java.io.InputStream
@@ -35,8 +39,11 @@ class SpeechStreamService(
 	private val inputStream: InputStream
 	private val sampleRate: Int
 	private val bufferSize: Int
-	private var recognizerThread: Thread? = null
-	private val mainHandler = Handler(Looper.getMainLooper())
+
+	private var recognizerThread: Job? = null
+	private val scope = CoroutineScope(Dispatchers.IO)
+
+	private var interrupt = false
 
 	/**
 	 * Creates speech service.
@@ -54,7 +61,7 @@ class SpeechStreamService(
 	 */
 	fun start(listener: RecognitionListener): Boolean {
 		if (null != recognizerThread) return false
-		recognizerThread = RecognizerThread(listener)
+		recognizerThread = scope.launch { recognizerThread(listener) }
 		recognizerThread!!.start()
 		return true
 	}
@@ -70,7 +77,7 @@ class SpeechStreamService(
 	 */
 	fun start(listener: RecognitionListener, timeout: Int): Boolean {
 		if (null != recognizerThread) return false
-		recognizerThread = RecognizerThread(listener, timeout)
+		recognizerThread = scope.launch { recognizerThread(listener, timeout) }
 		recognizerThread!!.start()
 		return true
 	}
@@ -84,64 +91,66 @@ class SpeechStreamService(
 	fun stop(): Boolean {
 		if (null == recognizerThread) return false
 		try {
-			recognizerThread!!.interrupt()
-			recognizerThread!!.join()
+			interrupt = true
+			runBlocking {
+				recognizerThread!!.join()
+			}
 		} catch (e: InterruptedException) {
 			// Restore the interrupted status.
 			Thread.currentThread().interrupt()
 		}
 		recognizerThread = null
+		interrupt = false
 		return true
 	}
 
-	private inner class RecognizerThread @JvmOverloads constructor(
-		var listener: RecognitionListener,
-		timeout: Int = Companion.NO_TIMEOUT
-	) : Thread() {
-		private var remainingSamples: Int
-		private val timeoutSamples: Int
+	suspend fun recognizerThread(
+		listener: RecognitionListener,
+		timeout: Int = NO_TIMEOUT
+	) {
+		var remainingSamples: Int
+		val timeoutSamples: Int
 
-		init {
-			if (timeout != Companion.NO_TIMEOUT) timeoutSamples =
-				timeout * sampleRate / 1000 else timeoutSamples = Companion.NO_TIMEOUT
-			remainingSamples = timeoutSamples
-		}
+		if (timeout != NO_TIMEOUT) timeoutSamples =
+			timeout * sampleRate / 1000 else timeoutSamples = NO_TIMEOUT
+		remainingSamples = timeoutSamples
 
-		override fun run() {
-			val buffer = ByteArray(bufferSize)
-			while (!interrupted()
-				&& (timeoutSamples == Companion.NO_TIMEOUT || remainingSamples > 0)
-			) {
-				try {
-					val nread = inputStream.read(buffer, 0, buffer.size)
-					if (nread < 0) {
-						break
-					} else {
-						val isSilence: Boolean = recognizer.acceptWaveform(buffer)
-						if (isSilence) {
-							val result = recognizer.result
-							mainHandler.post { listener.onResult(result) }
-						} else {
-							val partialResult = recognizer.partialResult
-							mainHandler.post { listener.onPartialResult(partialResult) }
-						}
-					}
-					if (timeoutSamples != NO_TIMEOUT) {
-						remainingSamples -= nread
-					}
-				} catch (e: IOException) {
-					mainHandler.post { listener.onError(e) }
+		val buffer = ByteArray(bufferSize)
+		while (!interrupt
+			&& (timeoutSamples == NO_TIMEOUT || remainingSamples > 0)
+		) {
+			try {
+				val nread = withContext(Dispatchers.IO) {
+					inputStream.read(buffer, 0, buffer.size)
 				}
-			}
-
-			// If we met timeout signal that speech ended
-			if (timeoutSamples != NO_TIMEOUT && remainingSamples <= 0) {
-				mainHandler.post { listener.onTimeout() }
-			} else {
-				val finalResult = recognizer.finalResult
-				mainHandler.post { listener.onFinalResult(finalResult) }
+				if (nread < 0) {
+					break
+				} else {
+					val isSilence: Boolean = recognizer.acceptWaveform(buffer)
+					if (isSilence) {
+						val result = recognizer.result
+						withContext(Dispatchers.Main) { listener.onResult(result) }
+					} else {
+						val partialResult = recognizer.partialResult
+						withContext(Dispatchers.Main) { listener.onPartialResult(partialResult) }
+					}
+				}
+				if (timeoutSamples != NO_TIMEOUT) {
+					remainingSamples -= nread
+				}
+			} catch (e: IOException) {
+				withContext(Dispatchers.Main) { listener.onError(e) }
 			}
 		}
+
+		// If we met timeout signal that speech ended
+		if (timeoutSamples != NO_TIMEOUT && remainingSamples <= 0) {
+			withContext(Dispatchers.Main) { listener.onTimeout() }
+		} else {
+			val finalResult = recognizer.finalResult
+			withContext(Dispatchers.Main) { listener.onFinalResult(finalResult) }
+		}
+
 	}
 
 	companion object {
