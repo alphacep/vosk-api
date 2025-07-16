@@ -37,16 +37,47 @@ struct OfflineFeatureExtractorConfig {
   // the sampling rate of the input waveform, we will do resampling inside.
   int32_t sampling_rate = 16000;
 
-  // Feature dimension
+  // num_mel_bins
+  //
+  // Note: for mfcc, this value is also for num_mel_bins.
+  // The actual feature dimension is actuall num_ceps
   int32_t feature_dim = 80;
 
-  // Set internally by some models, e.g., paraformer and wenet CTC models set
-  // it to false.
+  // minimal frequency for Mel-filterbank, in Hz
+  float low_freq = 20.0f;
+
+  // maximal frequency of Mel-filterbank
+  // in Hz; negative value is subtracted from Nyquist freq.:
+  // i.e. for sampling_rate 16000 / 2 - 400 = 7600Hz
+  //
+  // Please see
+  // https://github.com/lhotse-speech/lhotse/blob/master/lhotse/features/fbank.py#L27
+  // and
+  // https://github.com/k2-fsa/sherpa-onnx/issues/514
+  float high_freq = -400.0f;
+
+  // dithering constant, useful for signals with hard-zeroes in non-speech parts
+  // this prevents large negative values in log-mel filterbanks
+  //
+  // In k2, audio samples are in range [-1..+1], in kaldi the range was
+  // [-32k..+32k], so the value 0.00003 is equivalent to kaldi default 1.0
+  //
+  float dither = 0.0f;  // dithering disabled by default
+
+  // Set internally by some models, e.g., paraformer sets it to false.
   // This parameter is not exposed to users from the commandline
   // If true, the feature extractor expects inputs to be normalized to
   // the range [-1, 1].
   // If false, we will multiply the inputs by 32768
   bool normalize_samples = true;
+
+  bool snip_edges = false;
+  float frame_shift_ms = 10.0f;   // in milliseconds.
+  float frame_length_ms = 25.0f;  // in milliseconds.
+  bool is_librosa = false;
+  bool remove_dc_offset = true;       // Subtract mean of wave before FFT.
+  float preemph_coeff = 0.97f;        // Preemphasis coefficient.
+  std::string window_type = "povey";  // e.g. Hamming window
 
   // For models from NeMo
   // This option is not exposed and is set internally when loading models.
@@ -60,6 +91,16 @@ struct OfflineFeatureExtractorConfig {
   // https://github.com/NVIDIA/NeMo/blob/main/nemo/collections/asr/parts/preprocessing/features.py#L59
   // for details
   std::string nemo_normalize_type;
+
+  // for MFCC
+  int32_t num_ceps = 13;
+  bool use_energy = true;
+
+  bool is_mfcc = false;
+
+  bool is_whisper = false;
+
+  bool round_to_power_of_two = true;
 
   std::string ToString() const;
 

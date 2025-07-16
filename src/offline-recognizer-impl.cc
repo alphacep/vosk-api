@@ -9,6 +9,7 @@
 #include "onnxruntime_cxx_api.h"  // NOLINT
 #include "macros.h"
 #include "offline-recognizer-transducer-impl.h"
+#include "offline-recognizer-transducer-nemo-impl.h"
 #include "onnx-utils.h"
 #include "text-utils.h"
 
@@ -16,10 +17,13 @@ namespace sherpa_onnx {
 
 std::unique_ptr<OfflineRecognizerImpl> OfflineRecognizerImpl::Create(
     const OfflineRecognizerConfig &config) {
+
   if (!config.model_config.model_type.empty()) {
     const auto &model_type = config.model_config.model_type;
     if (model_type == "transducer") {
       return std::make_unique<OfflineRecognizerTransducerImpl>(config);
+    } else if (model_type == "nemo_transducer") {
+      return std::make_unique<OfflineRecognizerTransducerNeMoImpl>(config);
     } else {
       SHERPA_ONNX_LOGE(
           "Invalid model_type: %s. Trying to load the model to get its type",

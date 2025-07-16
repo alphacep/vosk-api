@@ -14,8 +14,8 @@ if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE
     print("Audio file must be WAV format mono PCM.")
     sys.exit(1)
 
-#model = Model("vosk-model-ru-0.53-private-0.1")
-model = Model("vosk-model-small-ru")
+model = Model("vosk-model-ru-0.54-private-0.1")
+#model = Model("vosk-model-small-ru")
 
 rec = KaldiRecognizer(model, wf.getframerate())
 

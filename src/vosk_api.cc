@@ -204,10 +204,10 @@ VoskModel *vosk_model_new(const char *model_path)
 
       OfflineRecognizerConfig config;
 
-      config.model_config.debug = 0;
-      config.model_config.num_threads = 0;
-      config.model_config.provider = "cpu";
-      config.model_config.model_type = "transducer";
+      config.model_config.debug = 1;
+      config.model_config.num_threads = 1;
+      config.model_config.provider = "cuda";
+      config.model_config.model_type = "nemo_transducer";
 
       model->model_path_str = model_path;
       config.model_config.tokens = model->model_path_str + "/lang/tokens.txt";
@@ -215,10 +215,11 @@ VoskModel *vosk_model_new(const char *model_path)
       config.model_config.transducer.decoder_filename = model->model_path_str + "/am-onnx/decoder.onnx";
       config.model_config.transducer.joiner_filename = model->model_path_str + "/am-onnx/joiner.onnx";
 
-      config.decoding_method = "modified_beam_search";
-      config.max_active_paths = 10;
-      config.feat_config.sampling_rate = 16000;
-      config.feat_config.feature_dim = 80;
+      // config.decoding_method = "modified_beam_search";
+      config.decoding_method = "greedy_search";
+      // config.max_active_paths = 10;
+      // config.feat_config.sampling_rate = 16000;
+      // config.feat_config.feature_dim = 80;
 
       model->recognizer = std::make_shared<OfflineRecognizer>(config);
 

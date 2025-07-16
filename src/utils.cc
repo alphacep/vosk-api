@@ -34,7 +34,7 @@ bool EncodeHotwords(std::istream &is, const SymbolTable &symbol_table,
           word = word.replace(0, 3, " ");
         }
       }
-      if (symbol_table.contains(word)) {
+      if (symbol_table.Contains(word)) {
         int32_t number = symbol_table[word];
         tmp.push_back(number);
       } else {

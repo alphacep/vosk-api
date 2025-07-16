@@ -41,12 +41,18 @@ std::string FeatureExtractorConfig::ToString() const {
 class FeatureExtractor::Impl {
  public:
   explicit Impl(const FeatureExtractorConfig &config) : config_(config) {
-    opts_.frame_opts.dither = 1;
-    opts_.frame_opts.snip_edges = false;
-    opts_.frame_opts.samp_freq = config.sampling_rate;
-
-    opts_.mel_opts.num_bins = config.feature_dim;
-    opts_.mel_opts.high_freq = -400;
+    opts_.frame_opts.dither = config_.dither;
+    opts_.frame_opts.snip_edges = config_.snip_edges;
+    opts_.frame_opts.samp_freq = config_.sampling_rate;
+    opts_.frame_opts.frame_shift_ms = config_.frame_shift_ms;
+    opts_.frame_opts.frame_length_ms = config_.frame_length_ms;
+    opts_.frame_opts.remove_dc_offset = config_.remove_dc_offset;
+    opts_.frame_opts.preemph_coeff = config_.preemph_coeff;
+    opts_.frame_opts.window_type = config_.window_type;
+    opts_.frame_opts.round_to_power_of_two = config_.round_to_power_of_two;
+    opts_.mel_opts.num_bins = config_.feature_dim;
+    opts_.mel_opts.high_freq = config_.high_freq;
+    opts_.mel_opts.low_freq = config_.low_freq;
 
     fbank_ = std::make_unique<knf::OnlineFbank>(opts_);
   }

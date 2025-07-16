@@ -35,6 +35,8 @@ struct OfflineRecognizerConfig {
   std::string hotwords_file;
   float hotwords_score = 1.5;
 
+  float blank_penalty = 0.0;
+
   // only greedy_search is implemented
   // TODO(fangjun): Implement modified_beam_search
 

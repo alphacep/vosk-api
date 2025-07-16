@@ -14,7 +14,7 @@ struct OfflineModelConfig {
   OfflineTransducerModelConfig transducer;
 
   std::string tokens;
-  int32_t num_threads = 2;
+  int32_t num_threads = 0;
   bool debug = false;
   std::string provider = "cpu";
 

@@ -315,4 +315,20 @@ std::vector<Ort::Value> Convert(std::vector<CopyableOrtValue> values) {
   return ans;
 }
 
+std::string LookupCustomModelMetaData(const Ort::ModelMetadata &meta_data,
+                                      const char *key,
+                                      OrtAllocator *allocator) {
+// Note(fangjun): We only tested 1.17.1 and 1.11.0
+// For other versions, we may need to change it
+#if ORT_API_VERSION >= 12
+  auto v = meta_data.LookupCustomMetadataMapAllocated(key, allocator);
+  return v ? v.get() : "";
+#else
+  auto v = meta_data.LookupCustomMetadataMap(key, allocator);
+  std::string ans = v ? v : "";
+  allocator->Free(allocator, v);
+  return ans;
+#endif
+}
+
 }  // namespace sherpa_onnx

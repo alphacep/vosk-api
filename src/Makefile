@@ -1,5 +1,5 @@
 # ONNX
-ONNX_ROOT=$(abspath ../../onnxruntime-linux-x64-1.20.1)
+ONNX_ROOT=$(abspath ../../onnxruntime-linux-x64-gpu-1.20.1)
 # Compiler
 CXX?=g++
 EXT?=so
@@ -29,6 +29,7 @@ VOSK_SOURCES= \
 	offline-stream.cc \
 	offline-transducer-greedy-search-decoder.cc \
 	offline-transducer-model.cc \
+	offline-transducer-greedy-search-nemo-decoder.cc \
 	offline-transducer-model-config.cc \
 	offline-transducer-modified-beam-search-decoder.cc \
 	online-feature.cc \
@@ -50,6 +51,7 @@ VOSK_SOURCES= \
 	vad-model.cc \
 	vad-model-config.cc \
 	voice-activity-detector.cc \
+	offline-transducer-nemo-model.cc \
 	vosk_api.cc
 
 VOSK_HEADERS= \
@@ -74,10 +76,13 @@ VOSK_HEADERS= \
 	offline-rnn-lm.h \
 	offline-stream.h \
 	offline-transducer-decoder.h \
+	offline-transducer-greedy-search-nemo-decoder.h \
 	offline-transducer-greedy-search-decoder.h \
 	offline-transducer-model-config.h \
 	offline-transducer-model.h \
 	offline-transducer-modified-beam-search-decoder.h \
+	offline-transducer-nemo-model.h \
+	offline-recognizer-transducer-nemo-impl.h \
 	online-feature.h \
 	onnx-utils.h \
 	packed-sequence.h \
@@ -99,7 +104,7 @@ VOSK_HEADERS= \
 	voice-activity-detector.h \
 	vosk_api.h
 
-CFLAGS=-g -O3 -mavx2 -fPIC -std=c++17 \
+CFLAGS=-g -O0 -mavx2 -fPIC -std=c++17 -Wno-deprecated \
        -I$(ONNX_ROOT)/include $(EXTRA_CFLAGS)
 
 LDFLAGS=-Wl,-rpath=$(ONNX_ROOT)/lib -L$(ONNX_ROOT)/lib -lonnxruntime 
