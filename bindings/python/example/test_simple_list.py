@@ -10,7 +10,7 @@ from timeit import default_timer as timer
 from multiprocessing.dummy import Pool
 from vosk import Model, KaldiRecognizer
 
-model = Model("vosk-model-ru-0.53-private-0.1")
+model = Model("vosk-model-ru-0.54-private-0.1")
 #model = Model("vosk-model-small-ru")
 
 def recognize(line):

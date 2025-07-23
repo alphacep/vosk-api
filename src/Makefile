@@ -1,5 +1,5 @@
 # ONNX
-ONNX_ROOT=$(abspath ../../onnxruntime-linux-x64-1.20.1)
+ONNX_ROOT=$(abspath ../../onnxruntime-linux-x64-gpu-1.20.1)
 # Compiler
 CXX?=g++
 EXT?=so
