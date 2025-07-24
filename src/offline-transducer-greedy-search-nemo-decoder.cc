@@ -99,7 +99,7 @@ OfflineTransducerGreedySearchNeMoDecoder::Decode(
   int32_t dim1 = static_cast<int32_t>(shape[1]);
   int32_t dim2 = static_cast<int32_t>(shape[2]);
 
-  const int64_t *p_length = encoder_out_length.GetTensorData<int64_t>();
+  const int32_t *p_length = encoder_out_length.GetTensorData<int32_t>();
   const float *p = encoder_out.GetTensorData<float>();
 
   std::vector<OfflineTransducerDecoderResult> ans(batch_size);

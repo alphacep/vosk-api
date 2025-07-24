@@ -52,7 +52,7 @@ def recognize(line):
 
 def main():
     start = timer()
-    p = Pool(2)
+    p = Pool(10)
     p.map(recognize, open(sys.argv[1]).readlines())
     allsize = sum([os.path.getsize(f.strip()) for f in open(sys.argv[1]).readlines()]) / 8000.0 / 2
     dur = timer() - start
