@@ -69,7 +69,7 @@ else
 endif
 
 ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
-    CFLAGS += -I$(OPENBLAS_ROOT)/include
+    CFLAGS += -DHAVE_OPENBLAS_CLAPACK=1 -I$(OPENBLAS_ROOT)/include
     ifeq ($(USE_SHARED), 0)
         LIBS += \
             $(OPENBLAS_ROOT)/lib/libopenblas.a \
