@@ -28,6 +28,9 @@ public class VoskDemo
    {
         // Demo float array
         VoskRecognizer rec = new VoskRecognizer(model, 16000.0f);
+
+        rec.SetEndpointerMode(EndpointerMode.LONG);
+
         using(Stream source = File.OpenRead("test.wav")) {
             byte[] buffer = new byte[4096];
             int bytesRead;

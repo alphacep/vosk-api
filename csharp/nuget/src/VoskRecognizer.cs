@@ -1,5 +1,12 @@
 namespace Vosk {
 
+public enum EndpointerMode {
+    DEFAULT = 0,
+    SHORT = 1,
+    LONG = 2,
+    VERY_LONG = 3
+}
+
 public class VoskRecognizer : System.IDisposable {
   private System.Runtime.InteropServices.HandleRef handle;
 
@@ -89,6 +96,14 @@ public class VoskRecognizer : System.IDisposable {
 
   public void Reset() {
     VoskPINVOKE.VoskRecognizer_Reset(handle);
+  }
+
+  public void SetEndpointerMode(EndpointerMode mode) {
+    VoskPINVOKE.VoskRecognizer_SetEndpointerMode(handle, (int) mode);
+  }
+
+  public void SetEndpointerDelays(float t_start_max, float t_end, float t_max) {
+    VoskPINVOKE.VoskRecognizer_SetEndpointerDelays(handle, t_start_max, t_end, t_max);
   }
 
 }

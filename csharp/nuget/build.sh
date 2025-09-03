@@ -1,2 +1,2 @@
-mcs -out:lib/netstandard2.0/Vosk.dll -target:library src/*.cs
-nuget pack
+rm -rf bin lib obj
+/home/shmyrev/local/dotnet/dotnet pack Vosk.csproj -p:NuspecFile=Vosk.nuspec -o .
