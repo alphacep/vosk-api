@@ -1,0 +1,54 @@
+import moviepy.editor as mp
+from vosk import Model, KaldiRecognizer
+import wave
+import json
+from gtts import gTTS
+import requests
+import os
+
+# -------------------------------
+# Configuration
+# -------------------------------
+input_folder = "input_videos"     # Folder में जितने भी videos हैं
+output_folder = "output_videos"   # Dubbed videos save होंगे
+vosk_model_folder = "vosk-model-small-en-us-0.15"  # VOSK model path
+translate_api = "https://libretranslate.de/translate"
+
+# Create output folder if not exists
+os.makedirs(output_folder, exist_ok=True)
+
+# -------------------------------
+# Load VOSK Model
+# -------------------------------
+if not os.path.exists(vosk_model_folder):
+    print(f"❌ VOSK model missing! Download from https://alphacephei.com/vosk/models and extract to {vosk_model_folder}")
+    exit()
+
+model = Model(vosk_model_folder)
+
+# -------------------------------
+# Process each video in input folder
+# -------------------------------
+for video_file in os.listdir(input_folder):
+    if not video_file.endswith((".mp4", ".mkv", ".avi")):
+        continue
+
+    print(f"\n🎬 Processing: {video_file}")
+    input_path = os.path.join(input_folder, video_file)
+    audio_file = "temp_audio.wav"
+
+    # 1️⃣ Extract audio from video
+    video = mp.VideoFileClip(input_path)
+    video.audio.write_audiofile(audio_file, verbose=False, logger=None)
+
+    # 2️⃣ Speech-to-Text with VOSK
+    wf = wave.open(audio_file, "rb")
+    rec = KaldiRecognizer(model, wf.getframerate())
+    transcript = ""
+
+    while True:
+        data = wf.readframes(4000)
+        if len(data) == 0:
+            break
+        if rec.AcceptWaveform(data):
+            res
