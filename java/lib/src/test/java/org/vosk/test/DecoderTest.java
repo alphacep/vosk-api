@@ -15,6 +15,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.vosk.LogLevel;
 import org.vosk.Recognizer;
+import org.vosk.Recognizer.EndpointerMode;
 import org.vosk.LibVosk;
 import org.vosk.Model;
 import org.vosk.TextProcessor;
@@ -96,6 +97,15 @@ public class DecoderTest {
         Assert.assertTrue(true);
     }
 
+    @Test
+    public void decoderEndpointerDelays() throws IOException, UnsupportedAudioFileException {
+        try (Model model = new Model("model");
+            Recognizer recognizer = new Recognizer(model, 16000)) {
+            recognizer.setEndpointerMode(EndpointerMode.VERY_LONG);
+            recognizer.setEndpointerDelays(5.0f, 3.0f, 50.0f);
+	}
+        Assert.assertTrue(true);
+    }
 
     @Test(expected = IOException.class)
     public void decoderTestException() throws IOException {

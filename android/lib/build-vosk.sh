@@ -29,7 +29,7 @@ set -x
 OS_NAME=`echo $(uname -s) | tr '[:upper:]' '[:lower:]'`
 ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64
 WORKDIR_BASE=`pwd`/build
-PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin:$PATH
+PATH=$ANDROID_TOOLCHAIN_PATH/bin:$PATH
 OPENFST_VERSION=1.8.0
 
 for arch in armeabi-v7a arm64-v8a x86_64 x86; do
@@ -45,6 +45,7 @@ case $arch in
           CC=armv7a-linux-androideabi21-clang
           CXX=armv7a-linux-androideabi21-clang++
           ARCHFLAGS="-mfloat-abi=softfp -mfpu=neon"
+          PAGESIZE_LDFLAGS=""
           ;;
     arm64-v8a)
           BLAS_ARCH=ARMV8
@@ -54,6 +55,8 @@ case $arch in
           CC=aarch64-linux-android21-clang
           CXX=aarch64-linux-android21-clang++
           ARCHFLAGS=""
+          # Ensure compatibility with 16KiB page size devices
+          PAGESIZE_LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=16384"
           ;;
     x86_64)
           BLAS_ARCH=ATOM
@@ -63,6 +66,7 @@ case $arch in
           CC=x86_64-linux-android21-clang
           CXX=x86_64-linux-android21-clang++
           ARCHFLAGS=""
+          PAGESIZE_LDFLAGS=""
           ;;
     x86)
           BLAS_ARCH=ATOM
@@ -72,6 +76,7 @@ case $arch in
           CC=i686-linux-android21-clang
           CXX=i686-linux-android21-clang++
           ARCHFLAGS=""
+          PAGESIZE_LDFLAGS=""
           ;;
 esac
 
@@ -88,7 +93,7 @@ cd $WORKDIR
 git clone -b v3.2.1  --single-branch https://github.com/alphacep/clapack
 mkdir -p clapack/BUILD && cd clapack/BUILD
 cmake -DCMAKE_C_FLAGS="$ARCHFLAGS" -DCMAKE_C_COMPILER_TARGET=$HOST \
-    -DCMAKE_C_COMPILER=$CC -DCMAKE_SYSTEM_NAME=Generic -DCMAKE_AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/${OS_NAME}-x86_64/bin/$AR \
+    -DCMAKE_C_COMPILER=$CC -DCMAKE_SYSTEM_NAME=Generic -DCMAKE_AR=$ANDROID_TOOLCHAIN_PATH/bin/$AR \
     -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
     -DCMAKE_CROSSCOMPILING=True ..
 make -j 8 -C F2CLIBS/libf2c
@@ -129,7 +134,7 @@ make -j 8 -C ${WORKDIR_BASE}/../../../src \
     OPENFST_ROOT=${WORKDIR}/local \
     OPENBLAS_ROOT=${WORKDIR}/local \
     CXX=$CXX \
-    EXTRA_LDFLAGS="-llog -static-libstdc++ -Wl,-soname,libvosk.so"
+    EXTRA_LDFLAGS="-llog -static-libstdc++ -Wl,-soname,libvosk.so ${PAGESIZE_LDFLAGS}"
 cp $WORKDIR/vosk/libvosk.so $WORKDIR/../../src/main/jniLibs/$arch/libvosk.so
 
 done

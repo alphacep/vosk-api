@@ -237,6 +237,34 @@ public class Recognizer extends PointerType implements AutoCloseable {
     }
 
     /**
+     * Endpointer delay mode
+     */
+    public class EndpointerMode {
+        public static final int DEFAULT = 0;
+        public static final int SHORT = 1;
+        public static final int LONG = 2;
+        public static final int VERY_LONG = 3;
+    }
+
+    /**
+     * Configures endpointer mode for recognizer
+     */
+    public void setEndpointerMode(int mode) {
+        LibVosk.vosk_recognizer_set_endpointer_mode(this.getPointer(), mode);
+    }
+
+    /**
+     * Set endpointer delays
+     *
+     * @param t_start_max     timeout for stopping recognition in case of initial silence (usually around 5.0)
+     * @param t_end           timeout for stopping recognition in milliseconds after we recognized something (usually around 0.5 - 1.0)
+     * @param t_max           timeout for forcing utterance end in milliseconds (usually around 20-30)
+     **/
+    public void setEndpointerDelays(float t_start_max, float t_end, float t_max) {
+        LibVosk.vosk_recognizer_set_endpointer_delays(this.getPointer(), t_start_max, t_end, t_max);
+    }
+
+    /**
      * Releases recognizer object.
      * Underlying model is also unreferenced and if needed, released.
      */

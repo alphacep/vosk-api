@@ -65,6 +65,12 @@ class VoskPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_reset")]
   public static extern void VoskRecognizer_Reset(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_endpointer_mode")]
+  public static extern void VoskRecognizer_SetEndpointerMode(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_recognizer_set_endpointer_delays")]
+  public static extern void VoskRecognizer_SetEndpointerDelays(global::System.Runtime.InteropServices.HandleRef jarg1, float jarg2, float jarg3, float jarg4);
+
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint="vosk_set_log_level")]
   public static extern void SetLogLevel(int jarg1);
 
@@ -107,7 +113,6 @@ class VoskPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("libvosk", EntryPoint = "vosk_batch_recognizer_get_pending_chunks")]
   public static extern int VoskBatchRecognizer_GetPendingChunks(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-
-    }
+}
 
 }
