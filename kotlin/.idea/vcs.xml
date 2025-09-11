@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/clapack/src/main/cpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/kaldi/src/main/cpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/openblas/src/main/cpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/openfst/src/main/cpp" vcs="Git" />
   </component>
 </project>
