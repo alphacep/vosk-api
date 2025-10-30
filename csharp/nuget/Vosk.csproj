@@ -10,8 +10,34 @@
     <owners>Alpha Cephei Inc</owners>
   </PropertyGroup>
 
-  <Target Name="CopyFiles" AfterTargets="Build">
-    <Copy SourceFiles="bin/Release/net8.0/Vosk.dll" DestinationFolder="lib/net8.0" />
-  </Target>
+  <ItemGroup>
+    <None Include="bin/Release/net8.0/Vosk.dll"
+          Pack="true"
+          PackagePath="lib/net8.0/" />
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <None Include="build/lib/linux-x64/*.so"
+	  Pack="true"
+	  PackagePath="runtimes/linux-x64/native/" />
+
+    <None Include="build/lib/linux-arm64/*.so"
+	  Pack="true"
+	  PackagePath="runtimes/linux-arm64/native/" />
+
+    <None Include="build/lib/win-x64/*.dll"
+	  Pack="true"
+	  PackagePath="runtimes/win-x64/native/" />
+
+    <None Include="build/lib/win-arm64/*.dll"
+	  Pack="true"
+	  PackagePath="runtimes/win-arm64/native/" />
+
+    <None Include="build/lib/osx-universal/*.dylib"
+	  Pack="true"
+	  PackagePath="runtimes/osx-universal/native/" />
+
+  </ItemGroup>
 
 </Project>
