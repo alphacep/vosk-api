@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Vosk</PackageId>
-    <Version>0.3.70</Version>
+    <Version>0.3.75</Version>
     <authors>Alpha Cephei Inc</authors>
     <owners>Alpha Cephei Inc</owners>
   </PropertyGroup>

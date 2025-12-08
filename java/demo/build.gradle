@@ -11,5 +11,5 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.50'
+    implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.75'
 }

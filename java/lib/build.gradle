@@ -16,7 +16,7 @@ repositories {
 
 archivesBaseName = 'vosk'
 group = 'com.alphacephei'
-version = '0.3.50'
+version = '0.3.75'
 
 mavenPublish {
     group = 'com.alphacephei'
@@ -25,7 +25,7 @@ mavenPublish {
 }
 
 dependencies {
-    api group: 'net.java.dev.jna', name: 'jna', version: '5.13.0'
+    api group: 'net.java.dev.jna', name: 'jna', version: '5.18.1'
     testImplementation 'junit:junit:4.13'
 }
 
