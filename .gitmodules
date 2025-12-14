@@ -1,0 +1,14 @@
+[submodule "kotlin/openblas/src/main/cpp"]
+	path = kotlin/openblas/src/main/cpp
+	url = https://github.com/OpenMathLib/OpenBLAS.git
+[submodule "kotlin/clapack/src/main/cpp"]
+	path = kotlin/clapack/src/main/cpp
+	url = https://github.com/alphacep/clapack.git
+	branch = v3.2.1
+[submodule "kotlin/kaldi/src/main/cpp"]
+	path = kotlin/kaldi/src/main/cpp
+	url = https://github.com/alphacep/kaldi.git
+	branch = vosk-android
+[submodule "kotlin/openfst/src/main/cpp"]
+	path = kotlin/openfst/src/main/cpp
+	url = https://github.com/messiaen/openfst.git
