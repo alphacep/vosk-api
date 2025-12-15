@@ -172,6 +172,84 @@ void vosk_recognizer_set_grm(VoskRecognizer *recognizer, char const *grammar);
  */
 void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives);
 
+/** Configures recognizer result options (i.e. whether to print word-level results or word and phone level results together)
+ * With phone level results (i.e. if configured with "phones" option)
+ * <pre>
+ *    {
+ *     "result" : [{
+ *         "conf" : 0.998335,
+ *         "end" : 0.450000,
+ *         "phone_end" : [0.450000],
+ *         "phone_label" : ["SIL"],
+ *         "phone_start" : [0.000000],
+ *         "start" : 0.000000,
+ *         "word" : "<eps>"
+ *       }, {
+ *         "conf" : 0.998324,
+ *         "end" : 0.600000,
+ *         "phone_end" : [0.540000, 0.600000],
+ *         "phone_label" : ["DH_B", "AH1_E"],
+ *         "phone_start" : [0.450000, 0.540000],
+ *         "start" : 0.450000,
+ *         "word" : "THE"
+ *       }, {
+ *         "conf" : 0.574095,
+ *         "end" : 1.200000,
+ *         "phone_end" : [0.720000, 0.810000, 0.870000, 0.930000, 0.990000, 1.080000, 1.110000, 1.200000],
+ *         "phone_label" : ["S_B", "T_I", "UW1_I", "D_I", "AH0_I", "N_I", "T_I", "S_E"],
+ *         "phone_start" : [0.600000, 0.720000, 0.810000, 0.870000, 0.930000, 0.990000, 1.080000, 1.110000],
+ *         "start" : 0.600000,
+ *         "word" : "STUDENT'S"
+ *       }, {
+ *         "conf" : 0.923344,
+ *         "end" : 1.260000,
+ *         "phone_end" : [1.260111],
+ *         "phone_label" : ["SIL"],
+ *         "phone_start" : [1.200111],
+ *         "start" : 1.200111,
+ *         "word" : "<eps>"
+ *       }, {
+ *         "conf" : 1.000000,
+ *         "end" : 1.800000,
+ *         "phone_end" : [1.440000, 1.500000, 1.590000, 1.680000, 1.800000],
+ *         "phone_label" : ["S_B", "T_I", "AH1_I", "D_I", "IY0_E"],
+ *         "phone_start" : [1.260000, 1.440000, 1.500000, 1.590000, 1.680000],
+ *         "start" : 1.260000,
+ *         "word" : "STUDY"
+ *       }, {
+ *         "conf" : 1.000000,
+ *         "end" : 1.860000,
+ *         "phone_end" : [1.860000],
+ *         "phone_label" : ["AH0_S"],
+ *         "phone_start" : [1.800000],
+ *         "start" : 1.800000,
+ *         "word" : "A"
+ *       }, {
+ *         "conf" : 1.000000,
+ *         "end" : 2.190000,
+ *         "phone_end" : [1.980000, 2.100000, 2.190000],
+ *         "phone_label" : ["L_B", "AA1_I", "T_E"],
+ *         "phone_start" : [1.860000, 1.980000, 2.100000],
+ *         "start" : 1.860000,
+ *         "word" : "LOT"
+ *       }, {
+ *         "conf" : 1.000000,
+ *         "end" : 2.880000,
+ *         "phone_end" : [2.880000],
+ *         "phone_label" : ["SIL"],
+ *         "phone_start" : [2.190000],
+ *         "start" : 2.190000,
+ *         "word" : "<eps>"
+ *       }],
+ *     "text" : " THE STUDENT'S STUDY A LOT"
+ *   }
+ * </pre>
+ *
+ * If configured with "words" option then result is same word-level MBR results. See vosk_recognizer_result() 
+ * </pre>
+ * * @param result_opts - result options to determine which recognition results to return
+ */
+void vosk_recognizer_set_result_options(VoskRecognizer *recognizer, const char *result_opts);
 
 /** Enables words with times in the output
  *
