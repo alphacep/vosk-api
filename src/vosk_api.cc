@@ -296,6 +296,14 @@ void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer)
 #endif
 }
 
+const char *vosk_batch_recognizer_partial_result(VoskBatchRecognizer *recognizer)
+{
+#if HAVE_CUDA
+    return ((BatchRecognizer *)recognizer)->PartialResult();
+#else
+    return NULL;
+#endif
+}
 
 int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer)
 {
