@@ -4,9 +4,11 @@ OPENFST_ROOT?=$(KALDI_ROOT)/tools/openfst
 OPENBLAS_ROOT?=$(KALDI_ROOT)/tools/OpenBLAS/install
 MKL_ROOT?=/opt/intel/mkl
 CUDA_ROOT?=/usr/local/cuda
-USE_SHARED?=0
+USE_SHARED_KALDI?=0
+USE_SHARED_MATH?=0
 # Math libraries
 HAVE_OPENBLAS_CLAPACK?=1
+HAVE_OPENBLAS?=0
 HAVE_MKL?=0
 HAVE_ACCELERATE=0
 HAVE_CUDA?=0
@@ -38,7 +40,7 @@ CFLAGS=-g -O3 -std=c++17 -Wno-deprecated-declarations -fPIC -DFST_NO_DYNAMIC_LIN
 
 LDFLAGS=
 
-ifeq ($(USE_SHARED), 0)
+ifeq ($(USE_SHARED_KALDI), 0)
     LIBS = \
         $(KALDI_ROOT)/src/online2/kaldi-online2.a \
         $(KALDI_ROOT)/src/decoder/kaldi-decoder.a \
@@ -70,7 +72,7 @@ endif
 
 ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
     CFLAGS += -I$(OPENBLAS_ROOT)/include
-    ifeq ($(USE_SHARED), 0)
+    ifeq ($(USE_SHARED_MATH), 0)
         LIBS += \
             $(OPENBLAS_ROOT)/lib/libopenblas.a \
             $(OPENBLAS_ROOT)/lib/liblapack.a \
@@ -78,6 +80,15 @@ ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
             $(OPENBLAS_ROOT)/lib/libf2c.a
     else
         LDFLAGS += -lopenblas -llapack -lblas -lf2c
+    endif
+endif
+
+ifeq ($(HAVE_OPENBLAS), 1)
+    CFLAGS += -I$(OPENBLAS_ROOT)/include
+    ifeq ($(USE_SHARED_MATH), 0)
+        LIBS += $(OPENBLAS_ROOT)/lib/libopenblas.a
+    else
+        LDFLAGS += -lopenblas -lgfortran
     endif
 endif
 
