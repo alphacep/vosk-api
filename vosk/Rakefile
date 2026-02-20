@@ -13,3 +13,30 @@ RuboCop::RakeTask.new
 # (or add this logic into gemspec)
 
 task default: %i[spec rubocop]
+
+
+task :ffi_gen do
+  require 'ffi_gen'
+
+# Pathced gem
+#   File: /home/vladimir/.local/share/rtx/installs/ruby/3.0.2/lib/ruby/gems/3.0.0/gems/ffi_gen-1.2.0/lib/ffi_gen.rb
+#   382:           raise ArgumentError
+#   383: 
+# Warning: Could not process value of enum constant "VOSK_EP_ANSWER_DEFAULT"
+# Warning: Could not process value of enum constant "VOSK_EP_ANSWER_SHORT"
+# Warning: Could not process value of enum constant "VOSK_EP_ANSWER_LONG"
+# Warning: Could not process value of enum constant "VOSK_EP_ANSWER_VERY_LONG"
+
+# That's because of explicit values
+# also doesn't recognize typedef VoskEndpointerMode
+# LD_LIBRARY_PATH=/usr/lib/llvm-14/lib bundle exec rake ffi_gen
+
+  FFIGen.generate(
+    module_name: 'Vosk',
+    ffi_lib: [File.join(__dir__, FFI.map_library_name("vosk")), "vosk"],
+    headers: [ENV.fetch('VOSK_SOURCE', '..') + "/src/vosk_api.h"],
+    # cflags: `llvm-config --cflags`.split(' '),
+    prefixes: ['vosk_'],
+    output: 'vosk_gen/index.rb',
+  )
+end

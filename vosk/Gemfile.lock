@@ -5,6 +5,7 @@ PATH
       bytesize (~> 0.1)
       ffi (~> 1.6)
       fileutils (~> 1.7)
+      ghazel-ffi_gen (= 1.3.9.2)
       httparty (~> 0.21)
       progressbar (~> 1.13)
       rubyzip (~> 2.4)
@@ -13,17 +14,22 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
+    byebug (11.1.3)
     bytesize (0.1.2)
+    coderay (1.1.3)
     csv (3.2.6)
     diff-lcs (1.5.1)
     ffi (1.17.0-x86_64-linux-gnu)
     fileutils (1.7.3)
+    ghazel-ffi_gen (1.3.9.2)
+      ffi (~> 1.0)
     httparty (0.22.0)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     json (2.9.0)
     language_server-protocol (3.17.0.3)
+    method_source (1.1.0)
     mini_mime (1.1.5)
     multi_xml (0.6.0)
     parallel (1.26.3)
@@ -31,6 +37,12 @@ GEM
       ast (~> 2.4.1)
       racc
     progressbar (1.13.0)
+    pry (0.14.2)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    pry-byebug (3.10.1)
+      byebug (~> 11.0)
+      pry (>= 0.13, < 0.15)
     racc (1.8.1)
     rainbow (3.1.1)
     rake (13.2.1)
@@ -70,6 +82,8 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  pry (= 0.14.2)
+  pry-byebug (= 3.10.1)
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 1.21)
