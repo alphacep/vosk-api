@@ -34,8 +34,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "bytesize", "~> 0.1"
   spec.add_dependency "rubyzip", "~> 2.4"
   spec.add_dependency "fileutils", "~> 1.7"
-  # spec.add_dependency "ffi_gen", "~> 1.2"
-  spec.add_dependency "ghazel-ffi_gen", "1.3.9.2"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
