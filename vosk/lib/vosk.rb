@@ -5,6 +5,53 @@ require "ffi"
 require "httparty"
 require "progressbar"
 require "bytesize"
+
+# Allow rate_scale to return a human-readable string (e.g. from ByteSize).
+# The default format '%i' coerces to integer, breaking string values.
+ProgressBar::Components::Rate.prepend(Module.new do
+  def rate_of_change(format_string = "%s")
+    return "0" if elapsed_seconds <= 0
+    format_string % scaled_rate
+  end
+end)
+
+# Add ByteSize-formatted methods to the Progress component (%c/%u).
+ProgressBar::Progress.prepend(Module.new do
+  def progress_with_precision
+    ByteSize.new(progress).to_s
+  end
+
+  def total_with_unknown_indicator_with_precision
+    total ? ByteSize.new(total).to_s : total_with_unknown_indicator
+  end
+end)
+
+# Add label-free time methods to the Time component (%a/%E).
+ProgressBar::Components::Time.prepend(Module.new do
+  def elapsed_no_label
+    val = elapsed
+    val.start_with?("00:") ? val[3..] : val
+  end
+
+  def estimated_no_label
+    val = estimated_with_friendly_oob.split(": ", 2).last
+    val.start_with?("00:") ? val[3..] : val
+  end
+end)
+
+# Remap %c/%u to ByteSize and %a/%E to label-free time.
+# MOLECULES is frozen so we override initialize instead of modifying the hash.
+ProgressBar::Format::Molecule.prepend(Module.new do
+  def initialize(letter)
+    super
+    case key.to_sym
+    when :c then self.method_name = [:progressable, :progress_with_precision]
+    when :u then self.method_name = [:progressable, :total_with_unknown_indicator_with_precision]
+    when :a then self.method_name = [:time_component, :elapsed_no_label]
+    when :E then self.method_name = [:time_component, :estimated_no_label]
+    end
+  end
+end)
 require "zip"
 require "fileutils"
 require "json"
@@ -234,8 +281,8 @@ module Vosk
         title: "#{model_name}.zip",
         total: nil,
         progress_mark: "█",
-        format: "%t: %j%%|%B| %c/%u [%a<%l, %R/sec]",
-        rate_scale: ->(rate) { ByteSize.new(rate).to_s },
+        format: "%t: %j%%|%B| %c/%u [%a<%E, %r/s]",
+        rate_scale: ->(rate) { ByteSize.new(rate.to_i).to_s },
       )
 
       begin
