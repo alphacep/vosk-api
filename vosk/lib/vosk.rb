@@ -7,33 +7,41 @@ require_relative "vosk/progressbar"
 require "zip"
 require "fileutils"
 require "json"
-require "pathname"
 
 module Vosk
   class Error < StandardError; end
 
   # Remote location of the models and local folders
-  MODEL_PRE_URL = "https://alphacephei.com/vosk/models/"
-  MODEL_LIST_URL = "#{MODEL_PRE_URL}model-list.json"
+  MODEL_PRE_URL = "https://alphacephei.com/vosk/models/".freeze
+  MODEL_LIST_URL = "#{MODEL_PRE_URL}model-list.json".freeze
   # TODO: Test on Windows
   MODEL_DIRS = [
     ENV["VOSK_MODEL_PATH"], "/usr/share/vosk",
     File.join(Dir.home, "AppData/Local/vosk"), File.join(Dir.home, ".cache/vosk"),
-  ]
+  ].compact.freeze
 
-  def self.list_models
+  # Different from Python: no need to print inside the method, simply use +puts Vosk.models+
+  def self.models
     response = HTTParty.get(MODEL_LIST_URL, timeout: 10)
-    response.each { |model| puts model["name"] }
+    response.map { |model| model["name"] }
   end
 
-  def self.list_languages
+  # Different from Python: no need to print inside the method, simply use +puts Vosk.languages+
+  def self.languages
     response = HTTParty.get(MODEL_LIST_URL, timeout: 10)
-    response.map { |model| model["lang"] }.uniq.each { |lang| puts lang }
+    response.map { |model| model["lang"] }.uniq
   end
 
   module C
     extend FFI::Library
     # FIXME: Load same way as in Python, test on Windows
+    # This second option, 'vosk', allows system-wide installed library to be loaded.
+    # I see you search /usr/share/vosk, so I guess it's supported somehow.
+    # It'll allow the gem to be used on systems not supported in pre-compiled releases.
+    # (in fact, we only need the first in a pre-compiled release and the second otherwise,
+    # but not worth the effort to put more configuration in the build stage - not possible without hacks)
+    # But when we load a lib not shipped with the gem itself, we (might) need to ensure it's a compatible version
+    # Note: options in the array are alternatives, only the first found is loaded
     ffi_lib [File.join(__dir__, FFI.map_library_name("vosk")), "vosk"]
 
     class VoskModel < FFI::AutoPointer
@@ -54,7 +62,7 @@ module Vosk
       end
 
       def self.release(ptr)
-        C.vosk_spk_model_free(ptr) unless ptr.null?
+        C.vosk_spk_model_free(ptr)
       end
     end
 
@@ -113,16 +121,16 @@ module Vosk
     )
 
     attach_function :vosk_model_new, [:string], VoskModel
-    attach_function :vosk_model_free, [:pointer], :void
+    attach_function :vosk_model_free, [VoskModel], :void
     attach_function :vosk_model_find_word, [VoskModel, :string], :int
 
     attach_function :vosk_spk_model_new, [:string], VoskSpkModel
-    attach_function :vosk_spk_model_free, [:pointer], :void
+    attach_function :vosk_spk_model_free, [VoskSpkModel], :void
 
     attach_function :vosk_recognizer_new, [VoskModel, :float], VoskRecognizer
     attach_function :vosk_recognizer_new_spk, [VoskModel, :float, VoskSpkModel], VoskRecognizer
     attach_function :vosk_recognizer_new_grm, [VoskModel, :float, :string], VoskRecognizer
-    attach_function :vosk_recognizer_free, [:pointer], :void
+    attach_function :vosk_recognizer_free, [VoskRecognizer], :void
     attach_function :vosk_recognizer_set_max_alternatives, [VoskRecognizer, :int], :void
     attach_function :vosk_recognizer_set_words, [VoskRecognizer, :int], :void
     attach_function :vosk_recognizer_set_partial_words, [VoskRecognizer, :int], :void
@@ -140,7 +148,7 @@ module Vosk
     attach_function :vosk_recognizer_reset, [VoskRecognizer], :void
 
     attach_function :vosk_batch_model_new, [:string], VoskBatchModel
-    attach_function :vosk_batch_model_free, [:pointer], :void
+    attach_function :vosk_batch_model_free, [VoskBatchModel], :void
     attach_function :vosk_batch_model_wait, [VoskBatchModel], :void
 
     attach_function :vosk_batch_recognizer_new, [VoskBatchModel, :float], VoskBatchRecognizer
@@ -188,48 +196,55 @@ module Vosk
 
     def get_model_by_name(model_name)
       MODEL_DIRS.each do |directory|
-        next if directory.nil? || !Dir.exist?(directory)
+        next unless Dir.exist?(directory)
         entry = Dir.entries(directory).find { |f| f == model_name }
         return File.join(directory, entry) if entry
       end
       response = HTTParty.get(MODEL_LIST_URL, timeout: 10)
       result_model = response.map { |m| m["name"] }.find { |n| n == model_name }
-      if result_model.nil?
-        warn "model name #{model_name} does not exist"
+      unless result_model
+        # It's not common for Ruby gems to exit the whole process, but I decided to match Python behavior
+        puts "model name #{model_name} does not exist"
         exit(1)
       end
-      dest = File.join(MODEL_DIRS.compact.last, result_model)
+      # It always selects the last dir for downloads, ignoring env and windows-specific dir
+      dest = File.join(MODEL_DIRS.last, result_model)
       download_model(dest)
       dest
     end
 
     def get_model_by_lang(lang)
       MODEL_DIRS.each do |directory|
-        next if directory.nil? || !Dir.exist?(directory)
+        next unless Dir.exist?(directory)
         entry = Dir.entries(directory).find { |f| f.match?(/\Avosk-model(-small)?-#{Regexp.escape(lang)}/) }
         return File.join(directory, entry) if entry
       end
       response = HTTParty.get(MODEL_LIST_URL, timeout: 10)
-      result_model = response.find { |m|
+      result_model = response.find do |m|
         m["lang"] == lang && m["type"] == "small" && m["obsolete"] == "false"
-      }&.dig("name")
-      if result_model.nil?
-        warn "lang #{lang} does not exist"
+      end&.dig("name")
+      unless result_model
+        # It's not common for Ruby gems to exit the whole process, but I decided to match Python behavior
+        puts "lang #{lang} does not exist"
         exit(1)
       end
-      dest = File.join(MODEL_DIRS.compact.last, result_model)
+      # It always selects the last dir for downloads, ignoring env and windows-specific dir
+      dest = File.join(MODEL_DIRS.last, result_model)
       download_model(dest)
       dest
     end
 
+    # Python param "model_name" is, in fact, a full path
     def download_model(model_path)
       dir = File.dirname(model_path)
+      # Python version won't try to create the directory if a file with the same name exists
       FileUtils.makedirs(dir) unless Dir.exist?(dir)
       model_name = File.basename(model_path)
       zip_path = "#{model_path}.zip"
       url = "#{MODEL_PRE_URL}#{model_name}.zip"
 
       progressbar = ProgressBar.create(
+        # Why add MODEL_PRE_URL and then split it away?
         title: "#{model_name}.zip",
         total: nil,
         progress_mark: "█",

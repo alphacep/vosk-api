@@ -28,11 +28,11 @@ WaveFile::Reader.new(ARGV[0]) do |reader|
 
   reader.each_buffer(4000) do |buffer|
     # 16 bits
-    data = buffer.samples.pack('s<*')
+    data = buffer.samples.pack(WaveFile::PACK_CODES.dig(:pcm, 16))
     next unless rec.accept_waveform(data).nonzero?
 
     print JSON.parse(rec.result)['text']
     print ', '
   end
-  puts JSON.parse(rec.final_result())['text']
+  puts JSON.parse(rec.final_result)['text']
 end
