@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "Offline speech recognition API"
   spec.description = "Vosk is an offline open source speech recognition toolkit. It enables speech recognition for 20+ languages and dialects - English, Indian English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish, Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino, Ukrainian, Kazakh, Swedish, Japanese, Esperanto, Hindi, Czech, Polish. More to come."
   spec.homepage = "https://alphacephei.com/vosk"
-  spec.license = "Apache 2.0"
+  spec.license = "Apache-2.0"
   spec.required_ruby_version = ">= 2.5"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
     *Dir["lib/**/*.rb"],
   ]
   spec.bindir = "exe"
-  spec.executables = ['exe/vosk-transcriber']
+  spec.executables = ["vosk-transcriber"]
   spec.require_paths = ["lib"]
 
   spec.add_dependency "ffi", "~> 1.6"

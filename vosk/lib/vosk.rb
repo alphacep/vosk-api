@@ -42,6 +42,7 @@ module Vosk
     # but not worth the effort to put more configuration in the build stage - not possible without hacks)
     # But when we load a lib not shipped with the gem itself, we (might) need to ensure it's a compatible version
     # Note: options in the array are alternatives, only the first found is loaded
+    # Note: probably needs RubyInstaller::Runtime.add_dll_directory on Windows
     ffi_lib [File.join(__dir__, FFI.map_library_name("vosk")), "vosk"]
 
     class VoskModel < FFI::AutoPointer
