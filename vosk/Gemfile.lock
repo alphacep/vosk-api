@@ -65,6 +65,7 @@ GEM
     unicode-display_width (3.1.2)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
+    wavefile (1.1.2)
 
 PLATFORMS
   x86_64-linux
@@ -74,6 +75,7 @@ DEPENDENCIES
   rspec (~> 3.0)
   rubocop (~> 1.21)
   vosk!
+  wavefile (~> 1.1)
 
 BUNDLED WITH
    2.4.22

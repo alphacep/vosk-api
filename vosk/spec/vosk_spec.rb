@@ -15,6 +15,8 @@ def read_wav(path)
 end
 
 RSpec.describe Vosk do
+  before(:all) { Vosk.set_log_level -1 }
+
   it "has a version number" do
     expect(Vosk::VERSION).not_to be_nil
   end
@@ -47,18 +49,18 @@ RSpec.describe Vosk do
       end
 
       it "finds a known word" do
-        expect(model.find_word("one")).to be >= 0
+        expect(model.vosk_model_find_word("one")).to be >= 0
       end
 
       it "returns -1 for an unknown word" do
-        expect(model.find_word("xyzzy")).to eq(-1)
+        expect(model.vosk_model_find_word("xyzzy")).to eq(-1)
       end
     end
   end
 
   describe Vosk::SpkModel do
     it "raises Vosk::Error on a bad path" do
-      expect { Vosk::SpkModel.new(model_path: "/nonexistent/path") }.to raise_error(Vosk::Error)
+      expect { Vosk::SpkModel.new("/nonexistent/path") }.to raise_error(Vosk::Error)
     end
   end
 

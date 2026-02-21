@@ -71,7 +71,7 @@ module Vosk
 
     class VoskBatchModel < FFI::AutoPointer
       def self.from_native(ptr, _ctx)
-        raise Error, "Failed to create a batch model" if ptr.null?
+        raise Error, "Failed to create a model" if ptr.null?
         super
       end
 
@@ -82,7 +82,7 @@ module Vosk
 
     class VoskBatchRecognizer < FFI::AutoPointer
       def self.from_native(ptr, _ctx)
-        raise Error, "Failed to create a batch recognizer" if ptr.null?
+        raise Error, "Failed to create a recognizer" if ptr.null?
         super
       end
 
@@ -93,7 +93,7 @@ module Vosk
 
     class VoskProcessor < FFI::AutoPointer
       def self.from_native(ptr, _ctx)
-        raise Error, "Failed to create a processor" if ptr.null?
+        raise Error, "Failed to create processor" if ptr.null?
         super
       end
 
@@ -172,7 +172,7 @@ module Vosk
       @handle = C.vosk_model_new(path)
     end
 
-    def find_word(word)
+    def vosk_model_find_word(word)
       C.vosk_model_find_word(@handle, word)
     end
 
@@ -274,7 +274,7 @@ module Vosk
   class SpkModel
     attr_reader :handle
 
-    def initialize(model_path:)
+    def initialize(model_path)
       @handle = C.vosk_spk_model_new(model_path)
     end
   end
