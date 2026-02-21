@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vosk (0.3.50)
+    vosk (0.3.45)
       bytesize (~> 0.1)
       ffi (~> 1.6)
       fileutils (~> 1.7)
