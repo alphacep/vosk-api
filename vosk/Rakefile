@@ -30,10 +30,10 @@ if cross_compile?
     # TODO
     # vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__),
     # "..")))
-    FileUtils.cp Dir[File.join(vosk_source, "src/lib*.*")], "lib"
+    FileUtils.cp Dir[File.join(vosk_source, "src/lib*.*")], "lib/vosk"
     # TODO: check it works properly (spec is modified after `gem` task is already created)
     # Matches package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
-    spec.files += Dir["lib/*.{so,dll,dyld}"]
+    spec.files += Dir["lib/vosk/*.{so,dll,dyld}"]
   end
   task gem: :libs
   # TODO: figure out platform

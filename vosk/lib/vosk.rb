@@ -36,8 +36,8 @@ module Vosk
     attr_reader :handle
 
     def initialize(model_path: nil, model_name: nil, lang: nil)
-      path = model_path || get_model_path(model_name, lang)
-      @handle = C.vosk_model_new(path)
+      model_path ||= get_model_path(model_name, lang)
+      @handle = C.vosk_model_new(model_path)
     end
 
     def vosk_model_find_word(word)
@@ -161,6 +161,7 @@ module Vosk
   end
 
   class KaldiRecognizer
+    # Python version accepts *args, so in case of a wrong number of arguments it'll raise TypeError, while Ruby raises ArgumentError
     def initialize(model, sample_rate, grammar_or_spk_model = nil)
       @handle = case grammar_or_spk_model
       when nil
@@ -174,23 +175,23 @@ module Vosk
       end
     end
 
-    def set_max_alternatives(max_alternatives)
+    def max_alternatives=(max_alternatives)
       C.vosk_recognizer_set_max_alternatives(@handle, max_alternatives)
     end
 
-    def set_words(enable_words)
+    def words=(enable_words)
       C.vosk_recognizer_set_words(@handle, enable_words ? 1 : 0)
     end
 
-    def set_partial_words(enable_partial_words)
+    def partial_words=(enable_partial_words)
       C.vosk_recognizer_set_partial_words(@handle, enable_partial_words ? 1 : 0)
     end
 
-    def set_nlsml(enable_nlsml)
+    def nlsml=(enable_nlsml)
       C.vosk_recognizer_set_nlsml(@handle, enable_nlsml ? 1 : 0)
     end
 
-    def set_endpointer_mode(mode)
+    def endpointer_mode=(mode)
       C.vosk_recognizer_set_endpointer_mode(@handle, mode.to_i)
     end
 
@@ -198,17 +199,18 @@ module Vosk
       C.vosk_recognizer_set_endpointer_delays(@handle, t_start_max.to_f, t_end.to_f, t_max.to_f)
     end
 
-    def set_spk_model(spk_model)
+    def spk_model=(spk_model)
       C.vosk_recognizer_set_spk_model(@handle, spk_model.handle)
     end
 
-    def set_grammar(grammar)
+    def grammar=(grammar)
       C.vosk_recognizer_set_grm(@handle, grammar)
     end
 
     def accept_waveform(data)
       res = C.vosk_recognizer_accept_waveform(@handle, data, data.bytesize)
       raise Error, "Failed to process waveform" if res < 0
+
       res
     end
 
@@ -228,42 +230,43 @@ module Vosk
       C.vosk_recognizer_reset(@handle)
     end
 
-    def srt_result(stream, words_per_line: 7)
-      results = []
-      while (data = stream.read(4000)) && !data.empty?
-        results << result if accept_waveform(data).nonzero?
-      end
-      results << final_result
+    # def srt_result(stream, words_per_line: 7)
+    #   results = []
+    #   while (data = stream.read(4000)) && !data.empty?
+    #     results << result if accept_waveform(data).nonzero?
+    #   end
+    #   results << final_result
 
-      subs = []
-      results.each do |res|
-        jres = JSON.parse(res)
-        next unless jres.key?("result")
-        jres["result"].each_slice(words_per_line) do |line|
-          index = subs.length + 1
-          start_time = srt_time(line.first["start"])
-          end_time = srt_time(line.last["end"])
-          content = line.map { |w| w["word"] }.join(" ")
-          subs << "#{index}\n#{start_time} --> #{end_time}\n#{content}\n"
-        end
-      end
-      subs.join("\n")
-    end
+    #   subs = []
+    #   results.each do |res|
+    #     jres = JSON.parse(res)
+    #     next unless jres.key?("result")
+    #     jres["result"].each_slice(words_per_line) do |line|
+    #       index = subs.length + 1
+    #       start_time = srt_time(line.first["start"])
+    #       end_time = srt_time(line.last["end"])
+    #       content = line.map { |w| w["word"] }.join(" ")
+    #       subs << "#{index}\n#{start_time} --> #{end_time}\n#{content}\n"
+    #     end
+    #   end
+    #   subs.join("\n")
+    # end
 
-    private
+    # private
 
-    def srt_time(seconds)
-      h = (seconds / 3600).to_i
-      m = ((seconds % 3600) / 60).to_i
-      s = (seconds % 60).to_i
-      ms = ((seconds - seconds.floor) * 1000).round
-      format("%02d:%02d:%02d,%03d", h, m, s, ms)
-    end
+    # def srt_time(seconds)
+    #   h = (seconds / 3600).to_i
+    #   m = ((seconds % 3600) / 60).to_i
+    #   s = (seconds % 60).to_i
+    #   ms = ((seconds - seconds.floor) * 1000).round
+    #   format("%02d:%02d:%02d,%03d", h, m, s, ms)
+    # end
   end
 
   class BatchModel
     attr_reader :handle
 
+    # Python version accepts additional ignored args for some reason
     def initialize(model_path)
       @handle = C.vosk_batch_model_new(model_path)
     end
@@ -274,6 +277,7 @@ module Vosk
   end
 
   class BatchRecognizer
+    # Python version accepts *args, but I don't just use regular arguments
     def initialize(batch_model, sample_rate)
       @handle = C.vosk_batch_recognizer_new(batch_model.handle, sample_rate.to_f)
     end
@@ -292,12 +296,13 @@ module Vosk
       C.vosk_batch_recognizer_finish_stream(@handle)
     end
 
-    def get_pending_chunks
+    def pending_chunks
       C.vosk_batch_recognizer_get_pending_chunks(@handle)
     end
   end
 
   class Processor
+    # Python version accepts *args, but I don't just use regular arguments
     def initialize(lang, type)
       @handle = C.vosk_text_processor_new(lang, type)
     end
@@ -307,7 +312,7 @@ module Vosk
     end
   end
 
-  def self.set_log_level(level)
+  def self.log_level=(level)
     C.vosk_set_log_level(level)
   end
 
