@@ -4,8 +4,6 @@ require "json"
 require "wavefile"
 
 RSpec.describe Vosk do
-  described_class.log_level = -1
-
   let(:en_model_path) { File.join(Dir.home, ".cache/vosk/vosk-model-small-en-us-0.4") }
   let(:test_wav_path) { File.expand_path("../example/test.wav", __dir__) }
   let(:wave_reader) { WaveFile::Reader.new(test_wav_path) }
@@ -29,30 +27,6 @@ RSpec.describe Vosk do
                Vosk::EndpointerMode::LONG,
                Vosk::EndpointerMode::VERY_LONG,
              ]).to eq([0, 1, 2, 3])
-    end
-  end
-
-  describe Vosk::Model do
-    it "raises Vosk::Error on a bad path" do
-      expect do
-        described_class.new(model_path: "/nonexistent/path")
-      end.to raise_error(Vosk::Error, "Failed to create a model")
-    end
-
-    context "when loaded from a path" do
-      subject(:model) { described_class.new(model_path: en_model_path) }
-
-      it "constructs successfully" do
-        expect(model).to be_a(described_class)
-      end
-
-      it "finds a known word" do
-        expect(model.vosk_model_find_word("one")).to be >= 0
-      end
-
-      it "returns -1 for an unknown word" do
-        expect(model.vosk_model_find_word("xyzzy")).to eq(-1)
-      end
     end
   end
 

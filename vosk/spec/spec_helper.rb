@@ -14,3 +14,5 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+Vosk.log_level = -1
