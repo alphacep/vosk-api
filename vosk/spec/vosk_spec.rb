@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "srt"
 require "wavefile"
 
 RSpec.describe Vosk do
@@ -59,6 +60,28 @@ RSpec.describe Vosk do
 
     context "when processing audio" do
       subject(:rec) { described_class.new(model, wave_sample_rate) }
+
+      let(:wave_stream) do
+        stream = wave_chunks.each_with_object(StringIO.new) { |chunk, stream| stream.write(chunk) }
+        stream.rewind
+        stream
+      end
+
+      let(:expected_srt) do
+        <<~SRT
+          1
+          00:00:00,870 --> 00:00:02,610
+          what zero zero zero one
+
+          2
+          00:00:03,930 --> 00:00:04,950
+          no no to uno
+
+          3
+          00:00:06,240 --> 00:00:08,010
+          cyril one eight zero three
+        SRT
+      end
 
       it "accept_waveform returns 0 or 1" do
         results = wave_chunks.map { |chunk| rec.accept_waveform(chunk) }.uniq
@@ -127,6 +150,11 @@ RSpec.describe Vosk do
 
       it "set_grammar changes the active grammar" do
         expect { rec.grammar = '["one two three", "[unk]"]' }.not_to raise_error
+      end
+
+      it "srt_result produces a valid SRT" do
+        rec.words = true
+        expect(rec.srt_result(wave_stream)).to eq(expected_srt)
       end
     end
 

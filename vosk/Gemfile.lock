@@ -8,6 +8,7 @@ PATH
       httparty (~> 0.21)
       progressbar (~> 1.13)
       rubyzip (~> 2.4)
+      srt (~> 0.1.5)
 
 GEM
   remote: https://rubygems.org/
@@ -81,6 +82,7 @@ GEM
       rubocop (~> 1.81)
     ruby-progressbar (1.13.0)
     rubyzip (2.4.1)
+    srt (0.1.5)
     unicode-display_width (3.1.2)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)

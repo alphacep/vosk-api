@@ -7,6 +7,7 @@ require_relative "vosk/ffi"
 require "zip"
 require "fileutils"
 require "json"
+require "srt"
 
 # Vosk speech recognition system
 module Vosk
@@ -247,37 +248,35 @@ module Vosk
       C.vosk_recognizer_reset(@handle)
     end
 
-    # def srt_result(stream, words_per_line: 7)
-    #   results = []
-    #   while (data = stream.read(4000)) && !data.empty?
-    #     results << result if accept_waveform(data).nonzero?
-    #   end
-    #   results << final_result
+    def srt_result(stream, words_per_line: 7)
+      results = []
+      while (data = stream.read(4000))
+        results.push(result) if accept_waveform(data).nonzero?
+      end
+      results.push(final_result)
 
-    #   subs = []
-    #   results.each do |res|
-    #     jres = JSON.parse(res)
-    #     next unless jres.key?("result")
-    #     jres["result"].each_slice(words_per_line) do |line|
-    #       index = subs.length + 1
-    #       start_time = srt_time(line.first["start"])
-    #       end_time = srt_time(line.last["end"])
-    #       content = line.map { |w| w["word"] }.join(" ")
-    #       subs << "#{index}\n#{start_time} --> #{end_time}\n#{content}\n"
-    #     end
-    #   end
-    #   subs.join("\n")
-    # end
+      create_srt(results, words_per_line)
+    end
 
-    # private
+    private
 
-    # def srt_time(seconds)
-    #   h = (seconds / 3600).to_i
-    #   m = ((seconds % 3600) / 60).to_i
-    #   s = (seconds % 60).to_i
-    #   ms = ((seconds - seconds.floor) * 1000).round
-    #   format("%02d:%02d:%02d,%03d", h, m, s, ms)
-    # end
+    def create_srt(results, words_per_line)
+      srt = SRT::File.new
+      results.each do |res|
+        jres = JSON.parse(res)
+        next unless jres.key?("result")
+
+        jres["result"].each_slice(words_per_line) do |line|
+          sub = SRT::Line.new
+          sub.sequence = srt.lines.length + 1
+          sub.start_time = line.first["start"]
+          sub.end_time = line.last["end"]
+          sub.text = line.map { |w| w["word"] }.join(" ")
+          srt.lines.push(sub)
+        end
+      end
+      srt.to_s
+    end
   end
 
   # Batch model object

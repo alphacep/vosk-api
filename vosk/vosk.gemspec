@@ -18,16 +18,10 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://alphacephei.com/vosk"
   spec.license = "Apache-2.0"
   spec.required_ruby_version = ">= 2.5"
-
-  # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
-
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/alphacep/vosk-api"
-  # spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
-
-  # TODO
   spec.files = [
-    *Dir["lib/**/*.rb"],
+    *Dir["lib/**/*.rb"], *Dir["exe/**/*"], *Dir["sig/**/*"],
   ]
   spec.bindir = "exe"
   spec.executables = ["vosk-transcriber"]
@@ -39,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "httparty", "~> 0.21"
   spec.add_dependency "progressbar", "~> 1.13"
   spec.add_dependency "rubyzip", "~> 2.4"
+  spec.add_dependency "srt", "~> 0.1.5"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
