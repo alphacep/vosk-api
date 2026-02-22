@@ -44,7 +44,7 @@ spec = Gem::Specification.load("vosk.gemspec")
 # end
 
 # add your default gem packing task
-# Run with `rake gem`
+# Run with `rake build`
 Gem::PackageTask.new(spec)
 
 task default: %i[spec rubocop]

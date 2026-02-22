@@ -5,6 +5,7 @@ require "ffi"
 module Vosk
   module C # :nodoc: all
     extend FFI::Library
+
     # FIXME: Load same way as in Python, test on Windows
     # This second option, 'vosk', allows system-wide installed library to be loaded.
     # I see you search /usr/share/vosk, so I guess it's supported somehow.
@@ -147,6 +148,7 @@ module Vosk
     # https://github.com/ffi/ffi/issues/467
     class OwnedString
       extend FFI::DataConverter
+
       native_type :strptr
 
       def self.to_native(_value, _context)

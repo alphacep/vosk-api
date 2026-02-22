@@ -9,7 +9,12 @@ Gem::Specification.new do |spec|
   spec.email = ["contact@alphacphei.com", "uvlad7@gmail.com"]
 
   spec.summary = "Offline speech recognition API"
-  spec.description = "Vosk is an offline open source speech recognition toolkit. It enables speech recognition for 20+ languages and dialects - English, Indian English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish, Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino, Ukrainian, Kazakh, Swedish, Japanese, Esperanto, Hindi, Czech, Polish. More to come."
+  spec.description =
+    "Vosk is an offline open source speech recognition toolkit. " \
+    "It enables speech recognition for 20+ languages and dialects - " \
+    "English, Indian English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish, Vietnamese, " \
+    "Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino, Ukrainian, Kazakh, Swedish, Japanese, " \
+    "Esperanto, Hindi, Czech, Polish. More to come."
   spec.homepage = "https://alphacephei.com/vosk"
   spec.license = "Apache-2.0"
   spec.required_ruby_version = ">= 2.5"

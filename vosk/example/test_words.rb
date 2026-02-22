@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require "vosk"
 require "wavefile"
@@ -16,7 +17,7 @@ WaveFile::Reader.new(ARGV[0]) do |reader|
   # the order doesn't have to be strict
   rec = Vosk::KaldiRecognizer.new(
     model, reader_format.sample_rate,
-    '["oh one two three", "four five six", "seven eight nine zero", "[unk]"]'
+    '["oh one two three", "four five six", "seven eight nine zero", "[unk]"]',
   )
 
   reader.each_buffer(4000) do |buffer|
