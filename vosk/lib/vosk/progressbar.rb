@@ -18,7 +18,7 @@ ProgressBar::Components::Rate.prepend(Module.new do
   end
 end)
 
-module ProgressBar # :nodoc: all
+class ProgressBar # :nodoc: all
   # Add ByteSize-formatted progress methods to the Progress component.
   class Progress
     def progress_with_precision
