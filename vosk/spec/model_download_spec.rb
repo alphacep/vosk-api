@@ -19,7 +19,6 @@ RSpec.describe Vosk::Model do
       end
 
       it "returns its path without hitting the network" do
-        expect(HTTParty).not_to receive(:get)
         expect(model.send(:get_model_by_name, model_name)).to eq(File.join(tmpdir, model_name))
       end
     end
@@ -27,13 +26,14 @@ RSpec.describe Vosk::Model do
     context "when the model is not in any MODEL_DIR" do
       before do
         stub_const("Vosk::MODEL_DIRS", [tmpdir])
-        allow(HTTParty).to receive(:get).with(Vosk::MODEL_LIST_URL, timeout: 10).and_return(model_list)
+        stub_request(:get, Vosk::MODEL_LIST_URL)
+          .to_return(status: 200, body: model_list.to_json, headers: { "Content-Type" => "application/json" })
         allow(model).to receive(:download_model)
       end
 
       it "downloads the model to the last MODEL_DIR" do
-        expect(model).to receive(:download_model).with(File.join(tmpdir, model_name))
         model.send(:get_model_by_name, model_name)
+        expect(model).to have_received(:download_model).with(File.join(tmpdir, model_name))
       end
 
       it "returns the expected path after downloading" do
@@ -54,7 +54,6 @@ RSpec.describe Vosk::Model do
       end
 
       it "returns its path without hitting the network" do
-        expect(HTTParty).not_to receive(:get)
         expect(model.send(:get_model_by_lang, "en-us")).to eq(File.join(tmpdir, model_name))
       end
 
@@ -62,7 +61,6 @@ RSpec.describe Vosk::Model do
         other = "vosk-model-en-us-0.22"
         FileUtils.makedirs(File.join(tmpdir, other))
         stub_const("Vosk::MODEL_DIRS", [tmpdir])
-        expect(HTTParty).not_to receive(:get)
         expect(model.send(:get_model_by_lang, "en-us")).not_to be_nil
       end
     end
@@ -70,13 +68,14 @@ RSpec.describe Vosk::Model do
     context "when no local model exists for the language" do
       before do
         stub_const("Vosk::MODEL_DIRS", [tmpdir])
-        allow(HTTParty).to receive(:get).with(Vosk::MODEL_LIST_URL, timeout: 10).and_return(model_list)
+        stub_request(:get, Vosk::MODEL_LIST_URL)
+          .to_return(status: 200, body: model_list.to_json, headers: { "Content-Type" => "application/json" })
         allow(model).to receive(:download_model)
       end
 
       it "downloads a small model for the language" do
-        expect(model).to receive(:download_model).with(File.join(tmpdir, model_name))
         model.send(:get_model_by_lang, "en-us")
+        expect(model).to have_received(:download_model).with(File.join(tmpdir, model_name))
       end
 
       it "exits when no model is available for the language" do
@@ -87,28 +86,30 @@ RSpec.describe Vosk::Model do
 
   describe "#download_model" do
     let(:model_path) { File.join(tmpdir, model_name) }
-    let(:source_zip) { File.join(tmpdir, "source.zip") }
-
-    before do
-      # Build a zip that mimics the model archive structure.
-      Zip::OutputStream.open(source_zip) do |zip|
+    let(:zip_content) do
+      Zip::OutputStream.write_buffer do |zip|
         zip.put_next_entry("#{model_name}/conf/model.conf")
-        zip.write("# model config\n")
+        zip.write("# model config\n" * 1_000)
         zip.put_next_entry("#{model_name}/README")
         zip.write("test model\n")
+      end.string
+    end
+    let(:progress_bar_content) { StringIO.new }
+    let(:progress_bar_stream) do
+      dbl = double
+      allow(dbl).to receive(:tty?).with(no_args).and_return(true)
+      allow(dbl).to receive(:print) do |*args|
+        progress_bar_content.print(*args)
       end
+      allow(dbl).to receive(:flush).with(no_args).and_return(dbl)
+      allow(dbl).to receive(:winsize).with(no_args).and_return([40, 180])
+      dbl
+    end
 
-      # Suppress progress bar output.
-      pb = Struct.new(:progress, :total).new(0, nil)
-      pb.define_singleton_method(:finish) {}
-      pb.define_singleton_method(:stop) {}
-      allow(ProgressBar).to receive(:create).and_return(pb)
-
-      # Stub download_file to deliver the pre-built zip instead of fetching from the network.
-      allow(model).to receive(:download_file) do |_url, dest, &callback|
-        FileUtils.cp(source_zip, dest)
-        callback&.call(File.size(dest), File.size(dest))
-      end
+    before do
+      stub_const("ProgressBar::Output::DEFAULT_OUTPUT_STREAM", progress_bar_stream)
+      stub_request(:get, "#{Vosk::MODEL_PRE_URL}#{model_name}.zip")
+        .to_return(status: 200, body: zip_content, headers: { "Content-Length" => zip_content.bytesize.to_s })
     end
 
     it "extracts the archive into the parent directory" do
@@ -128,9 +129,22 @@ RSpec.describe Vosk::Model do
     end
 
     it "uses the correct download URL" do
-      expect(model).to receive(:download_file)
-        .with("#{Vosk::MODEL_PRE_URL}#{model_name}.zip", anything)
       model.send(:download_model, model_path)
+      expect(WebMock).to have_requested(:get, "#{Vosk::MODEL_PRE_URL}#{model_name}.zip")
+    end
+
+    it "displays a progress bar during download" do
+      model.send(:download_model, model_path)
+      # TODO: test callback when multiple fragments are received
+      expect(progress_bar_content.string).to eq(
+        (" " * 120).concat(
+          "\r" \
+          "vosk-model-small-en-us-0.4.zip:   0%|=---=---=---=---=---=---=---=---=---=---=---=---=---=---=---=---=--" \
+          "-=---=---=---=---=---=---=---=---=---=---=| 0 bytes/?? [00:00<??:??:??, 0/s]\r" \
+          "vosk-model-small-en-us-0.4.zip: 100%|███████████████████████████████████████████████████████████████████" \
+          "████████████████████████████████████| 402 bytes/402 bytes [00:00<00:00, 0/s]\n",
+        ),
+      )
     end
   end
 end

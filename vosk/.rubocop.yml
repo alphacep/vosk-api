@@ -1,7 +1,10 @@
+plugins:
+ - rubocop-rake
+ - rubocop-rspec
+
 AllCops:
   TargetRubyVersion: 2.5
   NewCops: enable
-  SuggestExtensions: false
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
@@ -39,3 +42,12 @@ Metrics/MethodLength:
 Style/SymbolArray:
   Exclude:
     - 'lib/vosk/ffi.rb'
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/MultipleExpectations:
+ Max: 3
