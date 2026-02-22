@@ -300,4 +300,7 @@ class Processor:
         _c.vosk_text_processor_free(self._handle)
 
     def process(self, text):
-        return _ffi.string(_c.vosk_text_processor_itn(self._handle, text.encode('utf-8'))).decode('utf-8')
+        ptr = _c.vosk_text_processor_itn(self._handle, text.encode('utf-8'))
+        res = _ffi.string(ptr).decode('utf-8')
+        _c.free(ptr)
+        return res
