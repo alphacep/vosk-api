@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require "ffi"
 
 module Vosk
-    module C
+  module C # :nodoc: all
     extend FFI::Library
     # FIXME: Load same way as in Python, test on Windows
     # This second option, 'vosk', allows system-wide installed library to be loaded.
@@ -45,7 +47,7 @@ module Vosk
         :short, 1,
         :long, 2,
         :very_long, 3,
-      ]
+      ],
     )
 
     class VoskRecognizer < FFI::AutoPointer
@@ -164,7 +166,7 @@ module Vosk
     if Gem::Version.new(VERSION) >= Gem::Version.new("0.3.48")
       attach_function :vosk_text_processor_new, [:string, :string], VoskTextProcessor
       attach_function :vosk_text_processor_free, [VoskTextProcessor], :void
-      # Note: you have a memory leak here in your python version, needs to be
+      # NOTE: you have a memory leak here in your python version, needs to be
       # ptr = _c.vosk_text_processor_itn(self._handle, text.encode('utf-8'))
       # str = _ffi.string(ptr).decode('utf-8')
       #  _ffi.gc(ptr, _c.free)  # or call libc free directly

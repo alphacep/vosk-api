@@ -8,15 +8,16 @@ require "zip"
 require "fileutils"
 require "json"
 
+# Vosk speech recognition system
 module Vosk
   class Error < StandardError; end
 
   # Remote location of the models and local folders
-  MODEL_PRE_URL = "https://alphacephei.com/vosk/models/".freeze
-  MODEL_LIST_URL = "#{MODEL_PRE_URL}model-list.json".freeze
+  MODEL_PRE_URL = "https://alphacephei.com/vosk/models/"
+  MODEL_LIST_URL = "#{MODEL_PRE_URL}model-list.json"
   # TODO: Test on Windows
   MODEL_DIRS = [
-    ENV["VOSK_MODEL_PATH"], "/usr/share/vosk",
+    ENV.fetch("VOSK_MODEL_PATH", nil), "/usr/share/vosk",
     File.join(Dir.home, "AppData/Local/vosk"), File.join(Dir.home, ".cache/vosk"),
   ].compact.freeze
 
@@ -32,6 +33,9 @@ module Vosk
     response.map { |model| model["lang"] }.uniq
   end
 
+  # Model stores all the data required for recognition
+  #  it contains static data and can be shared across processing
+  #  threads.
   class Model
     attr_reader :handle
 
@@ -57,6 +61,7 @@ module Vosk
     def get_model_by_name(model_name)
       MODEL_DIRS.each do |directory|
         next unless Dir.exist?(directory)
+
         entry = Dir.entries(directory).find { |f| f == model_name }
         return File.join(directory, entry) if entry
       end
@@ -76,6 +81,7 @@ module Vosk
     def get_model_by_lang(lang)
       MODEL_DIRS.each do |directory|
         next unless Dir.exist?(directory)
+
         entry = Dir.entries(directory).find { |f| f.match?(/\Avosk-model(-small)?-#{Regexp.escape(lang)}/) }
         return File.join(directory, entry) if entry
       end
@@ -95,10 +101,11 @@ module Vosk
     end
 
     # Python param "model_name" is, in fact, a full path
+    # rubocop:disable Metrics/MethodLength
     def download_model(model_path)
       dir = File.dirname(model_path)
       # Python version won't try to create the directory if a file with the same name exists
-      FileUtils.makedirs(dir) unless Dir.exist?(dir)
+      FileUtils.makedirs(dir)
       model_name = File.basename(model_path)
       zip_path = "#{model_path}.zip"
       url = "#{MODEL_PRE_URL}#{model_name}.zip"
@@ -125,13 +132,14 @@ module Vosk
       Zip::File.open(zip_path) do |zip_file|
         zip_file.each do |entry|
           entry_path = File.join(dir, entry.name)
-          FileUtils.makedirs(File.dirname(entry_path)) unless Dir.exist?(File.dirname(entry_path))
+          FileUtils.makedirs(File.dirname(entry_path))
           entry.extract(entry_path) { true }
         end
       end
 
       File.unlink(zip_path)
     end
+    # rubocop:enable Metrics/MethodLength
 
     def download_file(url, dest, &callback)
       File.open(dest, File::CREAT | File::WRONLY | File::TRUNC | File::BINARY) do |file|
@@ -146,6 +154,8 @@ module Vosk
     end
   end
 
+  # Speaker model is the same as model but contains the data
+  #  for speaker identification.
   class SpkModel
     attr_reader :handle
 
@@ -154,25 +164,32 @@ module Vosk
     end
   end
 
+  # Endpointer scaling factor
   class EndpointerMode
     C::VoskEndpointerMode.symbol_map.each do |name, value|
       const_set(name.upcase, value)
     end
   end
 
+  # Recognizer object is the main object which processes data.
+  #  Each recognizer usually runs in own thread and takes audio as input.
+  #  Once audio is processed recognizer returns JSON object as a string
+  #  which represent decoded information - words, confidences, times, n-best lists,
+  #  speaker information and so on
   class KaldiRecognizer
-    # Python version accepts *args, so in case of a wrong number of arguments it'll raise TypeError, while Ruby raises ArgumentError
+    # Python version accepts *args, so in case of a wrong number of arguments it'll raise TypeError,
+    #   while Ruby raises ArgumentError
     def initialize(model, sample_rate, grammar_or_spk_model = nil)
       @handle = case grammar_or_spk_model
-      when nil
-        C.vosk_recognizer_new(model.handle, sample_rate.to_f)
-      when SpkModel
-        C.vosk_recognizer_new_spk(model.handle, sample_rate.to_f, grammar_or_spk_model.handle)
-      when String
-        C.vosk_recognizer_new_grm(model.handle, sample_rate.to_f, grammar_or_spk_model)
-      else
-        raise TypeError, "Unknown arguments"
-      end
+                when nil
+                  C.vosk_recognizer_new(model.handle, sample_rate.to_f)
+                when SpkModel
+                  C.vosk_recognizer_new_spk(model.handle, sample_rate.to_f, grammar_or_spk_model.handle)
+                when String
+                  C.vosk_recognizer_new_grm(model.handle, sample_rate.to_f, grammar_or_spk_model)
+                else
+                  raise TypeError, "Unknown arguments"
+                end
     end
 
     def max_alternatives=(max_alternatives)
@@ -263,6 +280,7 @@ module Vosk
     # end
   end
 
+  # Batch model object
   class BatchModel
     attr_reader :handle
 
@@ -276,6 +294,7 @@ module Vosk
     end
   end
 
+  # Batch recognizer object
   class BatchRecognizer
     # Python version accepts *args, but I don't just use regular arguments
     def initialize(batch_model, sample_rate)
@@ -301,6 +320,7 @@ module Vosk
     end
   end
 
+  # Inverse text normalization
   class Processor
     # Python version accepts *args, but I don't just use regular arguments
     def initialize(lang, type)

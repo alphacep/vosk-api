@@ -28,13 +28,14 @@ Gem::Specification.new do |spec|
   spec.executables = ["vosk-transcriber"]
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "bytesize", "~> 0.1"
   spec.add_dependency "ffi", "~> 1.6"
+  spec.add_dependency "fileutils", "~> 1.7"
   spec.add_dependency "httparty", "~> 0.21"
   spec.add_dependency "progressbar", "~> 1.13"
-  spec.add_dependency "bytesize", "~> 0.1"
   spec.add_dependency "rubyzip", "~> 2.4"
-  spec.add_dependency "fileutils", "~> 1.7"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

@@ -18,27 +18,31 @@ ProgressBar::Components::Rate.prepend(Module.new do
   end
 end)
 
-# Add ByteSize-formatted progress methods to the Progress component.
-class ProgressBar::Progress
-  def progress_with_precision
-    ByteSize.new(progress).to_s
+module ProgressBar # :nodoc: all
+  # Add ByteSize-formatted progress methods to the Progress component.
+  class Progress
+    def progress_with_precision
+      ByteSize.new(progress).to_s
+    end
+
+    def total_with_unknown_indicator_with_precision
+      total ? ByteSize.new(total).to_s : total_with_unknown_indicator
+    end
   end
 
-  def total_with_unknown_indicator_with_precision
-    total ? ByteSize.new(total).to_s : total_with_unknown_indicator
-  end
-end
+  module Components
+    # Add label-free time methods to the Time component.
+    class Time
+      def elapsed_no_label
+        val = elapsed
+        val.start_with?("00:") ? val[3..-1] : val
+      end
 
-# Add label-free time methods to the Time component.
-class ProgressBar::Components::Time
-  def elapsed_no_label
-    val = elapsed
-    val.start_with?("00:") ? val[3..] : val
-  end
-
-  def estimated_no_label
-    val = estimated_with_friendly_oob.split(": ", 2).last
-    val.start_with?("00:") ? val[3..] : val
+      def estimated_no_label
+        val = estimated_with_friendly_oob.split(": ", 2).last
+        val.start_with?("00:") ? val[3..-1] : val
+      end
+    end
   end
 end
 
@@ -47,8 +51,8 @@ end
 molecules = ProgressBar::Format::Molecule::MOLECULES
 ProgressBar::Format::Molecule.send(:remove_const, :MOLECULES)
 ProgressBar::Format::Molecule::MOLECULES = molecules.merge(
-  s: [:progressable,   :progress_with_precision],
-  z: [:progressable,   :total_with_unknown_indicator_with_precision],
-  d: [:time_component, :elapsed_no_label],
-  o: [:time_component, :estimated_no_label],
+  s: %i[progressable progress_with_precision],
+  z: %i[progressable total_with_unknown_indicator_with_precision],
+  d: %i[time_component elapsed_no_label],
+  o: %i[time_component estimated_no_label],
 ).freeze

@@ -1,8 +1,41 @@
 AllCops:
   TargetRubyVersion: 2.5
+  NewCops: enable
+  SuggestExtensions: false
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/NumericPredicate:
+  EnforcedStyle: comparison
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+
+Metrics/AbcSize:
+  Max: 27
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/MethodLength:
+  Max: 20
+
+Style/SymbolArray:
+  Exclude:
+    - 'lib/vosk/ffi.rb'
