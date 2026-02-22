@@ -274,7 +274,7 @@ class BatchRecognizer:
         _c.vosk_batch_recognizer_free(self._handle)
 
     def AcceptWaveform(self, data):
-        res = _c.vosk_batch_recognizer_accept_waveform(self._handle, data, len(data))
+        _c.vosk_batch_recognizer_accept_waveform(self._handle, data, len(data))
 
     def Result(self):
         ptr = _c.vosk_batch_recognizer_front_result(self._handle)
