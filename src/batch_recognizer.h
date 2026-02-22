@@ -19,6 +19,7 @@
 #include "util/common-utils.h"
 #include "feat/resample.h"
 
+#include <atomic>
 #include <queue>
 
 #include "batch_model.h"
@@ -45,6 +46,7 @@ class BatchRecognizer {
         uint64_t id_;
         bool initialized_;
         bool callbacks_set_;
+        std::atomic<bool> finished_;
         bool nlsml_;
         float sample_frequency_;
         std::queue<std::string> results_;

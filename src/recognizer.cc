@@ -267,6 +267,9 @@ void Recognizer::SetSpkModel(SpkModel *spk_model)
         KALDI_ERR << "Can't add speaker model to already running recognizer";
         return;
     }
+    if (spk_model_)
+        spk_model_->Unref();
+    delete spk_feature_;
     spk_model_ = spk_model;
     spk_model_->Ref();
     spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);

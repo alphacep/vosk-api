@@ -35,6 +35,8 @@
 
 #include "model.h"
 
+#include <atomic>
+
 using namespace kaldi;
 using namespace kaldi::cuda_decoder;
 
@@ -47,6 +49,8 @@ class BatchModel {
 
         uint64_t GetID(BatchRecognizer *recognizer);
         void WaitForCompletion();
+        void Ref();
+        void Unref();
 
     private:
         friend class BatchRecognizer;
@@ -66,6 +70,7 @@ class BatchModel {
 
         int32 samples_per_chunk_;
         uint64_t last_id_;
+        std::atomic<int> ref_cnt_;
 };
 
 #endif /* VOSK_BATCH_MODEL_H */
