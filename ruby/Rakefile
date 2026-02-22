@@ -1,0 +1,50 @@
+# frozen_string_literal: true
+
+require "bundler/gem_tasks"
+require "rspec/core/rake_task"
+require "rubygems/package_task"
+
+RSpec::Core::RakeTask.new(:spec)
+
+require "rubocop/rake_task"
+require "fileutils"
+
+RuboCop::RakeTask.new
+
+# TODO: modify 'build' task somehow to include pre-compiled binary
+# (or add this logic into gemspec)
+
+spec = Gem::Specification.load("vosk.gemspec")
+# Tweak spec when building pre-compiled gem:
+# (see example in https://github.com/oxidize-rb/actions/blob/main/cross-gem/action.yml and https://github.com/oxidize-rb/rb-sys/blob/main/gem/lib/rb_sys/extensiontask.rb)
+# See also https://github.com/rake-compiler/rake-compiler/blob/master/lib/rake/extensiontask.rb and https://github.com/rake-compiler/rake-compiler-dock
+# def cross_compile?
+#   # TODO: impl
+#   false
+# end
+
+# TODO: maybe it should be a separate task that extends Gem::PackageTask
+# if cross_compile?
+#   # Can't use 'file' task bc we don't know file names exactly
+#   task :libs do
+#     # TODO
+#     # vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__),
+#     # "..")))
+#     FileUtils.cp Dir[File.join(vosk_source, "src/lib*.*")], "lib/vosk"
+#     # TODO: check it works properly (spec is modified after `gem` task is already created)
+#     # Matches package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
+#     spec.files += Dir["lib/vosk/*.{so,dll,dyld}"]
+#   end
+#   task gem: :libs
+#   # TODO: figure out platform
+#   # system = os.environ.get('VOSK_SYSTEM', platform.system())
+#   # architecture = os.environ.get('VOSK_ARCHITECTURE', platform.architecture()[0])
+#   # machine = os.environ.get('VOSK_MACHINE', platform.machine())
+#   spec.platform = Gem::Platform.new(platf)
+# end
+
+# add your default gem packing task
+# Run with `rake build`
+Gem::PackageTask.new(spec)
+
+task default: %i[spec rubocop]
