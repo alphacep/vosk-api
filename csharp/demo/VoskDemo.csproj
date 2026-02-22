@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>VoskDemo</RootNamespace>
   </PropertyGroup>
 
@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Vosk" Version="0.3.50" />
+    <PackageReference Include="Vosk" Version="0.3.75" />
   </ItemGroup>
 
 </Project>

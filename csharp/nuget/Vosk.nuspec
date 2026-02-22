@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Vosk</id>
-    <version>0.3.50</version>
+    <version>0.3.75</version>
     <authors>Alpha Cephei Inc</authors>
     <owners>Alpha Cephei Inc</owners>
     <license type="expression">Apache-2.0</license>
@@ -23,10 +23,10 @@ Vosk scales from small devices like Raspberry Pi or Android smartphone to big cl
     <copyright>Copyright 2020-2050 Alpha Cephei Inc</copyright>
     <tags>speech recognition voice stt asr speech-to-text ai offline privacy</tags>
     <dependencies>
-      <group targetFramework=".NETStandard2.0"/>
+      <group targetFramework="net8.0"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="**" exclude="src/*.cs;build.sh;**/.keep-me;*.nupkg" />
+    <file src="**" exclude="bin/**;obj/**;build.sh;src/*.cs;*.nupkg;**/.keep-me" />
   </files>
 </package>

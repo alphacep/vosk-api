@@ -44,7 +44,7 @@ RUN cd /opt \
     && cd /opt/kaldi/src \
     && sed -i "s:TARGET_ARCH=\"\`uname -m\`\":TARGET_ARCH=$(echo $CROSS_TRIPLE|cut -d - -f 1):g" configure \
     && sed -i "s: -O1 : -O3 :g" makefiles/linux_openblas_arm.mk \
-    && sed -i "s: -O1 : -O3 :g" makefiles/linux_openblas_arm.mk \
+    && sed -i "s:-DHAVE_EXECINFO_H=1::g" makefiles/linux_openblas_arm.mk \
     && ./configure --mathlib=OPENBLAS_CLAPACK --shared --use-cuda=no \
     && make -j 10 online2 rnnlm \
     && find /opt/kaldi -name "*.o" -exec rm {} \;

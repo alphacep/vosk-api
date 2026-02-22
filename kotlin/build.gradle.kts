@@ -27,7 +27,7 @@ plugins {
 }
 
 group = "com.alphacephei"
-version = "0.3.50"
+version = "0.3.75"
 
 repositories {
 	google()

@@ -4,10 +4,10 @@ def pomDescription = "Small English model for Android"
 
 android {
     namespace "org.vosk"
-    compileSdkVersion 33
+    compileSdkVersion 36
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 36
         versionCode 10
         versionName = version
         archivesBaseName = archiveName

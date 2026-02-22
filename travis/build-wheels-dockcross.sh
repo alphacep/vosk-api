@@ -14,6 +14,11 @@ case $CROSS_TRIPLE in
         export VOSK_MACHINE=armv7l
         export VOSK_ARCHITECTURE=32bit
         ;;
+    *armv7l-linux-musleabihf*)
+        export VOSK_MACHINE=armv7l
+        export VOSK_ARCHITECTURE=32bit
+        export VOSK_VARIANT="-musl"
+        ;;
     *i686-*)
         export VOSK_MACHINE=x86
         export VOSK_ARCHITECTURE=32bit
@@ -29,9 +34,9 @@ case $CROSS_TRIPLE in
 esac
 
 # Copy library to output folder
-mkdir -p /io/wheelhouse/vosk-linux-$VOSK_MACHINE
-cp /opt/vosk-api/src/*.so /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vosk-linux-$VOSK_MACHINE
+mkdir -p /io/wheelhouse/vosk-linux-${VOSK_MACHINE}${VOSK_VARIANT}
+cp /opt/vosk-api/src/*.so /opt/vosk-api/src/vosk_api.h /io/wheelhouse/vosk-linux-$VOSK_MACHINE${VOSK_VARIANT}
 
 # Build wheel
-python3 -m pip install requests tqdm srt websockets wheel
+python3 -m pip install requests tqdm srt websockets wheel --break-system-packages
 python3 -m pip wheel /opt/vosk-api/python --no-deps -w /io/wheelhouse

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Vosk</PackageId>
+    <Version>0.3.75</Version>
+    <authors>Alpha Cephei Inc</authors>
+    <owners>Alpha Cephei Inc</owners>
+  </PropertyGroup>
+
+  <Target Name="CopyFiles" AfterTargets="Build">
+    <Copy SourceFiles="bin/Release/net8.0/Vosk.dll" DestinationFolder="lib/net8.0" />
+  </Target>
+
+</Project>

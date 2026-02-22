@@ -130,6 +130,9 @@ class Model {
          * @type {unknown}
          */
         this.handle = libvosk.vosk_model_new(modelPath);
+        if (!this.handle) {
+            throw new Error('Failed to create a model.');
+        }
     }
 
     /**
@@ -163,6 +166,9 @@ class SpeakerModel {
          * @type {unknown}
          */
         this.handle = libvosk.vosk_spk_model_new(modelPath);
+        if (!this.handle) {
+            throw new Error('Failed to create a speaker model.');
+        }
     }
 
     /**
@@ -237,6 +243,10 @@ class Recognizer {
             : hasOwnProperty(param, 'grammar')
                 ? libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(param.grammar))
                 : libvosk.vosk_recognizer_new(model.handle, sampleRate);
+
+        if (!this.handle) {
+            throw new Error('Failed to create a recognizer.');
+        }
     }
 
     /**

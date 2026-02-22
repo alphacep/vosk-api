@@ -1,6 +1,6 @@
 {
   "name": "vosk",
-  "version": "0.3.50",
+  "version": "0.3.75",
   "description": "Node binding for continuous offline voice recoginition with Vosk library.",
   "repository": {
     "type": "git",

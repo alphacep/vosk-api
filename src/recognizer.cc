@@ -355,6 +355,7 @@ void Recognizer::UpdateGrammarFst(char const *grammar)
         }
         estimator.AddCounts(sentence);
     }
+    delete g_fst_;
     g_fst_ = new StdVectorFst();
     estimator.Estimate(g_fst_);
 

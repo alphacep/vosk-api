@@ -56,6 +56,10 @@ public class LibVosk {
 
     public static native void vosk_recognizer_reset(Pointer recognizer);
 
+    public static native void vosk_recognizer_set_endpointer_mode(Pointer recognizer, int mode);
+
+    public static native void vosk_recognizer_set_endpointer_delays(Pointer recognizer, float t_start_max, float t_end, float t_max);
+
     public static native void vosk_recognizer_free(Pointer recognizer);
 
     public static native Pointer vosk_text_processor_new(String verbalizer, String tagger);

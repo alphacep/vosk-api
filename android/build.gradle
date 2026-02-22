@@ -4,13 +4,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.0'
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.24.0'
+        classpath 'com.android.tools.build:gradle:8.13.0'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.34.0'
     }
 }
 
 allprojects {
-    version = '0.3.50'
+    version = '0.3.75'
 }
 
 subprojects {
@@ -24,7 +24,7 @@ subprojects {
     }
 
     mavenPublishing {
-        publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01, false)
+        publishToMavenCentral()
         signAllPublications()
     }
 
