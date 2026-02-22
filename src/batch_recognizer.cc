@@ -18,12 +18,14 @@
 #include "lat/sausages.h"
 #include "json.h"
 
+#include <thread>
+#include <chrono>
+
 BatchRecognizer::BatchRecognizer(BatchModel *model, float
                                  sample_frequency) : model_(model), sample_frequency_(sample_frequency),
-                                 initialized_(false), callbacks_set_(false), nlsml_(false) {
+                                 initialized_(false), callbacks_set_(false), finished_(false), nlsml_(false) {
     model_->Ref();
     id_ = model->GetID(this);
-
 
     resampler_ = new LinearResample(
         sample_frequency, 16000.0f,
@@ -31,6 +33,12 @@ BatchRecognizer::BatchRecognizer(BatchModel *model, float
 }
 
 BatchRecognizer::~BatchRecognizer() {
+    if (callbacks_set_) {
+        if (!finished_)
+            FinishStream();
+        while (model_->dynamic_batcher_->GetNumPendingChunks(id_) > 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
     delete resampler_;
     model_->Unref();
     // Drop the ID
@@ -38,6 +46,9 @@ BatchRecognizer::~BatchRecognizer() {
 
 void BatchRecognizer::FinishStream()
 {
+    bool expected = false;
+    if (!finished_.compare_exchange_strong(expected, true))
+        return;
     SubVector<BaseFloat> chunk = buffer_.Range(0, buffer_.Dim());
     model_->dynamic_batcher_->Push(id_, !initialized_, true, chunk);
 }
