@@ -21,6 +21,7 @@
 BatchRecognizer::BatchRecognizer(BatchModel *model, float
                                  sample_frequency) : model_(model), sample_frequency_(sample_frequency),
                                  initialized_(false), callbacks_set_(false), nlsml_(false) {
+    model_->Ref();
     id_ = model->GetID(this);
 
 
@@ -31,6 +32,7 @@ BatchRecognizer::BatchRecognizer(BatchModel *model, float
 
 BatchRecognizer::~BatchRecognizer() {
     delete resampler_;
+    model_->Unref();
     // Drop the ID
 }
 
