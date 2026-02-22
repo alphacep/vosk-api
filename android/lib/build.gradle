@@ -12,6 +12,7 @@ android {
         versionName = version
         archivesBaseName = archiveName
         ndkVersion = "28.2.13676358"
+        consumerProguardFiles 'consumer-rules.pro'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
