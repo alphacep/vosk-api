@@ -162,7 +162,6 @@ module Vosk
 
   class KaldiRecognizer
     def initialize(model, sample_rate, grammar_or_spk_model = nil)
-      # FIXME: check @handle presence and validate that it's freed
       @handle = case grammar_or_spk_model
       when nil
         C.vosk_recognizer_new(model.handle, sample_rate.to_f)
@@ -304,11 +303,7 @@ module Vosk
     end
 
     def process(text)
-      ptr = C.vosk_text_processor_itn(@handle, text)
-      str = ptr.read_string
-      # We free it early, but it's optional thanks to AutoPointer, that's why there is no need for ensure
-      C.free(ptr)
-      str
+      C.vosk_text_processor_itn(@handle, text)
     end
   end
 

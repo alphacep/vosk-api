@@ -143,13 +143,22 @@ module Vosk
     attach_function :vosk_batch_recognizer_get_pending_chunks, [VoskBatchRecognizer], :int
 
     # https://github.com/ffi/ffi/issues/467
-    class OwnedString < FFI::AutoPointer
-      def self.release(ptr)
+    class OwnedString
+      extend FFI::DataConverter
+      native_type :strptr
+
+      def self.to_native(_value, _context)
+        raise TypeError, "owned_string can't be used for input"
+      end
+
+      def self.from_native((str, ptr), _context)
         C.free(ptr)
+        str
       end
     end
 
-    attach_function :free, [OwnedString], :void
+    typedef OwnedString, :owned_string
+    attach_function :free, [:pointer], :void
 
     # TODO: remove this, it was needed only because I used libvosk from Python package
     if Gem::Version.new(VERSION) >= Gem::Version.new("0.3.48")
@@ -159,7 +168,7 @@ module Vosk
       # ptr = _c.vosk_text_processor_itn(self._handle, text.encode('utf-8'))
       # str = _ffi.string(ptr).decode('utf-8')
       #  _ffi.gc(ptr, _c.free)  # or call libc free directly
-      attach_function :vosk_text_processor_itn, [VoskTextProcessor, :string], OwnedString
+      attach_function :vosk_text_processor_itn, [VoskTextProcessor, :string], :owned_string
     end
   end
 
