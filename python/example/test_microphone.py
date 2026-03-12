@@ -10,17 +10,13 @@ import json
 import queue
 import sys
 import sounddevice as sd
-from typing import Any
+from typing import Any, Tuple
 
 from vosk import Model, KaldiRecognizer
 
-q = queue.Queue()
+DEFAULT_ALTERNATIVES = 10
 
-@dataclass(kw_only=True)
-class Result:
-    text: str
-    is_partial: bool
-    raw: Any
+q = queue.Queue()
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -35,7 +31,10 @@ def callback(indata, frames, time, status):
         print(status, file=sys.stderr)
     q.put(bytes(indata))
 
-parser = argparse.ArgumentParser(add_help=False)
+parser = argparse.ArgumentParser(
+    add_help=False,
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+)
 parser.add_argument(
     "-l", "--list-devices", action="store_true",
     help="show list of audio devices and exit")
@@ -60,7 +59,9 @@ parser.add_argument(
 parser.add_argument(
     "-se", "--skip-empty", action="store_true", help="Skip empty partial results.")
 parser.add_argument(
-    "--nlsml", action="store_true", help="Generate output in NLSML (Natural Language Semantics Markup Language). Disables pretty print.")
+    "--alternatives", type=int, nargs="?", const=DEFAULT_ALTERNATIVES, help=f"Generate N alternatives ({DEFAULT_ALTERNATIVES} by default) with confidence instead of single result.")
+parser.add_argument(
+    "--nlsml", action="store_true", help="Generate output in NLSML (Natural Language Semantics Markup Language). Disables pretty print. Implies alternatives generation.")
 parser.add_argument(
     "-pp", "--prettyprint", action="store_true", help="Enable pretty (less verbose) output")
 args = parser.parse_args(remaining)
@@ -81,6 +82,10 @@ try:
     else:
         dump_fn = None
 
+    alternatives = args.alternatives
+    if not alternatives and args.nlsml:
+        alternatives = DEFAULT_ALTERNATIVES
+    
     pretty_print = args.prettyprint
 
     with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device,
@@ -90,48 +95,49 @@ try:
         print("#" * 80)
 
         rec = KaldiRecognizer(model, args.samplerate)
+        if alternatives:
+            rec.SetMaxAlternatives(alternatives)
+
         if args.nlsml:
-            rec.SetMaxAlternatives(10)
             rec.SetNLSML(True)
             pretty_print = False
 
+        need_newline = False
         while True:
             data = q.get()
             if rec.AcceptWaveform(data):
-                raw_result = rec.Result()
-                try:
-                    result_json = json.loads(raw_result)
-                except:
-                    result_json = None
-
-                result = Result(
-                    is_partial=False,
-                    raw=raw_result,
-                    text=result_json["text"] if result_json else "", 
-                )
+                result = rec.Result()
             else:
-                raw_result = rec.PartialResult()
-                result_json = json.loads(raw_result)                
-                result = Result(
-                    is_partial=True,
-                    raw=raw_result,
-                    text=result_json["partial"], 
-                )
+                result = rec.PartialResult()
 
             if dump_fn is not None:
                 dump_fn.write(data)
 
-            if args.skip_empty and result.is_partial and not result.text:
+            try:
+                result_dict = json.loads(result)
+            except:
+                result_dict = {}
+
+            if args.skip_empty and result_dict.get("partial") == "":
                 continue
 
             if pretty_print:
-                if result.is_partial and not result.text:
+                if result_dict.get("partial") == "":
                     print(".", end="", flush=True)
+                    need_newline = True
                 else:
-                    print("> " if result.is_partial else "# ", end="")
-                    print(result.text)
+                    if need_newline:
+                        print()
+                        need_newline = False
+                    if partial := result_dict.get("partial"):
+                        print(f"> {partial}")
+                    elif text := result_dict.get("text"):
+                        print(f"# {text}")
+                    elif alternatives := result_dict.get("alternatives"):
+                        for idx, alternative in enumerate(alternatives):
+                            print(f"# {idx + 1:2}. {alternative["confidence"]:3.2f} {alternative["text"]}")
             else:
-                print(result.raw)
+                print(result)
             
 
 except KeyboardInterrupt:
