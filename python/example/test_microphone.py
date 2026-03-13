@@ -5,11 +5,16 @@
 # For more help run: `python test_microphone.py -h`
 
 import argparse
+from dataclasses import dataclass
+import json
 import queue
 import sys
 import sounddevice as sd
+from typing import Any, Tuple
 
 from vosk import Model, KaldiRecognizer
+
+DEFAULT_ALTERNATIVES = 10
 
 q = queue.Queue()
 
@@ -26,7 +31,10 @@ def callback(indata, frames, time, status):
         print(status, file=sys.stderr)
     q.put(bytes(indata))
 
-parser = argparse.ArgumentParser(add_help=False)
+parser = argparse.ArgumentParser(
+    add_help=False,
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+)
 parser.add_argument(
     "-l", "--list-devices", action="store_true",
     help="show list of audio devices and exit")
@@ -48,6 +56,12 @@ parser.add_argument(
     "-r", "--samplerate", type=int, help="sampling rate")
 parser.add_argument(
     "-m", "--model", type=str, help="language model; e.g. en-us, fr, nl; default is en-us")
+parser.add_argument(
+    "-se", "--skip-empty", action="store_true", help="Skip empty partial results.")
+parser.add_argument(
+    "--alternatives", type=int, nargs="?", const=DEFAULT_ALTERNATIVES, help=f"Generate N alternatives ({DEFAULT_ALTERNATIVES} by default) with confidence instead of single result.")
+parser.add_argument(
+    "-pp", "--prettyprint", action="store_true", help="Enable pretty (less verbose) output")
 args = parser.parse_args(remaining)
 
 try:
@@ -66,6 +80,8 @@ try:
     else:
         dump_fn = None
 
+    pretty_print = args.prettyprint
+
     with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device,
             dtype="int16", channels=1, callback=callback):
         print("#" * 80)
@@ -73,14 +89,47 @@ try:
         print("#" * 80)
 
         rec = KaldiRecognizer(model, args.samplerate)
+        if args.alternatives:
+            rec.SetMaxAlternatives(args.alternatives)
+
+        need_newline = False
         while True:
             data = q.get()
             if rec.AcceptWaveform(data):
-                print(rec.Result())
+                result = rec.Result()
             else:
-                print(rec.PartialResult())
+                result = rec.PartialResult()
+
             if dump_fn is not None:
                 dump_fn.write(data)
+
+            try:
+                result_dict = json.loads(result)
+            except:
+                result_dict = {}
+
+            if args.skip_empty and result_dict.get("partial") == "":
+                continue
+
+            if pretty_print:
+                if result_dict.get("partial") == "":
+                    print(".", end="", flush=True)
+                    need_newline = True
+                else:
+                    if need_newline:
+                        print()
+                        need_newline = False
+                        
+                    if partial := result_dict.get("partial"):
+                        print(f"> {partial}")
+                    elif text := result_dict.get("text"):
+                        print(f"# {text}")
+                    elif alternatives := result_dict.get("alternatives"):
+                        for idx, alternative in enumerate(alternatives):
+                            print(f"# {idx + 1:2}. {alternative["confidence"]:3.2f} {alternative["text"]}")
+            else:
+                print(result)
+            
 
 except KeyboardInterrupt:
     print("\nDone")
