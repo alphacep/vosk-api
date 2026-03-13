@@ -119,6 +119,7 @@ try:
                     if need_newline:
                         print()
                         need_newline = False
+                        
                     if partial := result_dict.get("partial"):
                         print(f"> {partial}")
                     elif text := result_dict.get("text"):
