@@ -375,6 +375,9 @@ const char *vosk_batch_recognizer_front_result(VoskBatchRecognizer *recognizer);
 /** Release and free first retrieved result */
 void vosk_batch_recognizer_pop(VoskBatchRecognizer *recognizer);
 
+/** Return actual partial result */
+const char *vosk_batch_recognizer_partial_result(VoskBatchRecognizer *recognizer);
+
 /** Get amount of pending chunks for more intelligent waiting */
 int vosk_batch_recognizer_get_pending_chunks(VoskBatchRecognizer *recognizer);
 
