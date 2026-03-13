@@ -61,8 +61,6 @@ parser.add_argument(
 parser.add_argument(
     "--alternatives", type=int, nargs="?", const=DEFAULT_ALTERNATIVES, help=f"Generate N alternatives ({DEFAULT_ALTERNATIVES} by default) with confidence instead of single result.")
 parser.add_argument(
-    "--nlsml", action="store_true", help="Generate output in NLSML (Natural Language Semantics Markup Language). Disables pretty print. Implies alternatives generation.")
-parser.add_argument(
     "-pp", "--prettyprint", action="store_true", help="Enable pretty (less verbose) output")
 args = parser.parse_args(remaining)
 
@@ -82,10 +80,6 @@ try:
     else:
         dump_fn = None
 
-    alternatives = args.alternatives
-    if not alternatives and args.nlsml:
-        alternatives = DEFAULT_ALTERNATIVES
-    
     pretty_print = args.prettyprint
 
     with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device,
@@ -95,12 +89,8 @@ try:
         print("#" * 80)
 
         rec = KaldiRecognizer(model, args.samplerate)
-        if alternatives:
-            rec.SetMaxAlternatives(alternatives)
-
-        if args.nlsml:
-            rec.SetNLSML(True)
-            pretty_print = False
+        if args.alternatives:
+            rec.SetMaxAlternatives(args.alternatives)
 
         need_newline = False
         while True:
