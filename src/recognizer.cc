@@ -18,6 +18,8 @@
 #include "lat/sausages.h"
 #include "language_model.h"
 
+#include <unordered_set>
+
 using namespace fst;
 using namespace kaldi::nnet3;
 
@@ -462,13 +464,12 @@ bool Recognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_frame
     int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
 
-    // Not very efficient, would be nice to have faster search
+    std::unordered_set<int32> nonsilence_set(nonsilence_frames.begin(), nonsilence_frames.end());
     int num_nonsilence_frames = 0;
     Vector<BaseFloat> feat(spk_feature_->Dim());
 
     for (int i = 0; i < num_frames; ++i) {
-       if (std::find(nonsilence_frames.begin(),
-                     nonsilence_frames.end(), i / 3) == nonsilence_frames.end()) {
+       if (nonsilence_set.find(i / 3) == nonsilence_set.end()) {
            continue;
        }
 
