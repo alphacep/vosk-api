@@ -137,6 +137,19 @@ public class SpeechService {
         return stopRecognizerThread();
     }
 
+
+    /**
+     * Returns the audio session ID of the underlying {@link AudioRecord}.
+     * <p>
+     * The session ID can be used to attach audio effects such as
+     * {@link android.media.audiofx.NoiseSuppressor} to the recording session.
+     *
+     * @return audio session ID, or {@link AudioRecord#ERROR} if unavailable
+     */
+    public int getAudioSessionId() {
+        return recorder.getAudioSessionId();
+    }
+
     /**
      * Shutdown the recognizer and release the recorder
      */
