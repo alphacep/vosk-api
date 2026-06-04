@@ -66,6 +66,51 @@ public class SpeechService {
         }
     }
 
+    /**
+     * Creates speech service with a caller-supplied {@link AudioRecord}.
+     * <p>
+     * Use this when you need to control the audio input device - for example,
+     * to pin recording to the built-in microphone when an external USB device
+     * without a microphone is present:
+     * <pre>
+     * AudioRecord recorder = new AudioRecord.Builder()
+     *         .setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
+     *         .setAudioFormat(format)
+     *         .build();
+     * if (Build.VERSION.SDK_INT >= 28) {
+     *     AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+     *     for (AudioDeviceInfo d : am.getDevices(AudioManager.GET_DEVICES_INPUTS)) {
+     *         if (d.getType() == AudioDeviceInfo.TYPE_BUILTIN_MIC) {
+     *             recorder.setPreferredDevice(d);
+     *             break;
+     *         }
+     *     }
+     * }
+     * SpeechService service = new SpeechService(recognizer, 16000f, recorder);
+     * </pre>
+     * <p>
+     * The caller retains ownership of {@code recorder}: if this constructor
+     * throws, the recorder is <em>not</em> released. Call
+     * {@link AudioRecord#release()} yourself in that case.
+     *
+     * @param recognizer the Vosk recognizer
+     * @param sampleRate sample rate in Hz; must match {@code recorder}'s configuration
+     * @param recorder   a fully-initialised {@link AudioRecord}
+     * @throws IOException if {@code recorder} is in STATE_UNINITIALIZED
+     */
+    public SpeechService(Recognizer recognizer, float sampleRate, AudioRecord recorder)
+            throws IOException {
+        this.recognizer = recognizer;
+        this.sampleRate = (int) sampleRate;
+        this.recorder   = recorder;
+
+        bufferSize = Math.round(this.sampleRate * BUFFER_SIZE_SECONDS);
+
+        if (recorder.getState() == AudioRecord.STATE_UNINITIALIZED) {
+            throw new IOException(
+                    "Failed to initialize recorder. Microphone might be already in use.");
+        }
+    }
 
     /**
      * Starts recognition. Does nothing if recognition is active.
