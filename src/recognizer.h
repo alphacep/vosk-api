@@ -27,9 +27,12 @@
 #include "nnet3/am-nnet-simple.h"
 #include "nnet3/nnet-am-decodable-simple.h"
 #include "nnet3/nnet-utils.h"
+#include "lat/lattice-functions-transition-model.h"
 
 #include "model.h"
 #include "spk_model.h"
+
+#include <string>
 
 using namespace kaldi;
 
@@ -47,6 +50,7 @@ class Recognizer {
         Recognizer(Model *model, float sample_frequency, char const *grammar);
         ~Recognizer();
         void SetMaxAlternatives(int max_alternatives);
+        void SetResultOptions(const char *result_opts);
         void SetSpkModel(SpkModel *spk_model);
         void SetGrm(char const *grammar);
         void SetWords(bool words);
@@ -61,7 +65,7 @@ class Recognizer {
         const char* FinalResult();
         const char* PartialResult();
         void Reset();
-
+        
     private:
         void InitState();
         void InitRescoring();
@@ -102,6 +106,7 @@ class Recognizer {
 
         // Other
         int max_alternatives_ = 0; // Disable alternatives by default
+        std::string result_opts_ = "words"; // By default enable only word-level results
         bool words_ = false;
         bool partial_words_ = false;
         bool nlsml_ = false;
