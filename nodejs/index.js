@@ -87,6 +87,7 @@ const libvosk = ffi.Library(soname, {
     'vosk_set_log_level': ['void', ['int']],
     'vosk_model_new': [vosk_model_ptr, ['string']],
     'vosk_model_free': ['void', [vosk_model_ptr]],
+    'vosk_model_find_word': ['int', [vosk_model_ptr, 'string']],
     'vosk_spk_model_new': [vosk_spk_model_ptr, ['string']],
     'vosk_spk_model_free': ['void', [vosk_spk_model_ptr]],
     'vosk_recognizer_new': [vosk_recognizer_ptr, [vosk_model_ptr, 'float']],
@@ -96,12 +97,30 @@ const libvosk = ffi.Library(soname, {
     'vosk_recognizer_set_max_alternatives': ['void', [vosk_recognizer_ptr, 'int']],
     'vosk_recognizer_set_words': ['void', [vosk_recognizer_ptr, 'bool']],
     'vosk_recognizer_set_partial_words': ['void', [vosk_recognizer_ptr, 'bool']],
+    'vosk_recognizer_set_nlsml': ['void', [vosk_recognizer_ptr, 'bool']],
     'vosk_recognizer_set_spk_model': ['void', [vosk_recognizer_ptr, vosk_spk_model_ptr]],
-    'vosk_recognizer_accept_waveform': ['bool', [vosk_recognizer_ptr, 'pointer', 'int']],
+    'vosk_recognizer_set_grm': ['void', [vosk_recognizer_ptr, 'string']],
+    'vosk_recognizer_set_endpointer_mode': ['void', [vosk_recognizer_ptr, 'int']],
+    'vosk_recognizer_set_endpointer_delays': ['void', [vosk_recognizer_ptr, 'float', 'float', 'float']],
+    'vosk_recognizer_accept_waveform': ['int', [vosk_recognizer_ptr, 'pointer', 'int']],
     'vosk_recognizer_result': ['string', [vosk_recognizer_ptr]],
     'vosk_recognizer_final_result': ['string', [vosk_recognizer_ptr]],
     'vosk_recognizer_partial_result': ['string', [vosk_recognizer_ptr]],
     'vosk_recognizer_reset': ['void', [vosk_recognizer_ptr]],
+});
+
+/**
+ * Endpointer mode, controls how long the recognizer waits before it decides
+ * that the utterance has ended.
+ * @see Recognizer#setEndpointerMode
+ * @readonly
+ * @enum {number}
+ */
+const EndpointerMode = Object.freeze({
+    DEFAULT: 0,
+    SHORT: 1,
+    LONG: 2,
+    VERY_LONG: 3,
 });
 
 /**
@@ -144,6 +163,16 @@ class Model {
      */
     free() {
         libvosk.vosk_model_free(this.handle);
+    }
+
+    /** Check if a word can be recognized by the model
+     *
+     * @param {string} word The word to look up
+     * @returns the word symbol if the word exists inside the model, -1 otherwise.
+     *          Reminding that word symbol 0 is for <epsilon>
+     */
+    findWord(word) {
+        return libvosk.vosk_model_find_word(this.handle, word);
     }
 }
 
@@ -319,6 +348,18 @@ class Recognizer {
         libvosk.vosk_recognizer_set_partial_words(this.handle, partial_words);
     }
 
+    /** Configures recognizer to output results in NLSML format instead of JSON
+     *
+     * Only takes effect when n-best results are enabled with setMaxAlternatives.
+     * Note that resultString must be used to read NLSML output, since result,
+     * partialResult and finalResult parse their output as JSON.
+     *
+     * @param nlsml - boolean value
+     */
+    setNlsml(nlsml) {
+        libvosk.vosk_recognizer_set_nlsml(this.handle, nlsml);
+    }
+
     /** Adds speaker recognition model to already created recognizer. Helps to initialize
      * speaker recognition for grammar-based recognizer.
      *
@@ -328,6 +369,37 @@ class Recognizer {
         libvosk.vosk_recognizer_set_spk_model(this.handle, spk_model.handle);
     }
 
+    /** Reconfigures the recognizer to use a new grammar
+     *
+     * Only recognizers with lookahead models support this. Precompiled HCLG
+     * graph models are not supported.
+     *
+     * @param {Grammar} grammar The list of sentences to be recognized, or an
+     *                          empty list to switch back to the default model graph.
+     */
+    setGrammar(grammar) {
+        libvosk.vosk_recognizer_set_grm(this.handle, JSON.stringify(grammar));
+    }
+
+    /** Sets the endpointer scaling factor, which controls how long the
+     * recognizer waits before it decides that the utterance has ended.
+     *
+     * @param {number} mode One of the EndpointerMode values
+     */
+    setEndpointerMode(mode) {
+        libvosk.vosk_recognizer_set_endpointer_mode(this.handle, mode);
+    }
+
+    /** Sets the endpointer delays
+     *
+     * @param {number} t_start_max timeout for stopping recognition in case of initial silence (usually around 5.0)
+     * @param {number} t_end       timeout for stopping recognition after we recognized something (usually around 0.5 - 1.0)
+     * @param {number} t_max       timeout for forcing utterance end (usually around 20-30)
+     */
+    setEndpointerDelays(t_start_max, t_end, t_max) {
+        libvosk.vosk_recognizer_set_endpointer_delays(this.handle, t_start_max, t_end, t_max);
+    }
+
     /** 
      * Accept voice data
      *
@@ -335,9 +407,14 @@ class Recognizer {
      *
      * @param {Buffer} data audio data in PCM 16-bit mono format
      * @returns true if silence is occured and you can retrieve a new utterance with result method
+     * @throws {Error} if the library failed to process the chunk
      */
     acceptWaveform(data) {
-        return libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
+        const result = libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
+        if (result < 0) {
+            throw new Error('Failed to process audio chunk.');
+        }
+        return result === 1;
     };
 
     /** 
@@ -347,14 +424,17 @@ class Recognizer {
      *
      * @param {Buffer} data audio data in PCM 16-bit mono format
      * @returns true if silence is occured and you can retrieve a new utterance with result method
+     * @throws {Error} if the library failed to process the chunk
      */
     acceptWaveformAsync(data) {
         return new Promise((resolve, reject) => {
             libvosk.vosk_recognizer_accept_waveform.async(this.handle, data, data.length, function(err, result) {
                 if (err) {
                     reject(err);
+                } else if (result < 0) {
+                    reject(new Error('Failed to process audio chunk.'));
                 } else {
-                    resolve(result);
+                    resolve(result === 1);
                 }
             });
         });
@@ -440,6 +520,7 @@ class Recognizer {
 }
 
 exports.setLogLevel = setLogLevel
+exports.EndpointerMode = EndpointerMode
 exports.Model = Model
 exports.SpeakerModel = SpeakerModel
 exports.Recognizer = Recognizer
