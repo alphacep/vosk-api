@@ -35,7 +35,7 @@ actual class Model(val pointer: CPointer<VoskModel>) : Freeable {
 	 * Loads model data from the file and returns the model object
 	 *
 	 * @param path: the path of the model on the filesystem
-	 * @returns model object or NULL if problem occured
+	 * @returns model object or NULL if problem occurred
 	 */
 	@Throws(IOException::class)
 	actual constructor(path: String) : this(vosk_model_new(path) ?: throw ioException(path))
