@@ -21,6 +21,18 @@ transcription for lectures and interviews.
 Vosk scales from small devices like Raspberry Pi or Android smartphone to
 big clusters.
 
+# Building for Fedora 41 or later
+
+In order to build it on Fedora 41 using the libraries that are provided by the distro, you need to install kaldi, after building from the source (no kaldi packages for fedora exist).
+
+then build the package as follows:
+
+```
+cmake -S ./ -Bbuild/Release -DBuildForFedora=ON -DBUILD_SHARED_LIBS=ON
+cmake --build ./build/Release
+```
+
+
 # Documentation
 
 For installation instructions, examples and documentation visit [Vosk
