@@ -18,13 +18,13 @@ package org.vosk.android
 import android.content.Context
 import android.content.res.AssetManager
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.vosk.Model
+import org.vosk.exception.IOException
 import java.io.*
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import java.util.function.Consumer
 
 /**
@@ -34,6 +34,7 @@ import java.util.function.Consumer
 object StorageService {
 	private val TAG = StorageService::class.simpleName
 
+	@Deprecated("Use your own multi-threading. Or maybe just use Kotlin Coroutines.")
 	@JvmStatic
 	fun unpack(
 		context: Context,
@@ -42,18 +43,20 @@ object StorageService {
 		completeCallback: Consumer<Model>,
 		errorCallback: Consumer<IOException>
 	) {
-		val executor: Executor =
-			Executors.newSingleThreadExecutor() // change according to your requirements
-		val handler = Handler(Looper.getMainLooper())
-		executor.execute {
+		GlobalScope.launch(Dispatchers.IO) {
 			try {
-				val outputPath = sync(context, sourcePath, targetPath)
-				val model = Model(outputPath)
-				handler.post { completeCallback.accept(model) }
+				val model = unpack(context, sourcePath, targetPath)
+				launch(Dispatchers.Main) { completeCallback.accept(model) }
 			} catch (e: IOException) {
-				handler.post { errorCallback.accept(e) }
+				launch(Dispatchers.Main) { errorCallback.accept(e) }
 			}
 		}
+	}
+
+	@Throws(IOException::class)
+	fun unpack(context: Context, sourcePath: String, targetPath: String): Model {
+		val outputPath = sync(context, sourcePath, targetPath)
+		return Model(outputPath)
 	}
 
 	@JvmStatic

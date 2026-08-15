@@ -29,3 +29,7 @@ pluginManagement {
 	}
 }
 rootProject.name = "vosk-api-kotlin"
+include(":kaldi")
+include(":openblas")
+include(":clapack")
+include(":openfst")
