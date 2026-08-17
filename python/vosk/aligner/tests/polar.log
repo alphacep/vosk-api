@@ -1,0 +1,733 @@
+{
+  "transcript": "Upon my memory was gravens the vision of the city, and within frem had arisen another and vaguer recollection, of whose nature I was not then certain. Thereafters, uftz cloudy nights when I astfer sleep, I saw the city often booled under that bluue aspiredz moon, and sometimes sunders the hot bitzf rays of a sun which did not set, but which spolus low hepfe the horizon. And on the clear nights the Pole Star leered as never before.\n\n",
+  "words": [
+    {
+      "alignedWord": "upon",
+      "case": 1,
+      "conf": 1.0,
+      "end": 0.39,
+      "endOffset": 4,
+      "start": 0.09,
+      "startOffset": 0,
+      "word": "Upon"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 0.54,
+      "endOffset": 2,
+      "start": 0.39,
+      "startOffset": 0,
+      "word": "my"
+    },
+    {
+      "alignedWord": "memory",
+      "case": 1,
+      "conf": 1.0,
+      "end": 0.9,
+      "endOffset": 9,
+      "start": 0.54,
+      "startOffset": 3,
+      "word": "memory"
+    },
+    {
+      "alignedWord": "was",
+      "case": 1,
+      "conf": 1.0,
+      "end": 1.17,
+      "endOffset": 13,
+      "start": 0.9,
+      "startOffset": 10,
+      "word": "was"
+    },
+    {
+      "case": 3,
+      "endOffset": 21,
+      "startOffset": 14,
+      "word": "gravens"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 1.8600000000000003,
+      "endOffset": 25,
+      "start": 1.7400000000000002,
+      "startOffset": 22,
+      "word": "the"
+    },
+    {
+      "alignedWord": "vision",
+      "case": 1,
+      "conf": 1.0,
+      "end": 2.37,
+      "endOffset": 32,
+      "start": 1.8600000000000003,
+      "startOffset": 26,
+      "word": "vision"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 2.55,
+      "endOffset": 35,
+      "start": 2.4,
+      "startOffset": 33,
+      "word": "of"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 2.64,
+      "endOffset": 44,
+      "start": 2.55,
+      "startOffset": 41,
+      "word": "the"
+    },
+    {
+      "alignedWord": "city",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.1500000000000004,
+      "endOffset": 4,
+      "start": 2.64,
+      "startOffset": 0,
+      "word": "city"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.6,
+      "endOffset": 9,
+      "start": 3.4800000000000004,
+      "startOffset": 6,
+      "word": "and"
+    },
+    {
+      "alignedWord": "within",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.87,
+      "endOffset": 16,
+      "start": 3.6,
+      "startOffset": 10,
+      "word": "within"
+    },
+    {
+      "case": 3,
+      "endOffset": 21,
+      "startOffset": 17,
+      "word": "frem"
+    },
+    {
+      "alignedWord": "had",
+      "case": 1,
+      "conf": 1.0,
+      "end": 4.62,
+      "endOffset": 25,
+      "start": 4.470000000000001,
+      "startOffset": 22,
+      "word": "had"
+    },
+    {
+      "alignedWord": "arisen",
+      "case": 1,
+      "conf": 1.0,
+      "end": 5.01,
+      "endOffset": 32,
+      "start": 4.62,
+      "startOffset": 26,
+      "word": "arisen"
+    },
+    {
+      "alignedWord": "another",
+      "case": 1,
+      "conf": 1.0,
+      "end": 5.52,
+      "endOffset": 40,
+      "start": 5.01,
+      "startOffset": 33,
+      "word": "another"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 5.7,
+      "endOffset": 89,
+      "start": 5.49,
+      "startOffset": 86,
+      "word": "and"
+    },
+    {
+      "alignedWord": "vaguer",
+      "case": 1,
+      "conf": 1.0,
+      "end": 6.06,
+      "endOffset": 96,
+      "start": 5.7,
+      "startOffset": 90,
+      "word": "vaguer"
+    },
+    {
+      "alignedWord": "recollection",
+      "case": 1,
+      "conf": 1.0,
+      "end": 6.81,
+      "endOffset": 109,
+      "start": 6.06,
+      "startOffset": 97,
+      "word": "recollection"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.2,
+      "endOffset": 113,
+      "start": 7.05,
+      "startOffset": 111,
+      "word": "of"
+    },
+    {
+      "alignedWord": "whose",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.41,
+      "endOffset": 119,
+      "start": 7.2,
+      "startOffset": 114,
+      "word": "whose"
+    },
+    {
+      "alignedWord": "nature",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.8,
+      "endOffset": 126,
+      "start": 7.41,
+      "startOffset": 120,
+      "word": "nature"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.92,
+      "endOffset": 128,
+      "start": 7.8,
+      "startOffset": 127,
+      "word": "I"
+    },
+    {
+      "alignedWord": "was",
+      "case": 1,
+      "conf": 1.0,
+      "end": 8.1,
+      "endOffset": 132,
+      "start": 7.92,
+      "startOffset": 129,
+      "word": "was"
+    },
+    {
+      "alignedWord": "not",
+      "case": 1,
+      "conf": 1.0,
+      "end": 8.34,
+      "endOffset": 3,
+      "start": 8.1,
+      "startOffset": 0,
+      "word": "not"
+    },
+    {
+      "alignedWord": "then",
+      "case": 1,
+      "conf": 1.0,
+      "end": 8.549999999999999,
+      "endOffset": 8,
+      "start": 8.34,
+      "startOffset": 4,
+      "word": "then"
+    },
+    {
+      "alignedWord": "certain",
+      "case": 1,
+      "conf": 1.0,
+      "end": 9.059999999999999,
+      "endOffset": 16,
+      "start": 8.549999999999999,
+      "startOffset": 9,
+      "word": "certain"
+    },
+    {
+      "case": 3,
+      "endOffset": 29,
+      "startOffset": 18,
+      "word": "Thereafters"
+    },
+    {
+      "case": 3,
+      "endOffset": 35,
+      "startOffset": 31,
+      "word": "uftz"
+    },
+    {
+      "alignedWord": "cloudy",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.129999999999999,
+      "endOffset": 42,
+      "start": 10.739999999999998,
+      "startOffset": 36,
+      "word": "cloudy"
+    },
+    {
+      "alignedWord": "nights",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.46,
+      "endOffset": 49,
+      "start": 11.129999999999999,
+      "startOffset": 43,
+      "word": "nights"
+    },
+    {
+      "alignedWord": "when",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.58,
+      "endOffset": 54,
+      "start": 11.46,
+      "startOffset": 50,
+      "word": "when"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.7,
+      "endOffset": 56,
+      "start": 11.58,
+      "startOffset": 55,
+      "word": "I"
+    },
+    {
+      "case": 3,
+      "endOffset": 63,
+      "startOffset": 57,
+      "word": "astfer"
+    },
+    {
+      "alignedWord": "sleep",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.39,
+      "endOffset": 69,
+      "start": 11.969999999999999,
+      "startOffset": 64,
+      "word": "sleep"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.809999999999999,
+      "endOffset": 72,
+      "start": 12.66,
+      "startOffset": 71,
+      "word": "I"
+    },
+    {
+      "alignedWord": "saw",
+      "case": 1,
+      "conf": 1.0,
+      "end": 13.05,
+      "endOffset": 76,
+      "start": 12.809999999999999,
+      "startOffset": 73,
+      "word": "saw"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 13.14,
+      "endOffset": 80,
+      "start": 13.05,
+      "startOffset": 77,
+      "word": "the"
+    },
+    {
+      "alignedWord": "city",
+      "case": 1,
+      "conf": 1.0,
+      "end": 13.5,
+      "endOffset": 85,
+      "start": 13.14,
+      "startOffset": 81,
+      "word": "city"
+    },
+    {
+      "alignedWord": "often",
+      "case": 1,
+      "conf": 1.0,
+      "end": 13.98,
+      "endOffset": 91,
+      "start": 13.5,
+      "startOffset": 86,
+      "word": "often"
+    },
+    {
+      "case": 3,
+      "endOffset": 98,
+      "startOffset": 92,
+      "word": "booled"
+    },
+    {
+      "alignedWord": "under",
+      "case": 1,
+      "conf": 1.0,
+      "end": 15.45,
+      "endOffset": 104,
+      "start": 15.21,
+      "startOffset": 99,
+      "word": "under"
+    },
+    {
+      "alignedWord": "that",
+      "case": 1,
+      "conf": 1.0,
+      "end": 15.66,
+      "endOffset": 109,
+      "start": 15.45,
+      "startOffset": 105,
+      "word": "that"
+    },
+    {
+      "case": 3,
+      "endOffset": 115,
+      "startOffset": 110,
+      "word": "bluue"
+    },
+    {
+      "case": 3,
+      "endOffset": 124,
+      "startOffset": 116,
+      "word": "aspiredz"
+    },
+    {
+      "alignedWord": "moon",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.86,
+      "endOffset": 129,
+      "start": 16.41,
+      "startOffset": 125,
+      "word": "moon"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 17.34,
+      "endOffset": 134,
+      "start": 17.16,
+      "startOffset": 131,
+      "word": "and"
+    },
+    {
+      "alignedWord": "sometimes",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.03,
+      "endOffset": 144,
+      "start": 17.34,
+      "startOffset": 135,
+      "word": "sometimes"
+    },
+    {
+      "case": 3,
+      "endOffset": 152,
+      "startOffset": 145,
+      "word": "sunders"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.39,
+      "endOffset": 156,
+      "start": 18.3,
+      "startOffset": 153,
+      "word": "the"
+    },
+    {
+      "alignedWord": "hot",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.689999999999998,
+      "endOffset": 160,
+      "start": 18.39,
+      "startOffset": 157,
+      "word": "hot"
+    },
+    {
+      "case": 3,
+      "endOffset": 166,
+      "startOffset": 161,
+      "word": "bitzf"
+    },
+    {
+      "alignedWord": "rays",
+      "case": 1,
+      "conf": 1.0,
+      "end": 19.47,
+      "endOffset": 171,
+      "start": 19.08,
+      "startOffset": 167,
+      "word": "rays"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 19.59,
+      "endOffset": 174,
+      "start": 19.47,
+      "startOffset": 172,
+      "word": "of"
+    },
+    {
+      "alignedWord": "a",
+      "case": 1,
+      "conf": 1.0,
+      "end": 19.65,
+      "endOffset": 176,
+      "start": 19.59,
+      "startOffset": 175,
+      "word": "a"
+    },
+    {
+      "alignedWord": "sun",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.01,
+      "endOffset": 313,
+      "start": 19.65,
+      "startOffset": 310,
+      "word": "sun"
+    },
+    {
+      "alignedWord": "which",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.22,
+      "endOffset": 319,
+      "start": 20.01,
+      "startOffset": 314,
+      "word": "which"
+    },
+    {
+      "alignedWord": "did",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.43,
+      "endOffset": 323,
+      "start": 20.22,
+      "startOffset": 320,
+      "word": "did"
+    },
+    {
+      "alignedWord": "not",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.64,
+      "endOffset": 327,
+      "start": 20.43,
+      "startOffset": 324,
+      "word": "not"
+    },
+    {
+      "alignedWord": "set",
+      "case": 1,
+      "conf": 1.0,
+      "end": 21.060000000000002,
+      "endOffset": 3,
+      "start": 20.64,
+      "startOffset": 0,
+      "word": "set"
+    },
+    {
+      "alignedWord": "but",
+      "case": 1,
+      "conf": 1.0,
+      "end": 21.66,
+      "endOffset": 8,
+      "start": 21.45,
+      "startOffset": 5,
+      "word": "but"
+    },
+    {
+      "alignedWord": "which",
+      "case": 1,
+      "conf": 1.0,
+      "end": 21.810000000000002,
+      "endOffset": 14,
+      "start": 21.66,
+      "startOffset": 9,
+      "word": "which"
+    },
+    {
+      "case": 3,
+      "endOffset": 21,
+      "startOffset": 15,
+      "word": "spolus"
+    },
+    {
+      "alignedWord": "low",
+      "case": 1,
+      "conf": 1.0,
+      "end": 22.5,
+      "endOffset": 25,
+      "start": 22.17,
+      "startOffset": 22,
+      "word": "low"
+    },
+    {
+      "case": 3,
+      "endOffset": 31,
+      "startOffset": 26,
+      "word": "hepfe"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 22.89,
+      "endOffset": 35,
+      "start": 22.8,
+      "startOffset": 32,
+      "word": "the"
+    },
+    {
+      "alignedWord": "horizon",
+      "case": 1,
+      "conf": 1.0,
+      "end": 23.580000000000002,
+      "endOffset": 43,
+      "start": 22.89,
+      "startOffset": 36,
+      "word": "horizon"
+    },
+    {
+      "alignedWord": "on",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.54,
+      "endOffset": 379,
+      "start": 24.42,
+      "startOffset": 377,
+      "word": "on"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.63,
+      "endOffset": 383,
+      "start": 24.54,
+      "startOffset": 380,
+      "word": "the"
+    },
+    {
+      "alignedWord": "clear",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.93,
+      "endOffset": 389,
+      "start": 24.63,
+      "startOffset": 384,
+      "word": "clear"
+    },
+    {
+      "alignedWord": "nights",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.38,
+      "endOffset": 396,
+      "start": 24.93,
+      "startOffset": 390,
+      "word": "nights"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.68,
+      "endOffset": 3,
+      "start": 25.56,
+      "startOffset": 0,
+      "word": "the"
+    },
+    {
+      "alignedWord": "pole",
+      "case": 1,
+      "conf": 1.0,
+      "end": 26.07,
+      "endOffset": 8,
+      "start": 25.68,
+      "startOffset": 4,
+      "word": "Pole"
+    },
+    {
+      "alignedWord": "star",
+      "case": 1,
+      "conf": 1.0,
+      "end": 26.594082999999998,
+      "endOffset": 13,
+      "start": 26.07,
+      "startOffset": 9,
+      "word": "Star"
+    },
+    {
+      "case": 3,
+      "endOffset": 20,
+      "startOffset": 14,
+      "word": "leered"
+    },
+    {
+      "alignedWord": "as",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.419999999999998,
+      "endOffset": 23,
+      "start": 27.209999999999997,
+      "startOffset": 21,
+      "word": "as"
+    },
+    {
+      "alignedWord": "never",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.75,
+      "endOffset": 29,
+      "start": 27.419999999999998,
+      "startOffset": 24,
+      "word": "never"
+    },
+    {
+      "alignedWord": "before",
+      "case": 1,
+      "conf": 1.0,
+      "end": 28.349999999999998,
+      "endOffset": 36,
+      "start": 27.75,
+      "startOffset": 30,
+      "word": "before"
+    }
+  ]
+}

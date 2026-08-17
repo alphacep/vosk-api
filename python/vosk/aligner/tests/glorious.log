@@ -1,0 +1,2818 @@
+{
+  "transcript": "The drop is short and ends with terrible force again my body moves within the fluids that protected. I recall similar drop from my other life when I was a warrior of flash and blood then the blow of landing jar every bone in my body. Now I am protected from the most. Numbed to it. I am distant from every sensation and move as if in a dream. Only the pain is constant curled around me in my tomb intimately embracing my shattered body. The doors blow upwards pale light falls across invictus's metal hall. Ahead of me is an ugly orc fortress an asteroid landed directly on the surface of the world. The land here is dry but not the driest. Sub savannah. Low thorny trees and gray grass old parched. A lush landscape by armageddon standard. All is caked with ash. The season of fire has recently drawn to it close the weather is calming not that you guess it. The season of Shadows has began. It is my task to aid the rocks destruction. Worthy task. Battle rages already I stride into it with great joy in my heart praise be. Praise be. Drop pods fall from the sky all around me igniting the scrubby vegetation with that breaking jets. I am one of the first the spearhead of the ash waste crusade second group, praise be. Fifty six battle brothers forty nice neophytes various harm assets are being landed further out, under thunder hawk air support. All this and other information scrolls along the edges of my sensorium. Bright flashes and war lighting show through the ash trained sky the void crusade embattled in orbit as above so below.\n",
+  "words": [
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 2.61,
+      "endOffset": 3,
+      "start": 2.49,
+      "startOffset": 0,
+      "word": "The"
+    },
+    {
+      "alignedWord": "drop",
+      "case": 1,
+      "conf": 1.0,
+      "end": 2.94,
+      "endOffset": 8,
+      "start": 2.61,
+      "startOffset": 4,
+      "word": "drop"
+    },
+    {
+      "alignedWord": "is",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.0,
+      "endOffset": 11,
+      "start": 2.94,
+      "startOffset": 9,
+      "word": "is"
+    },
+    {
+      "alignedWord": "short",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.45,
+      "endOffset": 17,
+      "start": 3.03,
+      "startOffset": 12,
+      "word": "short"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.96,
+      "endOffset": 21,
+      "start": 3.81,
+      "startOffset": 18,
+      "word": "and"
+    },
+    {
+      "alignedWord": "ends",
+      "case": 1,
+      "conf": 1.0,
+      "end": 4.23,
+      "endOffset": 26,
+      "start": 3.96,
+      "startOffset": 22,
+      "word": "ends"
+    },
+    {
+      "alignedWord": "with",
+      "case": 1,
+      "conf": 1.0,
+      "end": 4.41,
+      "endOffset": 31,
+      "start": 4.23,
+      "startOffset": 27,
+      "word": "with"
+    },
+    {
+      "alignedWord": "terrible",
+      "case": 1,
+      "conf": 1.0,
+      "end": 4.86,
+      "endOffset": 40,
+      "start": 4.41,
+      "startOffset": 32,
+      "word": "terrible"
+    },
+    {
+      "alignedWord": "force",
+      "case": 1,
+      "conf": 1.0,
+      "end": 5.31,
+      "endOffset": 46,
+      "start": 4.86,
+      "startOffset": 41,
+      "word": "force"
+    },
+    {
+      "alignedWord": "again",
+      "case": 1,
+      "conf": 1.0,
+      "end": 6.15,
+      "endOffset": 52,
+      "start": 5.79,
+      "startOffset": 47,
+      "word": "again"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 6.36,
+      "endOffset": 55,
+      "start": 6.15,
+      "startOffset": 53,
+      "word": "my"
+    },
+    {
+      "alignedWord": "body",
+      "case": 1,
+      "conf": 1.0,
+      "end": 6.66,
+      "endOffset": 60,
+      "start": 6.36,
+      "startOffset": 56,
+      "word": "body"
+    },
+    {
+      "alignedWord": "moves",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.05,
+      "endOffset": 66,
+      "start": 6.66,
+      "startOffset": 61,
+      "word": "moves"
+    },
+    {
+      "alignedWord": "within",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.29,
+      "endOffset": 73,
+      "start": 7.05,
+      "startOffset": 67,
+      "word": "within"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.38,
+      "endOffset": 77,
+      "start": 7.29,
+      "startOffset": 74,
+      "word": "the"
+    },
+    {
+      "alignedWord": "fluids",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.77,
+      "endOffset": 84,
+      "start": 7.38,
+      "startOffset": 78,
+      "word": "fluids"
+    },
+    {
+      "alignedWord": "that",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.92,
+      "endOffset": 89,
+      "start": 7.77,
+      "startOffset": 85,
+      "word": "that"
+    },
+    {
+      "alignedWord": "protected",
+      "case": 1,
+      "conf": 1.0,
+      "end": 8.46,
+      "endOffset": 99,
+      "start": 7.92,
+      "startOffset": 90,
+      "word": "protected"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 9.39,
+      "endOffset": 102,
+      "start": 9.36,
+      "startOffset": 101,
+      "word": "I"
+    },
+    {
+      "alignedWord": "recall",
+      "case": 1,
+      "conf": 1.0,
+      "end": 9.72,
+      "endOffset": 109,
+      "start": 9.39,
+      "startOffset": 103,
+      "word": "recall"
+    },
+    {
+      "alignedWord": "similar",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.08,
+      "endOffset": 117,
+      "start": 9.72,
+      "startOffset": 110,
+      "word": "similar"
+    },
+    {
+      "alignedWord": "drop",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.35,
+      "endOffset": 122,
+      "start": 10.08,
+      "startOffset": 118,
+      "word": "drop"
+    },
+    {
+      "alignedWord": "from",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.5,
+      "endOffset": 127,
+      "start": 10.35,
+      "startOffset": 123,
+      "word": "from"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.65,
+      "endOffset": 130,
+      "start": 10.5,
+      "startOffset": 128,
+      "word": "my"
+    },
+    {
+      "alignedWord": "other",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.86,
+      "endOffset": 136,
+      "start": 10.65,
+      "startOffset": 131,
+      "word": "other"
+    },
+    {
+      "alignedWord": "life",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.19,
+      "endOffset": 141,
+      "start": 10.86,
+      "startOffset": 137,
+      "word": "life"
+    },
+    {
+      "alignedWord": "when",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.67,
+      "endOffset": 146,
+      "start": 11.52,
+      "startOffset": 142,
+      "word": "when"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.73,
+      "endOffset": 148,
+      "start": 11.67,
+      "startOffset": 147,
+      "word": "I"
+    },
+    {
+      "alignedWord": "was",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.85,
+      "endOffset": 152,
+      "start": 11.73,
+      "startOffset": 149,
+      "word": "was"
+    },
+    {
+      "alignedWord": "a",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.91,
+      "endOffset": 154,
+      "start": 11.85,
+      "startOffset": 153,
+      "word": "a"
+    },
+    {
+      "alignedWord": "warrior",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.33,
+      "endOffset": 162,
+      "start": 11.91,
+      "startOffset": 155,
+      "word": "warrior"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.45,
+      "endOffset": 165,
+      "start": 12.33,
+      "startOffset": 163,
+      "word": "of"
+    },
+    {
+      "alignedWord": "flash",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.84,
+      "endOffset": 171,
+      "start": 12.45,
+      "startOffset": 166,
+      "word": "flash"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.93,
+      "endOffset": 175,
+      "start": 12.84,
+      "startOffset": 172,
+      "word": "and"
+    },
+    {
+      "alignedWord": "blood",
+      "case": 1,
+      "conf": 1.0,
+      "end": 13.29,
+      "endOffset": 181,
+      "start": 12.93,
+      "startOffset": 176,
+      "word": "blood"
+    },
+    {
+      "alignedWord": "then",
+      "case": 1,
+      "conf": 1.0,
+      "end": 14.28,
+      "endOffset": 186,
+      "start": 14.01,
+      "startOffset": 182,
+      "word": "then"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 14.37,
+      "endOffset": 190,
+      "start": 14.28,
+      "startOffset": 187,
+      "word": "the"
+    },
+    {
+      "alignedWord": "blow",
+      "case": 1,
+      "conf": 1.0,
+      "end": 14.61,
+      "endOffset": 195,
+      "start": 14.37,
+      "startOffset": 191,
+      "word": "blow"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 14.73,
+      "endOffset": 198,
+      "start": 14.61,
+      "startOffset": 196,
+      "word": "of"
+    },
+    {
+      "alignedWord": "landing",
+      "case": 1,
+      "conf": 1.0,
+      "end": 15.15,
+      "endOffset": 206,
+      "start": 14.73,
+      "startOffset": 199,
+      "word": "landing"
+    },
+    {
+      "alignedWord": "jar",
+      "case": 1,
+      "conf": 1.0,
+      "end": 15.54,
+      "endOffset": 210,
+      "start": 15.15,
+      "startOffset": 207,
+      "word": "jar"
+    },
+    {
+      "alignedWord": "every",
+      "case": 1,
+      "conf": 1.0,
+      "end": 15.87,
+      "endOffset": 216,
+      "start": 15.54,
+      "startOffset": 211,
+      "word": "every"
+    },
+    {
+      "alignedWord": "bone",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.26,
+      "endOffset": 221,
+      "start": 15.87,
+      "startOffset": 217,
+      "word": "bone"
+    },
+    {
+      "alignedWord": "in",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.35,
+      "endOffset": 224,
+      "start": 16.26,
+      "startOffset": 222,
+      "word": "in"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.53,
+      "endOffset": 227,
+      "start": 16.35,
+      "startOffset": 225,
+      "word": "my"
+    },
+    {
+      "alignedWord": "body",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.92,
+      "endOffset": 232,
+      "start": 16.53,
+      "startOffset": 228,
+      "word": "body"
+    },
+    {
+      "alignedWord": "now",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.12,
+      "endOffset": 237,
+      "start": 17.82,
+      "startOffset": 234,
+      "word": "Now"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.3,
+      "endOffset": 239,
+      "start": 18.12,
+      "startOffset": 238,
+      "word": "I"
+    },
+    {
+      "alignedWord": "am",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.45,
+      "endOffset": 242,
+      "start": 18.3,
+      "startOffset": 240,
+      "word": "am"
+    },
+    {
+      "alignedWord": "protected",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.93,
+      "endOffset": 252,
+      "start": 18.45,
+      "startOffset": 243,
+      "word": "protected"
+    },
+    {
+      "alignedWord": "from",
+      "case": 1,
+      "conf": 1.0,
+      "end": 19.08,
+      "endOffset": 257,
+      "start": 18.93,
+      "startOffset": 253,
+      "word": "from"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 19.14,
+      "endOffset": 261,
+      "start": 19.08,
+      "startOffset": 258,
+      "word": "the"
+    },
+    {
+      "alignedWord": "most",
+      "case": 1,
+      "conf": 1.0,
+      "end": 19.44,
+      "endOffset": 266,
+      "start": 19.14,
+      "startOffset": 262,
+      "word": "most"
+    },
+    {
+      "alignedWord": "numbed",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.58,
+      "endOffset": 274,
+      "start": 20.07,
+      "startOffset": 268,
+      "word": "Numbed"
+    },
+    {
+      "alignedWord": "to",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.91,
+      "endOffset": 277,
+      "start": 20.76,
+      "startOffset": 275,
+      "word": "to"
+    },
+    {
+      "alignedWord": "it",
+      "case": 1,
+      "conf": 1.0,
+      "end": 21.03,
+      "endOffset": 280,
+      "start": 20.91,
+      "startOffset": 278,
+      "word": "it"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 22.02,
+      "endOffset": 283,
+      "start": 21.87,
+      "startOffset": 282,
+      "word": "I"
+    },
+    {
+      "alignedWord": "am",
+      "case": 1,
+      "conf": 1.0,
+      "end": 22.17,
+      "endOffset": 286,
+      "start": 22.02,
+      "startOffset": 284,
+      "word": "am"
+    },
+    {
+      "alignedWord": "distant",
+      "case": 1,
+      "conf": 1.0,
+      "end": 22.62,
+      "endOffset": 294,
+      "start": 22.2,
+      "startOffset": 287,
+      "word": "distant"
+    },
+    {
+      "alignedWord": "from",
+      "case": 1,
+      "conf": 1.0,
+      "end": 22.8,
+      "endOffset": 299,
+      "start": 22.62,
+      "startOffset": 295,
+      "word": "from"
+    },
+    {
+      "alignedWord": "every",
+      "case": 1,
+      "conf": 1.0,
+      "end": 23.13,
+      "endOffset": 305,
+      "start": 22.83,
+      "startOffset": 300,
+      "word": "every"
+    },
+    {
+      "alignedWord": "sensation",
+      "case": 1,
+      "conf": 1.0,
+      "end": 23.82,
+      "endOffset": 315,
+      "start": 23.13,
+      "startOffset": 306,
+      "word": "sensation"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.18,
+      "endOffset": 319,
+      "start": 24.0,
+      "startOffset": 316,
+      "word": "and"
+    },
+    {
+      "alignedWord": "move",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.51,
+      "endOffset": 324,
+      "start": 24.18,
+      "startOffset": 320,
+      "word": "move"
+    },
+    {
+      "alignedWord": "as",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.6,
+      "endOffset": 327,
+      "start": 24.51,
+      "startOffset": 325,
+      "word": "as"
+    },
+    {
+      "alignedWord": "if",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.78,
+      "endOffset": 330,
+      "start": 24.6,
+      "startOffset": 328,
+      "word": "if"
+    },
+    {
+      "alignedWord": "in",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.96,
+      "endOffset": 333,
+      "start": 24.81,
+      "startOffset": 331,
+      "word": "in"
+    },
+    {
+      "alignedWord": "a",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.02,
+      "endOffset": 335,
+      "start": 24.96,
+      "startOffset": 334,
+      "word": "a"
+    },
+    {
+      "alignedWord": "dream",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.44,
+      "endOffset": 341,
+      "start": 25.02,
+      "startOffset": 336,
+      "word": "dream"
+    },
+    {
+      "alignedWord": "only",
+      "case": 1,
+      "conf": 1.0,
+      "end": 26.73,
+      "endOffset": 347,
+      "start": 26.49,
+      "startOffset": 343,
+      "word": "Only"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 26.82,
+      "endOffset": 351,
+      "start": 26.73,
+      "startOffset": 348,
+      "word": "the"
+    },
+    {
+      "alignedWord": "pain",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.18,
+      "endOffset": 356,
+      "start": 26.82,
+      "startOffset": 352,
+      "word": "pain"
+    },
+    {
+      "alignedWord": "is",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.3,
+      "endOffset": 359,
+      "start": 27.18,
+      "startOffset": 357,
+      "word": "is"
+    },
+    {
+      "alignedWord": "constant",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.72,
+      "endOffset": 368,
+      "start": 27.3,
+      "startOffset": 360,
+      "word": "constant"
+    },
+    {
+      "alignedWord": "curled",
+      "case": 1,
+      "conf": 1.0,
+      "end": 28.53,
+      "endOffset": 375,
+      "start": 28.08,
+      "startOffset": 369,
+      "word": "curled"
+    },
+    {
+      "alignedWord": "around",
+      "case": 1,
+      "conf": 1.0,
+      "end": 28.89,
+      "endOffset": 382,
+      "start": 28.53,
+      "startOffset": 376,
+      "word": "around"
+    },
+    {
+      "alignedWord": "me",
+      "case": 1,
+      "conf": 1.0,
+      "end": 29.04,
+      "endOffset": 385,
+      "start": 28.89,
+      "startOffset": 383,
+      "word": "me"
+    },
+    {
+      "alignedWord": "in",
+      "case": 1,
+      "conf": 1.0,
+      "end": 29.16,
+      "endOffset": 388,
+      "start": 29.04,
+      "startOffset": 386,
+      "word": "in"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 29.34,
+      "endOffset": 391,
+      "start": 29.16,
+      "startOffset": 389,
+      "word": "my"
+    },
+    {
+      "alignedWord": "tomb",
+      "case": 1,
+      "conf": 1.0,
+      "end": 29.73,
+      "endOffset": 396,
+      "start": 29.34,
+      "startOffset": 392,
+      "word": "tomb"
+    },
+    {
+      "alignedWord": "intimately",
+      "case": 1,
+      "conf": 1.0,
+      "end": 30.84,
+      "endOffset": 407,
+      "start": 30.24,
+      "startOffset": 397,
+      "word": "intimately"
+    },
+    {
+      "alignedWord": "embracing",
+      "case": 1,
+      "conf": 1.0,
+      "end": 31.41,
+      "endOffset": 417,
+      "start": 30.84,
+      "startOffset": 408,
+      "word": "embracing"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 31.53,
+      "endOffset": 420,
+      "start": 31.41,
+      "startOffset": 418,
+      "word": "my"
+    },
+    {
+      "alignedWord": "shattered",
+      "case": 1,
+      "conf": 1.0,
+      "end": 32.01,
+      "endOffset": 430,
+      "start": 31.53,
+      "startOffset": 421,
+      "word": "shattered"
+    },
+    {
+      "alignedWord": "body",
+      "case": 1,
+      "conf": 1.0,
+      "end": 32.37,
+      "endOffset": 435,
+      "start": 32.01,
+      "startOffset": 431,
+      "word": "body"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 33.69,
+      "endOffset": 440,
+      "start": 33.57,
+      "startOffset": 437,
+      "word": "The"
+    },
+    {
+      "alignedWord": "doors",
+      "case": 1,
+      "conf": 1.0,
+      "end": 34.08,
+      "endOffset": 446,
+      "start": 33.69,
+      "startOffset": 441,
+      "word": "doors"
+    },
+    {
+      "alignedWord": "blow",
+      "case": 1,
+      "conf": 1.0,
+      "end": 34.59,
+      "endOffset": 451,
+      "start": 34.26,
+      "startOffset": 447,
+      "word": "blow"
+    },
+    {
+      "alignedWord": "upwards",
+      "case": 1,
+      "conf": 1.0,
+      "end": 35.1,
+      "endOffset": 459,
+      "start": 34.62,
+      "startOffset": 452,
+      "word": "upwards"
+    },
+    {
+      "alignedWord": "pale",
+      "case": 1,
+      "conf": 1.0,
+      "end": 35.94,
+      "endOffset": 464,
+      "start": 35.64,
+      "startOffset": 460,
+      "word": "pale"
+    },
+    {
+      "alignedWord": "light",
+      "case": 1,
+      "conf": 1.0,
+      "end": 36.21,
+      "endOffset": 5,
+      "start": 35.94,
+      "startOffset": 0,
+      "word": "light"
+    },
+    {
+      "alignedWord": "falls",
+      "case": 1,
+      "conf": 1.0,
+      "end": 36.57,
+      "endOffset": 11,
+      "start": 36.21,
+      "startOffset": 6,
+      "word": "falls"
+    },
+    {
+      "alignedWord": "across",
+      "case": 1,
+      "conf": 1.0,
+      "end": 36.93,
+      "endOffset": 18,
+      "start": 36.57,
+      "startOffset": 12,
+      "word": "across"
+    },
+    {
+      "case": 3,
+      "endOffset": 29,
+      "startOffset": 19,
+      "word": "invictus's"
+    },
+    {
+      "alignedWord": "metal",
+      "case": 1,
+      "conf": 1.0,
+      "end": 37.8,
+      "endOffset": 35,
+      "start": 37.5,
+      "startOffset": 30,
+      "word": "metal"
+    },
+    {
+      "alignedWord": "hall",
+      "case": 1,
+      "conf": 1.0,
+      "end": 38.087101,
+      "endOffset": 40,
+      "start": 37.8,
+      "startOffset": 36,
+      "word": "hall"
+    },
+    {
+      "alignedWord": "ahead",
+      "case": 1,
+      "conf": 1.0,
+      "end": 39.57,
+      "endOffset": 47,
+      "start": 39.3,
+      "startOffset": 42,
+      "word": "Ahead"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 39.629999999999995,
+      "endOffset": 50,
+      "start": 39.57,
+      "startOffset": 48,
+      "word": "of"
+    },
+    {
+      "alignedWord": "me",
+      "case": 1,
+      "conf": 1.0,
+      "end": 39.84,
+      "endOffset": 518,
+      "start": 39.66,
+      "startOffset": 516,
+      "word": "me"
+    },
+    {
+      "alignedWord": "is",
+      "case": 1,
+      "conf": 1.0,
+      "end": 39.99,
+      "endOffset": 521,
+      "start": 39.84,
+      "startOffset": 519,
+      "word": "is"
+    },
+    {
+      "alignedWord": "an",
+      "case": 1,
+      "conf": 1.0,
+      "end": 40.11,
+      "endOffset": 524,
+      "start": 39.99,
+      "startOffset": 522,
+      "word": "an"
+    },
+    {
+      "alignedWord": "ugly",
+      "case": 1,
+      "conf": 1.0,
+      "end": 40.56,
+      "endOffset": 529,
+      "start": 40.14,
+      "startOffset": 525,
+      "word": "ugly"
+    },
+    {
+      "alignedWord": "orc",
+      "case": 1,
+      "conf": 1.0,
+      "end": 40.89,
+      "endOffset": 533,
+      "start": 40.59,
+      "startOffset": 530,
+      "word": "orc"
+    },
+    {
+      "alignedWord": "fortress",
+      "case": 1,
+      "conf": 1.0,
+      "end": 41.4,
+      "endOffset": 542,
+      "start": 40.89,
+      "startOffset": 534,
+      "word": "fortress"
+    },
+    {
+      "alignedWord": "an",
+      "case": 1,
+      "conf": 1.0,
+      "end": 41.88,
+      "endOffset": 545,
+      "start": 41.73,
+      "startOffset": 543,
+      "word": "an"
+    },
+    {
+      "alignedWord": "asteroid",
+      "case": 1,
+      "conf": 1.0,
+      "end": 42.48,
+      "endOffset": 554,
+      "start": 41.88,
+      "startOffset": 546,
+      "word": "asteroid"
+    },
+    {
+      "alignedWord": "landed",
+      "case": 1,
+      "conf": 1.0,
+      "end": 42.87,
+      "endOffset": 561,
+      "start": 42.48,
+      "startOffset": 555,
+      "word": "landed"
+    },
+    {
+      "alignedWord": "directly",
+      "case": 1,
+      "conf": 1.0,
+      "end": 43.44,
+      "endOffset": 570,
+      "start": 42.87,
+      "startOffset": 562,
+      "word": "directly"
+    },
+    {
+      "alignedWord": "on",
+      "case": 1,
+      "conf": 1.0,
+      "end": 43.56,
+      "endOffset": 573,
+      "start": 43.44,
+      "startOffset": 571,
+      "word": "on"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 43.65,
+      "endOffset": 577,
+      "start": 43.56,
+      "startOffset": 574,
+      "word": "the"
+    },
+    {
+      "alignedWord": "surface",
+      "case": 1,
+      "conf": 1.0,
+      "end": 44.13,
+      "endOffset": 585,
+      "start": 43.65,
+      "startOffset": 578,
+      "word": "surface"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 44.22,
+      "endOffset": 588,
+      "start": 44.13,
+      "startOffset": 586,
+      "word": "of"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 44.31,
+      "endOffset": 592,
+      "start": 44.22,
+      "startOffset": 589,
+      "word": "the"
+    },
+    {
+      "alignedWord": "world",
+      "case": 1,
+      "conf": 1.0,
+      "end": 44.7,
+      "endOffset": 598,
+      "start": 44.31,
+      "startOffset": 593,
+      "word": "world"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 45.99,
+      "endOffset": 603,
+      "start": 45.84,
+      "startOffset": 600,
+      "word": "The"
+    },
+    {
+      "alignedWord": "land",
+      "case": 1,
+      "conf": 1.0,
+      "end": 46.35,
+      "endOffset": 608,
+      "start": 45.99,
+      "startOffset": 604,
+      "word": "land"
+    },
+    {
+      "alignedWord": "here",
+      "case": 1,
+      "conf": 1.0,
+      "end": 46.59,
+      "endOffset": 613,
+      "start": 46.35,
+      "startOffset": 609,
+      "word": "here"
+    },
+    {
+      "alignedWord": "is",
+      "case": 1,
+      "conf": 1.0,
+      "end": 46.8,
+      "endOffset": 616,
+      "start": 46.62,
+      "startOffset": 614,
+      "word": "is"
+    },
+    {
+      "alignedWord": "dry",
+      "case": 1,
+      "conf": 1.0,
+      "end": 47.16,
+      "endOffset": 620,
+      "start": 46.8,
+      "startOffset": 617,
+      "word": "dry"
+    },
+    {
+      "alignedWord": "but",
+      "case": 1,
+      "conf": 1.0,
+      "end": 47.31,
+      "endOffset": 624,
+      "start": 47.16,
+      "startOffset": 621,
+      "word": "but"
+    },
+    {
+      "alignedWord": "not",
+      "case": 1,
+      "conf": 1.0,
+      "end": 47.52,
+      "endOffset": 628,
+      "start": 47.31,
+      "startOffset": 625,
+      "word": "not"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 47.61,
+      "endOffset": 632,
+      "start": 47.52,
+      "startOffset": 629,
+      "word": "the"
+    },
+    {
+      "alignedWord": "driest",
+      "case": 1,
+      "conf": 1.0,
+      "end": 48.12,
+      "endOffset": 639,
+      "start": 47.61,
+      "startOffset": 633,
+      "word": "driest"
+    },
+    {
+      "alignedWord": "sub",
+      "case": 1,
+      "conf": 1.0,
+      "end": 48.87,
+      "endOffset": 644,
+      "start": 48.45,
+      "startOffset": 641,
+      "word": "Sub"
+    },
+    {
+      "alignedWord": "savannah",
+      "case": 1,
+      "conf": 1.0,
+      "end": 49.47,
+      "endOffset": 653,
+      "start": 48.9,
+      "startOffset": 645,
+      "word": "savannah"
+    },
+    {
+      "alignedWord": "low",
+      "case": 1,
+      "conf": 1.0,
+      "end": 50.79,
+      "endOffset": 658,
+      "start": 50.46,
+      "startOffset": 655,
+      "word": "Low"
+    },
+    {
+      "alignedWord": "thorny",
+      "case": 1,
+      "conf": 1.0,
+      "end": 51.18,
+      "endOffset": 665,
+      "start": 50.79,
+      "startOffset": 659,
+      "word": "thorny"
+    },
+    {
+      "alignedWord": "trees",
+      "case": 1,
+      "conf": 1.0,
+      "end": 51.72,
+      "endOffset": 671,
+      "start": 51.18,
+      "startOffset": 666,
+      "word": "trees"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 51.84,
+      "endOffset": 675,
+      "start": 51.72,
+      "startOffset": 672,
+      "word": "and"
+    },
+    {
+      "alignedWord": "gray",
+      "case": 1,
+      "conf": 1.0,
+      "end": 52.2,
+      "endOffset": 680,
+      "start": 51.87,
+      "startOffset": 676,
+      "word": "gray"
+    },
+    {
+      "alignedWord": "grass",
+      "case": 1,
+      "conf": 1.0,
+      "end": 52.68,
+      "endOffset": 686,
+      "start": 52.2,
+      "startOffset": 681,
+      "word": "grass"
+    },
+    {
+      "alignedWord": "old",
+      "case": 1,
+      "conf": 1.0,
+      "end": 52.95,
+      "endOffset": 690,
+      "start": 52.68,
+      "startOffset": 687,
+      "word": "old"
+    },
+    {
+      "alignedWord": "parched",
+      "case": 1,
+      "conf": 1.0,
+      "end": 53.58,
+      "endOffset": 698,
+      "start": 52.98,
+      "startOffset": 691,
+      "word": "parched"
+    },
+    {
+      "alignedWord": "a",
+      "case": 1,
+      "conf": 1.0,
+      "end": 54.54,
+      "endOffset": 701,
+      "start": 54.45,
+      "startOffset": 700,
+      "word": "A"
+    },
+    {
+      "alignedWord": "lush",
+      "case": 1,
+      "conf": 1.0,
+      "end": 54.84,
+      "endOffset": 706,
+      "start": 54.54,
+      "startOffset": 702,
+      "word": "lush"
+    },
+    {
+      "alignedWord": "landscape",
+      "case": 1,
+      "conf": 1.0,
+      "end": 55.41,
+      "endOffset": 716,
+      "start": 54.84,
+      "startOffset": 707,
+      "word": "landscape"
+    },
+    {
+      "alignedWord": "by",
+      "case": 1,
+      "conf": 1.0,
+      "end": 55.62,
+      "endOffset": 719,
+      "start": 55.41,
+      "startOffset": 717,
+      "word": "by"
+    },
+    {
+      "alignedWord": "armageddon",
+      "case": 1,
+      "conf": 1.0,
+      "end": 56.22,
+      "endOffset": 730,
+      "start": 55.62,
+      "startOffset": 720,
+      "word": "armageddon"
+    },
+    {
+      "alignedWord": "standard",
+      "case": 1,
+      "conf": 1.0,
+      "end": 56.73,
+      "endOffset": 739,
+      "start": 56.22,
+      "startOffset": 731,
+      "word": "standard"
+    },
+    {
+      "alignedWord": "all",
+      "case": 1,
+      "conf": 1.0,
+      "end": 58.08,
+      "endOffset": 744,
+      "start": 57.63,
+      "startOffset": 741,
+      "word": "All"
+    },
+    {
+      "alignedWord": "is",
+      "case": 1,
+      "conf": 1.0,
+      "end": 58.26,
+      "endOffset": 747,
+      "start": 58.08,
+      "startOffset": 745,
+      "word": "is"
+    },
+    {
+      "alignedWord": "caked",
+      "case": 1,
+      "conf": 1.0,
+      "end": 58.68,
+      "endOffset": 753,
+      "start": 58.26,
+      "startOffset": 748,
+      "word": "caked"
+    },
+    {
+      "alignedWord": "with",
+      "case": 1,
+      "conf": 1.0,
+      "end": 58.83,
+      "endOffset": 758,
+      "start": 58.68,
+      "startOffset": 754,
+      "word": "with"
+    },
+    {
+      "alignedWord": "ash",
+      "case": 1,
+      "conf": 1.0,
+      "end": 59.31,
+      "endOffset": 762,
+      "start": 58.86,
+      "startOffset": 759,
+      "word": "ash"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 60.21,
+      "endOffset": 767,
+      "start": 60.09,
+      "startOffset": 764,
+      "word": "The"
+    },
+    {
+      "alignedWord": "season",
+      "case": 1,
+      "conf": 1.0,
+      "end": 60.6,
+      "endOffset": 774,
+      "start": 60.21,
+      "startOffset": 768,
+      "word": "season"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 60.69,
+      "endOffset": 777,
+      "start": 60.6,
+      "startOffset": 775,
+      "word": "of"
+    },
+    {
+      "alignedWord": "fire",
+      "case": 1,
+      "conf": 1.0,
+      "end": 61.05,
+      "endOffset": 782,
+      "start": 60.69,
+      "startOffset": 778,
+      "word": "fire"
+    },
+    {
+      "alignedWord": "has",
+      "case": 1,
+      "conf": 1.0,
+      "end": 61.23,
+      "endOffset": 786,
+      "start": 61.08,
+      "startOffset": 783,
+      "word": "has"
+    },
+    {
+      "alignedWord": "recently",
+      "case": 1,
+      "conf": 1.0,
+      "end": 61.62,
+      "endOffset": 795,
+      "start": 61.23,
+      "startOffset": 787,
+      "word": "recently"
+    },
+    {
+      "alignedWord": "drawn",
+      "case": 1,
+      "conf": 1.0,
+      "end": 61.92,
+      "endOffset": 801,
+      "start": 61.62,
+      "startOffset": 796,
+      "word": "drawn"
+    },
+    {
+      "alignedWord": "to",
+      "case": 1,
+      "conf": 1.0,
+      "end": 62.04,
+      "endOffset": 804,
+      "start": 61.92,
+      "startOffset": 802,
+      "word": "to"
+    },
+    {
+      "alignedWord": "it",
+      "case": 1,
+      "conf": 1.0,
+      "end": 62.1,
+      "endOffset": 807,
+      "start": 62.04,
+      "startOffset": 805,
+      "word": "it"
+    },
+    {
+      "alignedWord": "close",
+      "case": 1,
+      "conf": 1.0,
+      "end": 62.49,
+      "endOffset": 813,
+      "start": 62.1,
+      "startOffset": 808,
+      "word": "close"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 63.09,
+      "endOffset": 817,
+      "start": 62.97,
+      "startOffset": 814,
+      "word": "the"
+    },
+    {
+      "alignedWord": "weather",
+      "case": 1,
+      "conf": 1.0,
+      "end": 63.39,
+      "endOffset": 825,
+      "start": 63.09,
+      "startOffset": 818,
+      "word": "weather"
+    },
+    {
+      "alignedWord": "is",
+      "case": 1,
+      "conf": 1.0,
+      "end": 63.54,
+      "endOffset": 828,
+      "start": 63.39,
+      "startOffset": 826,
+      "word": "is"
+    },
+    {
+      "alignedWord": "calming",
+      "case": 1,
+      "conf": 1.0,
+      "end": 64.08,
+      "endOffset": 836,
+      "start": 63.54,
+      "startOffset": 829,
+      "word": "calming"
+    },
+    {
+      "alignedWord": "not",
+      "case": 1,
+      "conf": 1.0,
+      "end": 64.95,
+      "endOffset": 840,
+      "start": 64.74,
+      "startOffset": 837,
+      "word": "not"
+    },
+    {
+      "alignedWord": "that",
+      "case": 1,
+      "conf": 1.0,
+      "end": 65.1,
+      "endOffset": 845,
+      "start": 64.95,
+      "startOffset": 841,
+      "word": "that"
+    },
+    {
+      "alignedWord": "you",
+      "case": 1,
+      "conf": 1.0,
+      "end": 65.25,
+      "endOffset": 849,
+      "start": 65.1,
+      "startOffset": 846,
+      "word": "you"
+    },
+    {
+      "alignedWord": "guess",
+      "case": 1,
+      "conf": 1.0,
+      "end": 65.58,
+      "endOffset": 855,
+      "start": 65.34,
+      "startOffset": 850,
+      "word": "guess"
+    },
+    {
+      "alignedWord": "it",
+      "case": 1,
+      "conf": 1.0,
+      "end": 65.7,
+      "endOffset": 858,
+      "start": 65.58,
+      "startOffset": 856,
+      "word": "it"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 66.33,
+      "endOffset": 863,
+      "start": 66.24,
+      "startOffset": 860,
+      "word": "The"
+    },
+    {
+      "alignedWord": "season",
+      "case": 1,
+      "conf": 1.0,
+      "end": 66.69,
+      "endOffset": 870,
+      "start": 66.33,
+      "startOffset": 864,
+      "word": "season"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 66.75,
+      "endOffset": 873,
+      "start": 66.69,
+      "startOffset": 871,
+      "word": "of"
+    },
+    {
+      "alignedWord": "shadows",
+      "case": 1,
+      "conf": 1.0,
+      "end": 67.38,
+      "endOffset": 881,
+      "start": 66.75,
+      "startOffset": 874,
+      "word": "Shadows"
+    },
+    {
+      "alignedWord": "has",
+      "case": 1,
+      "conf": 1.0,
+      "end": 67.86,
+      "endOffset": 885,
+      "start": 67.71,
+      "startOffset": 882,
+      "word": "has"
+    },
+    {
+      "alignedWord": "began",
+      "case": 1,
+      "conf": 1.0,
+      "end": 68.245701,
+      "endOffset": 891,
+      "start": 67.86,
+      "startOffset": 886,
+      "word": "began"
+    },
+    {
+      "alignedWord": "it",
+      "case": 1,
+      "conf": 1.0,
+      "end": 70.11,
+      "endOffset": 895,
+      "start": 69.96,
+      "startOffset": 893,
+      "word": "It"
+    },
+    {
+      "alignedWord": "is",
+      "case": 1,
+      "conf": 1.0,
+      "end": 70.2,
+      "endOffset": 898,
+      "start": 70.11,
+      "startOffset": 896,
+      "word": "is"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 70.41,
+      "endOffset": 901,
+      "start": 70.2,
+      "startOffset": 899,
+      "word": "my"
+    },
+    {
+      "alignedWord": "task",
+      "case": 1,
+      "conf": 1.0,
+      "end": 70.83,
+      "endOffset": 906,
+      "start": 70.41,
+      "startOffset": 902,
+      "word": "task"
+    },
+    {
+      "alignedWord": "to",
+      "case": 1,
+      "conf": 1.0,
+      "end": 71.01,
+      "endOffset": 909,
+      "start": 70.83,
+      "startOffset": 907,
+      "word": "to"
+    },
+    {
+      "alignedWord": "aid",
+      "case": 1,
+      "conf": 1.0,
+      "end": 71.43,
+      "endOffset": 913,
+      "start": 71.04,
+      "startOffset": 910,
+      "word": "aid"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 71.58,
+      "endOffset": 917,
+      "start": 71.46,
+      "startOffset": 914,
+      "word": "the"
+    },
+    {
+      "alignedWord": "rocks",
+      "case": 1,
+      "conf": 1.0,
+      "end": 71.94,
+      "endOffset": 923,
+      "start": 71.58,
+      "startOffset": 918,
+      "word": "rocks"
+    },
+    {
+      "alignedWord": "destruction",
+      "case": 1,
+      "conf": 1.0,
+      "end": 72.6,
+      "endOffset": 935,
+      "start": 71.94,
+      "startOffset": 924,
+      "word": "destruction"
+    },
+    {
+      "alignedWord": "worthy",
+      "case": 1,
+      "conf": 1.0,
+      "end": 73.74,
+      "endOffset": 943,
+      "start": 73.23,
+      "startOffset": 937,
+      "word": "Worthy"
+    },
+    {
+      "alignedWord": "task",
+      "case": 1,
+      "conf": 1.0,
+      "end": 74.22,
+      "endOffset": 948,
+      "start": 73.74,
+      "startOffset": 944,
+      "word": "task"
+    },
+    {
+      "alignedWord": "battle",
+      "case": 1,
+      "conf": 1.0,
+      "end": 75.3,
+      "endOffset": 956,
+      "start": 74.94,
+      "startOffset": 950,
+      "word": "Battle"
+    },
+    {
+      "alignedWord": "rages",
+      "case": 1,
+      "conf": 1.0,
+      "end": 75.69,
+      "endOffset": 962,
+      "start": 75.3,
+      "startOffset": 957,
+      "word": "rages"
+    },
+    {
+      "alignedWord": "already",
+      "case": 1,
+      "conf": 1.0,
+      "end": 76.08,
+      "endOffset": 970,
+      "start": 75.69,
+      "startOffset": 963,
+      "word": "already"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 77.04,
+      "endOffset": 972,
+      "start": 76.89,
+      "startOffset": 971,
+      "word": "I"
+    },
+    {
+      "alignedWord": "stride",
+      "case": 1,
+      "conf": 1.0,
+      "end": 77.4,
+      "endOffset": 979,
+      "start": 77.04,
+      "startOffset": 973,
+      "word": "stride"
+    },
+    {
+      "alignedWord": "into",
+      "case": 1,
+      "conf": 1.0,
+      "end": 77.61,
+      "endOffset": 984,
+      "start": 77.4,
+      "startOffset": 980,
+      "word": "into"
+    },
+    {
+      "alignedWord": "it",
+      "case": 1,
+      "conf": 1.0,
+      "end": 77.73,
+      "endOffset": 987,
+      "start": 77.61,
+      "startOffset": 985,
+      "word": "it"
+    },
+    {
+      "alignedWord": "with",
+      "case": 1,
+      "conf": 1.0,
+      "end": 77.88,
+      "endOffset": 992,
+      "start": 77.73,
+      "startOffset": 988,
+      "word": "with"
+    },
+    {
+      "alignedWord": "great",
+      "case": 1,
+      "conf": 1.0,
+      "end": 78.21,
+      "endOffset": 998,
+      "start": 77.88,
+      "startOffset": 993,
+      "word": "great"
+    },
+    {
+      "alignedWord": "joy",
+      "case": 1,
+      "conf": 1.0,
+      "end": 78.51,
+      "endOffset": 1002,
+      "start": 78.24,
+      "startOffset": 999,
+      "word": "joy"
+    },
+    {
+      "alignedWord": "in",
+      "case": 1,
+      "conf": 1.0,
+      "end": 78.6,
+      "endOffset": 1005,
+      "start": 78.51,
+      "startOffset": 1003,
+      "word": "in"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 78.75,
+      "endOffset": 1008,
+      "start": 78.6,
+      "startOffset": 1006,
+      "word": "my"
+    },
+    {
+      "alignedWord": "heart",
+      "case": 1,
+      "conf": 1.0,
+      "end": 79.14,
+      "endOffset": 1014,
+      "start": 78.75,
+      "startOffset": 1009,
+      "word": "heart"
+    },
+    {
+      "alignedWord": "praise",
+      "case": 1,
+      "conf": 1.0,
+      "end": 80.07,
+      "endOffset": 1032,
+      "start": 79.56,
+      "startOffset": 1026,
+      "word": "Praise"
+    },
+    {
+      "alignedWord": "be",
+      "case": 1,
+      "conf": 1.0,
+      "end": 80.46,
+      "endOffset": 1035,
+      "start": 80.07,
+      "startOffset": 1033,
+      "word": "be"
+    },
+    {
+      "alignedWord": "drop",
+      "case": 1,
+      "conf": 1.0,
+      "end": 83.79,
+      "endOffset": 1041,
+      "start": 83.49,
+      "startOffset": 1037,
+      "word": "Drop"
+    },
+    {
+      "alignedWord": "pods",
+      "case": 1,
+      "conf": 1.0,
+      "end": 84.15,
+      "endOffset": 1046,
+      "start": 83.79,
+      "startOffset": 1042,
+      "word": "pods"
+    },
+    {
+      "alignedWord": "fall",
+      "case": 1,
+      "conf": 1.0,
+      "end": 84.45,
+      "endOffset": 1051,
+      "start": 84.15,
+      "startOffset": 1047,
+      "word": "fall"
+    },
+    {
+      "alignedWord": "from",
+      "case": 1,
+      "conf": 1.0,
+      "end": 84.57,
+      "endOffset": 1056,
+      "start": 84.45,
+      "startOffset": 1052,
+      "word": "from"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 84.66,
+      "endOffset": 1060,
+      "start": 84.57,
+      "startOffset": 1057,
+      "word": "the"
+    },
+    {
+      "alignedWord": "sky",
+      "case": 1,
+      "conf": 1.0,
+      "end": 85.05,
+      "endOffset": 1064,
+      "start": 84.66,
+      "startOffset": 1061,
+      "word": "sky"
+    },
+    {
+      "alignedWord": "all",
+      "case": 1,
+      "conf": 1.0,
+      "end": 85.29,
+      "endOffset": 1068,
+      "start": 85.05,
+      "startOffset": 1065,
+      "word": "all"
+    },
+    {
+      "alignedWord": "around",
+      "case": 1,
+      "conf": 1.0,
+      "end": 85.68,
+      "endOffset": 1075,
+      "start": 85.29,
+      "startOffset": 1069,
+      "word": "around"
+    },
+    {
+      "alignedWord": "me",
+      "case": 1,
+      "conf": 1.0,
+      "end": 85.89,
+      "endOffset": 1078,
+      "start": 85.68,
+      "startOffset": 1076,
+      "word": "me"
+    },
+    {
+      "alignedWord": "igniting",
+      "case": 1,
+      "conf": 1.0,
+      "end": 86.64,
+      "endOffset": 1087,
+      "start": 86.1,
+      "startOffset": 1079,
+      "word": "igniting"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 86.73,
+      "endOffset": 1091,
+      "start": 86.64,
+      "startOffset": 1088,
+      "word": "the"
+    },
+    {
+      "alignedWord": "scrubby",
+      "case": 1,
+      "conf": 1.0,
+      "end": 87.12,
+      "endOffset": 1099,
+      "start": 86.73,
+      "startOffset": 1092,
+      "word": "scrubby"
+    },
+    {
+      "alignedWord": "vegetation",
+      "case": 1,
+      "conf": 1.0,
+      "end": 87.75,
+      "endOffset": 1110,
+      "start": 87.12,
+      "startOffset": 1100,
+      "word": "vegetation"
+    },
+    {
+      "alignedWord": "with",
+      "case": 1,
+      "conf": 1.0,
+      "end": 87.93,
+      "endOffset": 1115,
+      "start": 87.75,
+      "startOffset": 1111,
+      "word": "with"
+    },
+    {
+      "alignedWord": "that",
+      "case": 1,
+      "conf": 1.0,
+      "end": 88.08,
+      "endOffset": 1120,
+      "start": 87.93,
+      "startOffset": 1116,
+      "word": "that"
+    },
+    {
+      "alignedWord": "breaking",
+      "case": 1,
+      "conf": 1.0,
+      "end": 88.44,
+      "endOffset": 1129,
+      "start": 88.08,
+      "startOffset": 1121,
+      "word": "breaking"
+    },
+    {
+      "alignedWord": "jets",
+      "case": 1,
+      "conf": 1.0,
+      "end": 88.8,
+      "endOffset": 1134,
+      "start": 88.44,
+      "startOffset": 1130,
+      "word": "jets"
+    },
+    {
+      "alignedWord": "i",
+      "case": 1,
+      "conf": 1.0,
+      "end": 89.73,
+      "endOffset": 1137,
+      "start": 89.46,
+      "startOffset": 1136,
+      "word": "I"
+    },
+    {
+      "alignedWord": "am",
+      "case": 1,
+      "conf": 1.0,
+      "end": 89.82,
+      "endOffset": 1140,
+      "start": 89.73,
+      "startOffset": 1138,
+      "word": "am"
+    },
+    {
+      "alignedWord": "one",
+      "case": 1,
+      "conf": 1.0,
+      "end": 89.97,
+      "endOffset": 1144,
+      "start": 89.82,
+      "startOffset": 1141,
+      "word": "one"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 90.03,
+      "endOffset": 1147,
+      "start": 89.97,
+      "startOffset": 1145,
+      "word": "of"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 90.15,
+      "endOffset": 1151,
+      "start": 90.03,
+      "startOffset": 1148,
+      "word": "the"
+    },
+    {
+      "alignedWord": "first",
+      "case": 1,
+      "conf": 1.0,
+      "end": 90.6,
+      "endOffset": 1157,
+      "start": 90.15,
+      "startOffset": 1152,
+      "word": "first"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 90.96,
+      "endOffset": 1161,
+      "start": 90.84,
+      "startOffset": 1158,
+      "word": "the"
+    },
+    {
+      "alignedWord": "spearhead",
+      "case": 1,
+      "conf": 1.0,
+      "end": 91.56,
+      "endOffset": 1171,
+      "start": 90.96,
+      "startOffset": 1162,
+      "word": "spearhead"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 91.62,
+      "endOffset": 1174,
+      "start": 91.56,
+      "startOffset": 1172,
+      "word": "of"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 91.74,
+      "endOffset": 1178,
+      "start": 91.62,
+      "startOffset": 1175,
+      "word": "the"
+    },
+    {
+      "alignedWord": "ash",
+      "case": 1,
+      "conf": 1.0,
+      "end": 92.04,
+      "endOffset": 1182,
+      "start": 91.74,
+      "startOffset": 1179,
+      "word": "ash"
+    },
+    {
+      "alignedWord": "waste",
+      "case": 1,
+      "conf": 1.0,
+      "end": 92.4,
+      "endOffset": 1188,
+      "start": 92.07,
+      "startOffset": 1183,
+      "word": "waste"
+    },
+    {
+      "alignedWord": "crusade",
+      "case": 1,
+      "conf": 1.0,
+      "end": 92.91,
+      "endOffset": 1196,
+      "start": 92.4,
+      "startOffset": 1189,
+      "word": "crusade"
+    },
+    {
+      "alignedWord": "second",
+      "case": 1,
+      "conf": 1.0,
+      "end": 93.27,
+      "endOffset": 1203,
+      "start": 92.91,
+      "startOffset": 1197,
+      "word": "second"
+    },
+    {
+      "alignedWord": "group",
+      "case": 1,
+      "conf": 1.0,
+      "end": 93.57,
+      "endOffset": 1209,
+      "start": 93.27,
+      "startOffset": 1204,
+      "word": "group"
+    },
+    {
+      "alignedWord": "praise",
+      "case": 1,
+      "conf": 1.0,
+      "end": 94.2,
+      "endOffset": 1217,
+      "start": 93.81,
+      "startOffset": 1211,
+      "word": "praise"
+    },
+    {
+      "alignedWord": "be",
+      "case": 1,
+      "conf": 1.0,
+      "end": 94.56,
+      "endOffset": 1220,
+      "start": 94.2,
+      "startOffset": 1218,
+      "word": "be"
+    },
+    {
+      "alignedWord": "fifty",
+      "case": 1,
+      "conf": 1.0,
+      "end": 95.43,
+      "endOffset": 1227,
+      "start": 95.1,
+      "startOffset": 1222,
+      "word": "Fifty"
+    },
+    {
+      "alignedWord": "six",
+      "case": 1,
+      "conf": 1.0,
+      "end": 95.7,
+      "endOffset": 1231,
+      "start": 95.43,
+      "startOffset": 1228,
+      "word": "six"
+    },
+    {
+      "alignedWord": "battle",
+      "case": 1,
+      "conf": 1.0,
+      "end": 96.0,
+      "endOffset": 1238,
+      "start": 95.73,
+      "startOffset": 1232,
+      "word": "battle"
+    },
+    {
+      "alignedWord": "brothers",
+      "case": 1,
+      "conf": 1.0,
+      "end": 96.36,
+      "endOffset": 1247,
+      "start": 96.0,
+      "startOffset": 1239,
+      "word": "brothers"
+    },
+    {
+      "alignedWord": "forty",
+      "case": 1,
+      "conf": 1.0,
+      "end": 96.84,
+      "endOffset": 1253,
+      "start": 96.51,
+      "startOffset": 1248,
+      "word": "forty"
+    },
+    {
+      "alignedWord": "nice",
+      "case": 1,
+      "conf": 1.0,
+      "end": 97.14,
+      "endOffset": 1258,
+      "start": 96.84,
+      "startOffset": 1254,
+      "word": "nice"
+    },
+    {
+      "alignedWord": "neophytes",
+      "case": 1,
+      "conf": 1.0,
+      "end": 97.89,
+      "endOffset": 1268,
+      "start": 97.2,
+      "startOffset": 1259,
+      "word": "neophytes"
+    },
+    {
+      "alignedWord": "various",
+      "case": 1,
+      "conf": 1.0,
+      "end": 98.94,
+      "endOffset": 1276,
+      "start": 98.52,
+      "startOffset": 1269,
+      "word": "various"
+    },
+    {
+      "alignedWord": "harm",
+      "case": 1,
+      "conf": 1.0,
+      "end": 99.18,
+      "endOffset": 1281,
+      "start": 98.94,
+      "startOffset": 1277,
+      "word": "harm"
+    },
+    {
+      "alignedWord": "assets",
+      "case": 1,
+      "conf": 1.0,
+      "end": 99.75,
+      "endOffset": 1288,
+      "start": 99.18,
+      "startOffset": 1282,
+      "word": "assets"
+    },
+    {
+      "alignedWord": "are",
+      "case": 1,
+      "conf": 1.0,
+      "end": 99.81,
+      "endOffset": 1292,
+      "start": 99.75,
+      "startOffset": 1289,
+      "word": "are"
+    },
+    {
+      "alignedWord": "being",
+      "case": 1,
+      "conf": 1.0,
+      "end": 100.02,
+      "endOffset": 1298,
+      "start": 99.81,
+      "startOffset": 1293,
+      "word": "being"
+    },
+    {
+      "alignedWord": "landed",
+      "case": 1,
+      "conf": 1.0,
+      "end": 100.41,
+      "endOffset": 1305,
+      "start": 100.02,
+      "startOffset": 1299,
+      "word": "landed"
+    },
+    {
+      "alignedWord": "further",
+      "case": 1,
+      "conf": 1.0,
+      "end": 100.74,
+      "endOffset": 1313,
+      "start": 100.41,
+      "startOffset": 1306,
+      "word": "further"
+    },
+    {
+      "alignedWord": "out",
+      "case": 1,
+      "conf": 1.0,
+      "end": 101.04,
+      "endOffset": 1317,
+      "start": 100.77,
+      "startOffset": 1314,
+      "word": "out"
+    },
+    {
+      "alignedWord": "under",
+      "case": 1,
+      "conf": 1.0,
+      "end": 101.52,
+      "endOffset": 1324,
+      "start": 101.31,
+      "startOffset": 1319,
+      "word": "under"
+    },
+    {
+      "alignedWord": "thunder",
+      "case": 1,
+      "conf": 1.0,
+      "end": 101.91,
+      "endOffset": 1332,
+      "start": 101.55,
+      "startOffset": 1325,
+      "word": "thunder"
+    },
+    {
+      "alignedWord": "hawk",
+      "case": 1,
+      "conf": 1.0,
+      "end": 102.12,
+      "endOffset": 1337,
+      "start": 101.91,
+      "startOffset": 1333,
+      "word": "hawk"
+    },
+    {
+      "alignedWord": "air",
+      "case": 1,
+      "conf": 1.0,
+      "end": 102.36,
+      "endOffset": 1341,
+      "start": 102.15,
+      "startOffset": 1338,
+      "word": "air"
+    },
+    {
+      "alignedWord": "support",
+      "case": 1,
+      "conf": 1.0,
+      "end": 102.81,
+      "endOffset": 1349,
+      "start": 102.36,
+      "startOffset": 1342,
+      "word": "support"
+    },
+    {
+      "alignedWord": "all",
+      "case": 1,
+      "conf": 1.0,
+      "end": 103.77,
+      "endOffset": 1354,
+      "start": 103.53,
+      "startOffset": 1351,
+      "word": "All"
+    },
+    {
+      "alignedWord": "this",
+      "case": 1,
+      "conf": 1.0,
+      "end": 104.13,
+      "endOffset": 1359,
+      "start": 103.77,
+      "startOffset": 1355,
+      "word": "this"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 104.25,
+      "endOffset": 1363,
+      "start": 104.13,
+      "startOffset": 1360,
+      "word": "and"
+    },
+    {
+      "alignedWord": "other",
+      "case": 1,
+      "conf": 1.0,
+      "end": 104.58,
+      "endOffset": 1369,
+      "start": 104.31,
+      "startOffset": 1364,
+      "word": "other"
+    },
+    {
+      "alignedWord": "information",
+      "case": 1,
+      "conf": 1.0,
+      "end": 105.09,
+      "endOffset": 1381,
+      "start": 104.58,
+      "startOffset": 1370,
+      "word": "information"
+    },
+    {
+      "alignedWord": "scrolls",
+      "case": 1,
+      "conf": 1.0,
+      "end": 105.54,
+      "endOffset": 1389,
+      "start": 105.09,
+      "startOffset": 1382,
+      "word": "scrolls"
+    },
+    {
+      "alignedWord": "along",
+      "case": 1,
+      "conf": 1.0,
+      "end": 105.75,
+      "endOffset": 1395,
+      "start": 105.54,
+      "startOffset": 1390,
+      "word": "along"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 105.87,
+      "endOffset": 1399,
+      "start": 105.75,
+      "startOffset": 1396,
+      "word": "the"
+    },
+    {
+      "alignedWord": "edges",
+      "case": 1,
+      "conf": 1.0,
+      "end": 106.26,
+      "endOffset": 5,
+      "start": 105.87,
+      "startOffset": 0,
+      "word": "edges"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 106.32000000000001,
+      "endOffset": 8,
+      "start": 106.26,
+      "startOffset": 6,
+      "word": "of"
+    },
+    {
+      "alignedWord": "my",
+      "case": 1,
+      "conf": 1.0,
+      "end": 106.47,
+      "endOffset": 11,
+      "start": 106.32000000000001,
+      "startOffset": 9,
+      "word": "my"
+    },
+    {
+      "case": 3,
+      "endOffset": 21,
+      "startOffset": 12,
+      "word": "sensorium"
+    },
+    {
+      "alignedWord": "bright",
+      "case": 1,
+      "conf": 1.0,
+      "end": 107.91000000000001,
+      "endOffset": 29,
+      "start": 107.61,
+      "startOffset": 23,
+      "word": "Bright"
+    },
+    {
+      "alignedWord": "flashes",
+      "case": 1,
+      "conf": 1.0,
+      "end": 108.39,
+      "endOffset": 37,
+      "start": 107.91000000000001,
+      "startOffset": 30,
+      "word": "flashes"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 108.51,
+      "endOffset": 41,
+      "start": 108.39,
+      "startOffset": 38,
+      "word": "and"
+    },
+    {
+      "alignedWord": "war",
+      "case": 1,
+      "conf": 1.0,
+      "end": 108.78,
+      "endOffset": 1445,
+      "start": 108.51,
+      "startOffset": 1442,
+      "word": "war"
+    },
+    {
+      "alignedWord": "lighting",
+      "case": 1,
+      "conf": 1.0,
+      "end": 109.26,
+      "endOffset": 1454,
+      "start": 108.78,
+      "startOffset": 1446,
+      "word": "lighting"
+    },
+    {
+      "alignedWord": "show",
+      "case": 1,
+      "conf": 1.0,
+      "end": 109.62,
+      "endOffset": 1459,
+      "start": 109.29,
+      "startOffset": 1455,
+      "word": "show"
+    },
+    {
+      "alignedWord": "through",
+      "case": 1,
+      "conf": 1.0,
+      "end": 109.83,
+      "endOffset": 1467,
+      "start": 109.62,
+      "startOffset": 1460,
+      "word": "through"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 109.95,
+      "endOffset": 1471,
+      "start": 109.83,
+      "startOffset": 1468,
+      "word": "the"
+    },
+    {
+      "alignedWord": "ash",
+      "case": 1,
+      "conf": 1.0,
+      "end": 110.25,
+      "endOffset": 1475,
+      "start": 109.95,
+      "startOffset": 1472,
+      "word": "ash"
+    },
+    {
+      "alignedWord": "trained",
+      "case": 1,
+      "conf": 1.0,
+      "end": 110.52,
+      "endOffset": 1483,
+      "start": 110.25,
+      "startOffset": 1476,
+      "word": "trained"
+    },
+    {
+      "alignedWord": "sky",
+      "case": 1,
+      "conf": 1.0,
+      "end": 111.09,
+      "endOffset": 1487,
+      "start": 110.61,
+      "startOffset": 1484,
+      "word": "sky"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 111.66,
+      "endOffset": 1491,
+      "start": 111.54,
+      "startOffset": 1488,
+      "word": "the"
+    },
+    {
+      "alignedWord": "void",
+      "case": 1,
+      "conf": 1.0,
+      "end": 111.96,
+      "endOffset": 1496,
+      "start": 111.66,
+      "startOffset": 1492,
+      "word": "void"
+    },
+    {
+      "alignedWord": "crusade",
+      "case": 1,
+      "conf": 1.0,
+      "end": 112.53,
+      "endOffset": 1504,
+      "start": 111.96,
+      "startOffset": 1497,
+      "word": "crusade"
+    },
+    {
+      "alignedWord": "embattled",
+      "case": 1,
+      "conf": 1.0,
+      "end": 113.1,
+      "endOffset": 1514,
+      "start": 112.53,
+      "startOffset": 1505,
+      "word": "embattled"
+    },
+    {
+      "alignedWord": "in",
+      "case": 1,
+      "conf": 1.0,
+      "end": 113.22,
+      "endOffset": 1517,
+      "start": 113.1,
+      "startOffset": 1515,
+      "word": "in"
+    },
+    {
+      "alignedWord": "orbit",
+      "case": 1,
+      "conf": 1.0,
+      "end": 113.61,
+      "endOffset": 1523,
+      "start": 113.22,
+      "startOffset": 1518,
+      "word": "orbit"
+    },
+    {
+      "alignedWord": "as",
+      "case": 1,
+      "conf": 1.0,
+      "end": 114.33,
+      "endOffset": 1526,
+      "start": 114.12,
+      "startOffset": 1524,
+      "word": "as"
+    },
+    {
+      "alignedWord": "above",
+      "case": 1,
+      "conf": 1.0,
+      "end": 114.75,
+      "endOffset": 1532,
+      "start": 114.33,
+      "startOffset": 1527,
+      "word": "above"
+    },
+    {
+      "alignedWord": "so",
+      "case": 1,
+      "conf": 1.0,
+      "end": 115.62,
+      "endOffset": 1535,
+      "start": 115.38,
+      "startOffset": 1533,
+      "word": "so"
+    },
+    {
+      "alignedWord": "below",
+      "case": 1,
+      "conf": 1.0,
+      "end": 116.04,
+      "endOffset": 1541,
+      "start": 115.62,
+      "startOffset": 1536,
+      "word": "below"
+    }
+  ]
+}
+

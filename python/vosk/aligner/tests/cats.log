@@ -1,0 +1,725 @@
+{
+  "transcript": "There was in this singular caravan little boy with no father or mother, but only a tiny kitten to cherish. The plague had not to him, yet had left him furry thing to mitigate his sorrow; and when one, one can find great relief in the lively antics of. So the boy whom the dark people called than he wept as he sat playing with his steps of an oddly painted wagon.\n",
+  "words": [
+    {
+      "alignedWord": "there",
+      "case": 1,
+      "conf": 1.0,
+      "end": 0.81,
+      "endOffset": 5,
+      "start": 0.66,
+      "startOffset": 0,
+      "word": "There"
+    },
+    {
+      "alignedWord": "was",
+      "case": 1,
+      "conf": 1.0,
+      "end": 1.05,
+      "endOffset": 9,
+      "start": 0.81,
+      "startOffset": 6,
+      "word": "was"
+    },
+    {
+      "alignedWord": "in",
+      "case": 1,
+      "conf": 1.0,
+      "end": 1.17,
+      "endOffset": 12,
+      "start": 1.05,
+      "startOffset": 10,
+      "word": "in"
+    },
+    {
+      "alignedWord": "this",
+      "case": 1,
+      "conf": 1.0,
+      "end": 1.35,
+      "endOffset": 17,
+      "start": 1.17,
+      "startOffset": 13,
+      "word": "this"
+    },
+    {
+      "alignedWord": "singular",
+      "case": 1,
+      "conf": 1.0,
+      "end": 1.8,
+      "endOffset": 26,
+      "start": 1.35,
+      "startOffset": 18,
+      "word": "singular"
+    },
+    {
+      "alignedWord": "caravan",
+      "case": 1,
+      "conf": 1.0,
+      "end": 2.46,
+      "endOffset": 34,
+      "start": 1.8,
+      "startOffset": 27,
+      "word": "caravan"
+    },
+    {
+      "alignedWord": "little",
+      "case": 1,
+      "conf": 1.0,
+      "end": 2.79,
+      "endOffset": 41,
+      "start": 2.49,
+      "startOffset": 35,
+      "word": "little"
+    },
+    {
+      "alignedWord": "boy",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.12,
+      "endOffset": 45,
+      "start": 2.79,
+      "startOffset": 42,
+      "word": "boy"
+    },
+    {
+      "alignedWord": "with",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.27,
+      "endOffset": 50,
+      "start": 3.12,
+      "startOffset": 46,
+      "word": "with"
+    },
+    {
+      "alignedWord": "no",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.45,
+      "endOffset": 53,
+      "start": 3.27,
+      "startOffset": 51,
+      "word": "no"
+    },
+    {
+      "alignedWord": "father",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.9,
+      "endOffset": 60,
+      "start": 3.45,
+      "startOffset": 54,
+      "word": "father"
+    },
+    {
+      "alignedWord": "or",
+      "case": 1,
+      "conf": 1.0,
+      "end": 3.99,
+      "endOffset": 63,
+      "start": 3.9,
+      "startOffset": 61,
+      "word": "or"
+    },
+    {
+      "alignedWord": "mother",
+      "case": 1,
+      "conf": 1.0,
+      "end": 4.38,
+      "endOffset": 70,
+      "start": 3.99,
+      "startOffset": 64,
+      "word": "mother"
+    },
+    {
+      "alignedWord": "but",
+      "case": 1,
+      "conf": 1.0,
+      "end": 4.83,
+      "endOffset": 75,
+      "start": 4.65,
+      "startOffset": 72,
+      "word": "but"
+    },
+    {
+      "alignedWord": "only",
+      "case": 1,
+      "conf": 1.0,
+      "end": 5.1,
+      "endOffset": 80,
+      "start": 4.83,
+      "startOffset": 76,
+      "word": "only"
+    },
+    {
+      "alignedWord": "a",
+      "case": 1,
+      "conf": 1.0,
+      "end": 5.19,
+      "endOffset": 82,
+      "start": 5.1,
+      "startOffset": 81,
+      "word": "a"
+    },
+    {
+      "alignedWord": "tiny",
+      "case": 1,
+      "conf": 1.0,
+      "end": 5.61,
+      "endOffset": 87,
+      "start": 5.19,
+      "startOffset": 83,
+      "word": "tiny"
+    },
+    {
+      "alignedWord": "kitten",
+      "case": 1,
+      "conf": 1.0,
+      "end": 6.3,
+      "endOffset": 94,
+      "start": 5.94,
+      "startOffset": 88,
+      "word": "kitten"
+    },
+    {
+      "alignedWord": "to",
+      "case": 1,
+      "conf": 1.0,
+      "end": 6.45,
+      "endOffset": 97,
+      "start": 6.3,
+      "startOffset": 95,
+      "word": "to"
+    },
+    {
+      "alignedWord": "cherish",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.05,
+      "endOffset": 105,
+      "start": 6.45,
+      "startOffset": 98,
+      "word": "cherish"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 7.95,
+      "endOffset": 110,
+      "start": 7.83,
+      "startOffset": 107,
+      "word": "The"
+    },
+    {
+      "alignedWord": "plague",
+      "case": 1,
+      "conf": 1.0,
+      "end": 8.4,
+      "endOffset": 6,
+      "start": 7.95,
+      "startOffset": 0,
+      "word": "plague"
+    },
+    {
+      "alignedWord": "had",
+      "case": 1,
+      "conf": 1.0,
+      "end": 8.52,
+      "endOffset": 10,
+      "start": 8.4,
+      "startOffset": 7,
+      "word": "had"
+    },
+    {
+      "alignedWord": "not",
+      "case": 1,
+      "conf": 1.0,
+      "end": 8.67,
+      "endOffset": 14,
+      "start": 8.52,
+      "startOffset": 11,
+      "word": "not"
+    },
+    {
+      "alignedWord": "to",
+      "case": 1,
+      "conf": 1.0,
+      "end": 9.27,
+      "endOffset": 17,
+      "start": 9.18,
+      "startOffset": 15,
+      "word": "to"
+    },
+    {
+      "alignedWord": "him",
+      "case": 1,
+      "conf": 1.0,
+      "end": 9.6,
+      "endOffset": 21,
+      "start": 9.27,
+      "startOffset": 18,
+      "word": "him"
+    },
+    {
+      "alignedWord": "yet",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.44,
+      "endOffset": 26,
+      "start": 10.11,
+      "startOffset": 23,
+      "word": "yet"
+    },
+    {
+      "alignedWord": "had",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.8,
+      "endOffset": 30,
+      "start": 10.59,
+      "startOffset": 27,
+      "word": "had"
+    },
+    {
+      "alignedWord": "left",
+      "case": 1,
+      "conf": 1.0,
+      "end": 10.95,
+      "endOffset": 146,
+      "start": 10.68,
+      "startOffset": 142,
+      "word": "left"
+    },
+    {
+      "alignedWord": "him",
+      "case": 1,
+      "conf": 1.0,
+      "end": 11.13,
+      "endOffset": 150,
+      "start": 10.95,
+      "startOffset": 147,
+      "word": "him"
+    },
+    {
+      "alignedWord": "furry",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.0,
+      "endOffset": 156,
+      "start": 11.76,
+      "startOffset": 151,
+      "word": "furry"
+    },
+    {
+      "alignedWord": "thing",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.36,
+      "endOffset": 162,
+      "start": 12.0,
+      "startOffset": 157,
+      "word": "thing"
+    },
+    {
+      "alignedWord": "to",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.48,
+      "endOffset": 165,
+      "start": 12.36,
+      "startOffset": 163,
+      "word": "to"
+    },
+    {
+      "alignedWord": "mitigate",
+      "case": 1,
+      "conf": 1.0,
+      "end": 12.9,
+      "endOffset": 174,
+      "start": 12.48,
+      "startOffset": 166,
+      "word": "mitigate"
+    },
+    {
+      "alignedWord": "his",
+      "case": 1,
+      "conf": 1.0,
+      "end": 13.02,
+      "endOffset": 178,
+      "start": 12.9,
+      "startOffset": 175,
+      "word": "his"
+    },
+    {
+      "alignedWord": "sorrow",
+      "case": 1,
+      "conf": 1.0,
+      "end": 13.59,
+      "endOffset": 185,
+      "start": 13.02,
+      "startOffset": 179,
+      "word": "sorrow"
+    },
+    {
+      "alignedWord": "and",
+      "case": 1,
+      "conf": 1.0,
+      "end": 14.13,
+      "endOffset": 190,
+      "start": 13.95,
+      "startOffset": 187,
+      "word": "and"
+    },
+    {
+      "alignedWord": "when",
+      "case": 1,
+      "conf": 1.0,
+      "end": 14.28,
+      "endOffset": 195,
+      "start": 14.13,
+      "startOffset": 191,
+      "word": "when"
+    },
+    {
+      "alignedWord": "one",
+      "case": 1,
+      "conf": 1.0,
+      "end": 14.49,
+      "endOffset": 199,
+      "start": 14.28,
+      "startOffset": 196,
+      "word": "one"
+    },
+    {
+      "alignedWord": "one",
+      "case": 1,
+      "conf": 1.0,
+      "end": 15.75,
+      "endOffset": 204,
+      "start": 15.54,
+      "startOffset": 201,
+      "word": "one"
+    },
+    {
+      "alignedWord": "can",
+      "case": 1,
+      "conf": 1.0,
+      "end": 15.93,
+      "endOffset": 208,
+      "start": 15.75,
+      "startOffset": 205,
+      "word": "can"
+    },
+    {
+      "alignedWord": "find",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.23,
+      "endOffset": 213,
+      "start": 15.93,
+      "startOffset": 209,
+      "word": "find"
+    },
+    {
+      "alignedWord": "great",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.5,
+      "endOffset": 219,
+      "start": 16.23,
+      "startOffset": 214,
+      "word": "great"
+    },
+    {
+      "alignedWord": "relief",
+      "case": 1,
+      "conf": 1.0,
+      "end": 16.95,
+      "endOffset": 226,
+      "start": 16.5,
+      "startOffset": 220,
+      "word": "relief"
+    },
+    {
+      "alignedWord": "in",
+      "case": 1,
+      "conf": 1.0,
+      "end": 17.1,
+      "endOffset": 229,
+      "start": 16.98,
+      "startOffset": 227,
+      "word": "in"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 17.19,
+      "endOffset": 233,
+      "start": 17.1,
+      "startOffset": 230,
+      "word": "the"
+    },
+    {
+      "alignedWord": "lively",
+      "case": 1,
+      "conf": 1.0,
+      "end": 17.7,
+      "endOffset": 240,
+      "start": 17.19,
+      "startOffset": 234,
+      "word": "lively"
+    },
+    {
+      "alignedWord": "antics",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.21,
+      "endOffset": 247,
+      "start": 17.7,
+      "startOffset": 241,
+      "word": "antics"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 18.39,
+      "endOffset": 250,
+      "start": 18.24,
+      "startOffset": 248,
+      "word": "of"
+    },
+    {
+      "alignedWord": "so",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.22,
+      "endOffset": 254,
+      "start": 20.04,
+      "startOffset": 252,
+      "word": "So"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.34,
+      "endOffset": 258,
+      "start": 20.22,
+      "startOffset": 255,
+      "word": "the"
+    },
+    {
+      "alignedWord": "boy",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.67,
+      "endOffset": 262,
+      "start": 20.34,
+      "startOffset": 259,
+      "word": "boy"
+    },
+    {
+      "alignedWord": "whom",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.85,
+      "endOffset": 267,
+      "start": 20.67,
+      "startOffset": 263,
+      "word": "whom"
+    },
+    {
+      "alignedWord": "the",
+      "case": 1,
+      "conf": 1.0,
+      "end": 20.97,
+      "endOffset": 271,
+      "start": 20.85,
+      "startOffset": 268,
+      "word": "the"
+    },
+    {
+      "alignedWord": "dark",
+      "case": 1,
+      "conf": 1.0,
+      "end": 21.24,
+      "endOffset": 276,
+      "start": 20.97,
+      "startOffset": 272,
+      "word": "dark"
+    },
+    {
+      "alignedWord": "people",
+      "case": 1,
+      "conf": 1.0,
+      "end": 21.6,
+      "endOffset": 283,
+      "start": 21.24,
+      "startOffset": 277,
+      "word": "people"
+    },
+    {
+      "alignedWord": "called",
+      "case": 1,
+      "conf": 1.0,
+      "end": 21.84,
+      "endOffset": 290,
+      "start": 21.6,
+      "startOffset": 284,
+      "word": "called"
+    },
+    {
+      "alignedWord": "than",
+      "case": 1,
+      "conf": 1.0,
+      "end": 23.7,
+      "endOffset": 295,
+      "start": 23.55,
+      "startOffset": 291,
+      "word": "than"
+    },
+    {
+      "alignedWord": "he",
+      "case": 1,
+      "conf": 1.0,
+      "end": 23.82,
+      "endOffset": 298,
+      "start": 23.7,
+      "startOffset": 296,
+      "word": "he"
+    },
+    {
+      "alignedWord": "wept",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.21,
+      "endOffset": 303,
+      "start": 23.82,
+      "startOffset": 299,
+      "word": "wept"
+    },
+    {
+      "alignedWord": "as",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.78,
+      "endOffset": 306,
+      "start": 24.57,
+      "startOffset": 304,
+      "word": "as"
+    },
+    {
+      "alignedWord": "he",
+      "case": 1,
+      "conf": 1.0,
+      "end": 24.87,
+      "endOffset": 309,
+      "start": 24.78,
+      "startOffset": 307,
+      "word": "he"
+    },
+    {
+      "alignedWord": "sat",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.17,
+      "endOffset": 313,
+      "start": 24.87,
+      "startOffset": 310,
+      "word": "sat"
+    },
+    {
+      "alignedWord": "playing",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.59,
+      "endOffset": 321,
+      "start": 25.17,
+      "startOffset": 314,
+      "word": "playing"
+    },
+    {
+      "alignedWord": "with",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.74,
+      "endOffset": 326,
+      "start": 25.59,
+      "startOffset": 322,
+      "word": "with"
+    },
+    {
+      "alignedWord": "his",
+      "case": 1,
+      "conf": 1.0,
+      "end": 25.92,
+      "endOffset": 330,
+      "start": 25.74,
+      "startOffset": 327,
+      "word": "his"
+    },
+    {
+      "alignedWord": "steps",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.66,
+      "endOffset": 336,
+      "start": 27.24,
+      "startOffset": 331,
+      "word": "steps"
+    },
+    {
+      "alignedWord": "of",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.81,
+      "endOffset": 339,
+      "start": 27.66,
+      "startOffset": 337,
+      "word": "of"
+    },
+    {
+      "alignedWord": "an",
+      "case": 1,
+      "conf": 1.0,
+      "end": 27.93,
+      "endOffset": 342,
+      "start": 27.81,
+      "startOffset": 340,
+      "word": "an"
+    },
+    {
+      "alignedWord": "oddly",
+      "case": 1,
+      "conf": 1.0,
+      "end": 28.32,
+      "endOffset": 348,
+      "start": 27.96,
+      "startOffset": 343,
+      "word": "oddly"
+    },
+    {
+      "alignedWord": "painted",
+      "case": 1,
+      "conf": 1.0,
+      "end": 28.77,
+      "endOffset": 356,
+      "start": 28.32,
+      "startOffset": 349,
+      "word": "painted"
+    },
+    {
+      "alignedWord": "wagon",
+      "case": 1,
+      "conf": 1.0,
+      "end": 29.22,
+      "endOffset": 362,
+      "start": 28.77,
+      "startOffset": 357,
+      "word": "wagon"
+    }
+  ]
+}
