@@ -7,6 +7,7 @@ CUDA_ROOT?=/usr/local/cuda
 USE_SHARED?=0
 # Math libraries
 HAVE_OPENBLAS_CLAPACK?=1
+HAVE_OPENBLAS_NO_F2C?=0
 HAVE_MKL?=0
 HAVE_ACCELERATE=0
 HAVE_CUDA?=0
@@ -78,6 +79,18 @@ ifeq ($(HAVE_OPENBLAS_CLAPACK), 1)
             $(OPENBLAS_ROOT)/lib/libf2c.a
     else
         LDFLAGS += -lopenblas -llapack -lblas -lf2c
+    endif
+endif
+
+ifeq ($(HAVE_OPENBLAS_NO_F2C), 1)
+    CFLAGS += -I$(OPENBLAS_ROOT)/include
+    ifeq ($(USE_SHARED), 0)
+        LIBS += \
+            $(OPENBLAS_ROOT)/lib/libopenblas.a \
+            $(OPENBLAS_ROOT)/lib/liblapack.a \
+            $(OPENBLAS_ROOT)/lib/libblas.a
+    else
+        LDFLAGS += -lopenblas -llapack -lblas
     endif
 endif
 
