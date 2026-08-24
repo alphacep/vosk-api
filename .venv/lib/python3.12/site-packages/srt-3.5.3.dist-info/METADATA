@@ -1,0 +1,214 @@
+Metadata-Version: 2.4
+Name: srt
+Version: 3.5.3
+Summary: A tiny library for parsing, modifying, and composing SRT files.
+Home-page: https://github.com/cdown/srt
+Author: Chris Down
+Author-email: chris@chrisdown.name
+License: MIT
+Keywords: srt
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Multimedia :: Video
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Text Processing
+Requires-Python: >=2.7
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-python
+Dynamic: summary
+
+|ghactions| |coveralls|
+
+.. |ghactions| image:: https://img.shields.io/github/actions/workflow/status/cdown/srt/ci.yml?branch=develop
+  :target: https://github.com/cdown/srt/actions?query=branch%3Adevelop
+  :alt: Tests
+
+.. |coveralls| image:: https://img.shields.io/coveralls/cdown/srt/develop.svg?label=test%20coverage
+  :target: https://coveralls.io/github/cdown/srt?branch=develop
+  :alt: Coverage
+
+srt is a tiny but featureful Python library for parsing, modifying, and
+composing `SRT files`_. Take a look at the quickstart_ for a basic overview of
+the library. `Detailed API documentation`_ is also available.
+
+Want to see some examples of its use? Take a look at the `tools shipped with
+the library`_. This library is also used internally by projects like
+`subsync`_, `NVIDIA RAD-TTS`_, `manim`_, `kinobot`_, `bw_plex`_, and many more.
+
+.. _subsync: https://github.com/smacke/subsync
+.. _`NVIDIA RAD-TTS`: https://github.com/NVIDIA/radtts
+.. _bw_plex: https://github.com/Hellowlol/bw_plex
+.. _manim: https://github.com/ManimCommunity/manim
+.. _kinobot: https://github.com/vitiko98/kinobot
+
+Why choose this library?
+------------------------
+
+- Can parse many broken SRT files which other SRT libraries cannot, and fix them
+- Extremely lightweight, ~200 lines of code excluding docstrings
+- Simple, intuitive API
+- High quality test suite using Hypothesis_
+- `100% test coverage`_ (including branches)
+- `Well documented API`_, at both a high and low level
+- `~30% faster than pysrt on typical workloads`_
+- Full support for `PyPy`_
+- No dependencies outside of the standard library
+- Tolerant of many common errors found in real-world SRT files
+- Support for Asian-style SRT formats (ie. "fullwidth" SRT format)
+- Completely Unicode compliant
+- Released under a highly permissive license (MIT)
+- Real world tested — used in production to process thousands of SRT files
+  every day
+- Portable — runs on Linux, OSX, and Windows
+- Tools included — contains lightweight tools to perform generic tasks with the
+  library
+
+.. _quickstart: http://srt.readthedocs.org/en/latest/quickstart.html
+.. _`SRT files`: https://en.wikipedia.org/wiki/SubRip#SubRip_text_file_format
+.. _Hypothesis: https://github.com/DRMacIver/hypothesis
+.. _`100% test coverage`: https://coveralls.io/github/cdown/srt?branch=develop
+.. _`Well documented API`: http://srt.readthedocs.org/en/latest/index.html
+.. _PyPy: http://pypy.org/
+.. _`~30% faster than pysrt on typical workloads`: https://paste.pound-python.org/raw/8nQKbDW0ROWvS7bOeAb3/
+
+Usage
+-----
+
+Tools
+=====
+
+There are a number of `tools shipped with the library`_ to manipulate, process,
+and fix SRT files. Here's an example using `hanzidentifier`_ to strip out
+non-Chinese lines:
+
+.. code::
+
+    $ cat pe.srt
+    1
+    00:00:33,843 --> 00:00:38,097
+    Only 3% of the water on our planet is fresh.
+    地球上只有3%的水是淡水
+
+    2
+    00:00:40,641 --> 00:00:44,687
+    Yet, these precious waters are rich with surprise.
+    可是这些珍贵的淡水中却充满了惊奇
+
+    $ srt lines-matching -m hanzidentifier -f hanzidentifier.has_chinese -i pe.srt
+    1
+    00:00:33,843 --> 00:00:38,097
+    地球上只有3%的水是淡水
+
+    2
+    00:00:40,641 --> 00:00:44,687
+    可是这些珍贵的淡水中却充满了惊奇
+
+
+These tools are easy to chain together, for example, say you have one subtitle
+with Chinese and English, and other with French, but you want Chinese and
+French only. Oh, and the Chinese one is 5 seconds later than it should be.
+That's easy enough to sort out:
+
+.. code::
+
+   $ srt lines-matching -m hanzidentifier -f hanzidentifier.has_chinese -i chs+eng.srt |
+   >     srt fixed-timeshift --seconds -5 |
+   >     srt mux --input - --input fra.srt
+
+See the srt_tools/ directory for more information.
+
+.. _hanzidentifier: https://github.com/tsroten/hanzidentifier
+
+Library
+=======
+
+`Detailed API documentation`_ is available, but here are the basics.
+
+Here's how you convert SRT input to Subtitle objects which you can manipulate:
+
+.. code:: python
+
+    >>> data = '''\
+    1
+    00:00:33,843 --> 00:00:38,097
+    地球上只有3%的水是淡水
+
+    2
+    00:00:40,641 --> 00:00:44,687
+    可是这些珍贵的淡水中却充满了惊奇
+
+    3
+    00:00:57,908 --> 00:01:03,414
+    所有陆地生命归根结底都依赖於淡水
+
+    '''
+    >>> for sub in srt.parse(data):
+    ...     print(sub)
+    Subtitle(index=1, start=datetime.timedelta(seconds=33, microseconds=843000), end=datetime.timedelta(seconds=38, microseconds=97000), content='地球上只有3%的水是淡水', proprietary='')
+    Subtitle(index=2, start=datetime.timedelta(seconds=40, microseconds=641000), end=datetime.timedelta(seconds=44, microseconds=687000), content='可是这些珍贵的淡水中却充满了惊奇', proprietary='')
+    Subtitle(index=3, start=datetime.timedelta(seconds=57, microseconds=908000), end=datetime.timedelta(seconds=63, microseconds=414000), content='所有陆地生命归根结底都依赖於淡水', proprietary='')
+
+And here's how you go back from Subtitle objects to SRT output:
+
+.. code:: python
+
+    >>> subs = list(srt.parse(data))
+    >>> subs[1].content = "Changing subtitle data is easy!"
+    >>> print(srt.compose(subs))
+    1
+    00:00:33,843 --> 00:00:38,097
+    地球上只有3%的水是淡水
+
+    2
+    00:00:40,641 --> 00:00:44,687
+    Changing subtitle data is easy!
+
+    3
+    00:00:57,908 --> 00:01:03,414
+    所有陆地生命归根结底都依赖於淡水
+
+Installation
+------------
+
+To install the latest stable version from PyPi:
+
+.. code::
+
+    pip install -U srt
+
+To install the latest development version directly from GitHub:
+
+.. code::
+
+    pip install -U git+https://github.com/cdown/srt.git@develop
+
+Testing
+-------
+
+.. code::
+
+   tox
+
+.. _Tox: https://tox.readthedocs.org
+.. _`Detailed API documentation`: http://srt.readthedocs.org/en/latest/api.html
+.. _`tools shipped with the library`: https://github.com/cdown/srt/tree/develop/srt_tools
