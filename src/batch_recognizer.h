@@ -33,6 +33,7 @@ class BatchRecognizer {
         void AcceptWaveform(const char *data, int len);
         int GetNumPendingChunks();
         const char *FrontResult();
+        const char *PartialResult();
         void Pop();
         void FinishStream();
         void SetNLSML(bool nlsml);
@@ -48,6 +49,7 @@ class BatchRecognizer {
         bool nlsml_;
         float sample_frequency_;
         std::queue<std::string> results_;
+        std::string partial_result_;
         LinearResample *resampler_;
         kaldi::Vector<BaseFloat> buffer_;
 };
