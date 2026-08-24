@@ -179,7 +179,8 @@ class Transcriber:
                 fh.write(processed_result)
         else:
             print(processed_result)
-
+        if tot_samples == 0:
+            raise ValueError("Value of total samples is 0. Please check if input is an audio and try again")
         elapsed = timer() - start_time
         logging.info("Execution time: {:.3f} sec; "\
                 "xRT {:.3f}".format(elapsed, float(elapsed) * (2 * SAMPLE_RATE) / tot_samples))
