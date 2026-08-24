@@ -1,0 +1,50 @@
+Metadata-Version: 2.1
+Name: vosk
+Version: 0.3.44
+Summary: Offline open source speech recognition API based on Kaldi and Vosk
+Home-page: https://github.com/alphacep/vosk-api
+Author: Alpha Cephei Inc
+Author-email: contact@alphacephei.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3
+Description-Content-Type: text/markdown
+Requires-Dist: cffi (>=1.0)
+Requires-Dist: requests
+Requires-Dist: tqdm
+Requires-Dist: srt
+Requires-Dist: websockets
+
+This is a Python module for Vosk.
+
+Vosk is an offline open source speech recognition toolkit. It enables
+speech recognition for 20+ languages and dialects - English, Indian
+English, German, French, Spanish, Portuguese, Chinese, Russian, Turkish,
+Vietnamese, Italian, Dutch, Catalan, Arabic, Greek, Farsi, Filipino,
+Ukrainian, Kazakh, Swedish, Japanese, Esperanto, Hindi, Czech, Polish.
+More to come.
+
+Vosk models are small (50 Mb) but provide continuous large vocabulary
+transcription, zero-latency response with streaming API, reconfigurable
+vocabulary and speaker identification.
+
+Vosk supplies speech recognition for chatbots, smart home appliances,
+virtual assistants. It can also create subtitles for movies,
+transcription for lectures and interviews.
+
+Vosk scales from small devices like Raspberry Pi or Android smartphone to
+big clusters.
+
+# Documentation
+
+For installation instructions, examples and documentation visit [Vosk
+Website](https://alphacephei.com/vosk). See also our project on
+[Github](https://github.com/alphacep/vosk-api).
+
+
