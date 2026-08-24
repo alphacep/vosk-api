@@ -1,0 +1,12 @@
+# Core speech recognition
+vosk>=0.3.42
+
+# HTTP webhook + WebSocket server
+flask>=3.0.0
+flask-sock>=0.7.0
+
+# Production WSGI/ASGI server (recommended over flask dev server)
+gunicorn>=22.0.0
+
+# audioop is built-in on Python <=3.12; on Python 3.13+ install the drop-in replacement:
+# audioop-lts>=0.2.1
