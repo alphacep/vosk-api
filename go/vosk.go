@@ -125,6 +125,11 @@ func (r *VoskRecognizer) SetPartialWords(words int) {
 	C.vosk_recognizer_set_partial_words(r.rec, C.int(words))
 }
 
+// SetNlsml enables NLSML output instead of JSON.
+func (r *VoskRecognizer) SetNlsml(nlsml int) {
+	C.vosk_recognizer_set_nlsml(r.rec, C.int(nlsml))
+}
+
 // SetEndpointerDelays sets the recognition timeouts, where startMax
 // is the timeout for stopping recognition in case of initial silence
 // (usually around 5), end is the timeout for stopping recognition
