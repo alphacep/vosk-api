@@ -32,6 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 	rec.SetWords(1)
+	rec.SetEndpointerMode(vosk.EndpointerModeDefault)
 
 	file, err := os.Open(filename)
 	if err != nil {
