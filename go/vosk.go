@@ -125,6 +125,24 @@ func (r *VoskRecognizer) SetPartialWords(words int) {
 	C.vosk_recognizer_set_partial_words(r.rec, C.int(words))
 }
 
+// EndpointerMode controls how aggressively the endpointer decides
+// that an utterance has ended.
+type EndpointerMode int
+
+const (
+	EndpointerModeDefault EndpointerMode = iota
+	EndpointerModeShort
+	EndpointerModeLong
+	EndpointerModeVeryLong
+)
+
+// SetEndpointerMode sets the endpointer mode, trading off latency
+// against how much silence is tolerated before an utterance is
+// considered finished.
+func (r *VoskRecognizer) SetEndpointerMode(mode EndpointerMode) {
+	C.vosk_recognizer_set_endpointer_mode(r.rec, C.VoskEndpointerMode(mode))
+}
+
 // SetEndpointerDelays sets the recognition timeouts, where startMax
 // is the timeout for stopping recognition in case of initial silence
 // (usually around 5), end is the timeout for stopping recognition
