@@ -8,8 +8,8 @@ import enum
 import requests
 from urllib.request import urlretrieve
 from zipfile import ZipFile
-from re import match
 from pathlib import Path
+from .model_names import model_name_matches_lang
 from .vosk_cffi import ffi as _ffi
 from tqdm import tqdm
 
@@ -94,7 +94,7 @@ class Model:
                 continue
             model_file_list = os.listdir(directory)
             model_file = [model for model in model_file_list if
-                    match(r"vosk-model(-small)?-{}".format(lang), model)]
+                    model_name_matches_lang(model, lang)]
             if model_file != []:
                 return Path(directory, model_file[0])
         response = requests.get(MODEL_LIST_URL, timeout=10)
