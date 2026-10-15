@@ -118,9 +118,9 @@ class Transcriber:
         return stream
 
     async def resample_ffmpeg_async(self, infile):
-        cmd = "ffmpeg -nostdin -loglevel quiet "\
-        "-i \'{}\' -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE)
-        return await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)
+        cmd = shlex.split("ffmpeg -nostdin -loglevel quiet "
+                "-i {} -ar {} -ac 1 -f s16le -".format(shlex.quote(str(infile)), SAMPLE_RATE))
+        return await asyncio.create_subprocess_exec(*cmd, stdout=subprocess.PIPE)
 
     async def server_worker(self):
         while True:
