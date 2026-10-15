@@ -371,8 +371,21 @@ class JSON
                 }
                 case Class::String:
                     return "\"" + json_escape( *Internal.String ) + "\"";
-                case Class::Floating:
-                    return std::to_string( Internal.Float );
+                case Class::Floating: {
+                    string s = std::to_string( Internal.Float );
+                    // std::to_string() honors LC_NUMERIC: with a comma decimal
+                    // separator locale (de_DE, fr_FR, ...) it emits "0,942670",
+                    // which is invalid JSON (issue #808). The "%f" format never
+                    // emits thousands separators, so the decimal point is the
+                    // only ',' that can occur: rewrite it to '.' (no-op for
+                    // dot-separated locales). Direct char assignment is used
+                    // on purpose - the count argument of str.replace(pos,
+                    // count, ...) is easy to get wrong (see abandoned PR #1055).
+                    size_t sep = s.find( ',' );
+                    if( sep != string::npos )
+                        s[sep] = '.';
+                    return s;
+                }
                 case Class::Integral:
                     return std::to_string( Internal.Int );
                 case Class::Boolean:
