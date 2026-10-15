@@ -8,7 +8,7 @@ import os
 import requests
 from pathlib import Path
 from vosk import list_models, list_languages, MODEL_LIST_URL
-from vosk.transcriber.transcriber import Transcriber
+from vosk.transcriber.transcriber import STDIN_ARG, Transcriber
 
 parser = argparse.ArgumentParser(
         description = "Transcribe audio file and save result in selected format")
@@ -32,7 +32,7 @@ parser.add_argument(
         help="select model by language")
 parser.add_argument(
         "--input", "-i", type=str,
-        help="audiofile")
+        help="audiofile, or - to read from stdin")
 parser.add_argument(
         "--output", "-o", default="", type=str,
         help="optional output filename path")
@@ -76,14 +76,16 @@ def main():
         logging.info("Please specify input file or directory")
         sys.exit(1)
 
-    if not Path(args.input).exists():
-        logging.info("File/folder {args.input} does not exist, "\
-            "please specify an existing file/directory")
+    if args.input != STDIN_ARG and not Path(args.input).exists():
+        logging.info("File/folder {} does not exist, "\
+            "please specify an existing file/directory".format(args.input))
         sys.exit(1)
 
     transcriber = Transcriber(args)
 
-    if Path(args.input).is_dir():
+    if args.input == STDIN_ARG:
+        task_list = [(STDIN_ARG, args.output)]
+    elif Path(args.input).is_dir():
         task_list = [(Path(args.input, fn),
             Path(args.output,
             Path(fn).stem).with_suffix("." + args.output_type)) for fn in os.listdir(args.input)]

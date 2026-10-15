@@ -15,6 +15,15 @@ from multiprocessing.dummy import Pool
 CHUNK_SIZE = 4000
 SAMPLE_RATE = 16000.0
 
+# Passed as --input to read the audio stream from stdin, the same spelling
+# ffmpeg and whisper use.
+STDIN_ARG = "-"
+
+
+def ffmpeg_input(infile):
+    """The ffmpeg input URL for a task, or stdin when the task is STDIN_ARG."""
+    return "pipe:0" if str(infile) == STDIN_ARG else str(infile)
+
 class Transcriber:
 
     def __init__(self, args):
@@ -113,13 +122,13 @@ class Transcriber:
 
     def resample_ffmpeg(self, infile):
         cmd = shlex.split("ffmpeg -nostdin -loglevel quiet "
-                "-i \'{}\' -ar {} -ac 1 -f s16le -".format(str(infile), SAMPLE_RATE))
+                "-i \'{}\' -ar {} -ac 1 -f s16le -".format(ffmpeg_input(infile), SAMPLE_RATE))
         stream = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         return stream
 
     async def resample_ffmpeg_async(self, infile):
         cmd = shlex.split("ffmpeg -nostdin -loglevel quiet "
-                "-i {} -ar {} -ac 1 -f s16le -".format(shlex.quote(str(infile)), SAMPLE_RATE))
+                "-i {} -ar {} -ac 1 -f s16le -".format(shlex.quote(str(ffmpeg_input(infile))), SAMPLE_RATE))
         return await asyncio.create_subprocess_exec(*cmd, stdout=subprocess.PIPE)
 
     async def server_worker(self):
