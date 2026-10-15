@@ -5,8 +5,9 @@ import logging
 import sys
 import os
 
+import requests
 from pathlib import Path
-from vosk import list_models, list_languages
+from vosk import list_models, list_languages, MODEL_LIST_URL
 from vosk.transcriber.transcriber import Transcriber
 
 parser = argparse.ArgumentParser(
@@ -58,6 +59,18 @@ def main():
     if args.list_languages is True:
         list_languages()
         return
+
+    if args.model is None:
+        try:
+            response = requests.get(MODEL_LIST_URL, timeout=10)
+            languages = {model["lang"] for model in response.json()}
+        except requests.RequestException:
+            languages = None
+        if languages is not None and args.lang not in languages:
+            logging.info("Invalid language '%s' requested. "
+                "Run 'vosk-transcriber --list-languages' to see the list of "
+                "supported languages" % args.lang)
+            sys.exit(1)
 
     if not args.input:
         logging.info("Please specify input file or directory")
