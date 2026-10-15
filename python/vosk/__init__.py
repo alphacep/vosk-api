@@ -8,7 +8,7 @@ import enum
 import requests
 from urllib.request import urlretrieve
 from zipfile import ZipFile
-from re import match
+from re import escape, match
 from pathlib import Path
 from .vosk_cffi import ffi as _ffi
 from tqdm import tqdm
@@ -58,7 +58,7 @@ class Model:
             raise Exception("Failed to create a model")
 
     def __del__(self):
-        if _c is not None:
+        if _c is not None and hasattr(self, "_handle"):
             _c.vosk_model_free(self._handle)
 
     def vosk_model_find_word(self, word):
@@ -82,8 +82,7 @@ class Model:
         response = requests.get(MODEL_LIST_URL, timeout=10)
         result_model = [model["name"] for model in response.json() if model["name"] == model_name]
         if result_model == []:
-            print("model name %s does not exist" % (model_name))
-            sys.exit(1)
+            raise ValueError("model name %s does not exist" % (model_name))
         else:
             self.download_model(Path(directory, result_model[0]))
             return Path(directory, result_model[0])
@@ -94,15 +93,14 @@ class Model:
                 continue
             model_file_list = os.listdir(directory)
             model_file = [model for model in model_file_list if
-                    match(r"vosk-model(-small)?-{}".format(lang), model)]
+                    match(r"vosk-model(-small)?-{}".format(escape(lang)), model)]
             if model_file != []:
                 return Path(directory, model_file[0])
         response = requests.get(MODEL_LIST_URL, timeout=10)
         result_model = [model["name"] for model in response.json() if
                 model["lang"] == lang and model["type"] == "small" and model["obsolete"] == "false"]
         if result_model == []:
-            print("lang %s does not exist" % (lang))
-            sys.exit(1)
+            raise ValueError("lang %s does not exist" % (lang))
         else:
             self.download_model(Path(directory, result_model[0]))
             return Path(directory, result_model[0])
@@ -140,7 +138,8 @@ class SpkModel:
             raise Exception("Failed to create a speaker model")
 
     def __del__(self):
-        _c.vosk_spk_model_free(self._handle)
+        if hasattr(self, "_handle"):
+            _c.vosk_spk_model_free(self._handle)
 
 class EndpointerMode(enum.Enum):
     DEFAULT = 0
@@ -166,7 +165,8 @@ class KaldiRecognizer:
             raise Exception("Failed to create a recognizer")
 
     def __del__(self):
-        _c.vosk_recognizer_free(self._handle)
+        if hasattr(self, "_handle"):
+            _c.vosk_recognizer_free(self._handle)
 
     def SetMaxAlternatives(self, max_alternatives):
         _c.vosk_recognizer_set_max_alternatives(self._handle, max_alternatives)
