@@ -6,9 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import com.sun.jna.Platform;
 import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Assume;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -105,6 +110,24 @@ public class DecoderTest {
             recognizer.setEndpointerDelays(5.0f, 3.0f, 50.0f);
 	}
         Assert.assertTrue(true);
+    }
+
+    @Test
+    public void decoderTestNonAsciiPath() throws IOException {
+        Assume.assumeFalse(Platform.isWindows());
+        Path dir = Files.createTempDirectory("vosk");
+        Path link = dir.resolve("\u6a21\u578b");
+        try {
+            try {
+                Files.createSymbolicLink(link, Paths.get("model").toAbsolutePath());
+            } catch (IOException | UnsupportedOperationException e) {
+                Assume.assumeNoException(e);
+            }
+            new Model(link.toString()).close();
+        } finally {
+            Files.deleteIfExists(link);
+            Files.delete(dir);
+        }
     }
 
     @Test(expected = IOException.class)

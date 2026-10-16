@@ -1,6 +1,8 @@
 package org.vosk;
 
+import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import java.io.File;
@@ -8,6 +10,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LibVosk {
 
@@ -15,6 +19,19 @@ public class LibVosk {
         try (InputStream source = LibVosk.class.getResourceAsStream("/win32-x86-64/" + lib + ".dll")) {
             Files.copy(source, new File(targetDir, lib + ".dll").toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
+    }
+
+    private static void register(String lib) {
+        // The library uses UTF-8, JNA defaults to the platform charset
+        Map<String, Object> options = new HashMap<>();
+        options.put(Library.OPTION_CLASSLOADER, LibVosk.class.getClassLoader());
+        options.put(Library.OPTION_STRING_ENCODING, "UTF-8");
+        Native.register(LibVosk.class, NativeLibrary.getInstance(lib, options));
+    }
+
+    private static byte[] pathBytes(String path) {
+        // Windows opens files with the ANSI code page, elsewhere paths are UTF-8
+        return Native.toByteArray(path, Platform.isWindows() ? Native.getDefaultStringEncoding() : "UTF-8");
     }
 
     static {
@@ -35,20 +52,28 @@ public class LibVosk {
             } catch (IOException e) {
                 // Nothing for now, it will fail on next step
             } finally {
-                Native.register(LibVosk.class, "libvosk");
+                register("libvosk");
             }
         } else {
-            Native.register(LibVosk.class, "vosk");
+            register("vosk");
         }
     }
 
     public static native void vosk_set_log_level(int level);
 
-    public static native Pointer vosk_model_new(String path);
+    public static Pointer vosk_model_new(String path) {
+        return vosk_model_new(pathBytes(path));
+    }
+
+    private static native Pointer vosk_model_new(byte[] path);
 
     public static native void vosk_model_free(Pointer model);
 
-    public static native Pointer vosk_spk_model_new(String path);
+    public static Pointer vosk_spk_model_new(String path) {
+        return vosk_spk_model_new(pathBytes(path));
+    }
+
+    private static native Pointer vosk_spk_model_new(byte[] path);
 
     public static native void vosk_spk_model_free(Pointer model);
 
@@ -88,7 +113,11 @@ public class LibVosk {
 
     public static native void vosk_recognizer_free(Pointer recognizer);
 
-    public static native Pointer vosk_text_processor_new(String verbalizer, String tagger);
+    public static Pointer vosk_text_processor_new(String verbalizer, String tagger) {
+        return vosk_text_processor_new(pathBytes(verbalizer), pathBytes(tagger));
+    }
+
+    private static native Pointer vosk_text_processor_new(byte[] verbalizer, byte[] tagger);
 
     public static native void vosk_text_processor_free(Pointer processor);
 

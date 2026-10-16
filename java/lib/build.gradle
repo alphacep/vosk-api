@@ -62,6 +62,8 @@ publishing {
 
 test {
     dependsOn cleanTest
+    // Simulate a platform charset that is not UTF-8, JNA reads this when LibVosk loads
+    systemProperty 'jna.encoding', 'ISO-8859-1'
     testLogging.showStandardStreams = true
 }
 
