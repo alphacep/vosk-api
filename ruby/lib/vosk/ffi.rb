@@ -168,10 +168,6 @@ module Vosk
     if Gem::Version.new(VERSION) >= Gem::Version.new("0.3.48")
       attach_function :vosk_text_processor_new, [:string, :string], VoskTextProcessor
       attach_function :vosk_text_processor_free, [VoskTextProcessor], :void
-      # NOTE: you have a memory leak here in your python version, needs to be
-      # ptr = _c.vosk_text_processor_itn(self._handle, text.encode('utf-8'))
-      # str = _ffi.string(ptr).decode('utf-8')
-      #  _ffi.gc(ptr, _c.free)  # or call libc free directly
       attach_function :vosk_text_processor_itn, [VoskTextProcessor, :string], :owned_string
     end
   end

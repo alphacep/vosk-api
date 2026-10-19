@@ -232,7 +232,7 @@ VoskBatchModel *vosk_batch_model_new(const char *model_path)
 void vosk_batch_model_free(VoskBatchModel *model)
 {
 #if HAVE_CUDA
-    delete ((BatchModel *)model);
+    ((BatchModel *)model)->Unref();
 #endif
 }
 

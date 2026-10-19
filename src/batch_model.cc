@@ -111,6 +111,7 @@ BatchModel::BatchModel(const char *model_path) : model_path_str_(model_path) {
 
     samples_per_chunk_ = cuda_pipeline_->GetNSampsPerChunk();
     last_id_ = 0;
+    ref_cnt_ = 1;
 }
 
 uint64_t BatchModel::GetID(BatchRecognizer *recognizer) {
@@ -127,6 +128,19 @@ BatchModel::~BatchModel() {
 
     delete cuda_pipeline_;
     delete dynamic_batcher_;
+}
+
+void BatchModel::Ref()
+{
+    std::atomic_fetch_add_explicit(&ref_cnt_, 1, std::memory_order_relaxed);
+}
+
+void BatchModel::Unref()
+{
+    if (std::atomic_fetch_sub_explicit(&ref_cnt_, 1, std::memory_order_release) == 1) {
+        std::atomic_thread_fence(std::memory_order_acquire);
+        delete this;
+    }
 }
 
 void BatchModel::WaitForCompletion()
