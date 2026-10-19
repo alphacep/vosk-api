@@ -13,7 +13,19 @@ add_library(vosk
   src/postprocessor.cc
 )
 
-find_package(kaldi REQUIRED)
+if(BuildForFedora)
+    # Version used used by Fedora 41 is 1.83
+    # TODO: Detect the right version and put it here.
+    add_definitions(-DOPENFST_VER=18300)
+    find_package(kaldi REQUIRED)
+
+    # Small Hack for FindKaldi that does not provide the include directory
+    set(kaldi_INCLUDE_DIRS "${kaldi_DIR}/../../../include")
+    target_include_directories(vosk PUBLIC ${kaldi_INCLUDE_DIRS} "${kaldi_DIR}/../../../include/kaldi")
+
+    include_directories(/usr/include)
+endif()
+
 target_link_libraries(vosk PUBLIC kaldi-base kaldi-online2 kaldi-rnnlm fstngram)
 
 include(GNUInstallDirs)
